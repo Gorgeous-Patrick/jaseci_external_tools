@@ -62,7 +62,9 @@ def plot_hit_rates(
     plt.xlabel("Number of Following")
     plt.ylabel("Hit Rate")
     plt.title("Cache Hit Rate vs Edge Count")
-    plt.gca().yaxis.set_major_formatter(PercentFormatter(1.0))
+    ax = plt.gca()
+    ax.yaxis.set_major_formatter(PercentFormatter(1.0))
+    ax.set_ylim(bottom=0)
     plt.grid(True)
     plt.legend()
 
