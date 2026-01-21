@@ -36,19 +36,28 @@ def compute_hit_rate_by_edge(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def plot_hit_rates(
-    hit_df: pd.DataFrame,
+    enabled_df: pd.DataFrame,
+    disabled_df: pd.DataFrame | None = None,
     figsize=(10, 6),
     save_path: str | None = "cache_hit_rate.png",
 ):
-    """Plot hit rate vs edge count."""
+    """Plot hit rate vs edge count for both cache modes."""
 
     plt.figure(figsize=figsize)
     plt.plot(
-        hit_df["JAC_EDGE_NUM"],
-        hit_df["avg_hit_rate"],
-        label="Cache Hit Rate",
+        enabled_df["JAC_EDGE_NUM"],
+        enabled_df["avg_hit_rate"],
+        label="TTG-prefetch enabled",
         marker="o",
     )
+
+    if disabled_df is not None:
+        plt.plot(
+            disabled_df["JAC_EDGE_NUM"],
+            disabled_df["avg_hit_rate"],
+            label="prefetch disabled",
+            marker="o",
+        )
 
     plt.xlabel("Number of Edges")
     plt.ylabel("Hit Rate")
@@ -65,13 +74,40 @@ def plot_hit_rates(
         plt.show()
 
 
+def resolve_dataset(label: str, candidates: list[Path], required: bool) -> Path | None:
+    """Return the first existing candidate path for a dataset."""
+
+    for path in candidates:
+        if path.exists():
+            return path
+
+    if required:
+        cand_str = ", ".join(str(p) for p in candidates)
+        raise FileNotFoundError(f"Could not find {label}. Checked: {cand_str}")
+
+    return None
+
+
 if __name__ == "__main__":
-    stats_path = Path("cache_stats.json")
+    enabled_candidates = [
+        Path("cache_stats_TTG-prefetch_enabled.json"),
+        Path("cache_stats_prefetch_enabled.json"),
+        Path("cache_stats.json"),
+        Path("new/cache_stats.json"),
+    ]
 
-    if not stats_path.exists():
-        raise FileNotFoundError("Expected cache_stats.json in the current directory.")
+    disabled_candidates = [
+        Path("cache_stats_prefetch_disabled.json"),
+        Path("cache_stats_prefetch_disabled_old.json"),
+        Path("old/cache_stats.json"),
+    ]
 
-    cache_df = load_cache_stats(stats_path)
-    cache_df = compute_hit_rate_by_edge(cache_df)
+    enabled_path = resolve_dataset("TTG-prefetch enabled metrics", enabled_candidates, required=True)
+    disabled_path = resolve_dataset("prefetch disabled metrics", disabled_candidates, required=False)
 
-    plot_hit_rates(cache_df)
+    enabled_df = compute_hit_rate_by_edge(load_cache_stats(enabled_path))
+    disabled_df = None
+    if disabled_path is not None:
+        disabled_df = compute_hit_rate_by_edge(load_cache_stats(disabled_path))
+
+    plot_hit_rates(enabled_df, disabled_df)
