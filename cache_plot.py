@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-from matplotlib.ticker import PercentFormatter
 import pandas as pd
+from matplotlib.ticker import PercentFormatter
 
 
 def load_cache_stats(path: str | Path) -> pd.DataFrame:
@@ -18,55 +18,46 @@ def load_cache_stats(path: str | Path) -> pd.DataFrame:
     return df
 
 
-def compute_hit_rate_by_edge(df: pd.DataFrame) -> pd.DataFrame:
-    """Group cache stats by edge count to obtain average hit rates."""
+def aggregate_hit_rates(df: pd.DataFrame) -> pd.DataFrame:
+    """Aggregate hit rates per edge count for each cache/prefetch setting."""
 
     grouped = (
-        df.groupby("JAC_EDGE_NUM")
-        .agg(
-            avg_hit_rate=("hit_rate", "mean"),
-            total_hits=("hit", "sum"),
-            total_attempts=("total_acc", "sum"),
-        )
-        .reset_index()
+        df.groupby(["cache_size", "jac_prefetch", "JAC_EDGE_NUM"], as_index=False)
+        .agg(hit=("hit", "sum"), total_acc=("total_acc", "sum"))
         .sort_values("JAC_EDGE_NUM")
     )
 
+    grouped["hit_rate"] = grouped["hit"] / grouped["total_acc"].replace({0: pd.NA})
+    grouped["hit_rate"] = grouped["hit_rate"].fillna(0)
     return grouped
 
 
-def plot_hit_rates(
-    enabled_df: pd.DataFrame,
-    disabled_df: pd.DataFrame | None = None,
+def plot_hit_rate_curves(
+    aggregated_df: pd.DataFrame,
     figsize=(10, 6),
     save_path: str | None = "cache_hit_rate.png",
 ):
-    """Plot hit rate vs edge count for both cache modes."""
+    """Plot hit rate vs edge count for each (cache_size, jac_prefetch) tuple."""
 
     plt.figure(figsize=figsize)
-    plt.plot(
-        enabled_df["JAC_EDGE_NUM"],
-        enabled_df["avg_hit_rate"],
-        label="TTG-prefetch enabled",
-        marker="o",
-    )
-
-    if disabled_df is not None:
+    for (cache_size, jac_prefetch), subset in aggregated_df.groupby(["cache_size", "jac_prefetch"]):
+        ordered = subset.sort_values("JAC_EDGE_NUM")
+        label = f"cache={cache_size}, prefetch={jac_prefetch}"
         plt.plot(
-            disabled_df["JAC_EDGE_NUM"],
-            disabled_df["avg_hit_rate"],
-            label="prefetch disabled",
+            ordered["JAC_EDGE_NUM"],
+            ordered["hit_rate"],
             marker="o",
+            label=label,
         )
 
-    plt.xlabel("Number of Following")
+    plt.xlabel("Edge Count (JAC_EDGE_NUM)")
     plt.ylabel("Hit Rate")
     plt.title("Cache Hit Rate vs Edge Count")
     ax = plt.gca()
     ax.yaxis.set_major_formatter(PercentFormatter(1.0))
     ax.set_ylim(bottom=0)
     plt.grid(True)
-    plt.legend()
+    plt.legend(title="cache_size / jac_prefetch")
 
     if save_path:
         plt.savefig(save_path, dpi=300)
@@ -76,40 +67,14 @@ def plot_hit_rates(
         plt.show()
 
 
-def resolve_dataset(label: str, candidates: list[Path], required: bool) -> Path | None:
-    """Return the first existing candidate path for a dataset."""
+def main() -> None:
+    dataset_path = Path("cache_stats.json")
+    if not dataset_path.exists():
+        raise FileNotFoundError("Could not find cache_stats.json in the current directory")
 
-    for path in candidates:
-        if path.exists():
-            return path
-
-    if required:
-        cand_str = ", ".join(str(p) for p in candidates)
-        raise FileNotFoundError(f"Could not find {label}. Checked: {cand_str}")
-
-    return None
+    aggregated_df = aggregate_hit_rates(load_cache_stats(dataset_path))
+    plot_hit_rate_curves(aggregated_df)
 
 
 if __name__ == "__main__":
-    enabled_candidates = [
-        Path("cache_stats_TTG-prefetch_enabled.json"),
-        Path("cache_stats_prefetch_enabled.json"),
-        Path("cache_stats.json"),
-        Path("new/cache_stats.json"),
-    ]
-
-    disabled_candidates = [
-        Path("cache_stats_prefetch_disabled.json"),
-        Path("cache_stats_prefetch_disabled_old.json"),
-        Path("old/cache_stats.json"),
-    ]
-
-    enabled_path = resolve_dataset("TTG-prefetch enabled metrics", enabled_candidates, required=True)
-    disabled_path = resolve_dataset("prefetch disabled metrics", disabled_candidates, required=False)
-
-    enabled_df = compute_hit_rate_by_edge(load_cache_stats(enabled_path))
-    disabled_df = None
-    if disabled_path is not None:
-        disabled_df = compute_hit_rate_by_edge(load_cache_stats(disabled_path))
-
-    plot_hit_rates(enabled_df, disabled_df)
+    main()
