@@ -57,10 +57,10 @@ def plot_hit_rate_curves(
     ax.yaxis.set_major_formatter(PercentFormatter(1.0))
     ax.set_ylim(bottom=0)
     plt.grid(True)
-    plt.legend(title="cache_size / jac_prefetch")
+    plt.legend(title="cache_size / jac_prefetch", bbox_to_anchor=(1.05, 1), loc='upper left')
 
     if save_path:
-        plt.savefig(save_path, dpi=300)
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
         plt.close()
         print(f"Saved plot to {save_path}")
     else:
