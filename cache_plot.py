@@ -40,13 +40,22 @@ def plot_hit_rate_curves(
     """Plot hit rate vs edge count for each (cache_size, jac_prefetch) tuple."""
 
     plt.figure(figsize=figsize)
+    
+    # Get unique cache sizes and assign colors
+    cache_sizes = sorted(aggregated_df["cache_size"].unique())
+    colors = plt.cm.tab10(range(len(cache_sizes)))
+    color_map = {size: colors[i] for i, size in enumerate(cache_sizes)}
+    
     for (cache_size, jac_prefetch), subset in aggregated_df.groupby(["cache_size", "jac_prefetch"]):
         ordered = subset.sort_values("JAC_EDGE_NUM")
-        label = f"cache={cache_size}, prefetch={jac_prefetch}"
+        marker = "^" if jac_prefetch != 0 else "o"
+        prefetch_status = "enabled" if jac_prefetch != 0 else "disabled"
+        label = f"cache={cache_size}, prefetch {prefetch_status}"
         plt.plot(
             ordered["JAC_EDGE_NUM"],
             ordered["hit_rate"],
-            marker="o",
+            marker=marker,
+            color=color_map[cache_size],
             label=label,
         )
 
