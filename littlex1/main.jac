@@ -19,7 +19,7 @@ walker LoadFeed {
         if (self.visited >= 100) {
             return;
         }
-        print(f"{root.__jac__.id}");
+        print(f"{here.__jac__.id}");
         if (not self.visiting_neighbors) {
             self.visiting_neighbors = True;
             visit [->:Follow:->];
