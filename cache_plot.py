@@ -1,3 +1,4 @@
+import argparse
 import json
 from pathlib import Path
 
@@ -14,6 +15,11 @@ def load_cache_stats(path: str | Path) -> pd.DataFrame:
         data = json.load(f)
 
     df = pd.DataFrame(data)
+    # Keep only the last occurrence for duplicate configurations
+    df = df.drop_duplicates(
+        subset=["JAC_NODE_NUM", "JAC_EDGE_NUM", "JAC_TWEET_NUM", "jac_prefetch", "cache_size"],
+        keep="last"
+    )
     df["hit_rate"] = df["hit"] / df["total_acc"]
     return df
 
@@ -77,12 +83,26 @@ def plot_hit_rate_curves(
 
 
 def main() -> None:
-    dataset_path = Path("cache_stats.json")
+    parser = argparse.ArgumentParser(description="Plot cache hit rates from JSON data")
+    parser.add_argument(
+        "cache_stats_path",
+        nargs="?",
+        default="cache_stats.json",
+        help="Path to cache_stats.json file (default: cache_stats.json)"
+    )
+    parser.add_argument(
+        "-o", "--output",
+        default="cache_hit_rate.png",
+        help="Output path for the plot (default: cache_hit_rate.png)"
+    )
+    args = parser.parse_args()
+    
+    dataset_path = Path(args.cache_stats_path)
     if not dataset_path.exists():
-        raise FileNotFoundError("Could not find cache_stats.json in the current directory")
+        raise FileNotFoundError(f"Could not find {dataset_path}")
 
     aggregated_df = aggregate_hit_rates(load_cache_stats(dataset_path))
-    plot_hit_rate_curves(aggregated_df)
+    plot_hit_rate_curves(aggregated_df, save_path=args.output)
 
 
 if __name__ == "__main__":
