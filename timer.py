@@ -7,19 +7,37 @@ import pandas as pd
 from matplotlib.patches import Patch
 
 
-def load_timer_stats(path: str | Path) -> pd.DataFrame:
-    """Load timer stats JSON and keep only last occurrence for each configuration."""
+def load_timer_stats(path: str | Path, use_avg: bool = False) -> pd.DataFrame:
+    """Load timer stats JSON and keep only last occurrence for each configuration, or average if use_avg=True."""
 
     path = Path(path)
     with path.open("r") as f:
         data = json.load(f)
 
     df = pd.DataFrame(data)
-    # Keep only the last occurrence for duplicate configurations
-    df = df.drop_duplicates(
-        subset=["JAC_NODE_NUM", "JAC_EDGE_NUM", "JAC_TWEET_NUM", "jac_prefetch"],
-        keep="last"
-    )
+    
+    if use_avg:
+        # Take average for each configuration
+        df = df.groupby(
+            ["JAC_NODE_NUM", "JAC_EDGE_NUM", "JAC_TWEET_NUM", "jac_prefetch"],
+            as_index=False
+        ).agg({
+            "simulated": "first",
+            "hit": "mean",
+            "total_acc": "mean",
+            "cache_size": "first",
+            "ttg_generation_time": "mean",
+            "prefetch_time": "mean",
+            "traversal_time": "mean",
+            "memory_get_time": "mean",
+            "memory_get_count": "mean",
+        })
+    else:
+        # Keep only the last occurrence for duplicate configurations
+        df = df.drop_duplicates(
+            subset=["JAC_NODE_NUM", "JAC_EDGE_NUM", "JAC_TWEET_NUM", "jac_prefetch"],
+            keep="last"
+        )
     return df
 
 
@@ -179,13 +197,18 @@ def main() -> None:
         action="store_true",
         help="Only plot memory_get_time (ignores other hide flags)"
     )
+    parser.add_argument(
+        "--avg",
+        action="store_true",
+        help="Take average for each test case instead of using last data point"
+    )
     args = parser.parse_args()
     
     dataset_path = Path(args.cache_stats_path)
     if not dataset_path.exists():
         raise FileNotFoundError(f"Could not find {dataset_path}")
 
-    df = load_timer_stats(dataset_path)
+    df = load_timer_stats(dataset_path, use_avg=args.avg)
     plot_time_bars(df, save_path=args.output, hide_prefetch=args.hide_prefetch, hide_ttg=args.hide_ttg, only_memory=args.only_memory)
 
 
