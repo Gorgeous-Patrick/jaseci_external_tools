@@ -125,34 +125,34 @@ def plot_time_bars(
                 )
     
     plt.xlabel("Edge Count (JAC_EDGE_NUM)")
-    plt.ylabel("Total Time (seconds)")
-    plt.title("Total Execution Time vs Edge Count")
+    
+    if only_memory:
+        y_label = "Memory Get Time (seconds)"
+        title = "Memory Get Time vs Edge Count"
+    else:
+        y_label = "Walker Execution Time (seconds)"
+        title = "Walker Execution Time vs Edge Count"
+    
+    plt.ylabel(y_label)
+    plt.title(title)
     plt.xticks(x, edge_nums)
     ax = plt.gca()
     ax.set_ylim(bottom=0)
     plt.grid(True, axis='y', alpha=0.3)
     
-    # Create custom legend with both configuration and time component info
     handles, labels = ax.get_legend_handles_labels()
     
     if only_memory:
-        # Only show memory time legend
-        time_handles = [
-            Patch(facecolor='gray', edgecolor='black', label='Memory Get Time (base color by prefetch)'),
-        ]
+        time_handles = []
     else:
-        # Add time component patches
-        time_handles = [
-            Patch(facecolor='gray', edgecolor='black', label='Traversal Time (base color by prefetch)'),
-        ]
-        
-        if not hide_prefetch:
-            time_handles.insert(0, Patch(facecolor='orange', edgecolor='black', label='Prefetch Time'))
+        time_handles = []
         
         if not hide_ttg:
-            time_handles.insert(0, Patch(facecolor='green', edgecolor='black', label='TTG Generation Time'))
+            time_handles.append(Patch(facecolor='green', edgecolor='black', label='TTG Generation Time'))
+        
+        if not hide_prefetch:
+            time_handles.append(Patch(facecolor='orange', edgecolor='black', label='Prefetch Time'))
     
-    # Combine legends
     all_handles = handles + time_handles
     plt.legend(
         handles=all_handles,
