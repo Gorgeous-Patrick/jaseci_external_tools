@@ -1,162 +1,193 @@
+import argparse
 import json
-import pandas as pd
-
-def load_timer_json(path: str) -> pd.DataFrame:
-    # Load the JSON list
-    with open(path, "r") as f:
-        data = json.load(f)
-
-    # Convert to DataFrame
-    df = pd.DataFrame(data)
-
-    # Add useful computed columns
-    df["ttg_time"] = df["ttg_end_time"] - df["ttg_start_time"]
-    df["traversal_time"] = df["traversal_end_time"] - df["traversal_start_time"]
-    df["total_time"] = df["traversal_end_time"] - df["ttg_start_time"]
-
-    return df
-
-def compute_avg_times(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Given the updated timer dataframe, compute:
-      - average ttg_time
-      - average traversal_time
-      - average ttg_visited_num
-      - average traversal_visited_num
-    grouped by JAC_EDGE_NUM.
-
-    Returns
-    -------
-    grouped_df : pd.DataFrame
-        Columns:
-        ["JAC_EDGE_NUM",
-         "avg_ttg_time", "avg_traversal_time",
-         "avg_ttg_visited", "avg_traversal_visited"]
-    """
-
-    grouped_df = (
-        df.groupby("JAC_EDGE_NUM")
-        .agg(
-            avg_ttg_time=("ttg_time", "mean"),
-            avg_traversal_time=("traversal_time", "mean"),
-            avg_ttg_visited=("ttg_visited_num", "mean"),
-            avg_traversal_visited=("traversal_visited_num", "mean"),
-        )
-        .reset_index()
-        .sort_values("JAC_EDGE_NUM")
-    )
-
-    return grouped_df
+from pathlib import Path
 
 import matplotlib.pyplot as plt
+import pandas as pd
+from matplotlib.patches import Patch
 
-def plot_avg_times(avg_df: pd.DataFrame, avg_df_old: pd.DataFrame, figsize=(10, 6), save_path=None):
-    """
-    Plot average TTG time and traversal time vs edge count.
 
-    Parameters
-    ----------
-    avg_df : pd.DataFrame
-        Must contain: ["JAC_EDGE_NUM", "avg_ttg_time", "avg_traversal_time"]
+def load_timer_stats(path: str | Path) -> pd.DataFrame:
+    """Load timer stats JSON and keep only last occurrence for each configuration."""
 
-    figsize : tuple
-        Figure size.
+    path = Path(path)
+    with path.open("r") as f:
+        data = json.load(f)
 
-    save_path : str or None
-        If provided, save the figure to this path instead of showing it.
-    """
+    df = pd.DataFrame(data)
+    # Keep only the last occurrence for duplicate configurations
+    df = df.drop_duplicates(
+        subset=["JAC_NODE_NUM", "JAC_EDGE_NUM", "JAC_TWEET_NUM", "jac_prefetch"],
+        keep="last"
+    )
+    return df
+
+
+def plot_time_bars(
+    df: pd.DataFrame,
+    figsize=(14, 6),
+    save_path: str | None = "timer_plot_bar.png",
+    hide_prefetch: bool = False,
+    hide_ttg: bool = False,
+    only_memory: bool = False,
+):
+    """Plot timing metrics vs edge count as grouped bars for each prefetch configuration."""
 
     plt.figure(figsize=figsize)
-
-    # Plot the two lines
-    plt.plot(
-        avg_df["JAC_EDGE_NUM"],
-        avg_df["avg_ttg_time"],
-        label="Average TTG Time (After)",
-        marker="o",
+    
+    # Get unique values
+    edge_nums = sorted(df["JAC_EDGE_NUM"].unique())
+    prefetch_vals = sorted(df["jac_prefetch"].unique())
+    
+    # Assign colors based on prefetch status
+    colors = plt.cm.tab10(range(len(prefetch_vals)))
+    color_map = {val: colors[i] for i, val in enumerate(prefetch_vals)}
+    
+    # Calculate bar positions
+    n_groups = len(prefetch_vals)
+    bar_width = 0.8 / n_groups
+    x = range(len(edge_nums))
+    
+    # Plot bars for each configuration
+    for idx, jac_prefetch in enumerate(prefetch_vals):
+        subset = df[df["jac_prefetch"] == jac_prefetch]
+        ordered = subset.sort_values("JAC_EDGE_NUM")
+        
+        prefetch_status = "enabled" if jac_prefetch != 0 else "disabled"
+        label = f"prefetch {prefetch_status}"
+        
+        positions = [i + idx * bar_width - 0.4 + bar_width/2 for i in x]
+        
+        if only_memory:
+            # Only plot memory_get_time
+            plt.bar(
+                positions,
+                ordered["memory_get_time"],
+                width=bar_width,
+                color=color_map[jac_prefetch],
+                label=label,
+                edgecolor='black',
+                linewidth=0.5,
+            )
+        else:
+            # Plot traversal time (bottom layer)
+            plt.bar(
+                positions,
+                ordered["traversal_time"],
+                width=bar_width,
+                color=color_map[jac_prefetch],
+                label=label,
+                edgecolor='black',
+                linewidth=0.5,
+            )
+            
+            # Plot prefetch time (middle layer) - in orange
+            if not hide_prefetch:
+                plt.bar(
+                    positions,
+                    ordered["prefetch_time"],
+                    width=bar_width,
+                    bottom=ordered["traversal_time"],
+                    color='orange',
+                    edgecolor='black',
+                    linewidth=0.5,
+                )
+            
+            # Plot ttg generation time (top layer) - in green
+            if not hide_ttg:
+                bottom_value = ordered["traversal_time"] + (ordered["prefetch_time"] if not hide_prefetch else 0)
+                plt.bar(
+                    positions,
+                    ordered["ttg_generation_time"],
+                    width=bar_width,
+                    bottom=bottom_value,
+                    color='green',
+                    edgecolor='black',
+                    linewidth=0.5,
+                )
+    
+    plt.xlabel("Edge Count (JAC_EDGE_NUM)")
+    plt.ylabel("Total Time (seconds)")
+    plt.title("Total Execution Time vs Edge Count")
+    plt.xticks(x, edge_nums)
+    ax = plt.gca()
+    ax.set_ylim(bottom=0)
+    plt.grid(True, axis='y', alpha=0.3)
+    
+    # Create custom legend with both configuration and time component info
+    handles, labels = ax.get_legend_handles_labels()
+    
+    if only_memory:
+        # Only show memory time legend
+        time_handles = [
+            Patch(facecolor='gray', edgecolor='black', label='Memory Get Time (base color by prefetch)'),
+        ]
+    else:
+        # Add time component patches
+        time_handles = [
+            Patch(facecolor='gray', edgecolor='black', label='Traversal Time (base color by prefetch)'),
+        ]
+        
+        if not hide_prefetch:
+            time_handles.insert(0, Patch(facecolor='orange', edgecolor='black', label='Prefetch Time'))
+        
+        if not hide_ttg:
+            time_handles.insert(0, Patch(facecolor='green', edgecolor='black', label='TTG Generation Time'))
+    
+    # Combine legends
+    all_handles = handles + time_handles
+    plt.legend(
+        handles=all_handles,
+        title="Prefetch / Time Components",
+        bbox_to_anchor=(1.05, 1),
+        loc='upper left'
     )
-
-    plt.plot(
-        avg_df_old["JAC_EDGE_NUM"],
-        avg_df_old["avg_ttg_time"],
-        label="Average TTG Time (Before)",
-        marker="o",
-    )
-
-    plt.plot(
-        avg_df["JAC_EDGE_NUM"],
-        avg_df["avg_traversal_time"],
-        label="Average Walker Traversal Time",
-        marker="o",
-    )
-
-    # Labels and formatting
-    plt.xlabel("Number of Edges")
-    plt.ylabel("Time (seconds)")
-    plt.title("TTG Generation Time vs Traversal Time by Graph Density")
-    plt.legend()
-    plt.grid(True)
 
     if save_path:
-        plt.savefig(save_path, dpi=300)
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
         plt.close()
         print(f"Saved plot to {save_path}")
     else:
         plt.show()
 
 
-def plot_avg_visited(avg_df: pd.DataFrame, figsize=(10, 6), save_path=None):
-    """
-    Plot average TTG visited count and traversal visited count vs edge count.
-
-    Parameters
-    ----------
-    avg_df : pd.DataFrame
-        Must contain: ["JAC_EDGE_NUM",
-                        "avg_ttg_visited",
-                        "avg_traversal_visited"]
-
-    figsize : tuple
-        Figure size.
-
-    save_path : str or None
-        If provided, save the figure to this path instead of showing it.
-    """
-
-    plt.figure(figsize=figsize)
-
-    # Plot TTG visited count
-    plt.plot(
-        avg_df["JAC_EDGE_NUM"],
-        avg_df["avg_ttg_visited"],
-        label="Average TTG Visited Nodes",
-        marker="o",
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Plot timing metrics as grouped bars from JSON data")
+    parser.add_argument(
+        "cache_stats_path",
+        nargs="?",
+        default="cache_stats.json",
+        help="Path to cache_stats.json file (default: cache_stats.json)"
     )
-
-    # Plot traversal visited count
-    plt.plot(
-        avg_df["JAC_EDGE_NUM"],
-        avg_df["avg_traversal_visited"],
-        label="Average Traversal Visited Nodes",
-        marker="o",
+    parser.add_argument(
+        "-o", "--output",
+        default="timer_plot_bar.png",
+        help="Output path for the plot (default: timer_plot_bar.png)"
     )
+    parser.add_argument(
+        "--hide-prefetch",
+        action="store_true",
+        help="Hide prefetch time from the plot"
+    )
+    parser.add_argument(
+        "--hide-ttg",
+        action="store_true",
+        help="Hide TTG generation time from the plot"
+    )
+    parser.add_argument(
+        "--only-memory",
+        action="store_true",
+        help="Only plot memory_get_time (ignores other hide flags)"
+    )
+    args = parser.parse_args()
+    
+    dataset_path = Path(args.cache_stats_path)
+    if not dataset_path.exists():
+        raise FileNotFoundError(f"Could not find {dataset_path}")
 
-    # Labels and formatting
-    plt.xlabel("Number of Edges")
-    plt.ylabel("Visited Node Count")
-    plt.title("TTG vs Traversal: Average Nodes Visited by Graph Density")
-    plt.legend()
-    plt.grid(True)
+    df = load_timer_stats(dataset_path)
+    plot_time_bars(df, save_path=args.output, hide_prefetch=args.hide_prefetch, hide_ttg=args.hide_ttg, only_memory=args.only_memory)
 
-    if save_path:
-        plt.savefig(save_path, dpi=300)
-        plt.close()
-        print(f"Saved plot to {save_path}")
-    else:
-        plt.show()
-df_old = load_timer_json("old/timer.json")
-df_old = compute_avg_times(df_old)
-df_new = load_timer_json("new/timer.json")
-df_new = compute_avg_times(df_new)
-plot_avg_times(df_new, df_old, save_path="timer_plot.png")
-plot_avg_visited(df_new, save_path="visited_plot.png")
+
+if __name__ == "__main__":
+    main()
