@@ -2,7 +2,6 @@ import random;
 import os;
 import json;
 import from util { append_to_json_list }
-import from jaclang.pycore.runtime {JacRuntime}
 node Profile {
     has id: int;
 }
@@ -19,12 +18,7 @@ walker LoadFeed {
     has visited: int = 0;
 
     can load with Profile entry {
-        print("RUNNNN");
         self.visited += 1;
-        if (self.visited >= 100) {
-            return;
-        }
-        print(f"{root.__jac__.id}");
         if (not self.visiting_neighbors) {
             self.visiting_neighbors = True;
             visit [->:Post:->];
@@ -36,9 +30,6 @@ walker LoadFeed {
 
     can calc with Tweet entry {
         self.visited += 1;
-        if (self.visited >= 100) {
-            return;
-        }
         # print(here.id);
     }
 }
@@ -52,13 +43,14 @@ def create_node() -> list[str] {
         exit(1);
     }
     TWEET_NUM = int(os.environ.get("JAC_TWEET_NUM"));
+    TWEET_NUM = 1;
     for i in range(NODE_NUM) {
         nodes.append(Profile(id=i));
         root +>: Post :+> nodes[i];
         for j in range(TWEET_NUM) {
             nodes[i] +>: Post :+> Tweet(id=NODE_NUM + TWEET_NUM * i + j);
         }
-        print(f"Created node {i} (Total {NODE_NUM}) with tweets");
+        print(f"Created node {i} (Total {NODE_NUM}) with tweets {TWEET_NUM}");
     }
 
     available_edges = set();

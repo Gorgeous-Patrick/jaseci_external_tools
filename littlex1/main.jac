@@ -2,7 +2,6 @@ import random;
 import os;
 import json;
 import from util { append_to_json_list }
-import from jaclang.pycore.runtime {JacRuntime}
 node Profile {
     has id: int;
 }
