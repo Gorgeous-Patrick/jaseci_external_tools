@@ -36,8 +36,15 @@ def create_node() -> list[str] {
         exit(1);
     }
     TWEET_NUM = int(os.environ.get("JAC_TWEET_NUM"));
+
+    root_id = root.__jac__.id;
+    root.__jac__.persistent = True;
+
     for i in range(NODE_NUM) {
-        nodes.append(Profile(id=i));
+        p = Profile(id=i);
+        p.__jac__.persistent = True;
+        p.__jac__.root = root_id;
+        nodes.append(p);
         root ++> nodes[i];
         print(f"Created node {i} (Total {NODE_NUM}) with tweets");
     }
@@ -59,6 +66,9 @@ def create_node() -> list[str] {
         available_edges.remove((src, dst));
         print(f"Created edge {i} (Total {EDGE_NUM}) from {src} to {dst}");
     }
+
+    root.__jac__.is_updated = True;
+
     print(f"{root.__jac__.id}");
     return [str(n.__jac__.id) for n in nodes];
 }
