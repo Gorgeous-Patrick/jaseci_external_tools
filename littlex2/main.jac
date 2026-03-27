@@ -45,17 +45,19 @@ def create_node() -> list[str] {
     TWEET_NUM = int(os.environ.get("JAC_TWEET_NUM"));
     TWEET_NUM = 1;
 
-    # Mark root persistent so topology index hooks fire during edge creation
+    root_id = root.__jac__.id;
     root.__jac__.persistent = True;
 
     for i in range(NODE_NUM) {
         p = Profile(id=i);
         p.__jac__.persistent = True;
+        p.__jac__.root = root_id;
         nodes.append(p);
         root +>: Post :+> nodes[i];
         for j in range(TWEET_NUM) {
             t = Tweet(id=NODE_NUM + TWEET_NUM * i + j);
             t.__jac__.persistent = True;
+            t.__jac__.root = root_id;
             nodes[i] +>: Post :+> t;
         }
         print(f"Created node {i} (Total {NODE_NUM}) with tweets {TWEET_NUM}");
