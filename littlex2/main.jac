@@ -80,6 +80,10 @@ def create_node() -> list[str] {
         available_edges.remove((src, dst));
         print(f"Created edge {i} (Total {EDGE_NUM}) from {src} to {dst}");
     }
+    # Mark root anchor updated so topology index gets persisted to L3.
+    # set_topology_index modifies the anchor directly without setting is_updated.
+    root.__jac__.is_updated = True;
+
     print(f"{root.__jac__.id}");
     return [str(n.__jac__.id) for n in nodes];
 }
