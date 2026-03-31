@@ -6,6 +6,8 @@ entry-point = "main.jac"
 
 [run]
 topology_index = true
+prefetching = "ttg"
+prefetch_limit = 200
 
 [dependencies.npm]
 jac-client-node = "1.0.7"
@@ -17,6 +19,27 @@ jac-client-node = "1.0.7"
 watchdog = ">=3.0.0"
 
 [plugins.scale.database]
-mongodb_uri = "mongodb://localhost:27017"
-redis_url = "redis://localhost:6379"
 shelf_db_path = ".jac/data/anchor_store.db"
+
+[plugins.scale.kubernetes]
+app_name = "littlex1"
+docker_image_name = "littlex1"
+namespace = "default"
+container_port = 8000
+node_port = 30001
+mongodb_enabled = true
+redis_enabled = true
+docker_username = "local"
+
+[plugins.scale.jwt]
+secret = "littlex1-dev-secret-change-in-production"
+algorithm = "HS256"
+exp_delta_days = 7
+
+[plugins.scale.monitoring]
+enabled = true
+endpoint = "/metrics"
+walker_metrics = true
+
+[serve]
+docs_enabled = true
