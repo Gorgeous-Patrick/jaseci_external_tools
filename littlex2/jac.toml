@@ -6,6 +6,8 @@ entry-point = "main.jac"
 
 [run]
 topology_index = true
+prefetching = "ttg"
+prefetch_limit = 200
 
 [dependencies.npm]
 jac-client-node = "1.0.7"
@@ -16,12 +18,19 @@ jac-client-node = "1.0.7"
 [dev-dependencies]
 watchdog = ">=3.0.0"
 
-[run]
-topology_index = true
-prefetching = "ttg"
-prefetch_limit = 200
-
 [plugins.scale.database]
 mongodb_uri = "mongodb://localhost:27017"
 redis_url = "redis://localhost:6379"
-shelf_db_path = ".jac/data/anchor_store.db"
+
+[plugins.scale.jwt]
+secret = "littlex2-dev-secret-change-in-production"
+algorithm = "HS256"
+exp_delta_days = 7
+
+[plugins.scale.monitoring]
+enabled = true
+endpoint = "/metrics"
+walker_metrics = true
+
+[serve]
+docs_enabled = true
