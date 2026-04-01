@@ -33,7 +33,7 @@ http --ignore-stdin POST $base_url/user/register username=user password=password
 
 echo "=== Creating nodes (quick_run_1.sh) ==="
 export token=$(http --ignore-stdin POST $base_url/user/login username=user password=password | jq ".data.token" -r)
-export NODE=$(http --ignore-stdin -A bearer -a $token POST "$base_url/function/create_node" | jq ".data.result.[0]" -r)
+export NODE=$(http --ignore-stdin -A bearer -a $token POST "$base_url/function/create_node" | jq ".data.result[0]" -r)
 echo "First node: $NODE"
 
 # Wait for sync to MongoDB before clearing Redis
