@@ -35,8 +35,8 @@ def main():
     enabled_walker = ttg_enabled["walker_ms"].values
 
     ax.bar(x - width/2, enabled_walker, width, label="Walker (TTG)", color="steelblue")
-    ax.bar(x - width/2, enabled_prefetch, width, bottom=enabled_walker, label="Prefetch", color="orange")
-    ax.bar(x - width/2, enabled_ttg, width, bottom=enabled_walker + enabled_prefetch, label="Predictor", color="green")
+    ax.bar(x - width/2, enabled_prefetch, width, bottom=enabled_walker, label="TTG Prefetcher", color="orange")
+    ax.bar(x - width/2, enabled_ttg, width, bottom=enabled_walker + enabled_prefetch, label="TTG Predictor", color="green")
 
     # TTG disabled
     disabled_walker = ttg_disabled["walker_ms"].values
