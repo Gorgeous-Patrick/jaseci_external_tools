@@ -4,7 +4,7 @@ set -e
 # Configuration - modify these arrays to sweep different values
 # Note: max edges = nodes * (nodes - 1), so ensure edge counts are valid
 NODE_COUNTS=(25)
-EDGE_COUNTS=(25 50 75 100 125 150 175 200 225 250 275 300)
+EDGE_COUNTS=(0 25 50 75 100 125)
 TWEET_NUM=100
 
 # Results file
@@ -30,7 +30,7 @@ for nodes in "${NODE_COUNTS[@]}"; do
       if [ "$ttg_mode" == "ttg" ]; then
         ttg_label="enabled"
       else
-        ttg_label="disabled"
+        ttg_label="disabledJAC_"
       fi
 
       echo ""

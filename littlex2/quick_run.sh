@@ -59,13 +59,16 @@ echo "=== E2E Timing (3 trials) ==="
 for i in 1 2 3; do
   docker exec redis redis-cli FLUSHALL > /dev/null 2>&1 || true
   sleep 1
-  e2e_time=$(curl -s -o /dev/null -w "%{time_total}" -X POST \
+  response=$(curl -s -w "\n%{time_total}" -X POST \
     -H "Authorization: Bearer $token" \
     -H "Content-Type: application/json" \
     -d "{}" \
     "http://$base_url/walker/LoadFeed/$NODE")
+  e2e_time=$(echo "$response" | tail -n 1)
+  body=$(echo "$response" | head -n -1)
   e2e_ms=$(awk "BEGIN {printf \"%.1f\", $e2e_time * 1000}")
   echo "Trial $i: ${e2e_ms}ms"
+  echo "Response: $body"
 done
 
 echo ""
