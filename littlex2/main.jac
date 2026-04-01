@@ -14,18 +14,14 @@ edge Follow {}
 edge Post {}
 
 walker LoadFeed {
-    has visiting_neighbors: bool = False;
     has visited: int = 0;
 
     can load with Profile entry {
         self.visited += 1;
-        if (not self.visiting_neighbors) {
-            self.visiting_neighbors = True;
-            visit [->:Post:->];
-            visit [->:Follow:->];
-        } else {
-            visit [->:Post:->];
-        }
+        # Visit my posts
+        visit [->:Post:->];
+        # Visit posts from profiles I follow (multihop: Follow -> Post)
+        visit [->:Follow:->->:Post:->];
     }
 
     can calc with Tweet entry {
@@ -42,7 +38,6 @@ def create_node() -> list[str] {
         exit(1);
     }
     TWEET_NUM = int(os.environ.get("JAC_TWEET_NUM"));
-    TWEET_NUM = 1;
 
     for i in range(NODE_NUM) {
         p = Profile(id=i);

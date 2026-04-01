@@ -51,9 +51,17 @@ JAC_NODE_NUM=$JAC_NODE_NUM JAC_EDGE_NUM=$JAC_EDGE_NUM JAC_TWEET_NUM=$JAC_TWEET_N
 JAC_PID=$!
 sleep 10
 
-echo "=== Running walker (quick_run_2.sh) ==="
+echo "=== Running walker ==="
 export token=$(http --ignore-stdin POST $base_url/user/login username=user password=password | jq ".data.token" -r)
-http --ignore-stdin -A bearer -a $token POST "$base_url/walker/LoadFeed/$NODE" --raw "{}"
+
+echo "=== E2E Timing (3 trials) ==="
+for i in 1 2 3; do
+  echo "--- Trial $i ---"
+  docker exec redis redis-cli FLUSHALL > /dev/null 2>&1 || true
+  sleep 1
+  time http --ignore-stdin -A bearer -a $token POST "$base_url/walker/LoadFeed/$NODE" --raw "{}"
+  echo ""
+done
 
 echo ""
 echo "=== Done ==="
