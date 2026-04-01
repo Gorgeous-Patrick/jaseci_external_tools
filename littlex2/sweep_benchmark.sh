@@ -3,12 +3,13 @@ set -e
 
 # Configuration - modify these arrays to sweep different values
 # Note: max edges = nodes * (nodes - 1), so ensure edge counts are valid
-NODE_COUNTS=(250)
-EDGE_COUNTS=(250 500 750 1000 1250 1500 1750 2000 2250 2500 2750 3000)
+NODE_COUNTS=(25)
+EDGE_COUNTS=(25 50 75 100 125 150 175 200 225 250 275 300)
 TWEET_NUM=100
 
 # Results file
-RESULTS_FILE="sweep_results.csv"
+RESULTS_FILE="sweep_results_e2e.csv"
+PROFILE_CSV="profile_results.csv"
 
 echo "=== Sweep Benchmark ==="
 echo "Nodes: ${NODE_COUNTS[*]}"
@@ -17,7 +18,7 @@ echo "Tweets per node: $TWEET_NUM"
 echo ""
 
 # Write CSV header
-echo "nodes,edges,tweets,ttg_enabled,trial1_ms,trial2_ms,trial3_ms,avg_ms" > "$RESULTS_FILE"
+echo "node_num,edge_num,tweet_num,ttg_enabled,trial,ttg_ms,prefetch_ms,walker_ms" > "$RESULTS_FILE"
 
 for nodes in "${NODE_COUNTS[@]}"; do
   for edges in "${EDGE_COUNTS[@]}"; do
@@ -38,24 +39,23 @@ for nodes in "${NODE_COUNTS[@]}"; do
       # Update jac.toml with current TTG setting
       sed -i "s/prefetching = \".*\"/prefetching = \"$ttg_mode\"/" jac.toml
 
-      # Run quick_run.sh and capture output
-      output=$(JAC_NODE_NUM=$nodes JAC_EDGE_NUM=$edges JAC_TWEET_NUM=$TWEET_NUM bash quick_run.sh 2>&1)
+      # Clear the profile CSV before each run
+      rm -f "$PROFILE_CSV"
 
-      # Extract timing from output (format: "Trial N: 123.4ms")
-      times=($(echo "$output" | grep "^Trial" | sed 's/Trial [0-9]: //' | sed 's/ms//'))
+      # Run quick_run.sh with profiling enabled
+      JAC_NODE_NUM=$nodes JAC_EDGE_NUM=$edges JAC_TWEET_NUM=$TWEET_NUM JAC_PROFILE_CSV=$PROFILE_CSV bash quick_run.sh 2>&1 | tee /dev/null
 
-      trial1_ms=$(printf "%.0f" "${times[0]}")
-      trial2_ms=$(printf "%.0f" "${times[1]}")
-      trial3_ms=$(printf "%.0f" "${times[2]}")
-      avg_ms=$(echo "$trial1_ms $trial2_ms $trial3_ms" | awk '{printf "%.0f", ($1+$2+$3)/3}')
-
-      echo "  Trial 1: ${trial1_ms}ms"
-      echo "  Trial 2: ${trial2_ms}ms"
-      echo "  Trial 3: ${trial3_ms}ms"
-      echo "  Average: ${avg_ms}ms"
-
-      # Append to CSV
-      echo "$nodes,$edges,$TWEET_NUM,$ttg_label,$trial1_ms,$trial2_ms,$trial3_ms,$avg_ms" >> "$RESULTS_FILE"
+      # Read results from profile CSV (skip header, get last 3 trials)
+      if [ -f "$PROFILE_CSV" ]; then
+        trial_num=1
+        tail -n 3 "$PROFILE_CSV" | while IFS=, read -r node_num edge_num tweet_num ttg_enabled ttg_ms prefetch_ms walker_ms; do
+          echo "  Trial $trial_num: ttg=${ttg_ms}ms, prefetch=${prefetch_ms}ms, walker=${walker_ms}ms"
+          echo "$node_num,$edge_num,$tweet_num,$ttg_enabled,$trial_num,$ttg_ms,$prefetch_ms,$walker_ms" >> "$RESULTS_FILE"
+          trial_num=$((trial_num + 1))
+        done
+      else
+        echo "  WARNING: Profile CSV not found!"
+      fi
     done
   done
 done

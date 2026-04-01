@@ -5,6 +5,7 @@ export base_url="localhost:8000"
 export JAC_NODE_NUM=${JAC_NODE_NUM:-10}
 export JAC_EDGE_NUM=${JAC_EDGE_NUM:-45}
 export JAC_TWEET_NUM=${JAC_TWEET_NUM:-100}
+export JAC_PROFILE_CSV=${JAC_PROFILE_CSV:-""}
 
 # Clean previous state
 echo "=== Cleaning previous state ==="
@@ -24,7 +25,7 @@ LOG_1="logs/jac_server_1.log"
 LOG_2="logs/jac_server_2.log"
 
 echo "=== Starting jac server (log: $LOG_1) ==="
-JAC_NODE_NUM=$JAC_NODE_NUM JAC_EDGE_NUM=$JAC_EDGE_NUM JAC_TWEET_NUM=$JAC_TWEET_NUM jac start > "$LOG_1" 2>&1 &
+JAC_NODE_NUM=$JAC_NODE_NUM JAC_EDGE_NUM=$JAC_EDGE_NUM JAC_TWEET_NUM=$JAC_TWEET_NUM JAC_PROFILE_CSV=$JAC_PROFILE_CSV jac start > "$LOG_1" 2>&1 &
 JAC_PID=$!
 sleep 10
 
@@ -47,7 +48,7 @@ docker exec redis redis-cli FLUSHALL || true
 echo "=== Restarting jac server (log: $LOG_2) ==="
 kill $JAC_PID 2>/dev/null || true
 sleep 2
-JAC_NODE_NUM=$JAC_NODE_NUM JAC_EDGE_NUM=$JAC_EDGE_NUM JAC_TWEET_NUM=$JAC_TWEET_NUM jac start > "$LOG_2" 2>&1 &
+JAC_NODE_NUM=$JAC_NODE_NUM JAC_EDGE_NUM=$JAC_EDGE_NUM JAC_TWEET_NUM=$JAC_TWEET_NUM JAC_PROFILE_CSV=$JAC_PROFILE_CSV jac start > "$LOG_2" 2>&1 &
 JAC_PID=$!
 sleep 10
 
