@@ -56,15 +56,20 @@ export token=$(http --ignore-stdin POST $base_url/user/login username=user passw
 
 echo "=== E2E Timing (3 trials) ==="
 for i in 1 2 3; do
-  echo "--- Trial $i ---"
   docker exec redis redis-cli FLUSHALL > /dev/null 2>&1 || true
   sleep 1
-  time http --ignore-stdin -A bearer -a $token POST "$base_url/walker/LoadFeed/$NODE" --raw "{}"
-  echo ""
+  e2e_time=$(curl -s -o /dev/null -w "%{time_total}" -X POST \
+    -H "Authorization: Bearer $token" \
+    -H "Content-Type: application/json" \
+    -d "{}" \
+    "http://$base_url/walker/LoadFeed/$NODE")
+  e2e_ms=$(awk "BEGIN {printf \"%.1f\", $e2e_time * 1000}")
+  echo "Trial $i: ${e2e_ms}ms"
 done
 
 echo ""
 echo "=== Done ==="
 echo "Server logs: $LOG_1, $LOG_2"
-echo "Press Ctrl+C to stop the server"
-wait $JAC_PID
+
+# Kill the server
+kill $JAC_PID 2>/dev/null || true
