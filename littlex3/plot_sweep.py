@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Plot sweep_results_e2e.csv profiling data for littlex3."""
+"""Plot sweep_results_e2e.csv profiling data."""
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,65 +11,57 @@ def main():
 
     df = pd.read_csv(csv_file)
 
-    # Convert numeric columns
-    numeric_cols = ["e2e_ms", "ttg_total_ms", "topo_idx_ms", "ttg_ms", "prefetch_ms", "walker_ms"]
-    for col in numeric_cols:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
-
-    # Group by ttg_enabled, average across trials
-    grouped = df.groupby("ttg_enabled").agg({
+    # Group by tweet_num and ttg_enabled, average across trials
+    agg_dict = {
         "e2e_ms": "mean",
         "walker_ms": "mean",
-        "ttg_total_ms": "mean",
-        "topo_idx_ms": "mean",
-        "ttg_ms": "mean",
-        "prefetch_ms": "mean",
-    }).reset_index()
+    }
+    for col in ["ttg_total_ms", "topo_idx_ms", "ttg_ms", "prefetch_ms"]:
+        if col in df.columns:
+            agg_dict[col] = "mean"
+    grouped = df.groupby(["tweet_num", "ttg_enabled"]).agg(agg_dict).reset_index()
 
     # Separate TTG enabled and disabled
-    ttg_enabled = grouped[grouped["ttg_enabled"] == "enabled"].iloc[0]
-    ttg_disabled = grouped[grouped["ttg_enabled"] == "disabled"].iloc[0]
+    ttg_enabled = grouped[grouped["ttg_enabled"] == "enabled"].sort_values("tweet_num")
+    ttg_disabled = grouped[grouped["ttg_enabled"] == "disabled"].sort_values("tweet_num")
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(12, 6))
 
-    x = np.array([0, 1])
-    width = 0.5
+    x = np.arange(len(ttg_enabled))
+    width = 0.35
 
-    # TTG enabled - stacked bar
-    enabled_walker = ttg_enabled["walker_ms"]
-    enabled_topo_idx = ttg_enabled["topo_idx_ms"]
-    enabled_ttg = ttg_enabled["ttg_ms"]
-    enabled_prefetch = ttg_enabled["prefetch_ms"]
-    enabled_e2e = ttg_enabled["e2e_ms"]
-    enabled_misc = max(0, enabled_e2e - (enabled_walker + enabled_prefetch + enabled_ttg + enabled_topo_idx))
+    # TTG enabled - stacked
+    enabled_walker = ttg_enabled["walker_ms"].values
+    enabled_topo_idx = ttg_enabled["topo_idx_ms"].values if "topo_idx_ms" in ttg_enabled.columns else np.zeros_like(enabled_walker)
+    enabled_ttg = ttg_enabled["ttg_ms"].values if "ttg_ms" in ttg_enabled.columns else np.zeros_like(enabled_walker)
+    enabled_prefetch = ttg_enabled["prefetch_ms"].values if "prefetch_ms" in ttg_enabled.columns else np.zeros_like(enabled_walker)
+    enabled_e2e = ttg_enabled["e2e_ms"].values
+    enabled_misc = enabled_e2e - (enabled_walker + enabled_prefetch + enabled_ttg + enabled_topo_idx)
+    enabled_misc = np.maximum(enabled_misc, 0)
 
-    ax.bar(0, enabled_walker, width, label="Walker", color="steelblue")
-    ax.bar(0, enabled_prefetch, width, bottom=enabled_walker, label="Prefetcher", color="orange")
-    ax.bar(0, enabled_ttg, width, bottom=enabled_walker + enabled_prefetch, label="TTG Generator", color="green")
-    ax.bar(0, enabled_topo_idx, width, bottom=enabled_walker + enabled_prefetch + enabled_ttg, label="Load graph topology", color="purple")
-    ax.bar(0, enabled_misc, width, bottom=enabled_walker + enabled_prefetch + enabled_ttg + enabled_topo_idx, label="Misc", color="gray")
+    ax.bar(x - width/2, enabled_walker, width, label="Walker (TTG)", color="steelblue")
+    ax.bar(x - width/2, enabled_prefetch, width, bottom=enabled_walker, label="Prefetcher", color="orange")
+    ax.bar(x - width/2, enabled_ttg, width, bottom=enabled_walker + enabled_prefetch, label="TTG Generator", color="green")
+    ax.bar(x - width/2, enabled_topo_idx, width, bottom=enabled_walker + enabled_prefetch + enabled_ttg, label="Load graph topology", color="purple")
+    ax.bar(x - width/2, enabled_misc, width, bottom=enabled_walker + enabled_prefetch + enabled_ttg + enabled_topo_idx, label="Misc (TTG)", color="gray")
 
-    # TTG disabled - stacked bar
-    disabled_walker = ttg_disabled["walker_ms"]
-    disabled_e2e = ttg_disabled["e2e_ms"]
-    disabled_misc = max(0, disabled_e2e - disabled_walker)
+    # TTG disabled - stacked
+    disabled_walker = ttg_disabled["walker_ms"].values
+    disabled_e2e = ttg_disabled["e2e_ms"].values
+    disabled_misc = disabled_e2e - disabled_walker
+    disabled_misc = np.maximum(disabled_misc, 0)
 
-    ax.bar(1, disabled_walker, width, color="steelblue")
-    ax.bar(1, disabled_misc, width, bottom=disabled_walker, color="gray")
+    ax.bar(x + width/2, disabled_walker, width, label="Walker (No TTG)", color="lightcoral")
+    ax.bar(x + width/2, disabled_misc, width, bottom=disabled_walker, label="Misc (No TTG)", color="darkgray")
 
-    ax.set_xlabel("Mode")
+    ax.set_xlabel("# of Tweets per User")
     ax.set_ylabel("Time (ms)")
     ax.set_xticks(x)
-    ax.set_xticklabels(["TTG Enabled", "TTG Disabled"])
-    ax.legend(loc="upper right")
+    ax.set_xticklabels(ttg_enabled["tweet_num"].values)
+    ax.legend()
     ax.grid(axis="y", alpha=0.3)
 
-    # Add e2e time labels on bars
-    ax.text(0, enabled_e2e + 5, f"{enabled_e2e:.1f}ms", ha="center", fontweight="bold")
-    ax.text(1, disabled_e2e + 5, f"{disabled_e2e:.1f}ms", ha="center", fontweight="bold")
-
-    ax.set_title("Execution Time: TTG Enabled vs Disabled")
+    ax.set_title("Execution Time: TTG vs No TTG")
 
     plt.tight_layout()
 
