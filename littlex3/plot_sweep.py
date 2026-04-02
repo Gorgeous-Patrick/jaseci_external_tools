@@ -11,6 +11,12 @@ def main():
 
     df = pd.read_csv(csv_file)
 
+    # Convert numeric columns
+    numeric_cols = ["e2e_ms", "ttg_total_ms", "topo_idx_ms", "ttg_ms", "prefetch_ms", "walker_ms"]
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+
     # Group by ttg_enabled, average across trials
     grouped = df.groupby("ttg_enabled").agg({
         "e2e_ms": "mean",
