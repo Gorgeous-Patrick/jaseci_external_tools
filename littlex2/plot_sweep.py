@@ -44,8 +44,8 @@ def main():
 
     ax.bar(x - width/2, enabled_walker, width, label="Walker (TTG)", color="steelblue")
     ax.bar(x - width/2, enabled_prefetch, width, bottom=enabled_walker, label="Prefetcher", color="orange")
-    ax.bar(x - width/2, enabled_ttg, width, bottom=enabled_walker + enabled_prefetch, label="TTG Predictor", color="green")
-    ax.bar(x - width/2, enabled_topo_idx, width, bottom=enabled_walker + enabled_prefetch + enabled_ttg, label="Topo Index", color="purple")
+    ax.bar(x - width/2, enabled_ttg, width, bottom=enabled_walker + enabled_prefetch, label="TTG Generator", color="green")
+    ax.bar(x - width/2, enabled_topo_idx, width, bottom=enabled_walker + enabled_prefetch + enabled_ttg, label="Load graph topology (adjacency matrix)", color="purple")
     ax.bar(x - width/2, enabled_misc, width, bottom=enabled_walker + enabled_prefetch + enabled_ttg + enabled_topo_idx, label="Misc (TTG)", color="gray")
 
     # TTG disabled - stacked
