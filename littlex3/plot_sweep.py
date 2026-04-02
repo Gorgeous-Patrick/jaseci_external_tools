@@ -9,23 +9,27 @@ import sys
 def main():
     csv_file = sys.argv[1] if len(sys.argv) > 1 else "sweep_results_e2e.csv"
 
-    df = pd.read_csv(csv_file)
+    # Read CSV with correct column count (11 columns, not 9)
+    df = pd.read_csv(csv_file, header=None, skiprows=1, names=[
+        "tweet_num", "ttg_enabled", "trial", "e2e_ms",
+        "skip1", "skip2",  # duplicate tweet_num and ttg_enabled from profile CSV
+        "ttg_total_ms", "topo_idx_ms", "ttg_ms", "prefetch_ms", "walker_ms"
+    ])
 
     # Convert numeric columns
-    numeric_cols = ["e2e_ms", "ttg_total_ms", "topo_idx_ms", "ttg_ms", "prefetch_ms", "walker_ms"]
+    numeric_cols = ["tweet_num", "trial", "e2e_ms", "ttg_total_ms", "topo_idx_ms", "ttg_ms", "prefetch_ms", "walker_ms"]
     for col in numeric_cols:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+        df[col] = pd.to_numeric(df[col], errors="coerce")
 
     # Group by tweet_num and ttg_enabled, average across trials
-    agg_dict = {
+    grouped = df.groupby(["tweet_num", "ttg_enabled"]).agg({
         "e2e_ms": "mean",
         "walker_ms": "mean",
-    }
-    for col in ["ttg_total_ms", "topo_idx_ms", "ttg_ms", "prefetch_ms"]:
-        if col in df.columns:
-            agg_dict[col] = "mean"
-    grouped = df.groupby(["tweet_num", "ttg_enabled"]).agg(agg_dict).reset_index()
+        "ttg_total_ms": "mean",
+        "topo_idx_ms": "mean",
+        "ttg_ms": "mean",
+        "prefetch_ms": "mean",
+    }).reset_index()
 
     # Separate TTG enabled and disabled
     ttg_enabled = grouped[grouped["ttg_enabled"] == "enabled"].sort_values("tweet_num")
@@ -38,9 +42,9 @@ def main():
 
     # TTG enabled - stacked
     enabled_walker = ttg_enabled["walker_ms"].values
-    enabled_topo_idx = ttg_enabled["topo_idx_ms"].values if "topo_idx_ms" in ttg_enabled.columns else np.zeros_like(enabled_walker)
-    enabled_ttg = ttg_enabled["ttg_ms"].values if "ttg_ms" in ttg_enabled.columns else np.zeros_like(enabled_walker)
-    enabled_prefetch = ttg_enabled["prefetch_ms"].values if "prefetch_ms" in ttg_enabled.columns else np.zeros_like(enabled_walker)
+    enabled_topo_idx = ttg_enabled["topo_idx_ms"].values
+    enabled_ttg = ttg_enabled["ttg_ms"].values
+    enabled_prefetch = ttg_enabled["prefetch_ms"].values
     enabled_e2e = ttg_enabled["e2e_ms"].values
     enabled_misc = enabled_e2e - (enabled_walker + enabled_prefetch + enabled_ttg + enabled_topo_idx)
     enabled_misc = np.maximum(enabled_misc, 0)
@@ -63,7 +67,7 @@ def main():
     ax.set_xlabel("# of Tweets per User")
     ax.set_ylabel("Time (ms)")
     ax.set_xticks(x)
-    ax.set_xticklabels(ttg_enabled["tweet_num"].values)
+    ax.set_xticklabels(ttg_enabled["tweet_num"].astype(int).values)
     ax.legend()
     ax.grid(axis="y", alpha=0.3)
 
