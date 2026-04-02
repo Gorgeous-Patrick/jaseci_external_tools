@@ -21,6 +21,9 @@ def main():
     for col in numeric_cols:
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
+    # Filter to show only tweet_num <= 50
+    df = df[df["tweet_num"] <= 50]
+
     # Group by tweet_num and ttg_enabled, average across trials
     grouped = df.groupby(["tweet_num", "ttg_enabled"]).agg({
         "e2e_ms": "mean",
