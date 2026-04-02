@@ -19,7 +19,7 @@ echo "Tweets per node: $TWEET_NUM"
 echo ""
 
 # Write CSV header
-echo "node_num,edge_num,tweet_num,ttg_enabled,trial,e2e_ms,topo_idx_ms,ttg_ms,prefetch_ms,walker_ms" > "$RESULTS_FILE"
+echo "node_num,edge_num,tweet_num,ttg_enabled,trial,e2e_ms,ttg_total_ms,topo_idx_ms,ttg_ms,prefetch_ms,walker_ms" > "$RESULTS_FILE"
 
 for nodes in "${NODE_COUNTS[@]}"; do
   for edges in "${EDGE_COUNTS[@]}"; do
@@ -52,10 +52,10 @@ for nodes in "${NODE_COUNTS[@]}"; do
       # Read results from profile CSV (skip header, get last 3 trials)
       if [ -f "$PROFILE_CSV" ]; then
         trial_num=0
-        tail -n 3 "$PROFILE_CSV" | while IFS=, read -r node_num edge_num tweet_num ttg_enabled topo_idx_ms ttg_ms prefetch_ms walker_ms; do
+        tail -n 3 "$PROFILE_CSV" | while IFS=, read -r node_num edge_num tweet_num ttg_enabled ttg_total_ms topo_idx_ms ttg_ms prefetch_ms walker_ms; do
           e2e_ms="${e2e_times[$trial_num]:-0.0}"
-          echo "  Trial $((trial_num + 1)): e2e=${e2e_ms}ms, topo_idx=${topo_idx_ms}ms, ttg=${ttg_ms}ms, prefetch=${prefetch_ms}ms, walker=${walker_ms}ms"
-          echo "$node_num,$edge_num,$tweet_num,$ttg_enabled,$((trial_num + 1)),$e2e_ms,$topo_idx_ms,$ttg_ms,$prefetch_ms,$walker_ms" >> "$RESULTS_FILE"
+          echo "  Trial $((trial_num + 1)): e2e=${e2e_ms}ms, ttg_total=${ttg_total_ms}ms, topo_idx=${topo_idx_ms}ms, ttg=${ttg_ms}ms, prefetch=${prefetch_ms}ms, walker=${walker_ms}ms"
+          echo "$node_num,$edge_num,$tweet_num,$ttg_enabled,$((trial_num + 1)),$e2e_ms,$ttg_total_ms,$topo_idx_ms,$ttg_ms,$prefetch_ms,$walker_ms" >> "$RESULTS_FILE"
           trial_num=$((trial_num + 1))
         done
       else

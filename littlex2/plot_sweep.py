@@ -12,15 +12,17 @@ def main():
     df = pd.read_csv(csv_file)
 
     # Group by edge_num and ttg_enabled, average across trials
-    grouped = df.groupby(["edge_num", "ttg_enabled"]).agg({
+    agg_dict = {
         "e2e_ms": "mean",
-        "topo_idx_ms": "mean",
-        "ttg_ms": "mean",
-        "prefetch_ms": "mean",
         "walker_ms": "mean",
         "node_num": "first",
         "tweet_num": "first",
-    }).reset_index()
+    }
+    # Add optional columns if they exist
+    for col in ["ttg_total_ms", "topo_idx_ms", "ttg_ms", "prefetch_ms"]:
+        if col in df.columns:
+            agg_dict[col] = "mean"
+    grouped = df.groupby(["edge_num", "ttg_enabled"]).agg(agg_dict).reset_index()
 
     # Separate TTG enabled and disabled
     ttg_enabled = grouped[grouped["ttg_enabled"] == "enabled"].sort_values("edge_num")
@@ -32,10 +34,10 @@ def main():
     width = 0.35
 
     # TTG enabled - stacked
-    enabled_topo_idx = ttg_enabled["topo_idx_ms"].values
-    enabled_ttg = ttg_enabled["ttg_ms"].values
-    enabled_prefetch = ttg_enabled["prefetch_ms"].values
     enabled_walker = ttg_enabled["walker_ms"].values
+    enabled_topo_idx = ttg_enabled["topo_idx_ms"].values if "topo_idx_ms" in ttg_enabled.columns else np.zeros_like(enabled_walker)
+    enabled_ttg = ttg_enabled["ttg_ms"].values if "ttg_ms" in ttg_enabled.columns else np.zeros_like(enabled_walker)
+    enabled_prefetch = ttg_enabled["prefetch_ms"].values if "prefetch_ms" in ttg_enabled.columns else np.zeros_like(enabled_walker)
 
     ax.bar(x - width/2, enabled_walker, width, label="Walker (TTG)", color="steelblue")
     ax.bar(x - width/2, enabled_prefetch, width, bottom=enabled_walker, label="Prefetcher", color="orange")
