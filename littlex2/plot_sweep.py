@@ -13,6 +13,8 @@ def main():
 
     # Group by edge_num and ttg_enabled, average across trials
     grouped = df.groupby(["edge_num", "ttg_enabled"]).agg({
+        "e2e_ms": "mean",
+        "topo_idx_ms": "mean",
         "ttg_ms": "mean",
         "prefetch_ms": "mean",
         "walker_ms": "mean",
@@ -30,17 +32,25 @@ def main():
     width = 0.35
 
     # TTG enabled - stacked
+    enabled_topo_idx = ttg_enabled["topo_idx_ms"].values
     enabled_ttg = ttg_enabled["ttg_ms"].values
     enabled_prefetch = ttg_enabled["prefetch_ms"].values
     enabled_walker = ttg_enabled["walker_ms"].values
 
     ax.bar(x - width/2, enabled_walker, width, label="Walker (TTG)", color="steelblue")
-    ax.bar(x - width/2, enabled_prefetch, width, bottom=enabled_walker, label="TTG Prefetcher", color="orange")
+    ax.bar(x - width/2, enabled_prefetch, width, bottom=enabled_walker, label="Prefetcher", color="orange")
     ax.bar(x - width/2, enabled_ttg, width, bottom=enabled_walker + enabled_prefetch, label="TTG Predictor", color="green")
+    ax.bar(x - width/2, enabled_topo_idx, width, bottom=enabled_walker + enabled_prefetch + enabled_ttg, label="Topo Index", color="purple")
 
     # TTG disabled
     disabled_walker = ttg_disabled["walker_ms"].values
     ax.bar(x + width/2, disabled_walker, width, label="Walker (No TTG)", color="lightcoral")
+
+    # E2E markers (actual HTTP request time)
+    enabled_e2e = ttg_enabled["e2e_ms"].values
+    disabled_e2e = ttg_disabled["e2e_ms"].values
+    ax.scatter(x - width/2, enabled_e2e, color="black", marker="_", s=200, linewidths=2, zorder=5, label="E2E (TTG)")
+    ax.scatter(x + width/2, disabled_e2e, color="darkred", marker="_", s=200, linewidths=2, zorder=5, label="E2E (No TTG)")
 
     ax.set_xlabel("# of Followings")
     ax.set_ylabel("Time (ms)")
