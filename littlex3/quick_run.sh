@@ -66,6 +66,11 @@ for i in 1 2 3; do
   body=$(echo "$response" | head -n -2)
   e2e_ms=$(awk "BEGIN {printf \"%.1f\", $e2e_time * 1000}")
   echo "Trial $i: ${e2e_ms}ms, response_size=${resp_size}bytes"
+  # Print the [TTG] breakdown line from the server log for this trial
+  ttg_line=$(grep '\[TTG\]' "$LOG_2" 2>/dev/null | tail -n 1 || true)
+  if [ -n "$ttg_line" ]; then
+    echo "  $ttg_line"
+  fi
 done
 
 echo ""
