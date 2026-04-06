@@ -83,6 +83,8 @@ def main():
         # Annotate with resolve_calls
         if "resolve_calls" in ttg_on.columns:
             for i, (rc, am) in enumerate(zip(ttg_on["resolve_calls"].values, ttg_on["adj_list_size"].fillna(0).values)):
+                if np.isnan(rc) or np.isnan(am):
+                    continue
                 ax2.text(x[i], ttg_ms[i] + 0.5, f"calls={int(rc)}\nadj={int(am)}", ha="center", fontsize=7)
 
         ax2.set_xlabel("# of Tweets per User")
