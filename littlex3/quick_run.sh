@@ -45,7 +45,7 @@ docker exec redis redis-cli FLUSHALL || true
 echo "=== Restarting jac server (log: $LOG_2) ==="
 kill $JAC_PID 2>/dev/null || true
 sleep 2
-JAC_TWEET_NUM=$JAC_TWEET_NUM jac start > "$LOG_2" 2>&1 &
+JAC_TWEET_NUM=$JAC_TWEET_NUM JAC_PROFILE_CSV=$JAC_PROFILE_CSV jac start > "$LOG_2" 2>&1 &
 JAC_PID=$!
 sleep 10
 
