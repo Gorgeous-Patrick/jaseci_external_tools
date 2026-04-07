@@ -2,7 +2,7 @@
 set -e
 
 # Configuration - sweep tweet counts
-TWEET_COUNTS=(1 10 50 100)
+TWEET_COUNTS=(1 10)
 
 # Results file
 RESULTS_FILE="sweep_results_e2e.csv"
@@ -52,12 +52,12 @@ for tweets in "${TWEET_COUNTS[@]}"; do
     mapfile -t e2e_times < <(grep -oP 'Trial \d+: \K[0-9.]+(?=ms)' "$QUICK_RUN_OUTPUT" || true)
 
     # Extract [TTG] sub-timing lines from server log (one per trial, last 3)
-    mapfile -t ttg_lines < <(grep '\[TTG\]' logs/jac_server_2.log 2>/dev/null | tail -n 3 || true)
+    mapfile -t ttg_lines < <(grep '\[TTG\]' logs/jac_server_2.log 2>/dev/null | tail -n 10 || true)
 
     # Read results from profile CSV (skip header, get last 3 trials)
     if [ -f "$PROFILE_CSV" ]; then
       trial_num=0
-      tail -n 3 "$PROFILE_CSV" | while IFS=, read -r p_node_num p_edge_num p_tweet_num p_ttg_enabled ttg_total_ms topo_idx_ms ttg_ms prefetch_ms walker_ms resolve_total_ms_csv; do
+      tail -n 10 "$PROFILE_CSV" | while IFS=, read -r p_node_num p_edge_num p_tweet_num p_ttg_enabled ttg_total_ms topo_idx_ms ttg_ms prefetch_ms walker_ms resolve_total_ms_csv; do
         e2e_ms="${e2e_times[$trial_num]:-0.0}"
         ttg_line="${ttg_lines[$trial_num]:-}"
         if [ -n "$ttg_line" ]; then
@@ -78,7 +78,7 @@ for tweets in "${TWEET_COUNTS[@]}"; do
     else
       echo "  WARNING: Profile CSV not found!"
       # Record e2e times even without profile data
-      for i in 0 1 2; do
+      for i in 0 1 2 3 4 5 6 7 8 9; do
         e2e_ms="${e2e_times[$i]:-0.0}"
         ttg_line="${ttg_lines[$i]:-}"
         if [ -n "$ttg_line" ]; then

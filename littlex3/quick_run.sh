@@ -31,8 +31,8 @@ http --ignore-stdin POST $base_url/user/register username=user password=password
 
 echo "=== Creating nodes from edges.txt ==="
 export token=$(http --ignore-stdin POST $base_url/user/login username=user password=password | jq ".data.token" -r)
-export NODE=$(http --ignore-stdin -A bearer -a $token POST "$base_url/function/create_node" | jq ".data.result[0]" -r)
-echo "First node: $NODE"
+mapfile -t NODES < <(http --ignore-stdin -A bearer -a $token POST "$base_url/function/create_node" | jq -r '.data.result[]')
+echo "Nodes: ${NODES[*]}"
 
 # Wait for sync to MongoDB before clearing Redis
 echo "=== Waiting for sync ==="
@@ -52,8 +52,9 @@ sleep 10
 echo "=== Running walker ==="
 export token=$(http --ignore-stdin POST $base_url/user/login username=user password=password | jq ".data.token" -r)
 
-echo "=== E2E Timing (3 trials) ==="
-for i in 1 2 3; do
+echo "=== E2E Timing (10 trials) ==="
+for i in 1 2 3 4 5 6 7 8 9 10; do
+  NODE="${NODES[$((i-1))]}"
   docker exec redis redis-cli FLUSHALL > /dev/null 2>&1 || true
   sleep 1
   response=$(curl -s -w "\n%{size_download}\n%{time_total}" -X POST \
