@@ -54,7 +54,7 @@ export token=$(http --ignore-stdin POST $base_url/user/login username=user passw
 
 echo "=== E2E Timing (10 trials) ==="
 for i in 1 2 3 4 5 6 7 8 9 10; do
-  NODE="${NODES[$((i-1))]}"
+  NODE="${NODES[$((0))]}"
   docker exec redis redis-cli FLUSHALL > /dev/null 2>&1 || true
   sleep 1
   response=$(curl -s -w "\n%{size_download}\n%{time_total}" -X POST \
