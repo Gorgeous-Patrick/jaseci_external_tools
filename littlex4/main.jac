@@ -15,8 +15,12 @@ walker LoadFeed {
     has visited: int = 0;
 
     can load with Profile entry {
-        visit [->:Follow:->];
+        self.visited += 1;
+        if self.visited >= 500 {
+            disengage;
+        }
         visit [->:Post:->];
+        visit [->:Follow:->];
     }
 
     can calc with Tweet entry {
