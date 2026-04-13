@@ -3,6 +3,7 @@ set -e
 
 export base_url="localhost:8000"
 export JAC_TWEET_NUM=${JAC_TWEET_NUM:-10}
+export JAC_PROFILE_DIR=${JAC_PROFILE_DIR:-profiles}
 
 # Clean previous state
 echo "=== Cleaning previous state ==="
@@ -45,7 +46,8 @@ docker exec redis redis-cli FLUSHALL || true
 echo "=== Restarting jac server (log: $LOG_2) ==="
 kill $JAC_PID 2>/dev/null || true
 sleep 2
-JAC_TWEET_NUM=$JAC_TWEET_NUM JAC_PROFILE_CSV=$JAC_PROFILE_CSV jac start > "$LOG_2" 2>&1 &
+mkdir -p "$JAC_PROFILE_DIR"
+JAC_TWEET_NUM=$JAC_TWEET_NUM JAC_PROFILE_CSV=$JAC_PROFILE_CSV JAC_PROFILE_DIR=$JAC_PROFILE_DIR jac start > "$LOG_2" 2>&1 &
 JAC_PID=$!
 sleep 10
 

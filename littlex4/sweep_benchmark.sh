@@ -46,7 +46,8 @@ for tweets in "${TWEET_COUNTS[@]}"; do
     rm -f "$PROFILE_CSV"
 
     # Run quick_run.sh with profiling enabled and capture output
-    JAC_TWEET_NUM=$tweets JAC_PROFILE_CSV=$PROFILE_CSV bash quick_run.sh 2>&1 | tee "$QUICK_RUN_OUTPUT"
+    _prof_dir="profiles/${tweets}_${ttg_mode}"
+    JAC_TWEET_NUM=$tweets JAC_PROFILE_CSV=$PROFILE_CSV JAC_PROFILE_DIR=$_prof_dir bash quick_run.sh 2>&1 | tee "$QUICK_RUN_OUTPUT"
 
     # Extract e2e times from quick_run.sh output (lines like "Trial 1: 123.4ms")
     mapfile -t e2e_times < <(grep -oP 'Trial \d+: \K[0-9.]+(?=ms)' "$QUICK_RUN_OUTPUT" || true)
