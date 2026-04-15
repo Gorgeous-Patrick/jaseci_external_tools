@@ -1,0 +1,30 @@
+[project]
+name = "fraud_detect"
+version = "0.1.0"
+description = "Basic fraud detection on a transaction graph"
+entry-point = "main.jac"
+
+[run]
+topology_index = true
+prefetching = "none"
+prefetch_limit = 3000
+
+[dev-dependencies]
+watchdog = ">=3.0.0"
+
+[plugins.scale.database]
+mongodb_uri = "mongodb://localhost:27017"
+redis_url = "redis://localhost:6379"
+
+[plugins.scale.jwt]
+secret = "fraud-detect-dev-secret-change-in-production"
+algorithm = "HS256"
+exp_delta_days = 7
+
+[plugins.scale.monitoring]
+enabled = true
+endpoint = "/metrics"
+walker_metrics = true
+
+[serve]
+docs_enabled = true
