@@ -2,7 +2,7 @@
 set -e
 
 # Configuration - sweep tweet counts
-TWEET_COUNTS=(10)
+TWEET_COUNTS=(1 10)
 
 # Results file
 RESULTS_FILE="sweep_results_e2e.csv"
