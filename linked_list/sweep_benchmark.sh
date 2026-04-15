@@ -57,7 +57,7 @@ for size in "${LIST_SIZES[@]}"; do
     # Read results from profile CSV (skip header, get last 10 trials)
     if [ -f "$PROFILE_CSV" ]; then
       trial_num=0
-      tail -n 10 "$PROFILE_CSV" | while IFS=, read -r p_list_size p_ttg_enabled ttg_total_ms topo_idx_ms ttg_ms prefetch_ms walker_ms resolve_total_ms_csv; do
+      tail -n 10 "$PROFILE_CSV" | while IFS=, read -r p_node_num p_edge_num p_tweet_num p_ttg_enabled ttg_total_ms topo_idx_ms ttg_ms prefetch_ms walker_ms resolve_total_ms_csv; do
         e2e_ms="${e2e_times[$trial_num]:-0.0}"
         ttg_line="${ttg_lines[$trial_num]:-}"
         if [ -n "$ttg_line" ]; then

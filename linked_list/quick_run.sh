@@ -55,24 +55,26 @@ echo "=== Running walker ==="
 export token=$(http --ignore-stdin POST $base_url/user/login username=user password=password | jq ".data.token" -r)
 
 echo "=== E2E Timing (10 trials) ==="
+_tmpfile=$(mktemp)
 for i in 1 2 3 4 5 6 7 8 9 10; do
   NODE="${NODES[0]}"
   docker exec redis redis-cli FLUSHALL > /dev/null 2>&1 || true
   sleep 1
-  response=$(curl -s -w "\n%{size_download}\n%{time_total}" -X POST \
+  e2e_time=$(curl -s -w "%{time_total}" -o "$_tmpfile" -X POST \
     -H "Authorization: Bearer $token" \
     -H "Content-Type: application/json" \
     -d "{}" \
     "http://$base_url/walker/Traverse/$NODE")
-  e2e_time=$(echo "$response" | tail -n 1)
-  resp_size=$(echo "$response" | tail -n 2 | head -n 1)
-  e2e_ms=$(awk "BEGIN {printf \"%.1f\", $e2e_time * 1000}")
+  resp_size=$(wc -c < "$_tmpfile")
+  e2e_ms=$(awk "BEGIN {printf \"%.3f\", $e2e_time * 1000}")
   echo "Trial $i: ${e2e_ms}ms, response_size=${resp_size}bytes"
   ttg_line=$(grep '\[TTG\]' "$LOG_2" 2>/dev/null | tail -n 1 || true)
   if [ -n "$ttg_line" ]; then
     echo "  $ttg_line"
   fi
 done
+
+rm -f "$_tmpfile"
 
 echo ""
 echo "=== Done ==="
