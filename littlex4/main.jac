@@ -16,8 +16,7 @@ walker LoadFeed {
 
     can load with Profile entry {
         self.visited += 1;
-        if self.visited >= 500 {
-          print("DISENGAGE");
+        if self.visited >= 900 {
             disengage;
         }
         visit [->:Post:->];
@@ -27,8 +26,7 @@ walker LoadFeed {
     can calc with Tweet entry {
         self.visited += 1;
         report self;
-        if self.visited >= 500 {
-          print("DISENGAGE");
+        if self.visited >= 900 {
             disengage;
         }
     }
