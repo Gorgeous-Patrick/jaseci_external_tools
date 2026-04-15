@@ -2,7 +2,7 @@
 set -e
 
 # Configuration - sweep list sizes
-LIST_SIZES=(100 1000 5000)
+LIST_SIZES=(100 1000)
 
 # Results file
 RESULTS_FILE="sweep_results_e2e.csv"
