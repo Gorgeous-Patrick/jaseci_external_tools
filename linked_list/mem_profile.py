@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Analyze a jac server .prof file and report time broken down by memory tier.
+Analyze a jac server .prof file and report cumulative time broken down by memory tier.
 
 Tiers:
   L1  - in-process dict (VolatileMemory / app address space)
@@ -36,24 +36,28 @@ def format_ms(seconds: float) -> str:
     return f"{seconds * 1000:>10.3f} ms"
 
 
-def analyze(prof_path: str, top_n: int) -> None:
+def analyze(prof_path: str, top_n: int, trials: int) -> None:
     stats = pstats.Stats(prof_path, stream=open("/dev/null", "w"))
     raw = stats.stats
 
-    total_tottime = sum(entry[2] for entry in raw.values())
+    # Use self-time (tottime) for the tier summary — avoids double-counting
+    # callee time that would inflate cumtime across the call stack.
+    total_tottime = sum(entry[2] for entry in raw.values()) / trials
 
     tier_tottime: dict[str, float] = defaultdict(float)
     tier_funcs: dict[str, list] = defaultdict(list)
 
     for (filename, lineno, funcname), (cc, nc, tt, ct, _callers) in raw.items():
         tier = classify(filename)
-        tier_tottime[tier] += tt
-        tier_funcs[tier].append((tt, ct, nc, funcname, filename, lineno))
+        tier_tottime[tier] += tt / trials
+        # Per-function table shows cumtime (useful) alongside self-time
+        tier_funcs[tier].append((ct / trials, tt / trials, nc, funcname, filename, lineno))
 
     print(f"\n{'='*65}")
     print(f"  Memory tier breakdown  —  {prof_path}")
+    print(f"  averaged over {trials} trials (per-request)")
     print(f"{'='*65}")
-    print(f"{'Tier':<22}  {'Total self-time':>16}  {'% of profiled':>13}")
+    print(f"{'Tier':<22}  {'Avg self-time/req':>17}  {'% of profiled':>13}")
     print(f"{'-'*65}")
 
     ordered_tiers = ["L2 Redis", "L3 MongoDB", "coordination", "other"]
@@ -73,13 +77,13 @@ def analyze(prof_path: str, top_n: int) -> None:
             continue
         funcs.sort(key=lambda x: x[0], reverse=True)
         tier_total = tier_tottime.get(tier, 0.0)
-        print(f"  Top {top_n} functions in [{tier}]  (tier self-time: {tier_total*1000:.3f} ms)")
-        print(f"  {'self-time':>12}  {'cum-time':>12}  {'calls':>8}  function")
+        print(f"  Top {top_n} functions in [{tier}]  (avg self-time/req: {tier_total*1000:.3f} ms)")
+        print(f"  {'cum-time':>12}  {'self-time':>12}  {'calls':>8}  function")
         print(f"  {'-'*60}")
-        for tt, ct, nc, funcname, filename, lineno in funcs[:top_n]:
+        for ct, tt, nc, funcname, filename, lineno in funcs[:top_n]:
             short_file = filename.split("/")[-1] if "/" in filename else filename
             loc = f"{short_file}:{lineno}"
-            print(f"  {format_ms(tt)}  {format_ms(ct)}  {nc:>8}  {funcname}  [{loc}]")
+            print(f"  {format_ms(ct)}  {format_ms(tt)}  {nc:>8}  {funcname}  [{loc}]")
         print()
 
 
@@ -87,8 +91,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Memory tier profiling summary")
     parser.add_argument("prof", help="Path to .prof file")
     parser.add_argument("--top", type=int, default=10, help="Top N functions per tier")
+    parser.add_argument("--trials", type=int, default=10, help="Number of trials to average over")
     args = parser.parse_args()
-    analyze(args.prof, args.top)
+    analyze(args.prof, args.top, args.trials)
 
 
 if __name__ == "__main__":
