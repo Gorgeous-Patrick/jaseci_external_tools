@@ -20,6 +20,14 @@ import argparse
 from collections import defaultdict
 
 # ---------------------------------------------------------------------------
+# MongoBackend request functions — each call = one MongoDB round-trip.
+# ---------------------------------------------------------------------------
+MONGO_REQUEST_FUNCS = {
+    "get", "put", "delete", "has", "query",
+    "find", "find_raw", "batch_get", "bulk_put",
+}
+
+# ---------------------------------------------------------------------------
 # Tier classification rules — checked in order, first match wins.
 # Each rule is (tier_label, list_of_substrings_to_match_against_filename).
 # ---------------------------------------------------------------------------
@@ -50,11 +58,15 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
     # Accumulate tottime per tier and track individual functions
     tier_tottime: dict[str, float] = defaultdict(float)
     tier_funcs: dict[str, list] = defaultdict(list)
+    mongo_request_calls: dict[str, int] = {}
 
     for (filename, lineno, funcname), (cc, nc, tt, ct, _callers) in raw.items():
         tier = classify(filename)
         tier_tottime[tier] += tt / trials
         tier_funcs[tier].append((tt / trials, ct / trials, nc, funcname, filename, lineno))
+        short_funcname = funcname.split(".")[-1]
+        if tier == "L3 MongoDB" and short_funcname in MONGO_REQUEST_FUNCS and "memory_hierarchy.mongo" in filename:
+            mongo_request_calls[short_funcname] = mongo_request_calls.get(short_funcname, 0) + nc
 
     # Derive L1 time: coordination tottime minus what it spent calling L2/L3.
     # Since tottime already excludes called functions, L1 dict ops are embedded
@@ -81,6 +93,20 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
     print(f"{'-'*65}")
     print(f"  {'Total profiled':<20}  {format_ms(total_tottime)}")
     print(f"{'='*65}\n")
+
+    # -----------------------------------------------------------------------
+    # MongoDB request counts
+    # -----------------------------------------------------------------------
+    if mongo_request_calls:
+        total_mongo_calls = sum(mongo_request_calls.values())
+        print(f"  MongoDB requests (total across {trials} trials: {total_mongo_calls},  avg/req: {total_mongo_calls/trials:.1f})")
+        print(f"  {'function':<12}  {'total calls':>11}  {'avg/req':>9}")
+        print(f"  {'-'*38}")
+        for funcname in sorted(mongo_request_calls, key=lambda f: mongo_request_calls[f], reverse=True):
+            calls = mongo_request_calls[funcname]
+            note = "  (generator: counts docs yielded, not queries)" if funcname == "find_raw" else ""
+            print(f"  {funcname:<12}  {calls:>11}  {calls/trials:>9.1f}{note}")
+        print()
 
     # -----------------------------------------------------------------------
     # Per-tier top-N breakdown
