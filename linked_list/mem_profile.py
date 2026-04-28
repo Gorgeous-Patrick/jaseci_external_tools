@@ -50,11 +50,10 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
 
     # Use self-time (tottime) for the tier summary — avoids double-counting
     # callee time that would inflate cumtime across the call stack.
-    total_tottime = sum(entry[2] for entry in raw.values()) / trials
-
     tier_tottime: dict[str, float] = defaultdict(float)
     tier_funcs: dict[str, list] = defaultdict(list)
     mongo_request_calls: dict[str, int] = {}
+    entry_cumtime = 0.0  # cumtime of _jac_walker_execute — true wall time covering TTG + walker
 
     for (filename, lineno, funcname), (cc, nc, tt, ct, _callers) in raw.items():
         tier = classify(filename)
@@ -64,6 +63,13 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
         short_funcname = funcname.split(".")[-1]
         if tier == "L3 MongoDB" and short_funcname in MONGO_REQUEST_FUNCS and "memory_hierarchy.mongo" in filename:
             mongo_request_calls[short_funcname] = mongo_request_calls.get(short_funcname, 0) + nc
+        if funcname == "_jac_walker_execute":
+            entry_cumtime = ct / trials
+
+    # Use _jac_walker_execute cumtime as reference — covers TTG + walker, and avoids
+    # inflating total with background asyncio task time from other coroutines.
+    # Fall back to sum of tottime if entry function not found.
+    total_ref = entry_cumtime if entry_cumtime > 0 else sum(entry[2] for entry in raw.values()) / trials
 
     print(f"\n{'='*65}")
     print(f"  Memory tier breakdown  —  {prof_path}")
@@ -75,12 +81,13 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
     ordered_tiers = ["L2 Redis", "L3 MongoDB", "coordination", "other"]
     for tier in ordered_tiers:
         tt = tier_tottime.get(tier, 0.0)
-        pct = (tt / total_tottime * 100) if total_tottime > 0 else 0.0
+        pct = (tt / total_ref * 100) if total_ref > 0 else 0.0
         label = tier if tier != "coordination" else "L1 + coordination"
         print(f"  {label:<20}  {format_ms(tt)}  {pct:>12.1f}%")
 
     print(f"{'-'*65}")
-    print(f"  {'Total profiled':<20}  {format_ms(total_tottime)}")
+    ref_label = "Total (_jac_walker_execute)" if entry_cumtime > 0 else "Total profiled"
+    print(f"  {ref_label:<20}  {format_ms(total_ref)}")
     print(f"{'='*65}\n")
 
     # -----------------------------------------------------------------------
