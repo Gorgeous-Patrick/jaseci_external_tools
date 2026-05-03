@@ -48,30 +48,56 @@ def format_ms(seconds: float) -> str:
     return f"{seconds * 1000:>10.3f} ms"
 
 
+def reachable_from(entry_key, raw: dict) -> set:
+    """BFS from entry_key following callee edges; returns set of reachable keys."""
+    # Build callee map: caller -> [callees]
+    callee_map: dict = defaultdict(list)
+    for callee_key, (cc, nc, tt, ct, callers) in raw.items():
+        for caller_key in callers:
+            callee_map[caller_key].append(callee_key)
+
+    visited = set()
+    frontier = [entry_key]
+    while frontier:
+        key = frontier.pop()
+        if key in visited:
+            continue
+        visited.add(key)
+        frontier.extend(callee_map.get(key, []))
+    return visited
+
+
 def analyze(prof_path: str, top_n: int, trials: int) -> None:
     stats = pstats.Stats(prof_path, stream=open("/dev/null", "w"))
     # stats.stats: {(file, lineno, func): (prim_calls, total_calls, tottime, cumtime, callers)}
     raw = stats.stats
 
-    # Accumulate tottime per tier and track individual functions
+    # Find _jac_walker_execute and BFS to get its subtree
+    entry_key = next((k for k in raw if k[2] == "_jac_walker_execute"), None)
+    subtree = reachable_from(entry_key, raw) if entry_key else set(raw.keys())
+    entry_cumtime = (raw[entry_key][3] / trials) if entry_key else 0.0
+
+    # Accumulate tottime per tier and track individual functions — subtree only
     tier_tottime: dict[str, float] = defaultdict(float)
     tier_funcs: dict[str, list] = defaultdict(list)
     mongo_request_calls: dict[str, int] = {}
-    entry_cumtime = 0.0  # cumtime of _jac_walker_execute — true wall time covering TTG + walker
+    ttg_cumtime = 0.0
+    prefetch_cumtime = 0.0
 
-    for (filename, lineno, funcname), (cc, nc, tt, ct, _callers) in raw.items():
+    for key in subtree:
+        filename, lineno, funcname = key
+        cc, nc, tt, ct, _callers = raw[key]
         tier = classify(filename)
         tier_tottime[tier] += tt / trials
         tier_funcs[tier].append((tt / trials, ct / trials, nc, funcname, filename, lineno))
         short_funcname = funcname.split(".")[-1]
         if tier == "L3 MongoDB" and short_funcname in MONGO_REQUEST_FUNCS and "memory_hierarchy.mongo" in filename:
             mongo_request_calls[short_funcname] = mongo_request_calls.get(short_funcname, 0) + nc
-        if funcname == "_jac_walker_execute":
-            entry_cumtime = ct / trials
+        if funcname == "get_ttg_prefetch_list":
+            ttg_cumtime = ct / trials
+        elif funcname == "ScaleTieredMemory.prefetch":
+            prefetch_cumtime = ct / trials
 
-    # Use _jac_walker_execute cumtime as reference — covers TTG + walker, and avoids
-    # inflating total with background asyncio task time from other coroutines.
-    # Fall back to sum of tottime if entry function not found.
     total_ref = entry_cumtime if entry_cumtime > 0 else sum(entry[2] for entry in raw.values()) / trials
 
     # Derive L1 time: coordination tottime minus what it spent calling L2/L3.
@@ -99,6 +125,13 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
     print(f"{'-'*65}")
     ref_label = "Total (_jac_walker_execute)" if entry_cumtime > 0 else "Total profiled"
     print(f"  {ref_label:<20}  {format_ms(total_ref)}")
+    if ttg_cumtime > 0 or prefetch_cumtime > 0:
+        print(f"{'='*65}")
+        print(f"  TTG breakdown (cum-time/req):")
+        if ttg_cumtime > 0:
+            print(f"    {'get_ttg_prefetch_list':<22}  {format_ms(ttg_cumtime)}")
+        if prefetch_cumtime > 0:
+            print(f"    {'prefetch':<22}  {format_ms(prefetch_cumtime)}")
     print(f"{'='*65}\n")
 
     # -----------------------------------------------------------------------
