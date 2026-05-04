@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Analyze a jac server .prof file and report time broken down by memory tier.
+Analyze a jac server .prof file and report cumulative time broken down by memory tier.
 
 Tiers:
   L1  - in-process dict (VolatileMemory / app address space)
@@ -89,7 +89,8 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
         cc, nc, tt, ct, _callers = raw[key]
         tier = classify(filename)
         tier_tottime[tier] += tt / trials
-        tier_funcs[tier].append((tt / trials, ct / trials, nc, funcname, filename, lineno))
+        # Per-function table shows cumtime (useful) alongside self-time
+        tier_funcs[tier].append((ct / trials, tt / trials, nc, funcname, filename, lineno))
         short_funcname = funcname.split(".")[-1]
         if tier == "L3 MongoDB" and short_funcname in MONGO_REQUEST_FUNCS and "memory_hierarchy.mongo" in filename:
             mongo_request_calls[short_funcname] = mongo_request_calls.get(short_funcname, 0) + nc
@@ -158,12 +159,12 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
         funcs.sort(key=lambda x: x[0], reverse=True)
         tier_total = tier_tottime.get(tier, 0.0)
         print(f"  Top {top_n} functions in [{tier}]  (avg self-time/req: {tier_total*1000:.3f} ms)")
-        print(f"  {'self-time':>12}  {'cum-time':>12}  {'calls':>8}  function")
+        print(f"  {'cum-time':>12}  {'self-time':>12}  {'calls':>8}  function")
         print(f"  {'-'*60}")
-        for tt, ct, nc, funcname, filename, lineno in funcs[:top_n]:
+        for ct, tt, nc, funcname, filename, lineno in funcs[:top_n]:
             short_file = filename.split("/")[-1] if "/" in filename else filename
             loc = f"{short_file}:{lineno}"
-            print(f"  {format_ms(tt)}  {format_ms(ct)}  {nc:>8}  {funcname}  [{loc}]")
+            print(f"  {format_ms(ct)}  {format_ms(tt)}  {nc:>8}  {funcname}  [{loc}]")
         print()
 
 
