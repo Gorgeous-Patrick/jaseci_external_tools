@@ -13,8 +13,14 @@ import sys
 import argparse
 from collections import defaultdict
 
+# ---------------------------------------------------------------------------
+# Helpers to identify functions by name substring
+# ---------------------------------------------------------------------------
+# In compiled jac, spawn_call becomes _execute_entries;
+# per-node dispatch is _visit_node_recursive.
 SPAWN_FUNCS = ("_execute_entries", "_visit_node_recursive")
 
+# Jaclang internal modules to exclude when showing "user" walker functions
 INTERNAL_PREFIXES = (
     "jaclang/",
     "jaclang\\",
@@ -41,6 +47,10 @@ def format_us(seconds: float) -> str:
     return f"{seconds * 1_000_000:>10.1f} µs"
 
 
+# ---------------------------------------------------------------------------
+# Build an inverted callee map from pstats
+# callee_map[caller_key] = list of callee_keys
+# ---------------------------------------------------------------------------
 def build_callee_map(raw: dict) -> dict:
     callee_map: dict = defaultdict(list)
     for callee_key, (cc, nc, tt, ct, callers) in raw.items():
@@ -49,9 +59,13 @@ def build_callee_map(raw: dict) -> dict:
     return callee_map
 
 
+# ---------------------------------------------------------------------------
+# BFS to collect all transitive callees of a seed set of keys
+# ---------------------------------------------------------------------------
 def transitive_callees(
     seed_keys: list, callee_map: dict, max_depth: int = 6
 ) -> dict:
+    """Return {key: depth} for all nodes reachable from seed_keys."""
     visited: dict = {}
     frontier = [(k, 0) for k in seed_keys]
     while frontier:
@@ -65,13 +79,21 @@ def transitive_callees(
     return visited
 
 
+# ---------------------------------------------------------------------------
+# Main analysis
+# ---------------------------------------------------------------------------
 def analyze(prof_path: str, top_n: int) -> None:
     stats = pstats.Stats(prof_path, stream=open("/dev/null", "w"))
-    raw = stats.stats
+    raw = stats.stats  # {(file, lineno, func): (cc, nc, tt, ct, callers)}
 
     callee_map = build_callee_map(raw)
 
-    spawn_keys = [k for k in raw if k[2] in SPAWN_FUNCS]
+    # ------------------------------------------------------------------
+    # 1. Find spawn_call / async_spawn_call entries
+    # ------------------------------------------------------------------
+    spawn_keys = [
+        k for k in raw if k[2] in SPAWN_FUNCS
+    ]
 
     print(f"\n{'='*70}")
     print(f"  Walker execution summary  —  {prof_path}")
@@ -94,8 +116,14 @@ def analyze(prof_path: str, top_n: int) -> None:
 
     print(f"{'='*70}\n")
 
+    # ------------------------------------------------------------------
+    # 2. Collect transitive callees of spawn_call(s)
+    # ------------------------------------------------------------------
     reachable = transitive_callees(spawn_keys, callee_map, max_depth=10)
 
+    # ------------------------------------------------------------------
+    # 3. Split into: jaclang internals vs user (walker) functions
+    # ------------------------------------------------------------------
     internal_entries = []
     user_entries = []
 
@@ -108,6 +136,9 @@ def analyze(prof_path: str, top_n: int) -> None:
         else:
             user_entries.append((nc, tt, ct, depth, key))
 
+    # ------------------------------------------------------------------
+    # 4. Walker (user) entry functions — sorted by total cumtime desc
+    # ------------------------------------------------------------------
     print(f"  Walker functions in spawn_call subtree (user-defined, top {top_n} by cum-time)")
     print(f"  {'calls':>8}  {'self-time':>12}  {'cum-time':>12}  {'avg cum/call':>14}  function  [location]")
     print(f"  {'-'*70}")
@@ -125,6 +156,9 @@ def analyze(prof_path: str, top_n: int) -> None:
 
     print()
 
+    # ------------------------------------------------------------------
+    # 5. Key jaclang internals in the call tree (for context)
+    # ------------------------------------------------------------------
     INTERESTING = {
         "_execute_entries", "_visit_node_recursive",
         "batch_load_nodes", "plan_query", "refs",
@@ -150,6 +184,9 @@ def analyze(prof_path: str, top_n: int) -> None:
 
     print()
 
+    # ------------------------------------------------------------------
+    # 6. Top-N all jaclang internals by self-time (for deep dives)
+    # ------------------------------------------------------------------
     print(f"  Top {top_n} jaclang internals in spawn_call subtree (by self-time)")
     print(f"  {'calls':>8}  {'self-time':>12}  {'cum-time':>12}  {'avg cum/call':>14}  function  [location]")
     print(f"  {'-'*70}")

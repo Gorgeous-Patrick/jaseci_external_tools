@@ -27,6 +27,10 @@ MONGO_REQUEST_FUNCS = {
     "find", "find_raw", "batch_get", "bulk_put",
 }
 
+# ---------------------------------------------------------------------------
+# Tier classification rules — checked in order, first match wins.
+# Each rule is (tier_label, list_of_substrings_to_match_against_filename).
+# ---------------------------------------------------------------------------
 TIER_RULES = [
     ("L2 Redis",    ["memory_hierarchy.redis", "/redis/", "\\redis\\"]),
     ("L3 MongoDB",  ["memory_hierarchy.mongo", "/pymongo/", "\\pymongo\\", "bson"]),
@@ -46,6 +50,7 @@ def format_ms(seconds: float) -> str:
 
 def reachable_from(entry_key, raw: dict) -> set:
     """BFS from entry_key following callee edges; returns set of reachable keys."""
+    # Build callee map: caller -> [callees]
     callee_map: dict = defaultdict(list)
     for callee_key, (cc, nc, tt, ct, callers) in raw.items():
         for caller_key in callers:
@@ -64,6 +69,7 @@ def reachable_from(entry_key, raw: dict) -> set:
 
 def analyze(prof_path: str, top_n: int, trials: int) -> None:
     stats = pstats.Stats(prof_path, stream=open("/dev/null", "w"))
+    # stats.stats: {(file, lineno, func): (prim_calls, total_calls, tottime, cumtime, callers)}
     raw = stats.stats
 
     # Find _jac_walker_execute and BFS to get its subtree
@@ -95,6 +101,14 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
 
     total_ref = entry_cumtime if entry_cumtime > 0 else sum(entry[2] for entry in raw.values()) / trials
 
+    # Derive L1 time: coordination tottime minus what it spent calling L2/L3.
+    # Since tottime already excludes called functions, L1 dict ops are embedded
+    # in coordination tottime (they are inlined / not separate function calls).
+    # We label the coordination tier as "L1 + coordination overhead" accordingly.
+
+    # -----------------------------------------------------------------------
+    # Summary table
+    # -----------------------------------------------------------------------
     print(f"\n{'='*65}")
     print(f"  Memory tier breakdown  —  {prof_path}")
     print(f"  averaged over {trials} trials (per-request)")
@@ -135,6 +149,9 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
             print(f"  {funcname:<12}  {calls:>11}  {calls/trials:>9.1f}{note}")
         print()
 
+    # -----------------------------------------------------------------------
+    # Per-tier top-N breakdown
+    # -----------------------------------------------------------------------
     for tier in ["L2 Redis", "L3 MongoDB", "coordination"]:
         funcs = tier_funcs.get(tier, [])
         if not funcs:
