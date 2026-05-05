@@ -84,6 +84,9 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
     mongo_request_cumtime: dict[str, float] = {}
     ttg_cumtime = 0.0
     prefetch_cumtime = 0.0
+    prefetch_bulk_exists_cumtime = 0.0
+    prefetch_find_raw_cumtime = 0.0
+    prefetch_bulk_put_raw_cumtime = 0.0
 
     for key in subtree:
         filename, lineno, funcname = key
@@ -100,6 +103,12 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
             ttg_cumtime = ct / trials
         elif funcname == "ScaleTieredMemory.prefetch":
             prefetch_cumtime = ct / trials
+        elif funcname == "RedisBackend.bulk_exists":
+            prefetch_bulk_exists_cumtime = ct / trials
+        elif funcname == "MongoBackend.find_raw":
+            prefetch_find_raw_cumtime = ct / trials
+        elif funcname == "RedisBackend.bulk_put_raw":
+            prefetch_bulk_put_raw_cumtime = ct / trials
 
     total_ref = entry_cumtime if entry_cumtime > 0 else sum(entry[2] for entry in raw.values()) / trials
 
@@ -133,9 +142,15 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
         print(f"{'='*65}")
         print(f"  TTG breakdown (cum-time/req):")
         if ttg_cumtime > 0:
-            print(f"    {'get_ttg_prefetch_list':<22}  {format_ms(ttg_cumtime)}")
+            print(f"    {'get_ttg_prefetch_list':<28}  {format_ms(ttg_cumtime)}")
         if prefetch_cumtime > 0:
-            print(f"    {'prefetch':<22}  {format_ms(prefetch_cumtime)}")
+            print(f"    {'prefetch':<28}  {format_ms(prefetch_cumtime)}")
+            if prefetch_bulk_exists_cumtime > 0:
+                print(f"      {'bulk_exists (L2)':<26}  {format_ms(prefetch_bulk_exists_cumtime)}")
+            if prefetch_find_raw_cumtime > 0:
+                print(f"      {'find_raw (L3)':<26}  {format_ms(prefetch_find_raw_cumtime)}")
+            if prefetch_bulk_put_raw_cumtime > 0:
+                print(f"      {'bulk_put_raw (L2)':<26}  {format_ms(prefetch_bulk_put_raw_cumtime)}")
     print(f"{'='*65}\n")
 
     # -----------------------------------------------------------------------
