@@ -81,6 +81,7 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
     tier_tottime: dict[str, float] = defaultdict(float)
     tier_funcs: dict[str, list] = defaultdict(list)
     mongo_request_calls: dict[str, int] = {}
+    mongo_request_cumtime: dict[str, float] = {}
     ttg_cumtime = 0.0
     prefetch_cumtime = 0.0
 
@@ -94,6 +95,7 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
         short_funcname = funcname.split(".")[-1]
         if tier == "L3 MongoDB" and short_funcname in MONGO_REQUEST_FUNCS and "memory_hierarchy.mongo" in filename:
             mongo_request_calls[short_funcname] = mongo_request_calls.get(short_funcname, 0) + nc
+            mongo_request_cumtime[short_funcname] = mongo_request_cumtime.get(short_funcname, 0.0) + ct
         if funcname == "get_ttg_prefetch_list":
             ttg_cumtime = ct / trials
         elif funcname == "ScaleTieredMemory.prefetch":
@@ -116,10 +118,11 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
     print(f"{'Tier':<22}  {'Avg self-time/req':>17}  {'% of profiled':>13}")
     print(f"{'-'*65}")
 
+    total_self = sum(tier_tottime.values())
     ordered_tiers = ["L2 Redis", "L3 MongoDB", "coordination", "other"]
     for tier in ordered_tiers:
         tt = tier_tottime.get(tier, 0.0)
-        pct = (tt / total_ref * 100) if total_ref > 0 else 0.0
+        pct = (tt / total_self * 100) if total_self > 0 else 0.0
         label = tier if tier != "coordination" else "L1 + coordination"
         print(f"  {label:<20}  {format_ms(tt)}  {pct:>12.1f}%")
 
@@ -141,12 +144,14 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
     if mongo_request_calls:
         total_mongo_calls = sum(mongo_request_calls.values())
         print(f"  MongoDB requests (total across {trials} trials: {total_mongo_calls},  avg/req: {total_mongo_calls/trials:.1f})")
-        print(f"  {'function':<12}  {'total calls':>11}  {'avg/req':>9}")
-        print(f"  {'-'*38}")
+        print(f"  {'function':<12}  {'total calls':>11}  {'avg/req':>9}  {'cum/req':>12}  {'avg/call':>12}")
+        print(f"  {'-'*62}")
         for funcname in sorted(mongo_request_calls, key=lambda f: mongo_request_calls[f], reverse=True):
             calls = mongo_request_calls[funcname]
+            ct = mongo_request_cumtime.get(funcname, 0.0)
+            avg_call = ct / calls if calls else 0.0
             note = "  (generator: counts docs yielded, not queries)" if funcname == "find_raw" else ""
-            print(f"  {funcname:<12}  {calls:>11}  {calls/trials:>9.1f}{note}")
+            print(f"  {funcname:<12}  {calls:>11}  {calls/trials:>9.1f}  {format_ms(ct/trials)}  {format_ms(avg_call)}{note}")
         print()
 
     # -----------------------------------------------------------------------
