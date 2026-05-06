@@ -2,7 +2,7 @@
 set -e
 
 # Configuration — edit these to match your experiment
-PREFETCH_LIMITS=(0 2000 4000 6000 8000 10000 12000 14000 16000 18000 20000 22000 24000 26000 28000 30000 32000)
+PREFETCH_LIMITS=(0 2000 4000 6000 8000 10000 12000 14000 16000)
 LIST_SIZE=${JAC_LIST_SIZE:-1000}
 TRIALS=10
 
@@ -15,7 +15,7 @@ echo "Limits     : ${PREFETCH_LIMITS[*]}"
 echo ""
 
 # Write CSV header
-echo "prefetch_limit,trial,e2e_ms,ttg_bfs_ms,bulk_exists_ms,find_raw_ms,bulk_put_raw_ms,batch_load_ms,l2_hit_rate,get_l2_hit_rate" > "$RESULTS_FILE"
+echo "prefetch_limit,trial,e2e_ms,ttg_bfs_ms,bulk_exists_ms,find_raw_ms,bulk_put_raw_ms,batch_load_ms,l2_hit_rate" > "$RESULTS_FILE"
 
 for limit in "${PREFETCH_LIMITS[@]}"; do
   echo "========================================"
@@ -44,29 +44,24 @@ import pstats, sys
 prof_path, trials = sys.argv[1], int(sys.argv[2])
 stats = pstats.Stats(prof_path, stream=open('/dev/null', 'w'))
 ct_map = {}
-nc_map = {}
 for (f, l, fn), (cc, nc, tt, ct, callers) in stats.stats.items():
     ct_map[fn] = ct_map.get(fn, 0) + ct
-    nc_map[fn] = nc_map.get(fn, 0) + nc
 t = trials
 def ms(fn): return f"{ct_map.get(fn, 0) / t * 1000:.3f}"
-total_gets = nc_map.get('TieredMemory.get', 0)
-l3_gets    = nc_map.get('MongoBackend.get', 0)
-get_l2_hit = f"{(1 - l3_gets / total_gets) * 100:.1f}" if total_gets > 0 else "100.0"
-print(ms('get_ttg_prefetch_list'), ms('RedisBackend.bulk_exists'), ms('MongoBackend.find_raw'), ms('RedisBackend.bulk_put_raw'), ms('batch_load_nodes'), get_l2_hit)
+print(ms('get_ttg_prefetch_list'), ms('RedisBackend.bulk_exists'), ms('MongoBackend.find_raw'), ms('RedisBackend.bulk_put_raw'), ms('batch_load_nodes'))
 PYEOF
     )
-    read -r ttg_bfs_ms bulk_exists_ms find_raw_ms bulk_put_raw_ms batch_load_ms get_l2_hit_rate <<< "$prof_data"
+    read -r ttg_bfs_ms bulk_exists_ms find_raw_ms bulk_put_raw_ms batch_load_ms <<< "$prof_data"
 
     for i in $(seq 0 $((TRIALS - 1))); do
       e2e_ms="${e2e_times[$i]:-0.0}"
-      echo "  Trial $((i + 1)): e2e=${e2e_ms}ms  ttg_bfs=${ttg_bfs_ms}ms  bulk_exists=${bulk_exists_ms}ms  find_raw=${find_raw_ms}ms  bulk_put_raw=${bulk_put_raw_ms}ms  batch_load=${batch_load_ms}ms  l2_rate=${l2_hit_rate}%  get_l2_rate=${get_l2_hit_rate}%"
-      echo "$limit,$((i + 1)),$e2e_ms,$ttg_bfs_ms,$bulk_exists_ms,$find_raw_ms,$bulk_put_raw_ms,$batch_load_ms,$l2_hit_rate,$get_l2_hit_rate" >> "$RESULTS_FILE"
+      echo "  Trial $((i + 1)): e2e=${e2e_ms}ms  ttg_bfs=${ttg_bfs_ms}ms  bulk_exists=${bulk_exists_ms}ms  find_raw=${find_raw_ms}ms  bulk_put_raw=${bulk_put_raw_ms}ms  batch_load=${batch_load_ms}ms  l2_rate=${l2_hit_rate}%"
+      echo "$limit,$((i + 1)),$e2e_ms,$ttg_bfs_ms,$bulk_exists_ms,$find_raw_ms,$bulk_put_raw_ms,$batch_load_ms,$l2_hit_rate" >> "$RESULTS_FILE"
     done
   else
     echo "  WARNING: Profile not found at $prof_file"
     for i in $(seq 0 $((TRIALS - 1))); do
-      echo "$limit,$((i + 1)),${e2e_times[$i]:-0.0},0.0,0.0,0.0,0.0,0.0,0.0,0.0" >> "$RESULTS_FILE"
+      echo "$limit,$((i + 1)),${e2e_times[$i]:-0.0},0.0,0.0,0.0,0.0,0.0,0.0" >> "$RESULTS_FILE"
     done
   fi
 done

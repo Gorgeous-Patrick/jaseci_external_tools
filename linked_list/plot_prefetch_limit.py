@@ -34,8 +34,7 @@ def main():
     ttg_bfs      = grouped["ttg_bfs_ms"].values
     e2e          = grouped["e2e_ms"].values
     other        = np.maximum(e2e - (batch_load + bulk_put_raw + find_raw + bulk_exists + ttg_bfs), 0)
-    l2_hit_rate     = grouped["l2_hit_rate"].values if "l2_hit_rate" in grouped.columns else None
-    get_l2_hit_rate = grouped["get_l2_hit_rate"].values if "get_l2_hit_rate" in grouped.columns else None
+    l2_hit_rate = grouped["l2_hit_rate"].values if "l2_hit_rate" in grouped.columns else None
 
     fig, ax = plt.subplots(figsize=(12, 6))
 
@@ -56,15 +55,10 @@ def main():
     for i, total in enumerate(e2e):
         ax.text(x[i], total + 5, f"{total:.0f}ms", ha="center", va="bottom", fontsize=8)
 
-    # Secondary axis: L2 hit rates
-    has_rates = (l2_hit_rate is not None and l2_hit_rate.sum() > 0) or \
-                (get_l2_hit_rate is not None and get_l2_hit_rate.sum() > 0)
-    if has_rates:
+    # Secondary axis: L2 hit rate
+    if l2_hit_rate is not None and l2_hit_rate.sum() > 0:
         ax2 = ax.twinx()
-        if l2_hit_rate is not None and l2_hit_rate.sum() > 0:
-            ax2.plot(x, l2_hit_rate, color="darkblue", marker="o", linewidth=2, label="batch_get L2 hit rate (%)")
-        if get_l2_hit_rate is not None and get_l2_hit_rate.sum() > 0:
-            ax2.plot(x, get_l2_hit_rate, color="purple", marker="s", linewidth=2, linestyle="--", label="get() L2 hit rate (%)")
+        ax2.plot(x, l2_hit_rate, color="darkblue", marker="o", linewidth=2, label="L2 hit rate (%)")
         ax2.set_ylabel("L2 Hit Rate (%)")
         ax2.set_ylim(0, 110)
         ax2.legend(loc="upper right")
