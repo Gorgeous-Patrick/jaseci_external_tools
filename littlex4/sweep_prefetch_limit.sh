@@ -2,7 +2,7 @@
 set -e
 
 # Configuration — edit these to match your experiment
-PREFETCH_LIMITS=(0 2000 4000 6000 8000 10000 12000 14000 16000 18000 20000 22000 24000 26000 28000 30000 32000)
+PREFETCH_LIMITS=(0 2000 4000 6000 8000 10000 12000 14000 16000)
 TWEET_NUM=${JAC_TWEET_NUM:-10}
 TRIALS=10
 
@@ -15,7 +15,7 @@ echo "Limits     : ${PREFETCH_LIMITS[*]}"
 echo ""
 
 # Write CSV header
-echo "prefetch_limit,trial,e2e_ms,ttg_bfs_ms,bulk_exists_ms,find_raw_ms,bulk_put_raw_ms,batch_load_ms,l2_hit_rate" > "$RESULTS_FILE"
+echo "prefetch_limit,trial,e2e_ms,topo_idx_ms,ttg_ms,prefetch_ms,walker_ms" > "$RESULTS_FILE"
 
 for limit in "${PREFETCH_LIMITS[@]}"; do
   echo "========================================"
@@ -26,42 +26,32 @@ for limit in "${PREFETCH_LIMITS[@]}"; do
   sed -i "s/prefetch_limit = .*/prefetch_limit = $limit/" jac.toml
 
   _prof_dir="profiles/limit_${limit}"
-  JAC_TWEET_NUM=$TWEET_NUM JAC_PROFILE_DIR="$_prof_dir" bash quick_run.sh 2>&1 | tee "$QUICK_RUN_OUTPUT"
+  _profile_csv="$_prof_dir/profile.csv"
+  JAC_TWEET_NUM=$TWEET_NUM JAC_PROFILE_DIR="$_prof_dir" JAC_PROFILE_CSV="$_profile_csv" bash quick_run.sh 2>&1 | tee "$QUICK_RUN_OUTPUT"
 
   # Extract e2e times from quick_run output (lines like "Trial 1: 123.4ms")
   mapfile -t e2e_times < <(grep -oP 'Trial \d+: \K[0-9.]+(?=ms)' "$QUICK_RUN_OUTPUT" || true)
 
-  # Extract average L2 hit rate from [BATCH_GET] log lines in server log
-  l2_hit_rate=$(grep '\[BATCH_GET\]' logs/jac_server_2.log 2>/dev/null \
-    | grep -oP 'l2_rate=\K[0-9.]+' \
-    | awk '{sum+=$1; n++} END {if(n>0) printf "%.1f", sum/n; else print "0.0"}' || echo "0.0")
-
-  # Extract profile breakdown from .prof file
-  prof_file="$_prof_dir/jac_server.prof"
-  if [ -f "$prof_file" ]; then
-    prof_data=$(python3 - "$prof_file" "$TRIALS" <<'PYEOF'
-import pstats, sys
-prof_path, trials = sys.argv[1], int(sys.argv[2])
-stats = pstats.Stats(prof_path, stream=open('/dev/null', 'w'))
-ct_map = {}
-for (f, l, fn), (cc, nc, tt, ct, callers) in stats.stats.items():
-    ct_map[fn] = ct_map.get(fn, 0) + ct
-t = trials
-def ms(fn): return f"{ct_map.get(fn, 0) / t * 1000:.3f}"
-print(ms('get_ttg_prefetch_list'), ms('RedisBackend.bulk_exists'), ms('MongoBackend.find_raw'), ms('RedisBackend.bulk_put_raw'), ms('batch_load_nodes'))
-PYEOF
-    )
-    read -r ttg_bfs_ms bulk_exists_ms find_raw_ms bulk_put_raw_ms batch_load_ms <<< "$prof_data"
+  # Read per-trial breakdown from profile CSV (columns: topo_idx_ms=6, ttg_ms=7, prefetch_ms=8, walker_ms=9)
+  if [ -f "$_profile_csv" ]; then
+    mapfile -t topo_idx_ms_arr < <(awk -F',' 'NR>1 {print $6}' "$_profile_csv")
+    mapfile -t ttg_ms_arr      < <(awk -F',' 'NR>1 {print $7}' "$_profile_csv")
+    mapfile -t prefetch_ms_arr < <(awk -F',' 'NR>1 {print $8}' "$_profile_csv")
+    mapfile -t walker_ms_arr   < <(awk -F',' 'NR>1 {print $9}' "$_profile_csv")
 
     for i in $(seq 0 $((TRIALS - 1))); do
       e2e_ms="${e2e_times[$i]:-0.0}"
-      echo "  Trial $((i + 1)): e2e=${e2e_ms}ms  ttg_bfs=${ttg_bfs_ms}ms  bulk_exists=${bulk_exists_ms}ms  find_raw=${find_raw_ms}ms  bulk_put_raw=${bulk_put_raw_ms}ms  batch_load=${batch_load_ms}ms  l2_rate=${l2_hit_rate}%"
-      echo "$limit,$((i + 1)),$e2e_ms,$ttg_bfs_ms,$bulk_exists_ms,$find_raw_ms,$bulk_put_raw_ms,$batch_load_ms,$l2_hit_rate" >> "$RESULTS_FILE"
+      topo_idx_ms="${topo_idx_ms_arr[$i]:-0.0}"
+      ttg_ms="${ttg_ms_arr[$i]:-0.0}"
+      prefetch_ms="${prefetch_ms_arr[$i]:-0.0}"
+      walker_ms="${walker_ms_arr[$i]:-0.0}"
+      echo "  Trial $((i + 1)): e2e=${e2e_ms}ms  walker=${walker_ms}ms  prefetch=${prefetch_ms}ms  ttg=${ttg_ms}ms  topo_idx=${topo_idx_ms}ms"
+      echo "$limit,$((i + 1)),$e2e_ms,$topo_idx_ms,$ttg_ms,$prefetch_ms,$walker_ms" >> "$RESULTS_FILE"
     done
   else
-    echo "  WARNING: Profile not found at $prof_file"
+    echo "  WARNING: Profile CSV not found at $_profile_csv"
     for i in $(seq 0 $((TRIALS - 1))); do
-      echo "$limit,$((i + 1)),${e2e_times[$i]:-0.0},0.0,0.0,0.0,0.0,0.0,0.0" >> "$RESULTS_FILE"
+      echo "$limit,$((i + 1)),${e2e_times[$i]:-0.0},0.0,0.0,0.0,0.0" >> "$RESULTS_FILE"
     done
   fi
 done

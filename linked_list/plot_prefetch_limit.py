@@ -14,8 +14,7 @@ def main():
 
     numeric_cols = [
         "prefetch_limit", "trial", "e2e_ms",
-        "ttg_bfs_ms", "bulk_exists_ms", "find_raw_ms", "bulk_put_raw_ms", "batch_load_ms",
-        "l2_hit_rate",
+        "topo_idx_ms", "ttg_ms", "prefetch_ms", "walker_ms",
     ]
     for col in numeric_cols:
         if col in df.columns:
@@ -27,30 +26,23 @@ def main():
     x = np.arange(len(grouped))
     width = 0.6
 
-    batch_load   = grouped["batch_load_ms"].values
-    bulk_put_raw = grouped["bulk_put_raw_ms"].values
-    find_raw     = grouped["find_raw_ms"].values
-    bulk_exists  = grouped["bulk_exists_ms"].values
-    ttg_bfs      = grouped["ttg_bfs_ms"].values
-    e2e          = grouped["e2e_ms"].values
-    other        = np.maximum(e2e - (batch_load + bulk_put_raw + find_raw + bulk_exists + ttg_bfs), 0)
+    ew = grouped["walker_ms"].values
+    ep = grouped["prefetch_ms"].values
+    eg = grouped["ttg_ms"].values
+    et = grouped["topo_idx_ms"].values
+    ee = grouped["e2e_ms"].values
+    em = np.maximum(ee - (ew + ep + eg + et), 0)
+
     fig, ax = plt.subplots(figsize=(12, 6))
 
-    b0 = batch_load
-    b1 = b0 + bulk_put_raw
-    b2 = b1 + find_raw
-    b3 = b2 + bulk_exists
-    b4 = b3 + ttg_bfs
-
-    ax.bar(x, batch_load,   width,           label="batch_load_nodes (walker)",  color="steelblue")
-    ax.bar(x, bulk_put_raw, width, bottom=b0, label="bulk_put_raw (L2 write)",    color="orange")
-    ax.bar(x, find_raw,     width, bottom=b1, label="find_raw (L3 fetch)",        color="tomato")
-    ax.bar(x, bulk_exists,  width, bottom=b2, label="bulk_exists (L2 check)",     color="gold")
-    ax.bar(x, ttg_bfs,      width, bottom=b3, label="TTG BFS",                    color="green")
-    ax.bar(x, other,        width, bottom=b4, label="Other",                      color="lightgray")
+    ax.bar(x, ew, width,                     label="Walker",        color="steelblue")
+    ax.bar(x, ep, width, bottom=ew,          label="Prefetcher",    color="orange")
+    ax.bar(x, eg, width, bottom=ew+ep,       label="TTG Generator", color="green")
+    ax.bar(x, et, width, bottom=ew+ep+eg,    label="Load topology", color="purple")
+    ax.bar(x, em, width, bottom=ew+ep+eg+et, label="Misc",          color="lightgray")
 
     # Annotate total e2e on top of each bar
-    for i, total in enumerate(e2e):
+    for i, total in enumerate(ee):
         ax.text(x[i], total + 5, f"{total:.0f}ms", ha="center", va="bottom", fontsize=8)
 
     ax.set_xlabel("Prefetch Limit (max nodes prefetched)")
