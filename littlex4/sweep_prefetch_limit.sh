@@ -15,7 +15,7 @@ echo "Limits     : ${PREFETCH_LIMITS[*]}"
 echo ""
 
 # Write CSV header
-echo "prefetch_limit,trial,e2e_ms,ttg_bfs_ms,bulk_exists_ms,find_raw_ms,bulk_put_raw_ms,batch_load_ms" > "$RESULTS_FILE"
+echo "prefetch_limit,trial,e2e_ms,ttg_bfs_ms,bulk_exists_ms,find_raw_ms,bulk_put_raw_ms,batch_load_ms,l2_hit_rate" > "$RESULTS_FILE"
 
 for limit in "${PREFETCH_LIMITS[@]}"; do
   echo "========================================"
@@ -30,6 +30,11 @@ for limit in "${PREFETCH_LIMITS[@]}"; do
 
   # Extract e2e times from quick_run output (lines like "Trial 1: 123.4ms")
   mapfile -t e2e_times < <(grep -oP 'Trial \d+: \K[0-9.]+(?=ms)' "$QUICK_RUN_OUTPUT" || true)
+
+  # Extract average L2 hit rate from [BATCH_GET] log lines in server log
+  l2_hit_rate=$(grep '\[BATCH_GET\]' logs/jac_server_2.log 2>/dev/null \
+    | grep -oP 'l2_rate=\K[0-9.]+' \
+    | awk '{sum+=$1; n++} END {if(n>0) printf "%.1f", sum/n; else print "0.0"}' || echo "0.0")
 
   # Extract profile breakdown from .prof file
   prof_file="$_prof_dir/jac_server.prof"
@@ -50,13 +55,13 @@ PYEOF
 
     for i in $(seq 0 $((TRIALS - 1))); do
       e2e_ms="${e2e_times[$i]:-0.0}"
-      echo "  Trial $((i + 1)): e2e=${e2e_ms}ms  ttg_bfs=${ttg_bfs_ms}ms  bulk_exists=${bulk_exists_ms}ms  find_raw=${find_raw_ms}ms  bulk_put_raw=${bulk_put_raw_ms}ms  batch_load=${batch_load_ms}ms"
-      echo "$limit,$((i + 1)),$e2e_ms,$ttg_bfs_ms,$bulk_exists_ms,$find_raw_ms,$bulk_put_raw_ms,$batch_load_ms" >> "$RESULTS_FILE"
+      echo "  Trial $((i + 1)): e2e=${e2e_ms}ms  ttg_bfs=${ttg_bfs_ms}ms  bulk_exists=${bulk_exists_ms}ms  find_raw=${find_raw_ms}ms  bulk_put_raw=${bulk_put_raw_ms}ms  batch_load=${batch_load_ms}ms  l2_rate=${l2_hit_rate}%"
+      echo "$limit,$((i + 1)),$e2e_ms,$ttg_bfs_ms,$bulk_exists_ms,$find_raw_ms,$bulk_put_raw_ms,$batch_load_ms,$l2_hit_rate" >> "$RESULTS_FILE"
     done
   else
     echo "  WARNING: Profile not found at $prof_file"
     for i in $(seq 0 $((TRIALS - 1))); do
-      echo "$limit,$((i + 1)),${e2e_times[$i]:-0.0},0.0,0.0,0.0,0.0,0.0" >> "$RESULTS_FILE"
+      echo "$limit,$((i + 1)),${e2e_times[$i]:-0.0},0.0,0.0,0.0,0.0,0.0,0.0" >> "$RESULTS_FILE"
     done
   fi
 done
