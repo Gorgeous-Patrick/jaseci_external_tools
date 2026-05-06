@@ -34,8 +34,6 @@ def main():
     ttg_bfs      = grouped["ttg_bfs_ms"].values
     e2e          = grouped["e2e_ms"].values
     other        = np.maximum(e2e - (batch_load + bulk_put_raw + find_raw + bulk_exists + ttg_bfs), 0)
-    l2_hit_rate = grouped["l2_hit_rate"].values if "l2_hit_rate" in grouped.columns else None
-
     fig, ax = plt.subplots(figsize=(12, 6))
 
     b0 = batch_load
@@ -55,20 +53,12 @@ def main():
     for i, total in enumerate(e2e):
         ax.text(x[i], total + 5, f"{total:.0f}ms", ha="center", va="bottom", fontsize=8)
 
-    # Secondary axis: L2 hit rate
-    if l2_hit_rate is not None and l2_hit_rate.sum() > 0:
-        ax2 = ax.twinx()
-        ax2.plot(x, l2_hit_rate, color="darkblue", marker="o", linewidth=2, label="L2 hit rate (%)")
-        ax2.set_ylabel("L2 Hit Rate (%)")
-        ax2.set_ylim(0, 110)
-        ax2.legend(loc="upper right")
-
     ax.set_xlabel("Prefetch Limit (max nodes prefetched)")
     ax.set_ylabel("Time (ms)")
     ax.set_xticks(x)
     ax.set_xticklabels(grouped["prefetch_limit"].astype(int).values)
     ax.set_title("E2E Time vs Prefetch Limit\n(cold Redis cache per trial, averaged over trials)")
-    ax.legend(loc="upper left")
+    ax.legend(loc="upper right")
     ax.grid(axis="y", alpha=0.3)
 
     plt.tight_layout()
