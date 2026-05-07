@@ -48,6 +48,7 @@ TRACKED = [
     ("ScaleTieredMemory.batch_get",    "  ScaleTieredMemory.batch_get","coordination"),
     ("plan_query",                     "  plan_query",                 "coordination"),
     ("RedisBackend.batch_get",         "  L2: RedisBackend.batch_get", "l2"),
+    ("_deserialize_anchor",            "    L2: deserialize (json+obj)","l2"),
     ("RedisBackend.put",               "  L2: RedisBackend.put",       "l2"),
     ("MongoBackend.batch_get",         "  L3: MongoBackend.batch_get", "l3"),
     ("MongoBackend.find_raw",          "  L3: MongoBackend.find_raw",  "l3"),
