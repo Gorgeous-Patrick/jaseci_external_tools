@@ -2,7 +2,7 @@
 set -e
 
 # Configuration — edit these to match your experiment
-PREFETCH_LIMITS=(0 2000)
+PREFETCH_LIMITS=(0 200 400 600 800 1000 1200 1400 1600 1800 2000 2200 2400)
 LIST_SIZE=${JAC_LIST_SIZE:-1000}
 TRIALS=10
 
