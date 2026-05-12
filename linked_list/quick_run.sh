@@ -5,6 +5,12 @@ export base_url="localhost:8000"
 export JAC_LIST_SIZE=${JAC_LIST_SIZE:-100}
 export JAC_PROFILE_DIR=${JAC_PROFILE_DIR:-profiles}
 
+# Restart docker compose
+echo "=== Restarting docker compose ==="
+docker compose down
+docker compose up -d
+sleep 5
+
 # Clean previous state
 echo "=== Cleaning previous state ==="
 yes | jac clean || true
@@ -17,10 +23,10 @@ docker exec redis redis-cli FLUSHALL || true
 echo "=== Dropping MongoDB databases ==="
 docker exec mongodb mongosh --quiet --eval 'db.getMongo().getDBNames().forEach(function(d){if(d!="admin"&&d!="local"&&d!="config"){db.getSiblingDB(d).dropDatabase()}})' || true
 
-# Create logs directory
+# Clean logs and profiles
+rm -rf logs profiles
 mkdir -p logs
-LOG_1="logs/jac_server_1.log"
-LOG_2="logs/jac_server_2.log"
+LOG_1="logs/jac_server_setup.log"
 
 echo "=== Starting jac server (log: $LOG_1) ==="
 JAC_LIST_SIZE=$JAC_LIST_SIZE jac start > "$LOG_1" 2>&1 &
@@ -43,42 +49,57 @@ sleep 5
 echo "=== Clearing Redis (post node creation) ==="
 docker exec redis redis-cli FLUSHALL || true
 
-echo "=== Restarting jac server (log: $LOG_2) ==="
+echo "=== Stopping setup server ==="
 kill $JAC_PID 2>/dev/null || true
+pkill -f "jac start" 2>/dev/null || true
 sleep 2
-mkdir -p "$JAC_PROFILE_DIR"
-JAC_LIST_SIZE=$JAC_LIST_SIZE JAC_PROFILE_CSV=$JAC_PROFILE_CSV JAC_PROFILE_DIR=$JAC_PROFILE_DIR jac start > "$LOG_2" 2>&1 &
-JAC_PID=$!
-sleep 10
 
-echo "=== Running walker ==="
-export token=$(http --ignore-stdin POST $base_url/user/login username=user password=password | jq ".data.token" -r)
+PREFETCH_LIMIT=$(grep 'prefetch_limit' jac.toml | sed 's/.*= *//')
 
-echo "=== E2E Timing (10 trials) ==="
+echo "=== E2E Timing (10 trials, server restarted each trial, prefetch_limit=$PREFETCH_LIMIT) ==="
 _tmpfile=$(mktemp)
 for i in 1 2 3 4 5 6 7 8 9 10; do
   NODE="${NODES[0]}"
+  TRIAL_DIR="$JAC_PROFILE_DIR/trial_${i}"
+  LOG_TRIAL="logs/jac_server_limit${PREFETCH_LIMIT}_trial${i}.log"
+
   docker exec redis redis-cli FLUSHALL > /dev/null 2>&1 || true
-  sleep 1
-  e2e_time=$(curl -s -w "%{time_total}" -o "$_tmpfile" -X POST \
+
+  JAC_LIST_SIZE=$JAC_LIST_SIZE JAC_PROFILE_DIR="$TRIAL_DIR" \
+    jac start > "$LOG_TRIAL" 2>&1 &
+  JAC_PID=$!
+  sleep 10
+
+  token=$(http --ignore-stdin POST $base_url/user/login username=user password=password | jq ".data.token" -r)
+
+  http_out=$(curl -s -w "%{http_code}\n%{time_total}" -o "$_tmpfile" -X POST \
     -H "Authorization: Bearer $token" \
     -H "Content-Type: application/json" \
     -d "{}" \
     "http://$base_url/walker/Traverse/$NODE")
+  http_status=$(echo "$http_out" | head -1)
+  e2e_time=$(echo "$http_out" | tail -1)
   resp_size=$(wc -c < "$_tmpfile")
   e2e_ms=$(awk "BEGIN {printf \"%.3f\", $e2e_time * 1000}")
-  echo "Trial $i: ${e2e_ms}ms, response_size=${resp_size}bytes"
-  ttg_line=$(grep '\[TTG\]' "$LOG_2" 2>/dev/null | tail -n 1 || true)
-  if [ -n "$ttg_line" ]; then
-    echo "  $ttg_line"
+  echo "Trial $i: ${e2e_ms}ms  HTTP=$http_status  response_size=${resp_size}bytes  (log: $LOG_TRIAL)"
+
+  # Append to results CSV if provided
+  if [ -n "$JAC_RESULTS_FILE" ] && [ -f "$JAC_PROFILE_CSV" ]; then
+    last_row=$(tail -1 "$JAC_PROFILE_CSV")
+    topo_idx_ms=$(echo "$last_row" | awk -F',' '{print $6}')
+    ttg_ms=$(echo "$last_row" | awk -F',' '{print $7}')
+    prefetch_ms=$(echo "$last_row" | awk -F',' '{print $8}')
+    walker_ms=$(echo "$last_row" | awk -F',' '{print $9}')
+    echo "$PREFETCH_LIMIT,$i,$e2e_ms,$topo_idx_ms,$ttg_ms,$prefetch_ms,$walker_ms" >> "$JAC_RESULTS_FILE"
   fi
+
+  kill $JAC_PID 2>/dev/null || true
+  pkill -f "jac start" 2>/dev/null || true
+  sleep 2
 done
 
 rm -f "$_tmpfile"
 
 echo ""
 echo "=== Done ==="
-echo "Server logs: $LOG_1, $LOG_2"
-
-# Kill the server
-kill $JAC_PID 2>/dev/null || true
+echo "Server logs: logs/jac_server_trial*.log"
