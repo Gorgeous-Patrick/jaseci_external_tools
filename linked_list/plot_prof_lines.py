@@ -22,6 +22,8 @@ import matplotlib.pyplot as plt
 TRACKED = {
     "L2 batch_get (Redis)":   "RedisBackend.batch_get",
     "L3 batch_get (MongoDB)": "MongoBackend.batch_get",
+    "TTG generator":          "get_ttg_prefetch_list",
+    "Prefetcher":             "ScaleTieredMemory.prefetch",
 }
 
 
@@ -64,6 +66,8 @@ def main():
     colors = {
         "L2 batch_get (Redis)":   "orange",
         "L3 batch_get (MongoDB)": "tomato",
+        "TTG generator":          "steelblue",
+        "Prefetcher":             "green",
     }
 
     x = np.array(limits)
