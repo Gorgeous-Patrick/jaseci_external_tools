@@ -23,8 +23,7 @@ docker exec redis redis-cli FLUSHALL || true
 echo "=== Dropping MongoDB databases ==="
 docker exec mongodb mongosh --quiet --eval 'db.getMongo().getDBNames().forEach(function(d){if(d!="admin"&&d!="local"&&d!="config"){db.getSiblingDB(d).dropDatabase()}})' || true
 
-# Clean logs and profiles
-rm -rf logs profiles
+# Clean logs for this run
 mkdir -p logs
 LOG_1="logs/jac_server_setup.log"
 

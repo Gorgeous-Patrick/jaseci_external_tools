@@ -8,6 +8,9 @@ TRIALS=10
 
 RESULTS_FILE="sweep_prefetch_limit.csv"
 
+# Clean all previous data
+rm -rf logs profiles
+
 echo "=== Prefetch Limit Sweep ==="
 echo "List size  : $LIST_SIZE"
 echo "Limits     : ${PREFETCH_LIMITS[*]}"
