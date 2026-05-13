@@ -35,11 +35,11 @@ def main():
 
     fig, ax = plt.subplots(figsize=(12, 6))
 
-    ax.bar(x, ew, width,                   label="Walker",        color="steelblue")
-    ax.bar(x, ep, width, bottom=ew,        label="Prefetcher",    color="orange")
-    ax.bar(x, eg, width, bottom=ew+ep,     label="TTG Generator", color="green")
-    ax.bar(x, et, width, bottom=ew+ep+eg,  label="Load topology", color="purple")
-    ax.bar(x, em, width, bottom=ew+ep+eg+et, label="Misc",        color="lightgray")
+    ax.bar(x, ew, width,                     label="Walker",        color="steelblue")
+    ax.bar(x, ep, width, bottom=ew,          label="Prefetcher",    color="orange")
+    ax.bar(x, eg, width, bottom=ew+ep,       label="TTG Generator", color="green")
+    ax.bar(x, et, width, bottom=ew+ep+eg,    label="Load topology", color="purple")
+    ax.bar(x, em, width, bottom=ew+ep+eg+et, label="Misc",          color="lightgray")
 
     # Annotate total e2e on top of each bar
     for i, total in enumerate(ee):
@@ -59,7 +59,7 @@ def main():
     plt.savefig(output_file, dpi=150)
     print(f"Saved plot to {output_file}")
 
-    plt.show()
+    # plt.show()
 
 
 if __name__ == "__main__":
