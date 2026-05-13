@@ -59,7 +59,7 @@ def main():
     plt.savefig(output_file, dpi=150)
     print(f"Saved plot to {output_file}")
 
-    plt.show()
+    # plt.show()
 
 
 if __name__ == "__main__":
