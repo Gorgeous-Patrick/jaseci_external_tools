@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 
 TRACKED = {
     "L2 batch_get (Redis)":   "RedisBackend.batch_get",
-    "L2 put (Redis)":         "RedisBackend.put",
+    "L2 bulk_put (Redis)":    "RedisBackend.bulk_put",
     "L3 batch_get (MongoDB)": "MongoBackend.batch_get",
     "TTG generator":          "get_ttg_prefetch_list",
     "Prefetcher":             "ScaleTieredMemory.prefetch",
@@ -78,7 +78,7 @@ def main():
     tiers = list(TRACKED.keys()) + list(CALLER_TRACKED.keys())
     colors = {
         "L2 batch_get (Redis)":   "orange",
-        "L2 put (Redis)":         "goldenrod",
+        "L2 bulk_put (Redis)":    "goldenrod",
         "L3 batch_get (MongoDB)": "tomato",
         "TTG generator":          "steelblue",
         "Prefetcher":             "green",
@@ -96,29 +96,6 @@ def main():
         mu_at[tier] = mu
         ax.plot(x, mu, color=colors[tier], linewidth=2, marker="o", markersize=4, label=tier)
         ax.fill_between(x, mu - sd, mu + sd, color=colors[tier], alpha=0.15)
-
-    # Annotate slope (limit=2000 - limit=0) / 2000 at the limit=2000 point
-    slopes = {}
-    if 0 in limits and 2000 in limits:
-        idx0    = limits.index(0)
-        idx2000 = limits.index(2000)
-        for tier in tiers:
-            v0    = mu_at[tier][idx0]
-            v2000 = mu_at[tier][idx2000]
-            slope = (v2000 - v0) / 2000
-            slopes[tier] = slope
-            ax.annotate(
-                f"{slope:+.3f}ms/limit",
-                xy=(x[idx2000], v2000),
-                xytext=(4, 4), textcoords="offset points",
-                color=colors[tier], fontsize=8, fontweight="bold",
-            )
-
-    if slopes:
-        print("\nSlopes (ms per prefetch_limit unit):")
-        for tier, slope in slopes.items():
-            print(f"  {tier:<30} {slope:+.4f}")
-        print(f"  {'SUM':<30} {sum(slopes.values()):+.4f}")
 
     ax.set_xlabel("Prefetch Limit (max nodes prefetched)")
     ax.set_ylabel("Time (ms)")
