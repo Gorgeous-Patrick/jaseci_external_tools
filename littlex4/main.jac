@@ -12,11 +12,15 @@ edge Follow {}
 edge Post {}
 
 walker LoadFeed {
-    has visited: int = 0;
+    has visited: set = set();
 
     can load with Profile entry {
-        self.visited += 1;
-        if self.visited >= 900 {
+        if here.__jac__.id in self.visited {
+            return;
+        }
+        print(f"Profile ID: {here.id}");
+        self.visited.add(here.__jac__.id);
+        if len(self.visited) >= 900 {
             disengage;
         }
         visit [->:Post:->];
@@ -24,9 +28,12 @@ walker LoadFeed {
     }
 
     can calc with Tweet entry {
-        self.visited += 1;
+        if here.__jac__.id in self.visited {
+            return;
+        }
+        self.visited.add(here.__jac__.id);
         report self;
-        if self.visited >= 900 {
+        if len(self.visited) >= 900 {
             disengage;
         }
     }

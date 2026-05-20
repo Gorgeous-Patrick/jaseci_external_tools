@@ -27,17 +27,28 @@ TRACKED = {
     "Prefetcher":             "ScaleTieredMemory.prefetch",
 }
 
+# (funcname, caller_funcname) -> only count ct from a specific caller
+CALLER_TRACKED = {
+    "Prefetch: deserialize": ("deserialize", "ScaleTieredMemory.prefetch"),
+}
 
-def load_cumtimes(prof_path: Path) -> dict:
+
+def load_stats(prof_path: Path) -> dict:
     stats = pstats.Stats(str(prof_path), stream=io.StringIO())
-    result = defaultdict(float)
-    for (_file, _line, funcname), (_cc, _nc, _tt, ct, _callers) in stats.stats.items():
-        result[funcname] += ct
-    return dict(result)
+    cumtimes = defaultdict(float)
+    caller_cumtimes = defaultdict(float)
+    for (_file, _line, funcname), (_cc, _nc, _tt, ct, callers) in stats.stats.items():
+        cumtimes[funcname] += ct
+        for (_cf, _cl, cfn), caller_stats in callers.items():
+            caller_cumtimes[(funcname, cfn)] += caller_stats[3]
+    return dict(cumtimes), dict(caller_cumtimes)
 
 
-def tier_times(cumtimes: dict) -> dict:
-    return {label: cumtimes.get(func, 0.0) for label, func in TRACKED.items()}
+def tier_times(cumtimes: dict, caller_cumtimes: dict) -> dict:
+    result = {label: cumtimes.get(func, 0.0) for label, func in TRACKED.items()}
+    for label, (func, caller) in CALLER_TRACKED.items():
+        result[label] = caller_cumtimes.get((func, caller), 0.0)
+    return result
 
 
 def collect(profiles_dir: Path) -> dict:
@@ -48,7 +59,8 @@ def collect(profiles_dir: Path) -> dict:
             continue
         limit = int(m.group(1))
         try:
-            data[limit].append(tier_times(load_cumtimes(prof_path)))
+            cumtimes, caller_cumtimes = load_stats(prof_path)
+            data[limit].append(tier_times(cumtimes, caller_cumtimes))
         except Exception as e:
             print(f"Warning: could not load {prof_path}: {e}", file=sys.stderr)
     return dict(data)
@@ -63,13 +75,14 @@ def main():
         sys.exit(1)
 
     limits = sorted(data.keys())
-    tiers = list(TRACKED.keys())
+    tiers = list(TRACKED.keys()) + list(CALLER_TRACKED.keys())
     colors = {
         "L2 batch_get (Redis)":   "orange",
         "L2 put (Redis)":         "goldenrod",
         "L3 batch_get (MongoDB)": "tomato",
         "TTG generator":          "steelblue",
         "Prefetcher":             "green",
+        "Prefetch: deserialize":  "mediumpurple",
     }
 
     x = np.array(limits)
