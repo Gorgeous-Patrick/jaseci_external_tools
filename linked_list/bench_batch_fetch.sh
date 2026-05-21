@@ -24,8 +24,11 @@ echo "=== Dropping MongoDB databases ==="
 docker exec mongodb mongosh --quiet --eval \
   'db.getMongo().getDBNames().forEach(function(d){if(d!="admin"&&d!="local"&&d!="config"){db.getSiblingDB(d).dropDatabase()}})' || true
 
-echo "=== Starting jac server ==="
-JAC_LIST_SIZE=$JAC_LIST_SIZE jac start > /dev/null 2>&1 &
+mkdir -p logs
+LOG="logs/jac_server_setup.log"
+
+echo "=== Starting jac server (log: $LOG) ==="
+JAC_LIST_SIZE=$JAC_LIST_SIZE jac start > "$LOG" 2>&1 &
 JAC_PID=$!
 sleep 10
 
