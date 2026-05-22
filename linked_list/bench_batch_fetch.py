@@ -11,11 +11,12 @@ import argparse
 import csv
 import json
 import statistics
-import time
 
 import matplotlib.pyplot as plt
 from pymongo import MongoClient
 import redis
+import yappi
+import yappi
 
 
 def get_anchor_ids(col) -> tuple[list[str], list[str]]:
@@ -42,9 +43,16 @@ def sequential_get_redis(r: redis.Redis, ids: list[str]) -> list:
 
 
 def time_once(func, *args) -> float:
-    start = time.perf_counter()
+    """Measure wall-clock time using yappi (same profiler as Jac server)."""
+    yappi.clear_stats()
+    yappi.set_clock_type("wall")
+    yappi.start(builtins=False)
     func(*args)
-    return time.perf_counter() - start
+    yappi.stop()
+    for stat in yappi.get_func_stats():
+        if stat.name == func.__name__:
+            return stat.ttot
+    return 0.0
 
 
 def main():
