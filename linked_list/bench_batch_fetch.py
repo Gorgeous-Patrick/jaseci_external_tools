@@ -16,7 +16,6 @@ import matplotlib.pyplot as plt
 from pymongo import MongoClient
 import redis
 import yappi
-import yappi
 
 
 def get_anchor_ids(col) -> tuple[list[str], list[str]]:
@@ -40,6 +39,18 @@ def batch_get_redis(r: redis.Redis, ids: list[str]) -> list:
 
 def sequential_get_redis(r: redis.Redis, ids: list[str]) -> list:
     return [r.mget([node_id]) for node_id in ids]
+
+
+def batch_set_redis(r: redis.Redis, kv: dict[str, str]) -> None:
+    r.mset(kv)
+
+
+def sequential_set_redis(r: redis.Redis, kv: dict[str, str]) -> None:
+    pipe = r.pipeline()
+    for k, v in kv.items():
+        pipe.set(k, v)
+        pipe.execute()
+        pipe = r.pipeline()
 
 
 def time_once(func, *args) -> float:
@@ -98,11 +109,13 @@ def main():
     writer = csv.writer(csv_file)
     writer.writerow(["nodes", "run", "backend", "time_s"])
 
-    print(f"{'Nodes':>8}  {'Mongo batch':>14}  {'Mongo seq':>14}  {'Redis mget':>14}  {'Redis seq':>14}")
-    print("-" * 76)
+    all_backends = ["mongo_batch", "mongo_seq", "redis_mget", "redis_seq", "redis_mset", "redis_seq_set"]
+
+    print(f"{'Nodes':>8}  {'Mongo batch':>14}  {'Mongo seq':>14}  {'Redis mget':>14}  {'Redis seq':>14}  {'Redis mset':>14}  {'Redis seq set':>14}")
+    print("-" * 104)
 
     plot_nodes = []
-    stats = {k: {"avg": [], "std": []} for k in ["mongo_batch", "mongo_seq", "redis_mget", "redis_seq"]}
+    stats = {k: {"avg": [], "std": []} for k in all_backends}
 
     for n in node_counts:
         # For X nodes, take X-1 edges (linked list has N-1 edges for N nodes)
@@ -110,12 +123,18 @@ def main():
         e_ids = all_edge_ids[:max(n - 1, 0)]
         ids = n_ids + e_ids
 
-        times = {"mongo_batch": [], "mongo_seq": [], "redis_mget": [], "redis_seq": []}
+        # Pre-read values from Redis for write benchmarks
+        values = r.mget(ids)
+        kv = {k: v for k, v in zip(ids, values) if v is not None}
+
+        times = {k: [] for k in all_backends}
         for run in range(1, args.runs + 1):
             times["mongo_batch"].append(time_once(batch_get_mongo, col, ids))
             times["mongo_seq"].append(time_once(sequential_get_mongo, col, ids))
             times["redis_mget"].append(time_once(batch_get_redis, r, ids))
             times["redis_seq"].append(time_once(sequential_get_redis, r, ids))
+            times["redis_mset"].append(time_once(batch_set_redis, r, kv))
+            times["redis_seq_set"].append(time_once(sequential_set_redis, r, kv))
             for backend, t_list in times.items():
                 writer.writerow([n, run, backend, f"{t_list[-1]:.6f}"])
 
@@ -127,7 +146,9 @@ def main():
         print(f"{n:>8}  {stats['mongo_batch']['avg'][-1]:>12.4f} s"
               f"  {stats['mongo_seq']['avg'][-1]:>12.4f} s"
               f"  {stats['redis_mget']['avg'][-1]:>12.4f} s"
-              f"  {stats['redis_seq']['avg'][-1]:>12.4f} s")
+              f"  {stats['redis_seq']['avg'][-1]:>12.4f} s"
+              f"  {stats['redis_mset']['avg'][-1]:>12.4f} s"
+              f"  {stats['redis_seq_set']['avg'][-1]:>12.4f} s")
 
     csv_file.close()
     print(f"\nResults written to {args.output}")
@@ -140,12 +161,16 @@ def main():
         "mongo_seq": "tab:cyan",
         "redis_mget": "tab:red",
         "redis_seq": "tab:orange",
+        "redis_mset": "tab:green",
+        "redis_seq_set": "tab:olive",
     }
     labels = {
         "mongo_batch": "MongoDB ($in)",
         "mongo_seq": "MongoDB (sequential)",
         "redis_mget": "Redis (mget)",
         "redis_seq": "Redis (sequential get)",
+        "redis_mset": "Redis (mset)",
+        "redis_seq_set": "Redis (sequential set)",
     }
 
     def linreg(xs, ys):
@@ -158,25 +183,28 @@ def main():
         b = (sy - a * sx) / n
         return a, b
 
+    # Convert node counts to object counts (1 node = 1 node anchor + 1 edge anchor)
+    plot_objects = [n * 2 for n in plot_nodes]
+
     print(f"\nLinear fit (ms):")
     for k in stats:
         avg_ms = [v * 1000 for v in stats[k]["avg"]]
         std_ms = [v * 1000 for v in stats[k]["std"]]
 
-        ax.plot(plot_nodes, avg_ms, label=labels[k], color=colors[k])
+        ax.plot(plot_objects, avg_ms, label=labels[k], color=colors[k])
         ax.fill_between(
-            plot_nodes,
+            plot_objects,
             [a - s for a, s in zip(avg_ms, std_ms)],
             [a + s for a, s in zip(avg_ms, std_ms)],
             alpha=0.2, color=colors[k],
         )
 
-        a, b = linreg(plot_nodes, avg_ms)
-        ax.plot(plot_nodes, [a * x + b for x in plot_nodes], "--", color=colors[k], alpha=0.7,
+        a, b = linreg(plot_objects, avg_ms)
+        ax.plot(plot_objects, [a * x + b for x in plot_objects], "--", color=colors[k], alpha=0.7,
                 label=f"{labels[k]} fit: {a:.4f}x + {b:.4f}")
-        print(f"  {labels[k]:.<30s} {a:.4f} * nodes + {b:.4f}")
+        print(f"  {labels[k]:.<30s} {a:.4f} * objects + {b:.4f}")
 
-    ax.set_xlabel("Number of nodes fetched")
+    ax.set_xlabel("Number of objects fetched")
     ax.set_ylabel("Time (ms)")
     ax.set_title("Batch Fetch: MongoDB vs Redis")
     ax.legend()
