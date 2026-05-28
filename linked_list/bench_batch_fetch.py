@@ -71,6 +71,7 @@ def main():
         description="Benchmark batch-fetch of linked-list nodes: MongoDB vs Redis"
     )
     parser.add_argument("--step", type=int, default=10, help="Step size for node counts")
+    parser.add_argument("--max-nodes", type=int, default=1000, help="Maximum number of nodes to benchmark")
     parser.add_argument("--runs", type=int, default=10, help="Repetitions per measurement")
     parser.add_argument("--output", "-o", default="bench_batch_fetch.csv", help="Output CSV path")
     parser.add_argument("--plot", default="bench_batch_fetch.png", help="Output plot path")
@@ -101,9 +102,10 @@ def main():
     pipe.execute()
     print(f"Loaded {loaded} anchors into Redis (nodes + edges)")
 
-    node_counts = list(range(args.step, len(all_node_ids) + 1, args.step))
-    if node_counts[-1] != len(all_node_ids):
-        node_counts.append(len(all_node_ids))
+    max_nodes = min(args.max_nodes, len(all_node_ids))
+    node_counts = list(range(args.step, max_nodes + 1, args.step))
+    if node_counts[-1] != max_nodes:
+        node_counts.append(max_nodes)
 
     csv_file = open(args.output, "w", newline="")
     writer = csv.writer(csv_file)
