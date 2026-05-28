@@ -13,7 +13,7 @@ services:
     entrypoint: >
       bash -c "
         apt-get update -qq && apt-get install -y -qq iproute2 > /dev/null 2>&1;
-        tc qdisc add dev eth0 root netem delay 5ms 2>/dev/null || true;
+        tc qdisc add dev eth0 root netem delay 1ms 2>/dev/null || true;
         exec docker-entrypoint.sh mongod
       "
 
@@ -31,7 +31,7 @@ services:
     entrypoint: >
       sh -c "
         apk add --quiet iproute2 > /dev/null 2>&1;
-        tc qdisc add dev eth0 root netem delay 5ms 2>/dev/null || true;
+        tc qdisc add dev eth0 root netem delay 1ms 2>/dev/null || true;
         exec docker-entrypoint.sh redis-server
       "
 
