@@ -29,11 +29,27 @@ typescript = "^5.3.3"
 "@types/react" = "^18.2.0"
 "@types/react-dom" = "^18.2.0"
 
+[run]
+topology_index = true
+prefetching = "ttg"
+prefetch_limit = 0
+async_prefetch = false
+
 [dev-dependencies]
 watchdog = ">=3.0.0"
 
 [serve]
 base_route_app = "app"
+docs_enabled = true
+
+[plugins.scale.database]
+mongodb_uri = "mongodb://localhost:27017"
+redis_url = "redis://localhost:6379"
+
+[plugins.scale.jwt]
+secret = "littlex5-dev-secret-change-in-production"
+algorithm = "HS256"
+exp_delta_days = 7
 
 [plugins.client.app_meta_data]
 title = "Little-X"
