@@ -2,38 +2,20 @@ services:
   mongodb:
     image: mongo:7
     container_name: mongodb
-    cap_add:
-      - NET_ADMIN
     ports:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
     restart: unless-stopped
-    # Simulate 5ms network latency
-    entrypoint: >
-      bash -c "
-        apt-get update -qq && apt-get install -y -qq iproute2 > /dev/null 2>&1;
-        tc qdisc add dev eth0 root netem delay 1ms 2>/dev/null || true;
-        exec docker-entrypoint.sh mongod
-      "
 
   redis:
     image: redis:7-alpine
     container_name: redis
-    cap_add:
-      - NET_ADMIN
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
     restart: unless-stopped
-    # Simulate 5ms network latency
-    entrypoint: >
-      sh -c "
-        apk add --quiet iproute2 > /dev/null 2>&1;
-        tc qdisc add dev eth0 root netem delay 1ms 2>/dev/null || true;
-        exec docker-entrypoint.sh redis-server
-      "
 
 volumes:
   mongodb_data:

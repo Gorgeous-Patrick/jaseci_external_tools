@@ -17,7 +17,9 @@ walker Traverse {
         if self.visited >= 10000 {
             disengage;
         }
-        visit [->:Next:->];
+        next_nodes = [->:Next:->];
+        print(f"NEXT_NODES = {next_nodes}");
+        visit next_nodes;
     }
 }
 
