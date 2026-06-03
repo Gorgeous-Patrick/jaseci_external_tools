@@ -1,0 +1,91 @@
+#!/bin/bash
+set -e
+
+export base_url="localhost:8000"
+export JAC_PROFILE_DIR=${JAC_PROFILE_DIR:-profiles}
+
+# Which walkers to benchmark (read-heavy ones)
+WALKERS=("get_profile" "load_feed")
+# Pick a user with decent connectivity
+TEST_USER=${TEST_USER:-user3}
+TEST_PASSWORD=${TEST_PASSWORD:-password}
+
+# Restart docker compose
+echo "=== Restarting docker compose ==="
+docker compose down
+docker compose up -d
+sleep 5
+
+# Restore MongoDB from dump if it exists
+if [ -f jac_db.dump ]; then
+    echo "=== Restoring MongoDB from dump ==="
+    docker cp jac_db.dump mongodb:/tmp/jac_db.dump
+    docker exec mongodb mongorestore --archive=/tmp/jac_db.dump --drop 2>&1 | tail -3
+else
+    echo "=== No jac_db.dump found — using existing data ==="
+fi
+
+# Clear Redis
+echo "=== Clearing Redis ==="
+docker exec redis redis-cli FLUSHALL || true
+
+# Clean logs for this run
+mkdir -p logs
+
+echo "=== Stopping any running jac server ==="
+pkill -f "jac start" 2>/dev/null || true
+sleep 2
+
+PREFETCH_LIMIT=$(grep 'prefetch_limit' jac.toml 2>/dev/null | sed 's/.*= *//' || echo "0")
+
+echo "=== E2E Timing (10 trials per walker, server restarted each trial) ==="
+echo "prefetch_limit=$PREFETCH_LIMIT  user=$TEST_USER"
+echo ""
+
+_tmpfile=$(mktemp)
+
+for walker in "${WALKERS[@]}"; do
+  echo "--- Walker: $walker ---"
+
+  for i in 1 2 3 4 5 6 7 8 9 10; do
+    TRIAL_DIR="$JAC_PROFILE_DIR/${walker}/trial_${i}"
+    LOG_TRIAL="logs/jac_server_${walker}_limit${PREFETCH_LIMIT}_trial${i}.log"
+
+    docker exec redis redis-cli FLUSHALL > /dev/null 2>&1 || true
+
+    JAC_PROFILE_DIR="$TRIAL_DIR" jac start > "$LOG_TRIAL" 2>&1 &
+    JAC_PID=$!
+    sleep 12
+
+    token=$(curl -s -X POST "http://$base_url/user/login" \
+      -H "Content-Type: application/json" \
+      -d "{\"identity\":{\"type\":\"username\",\"value\":\"$TEST_USER\"},\"credential\":{\"type\":\"password\",\"password\":\"$TEST_PASSWORD\"}}" \
+      | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['token'])")
+
+    http_out=$(curl -s -w "%{http_code}\n%{time_total}" -o "$_tmpfile" -X POST \
+      -H "Authorization: Bearer $token" \
+      -H "Content-Type: application/json" \
+      -d "{}" \
+      "http://$base_url/walker/$walker")
+    http_status=$(echo "$http_out" | head -1)
+    e2e_time=$(echo "$http_out" | tail -1)
+    resp_size=$(wc -c < "$_tmpfile")
+    e2e_ms=$(awk "BEGIN {printf \"%.3f\", $e2e_time * 1000}")
+    echo "  Trial $i: ${e2e_ms}ms  HTTP=$http_status  resp=${resp_size}bytes"
+
+    # Append to results CSV if provided
+    if [ -n "$JAC_RESULTS_FILE" ]; then
+      echo "$walker,$PREFETCH_LIMIT,$i,$e2e_ms,$http_status,$resp_size" >> "$JAC_RESULTS_FILE"
+    fi
+
+    kill $JAC_PID 2>/dev/null || true
+    pkill -f "jac start" 2>/dev/null || true
+    sleep 2
+  done
+  echo ""
+done
+
+rm -f "$_tmpfile"
+
+echo "=== Done ==="
+echo "Server logs: logs/"

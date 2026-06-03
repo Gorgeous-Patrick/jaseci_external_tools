@@ -2,6 +2,7 @@ services:
   mongodb:
     image: mongo:7
     container_name: mongodb
+    user: "1000:100"
     ports:
       - "27017:27017"
     volumes:
@@ -11,6 +12,7 @@ services:
   redis:
     image: redis:7-alpine
     container_name: redis
+    user: "1000:100"
     ports:
       - "6379:6379"
     volumes:

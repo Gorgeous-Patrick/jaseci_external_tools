@@ -12,6 +12,7 @@ Usage:
 """
 
 import argparse
+import pathlib
 import random
 import requests
 
@@ -115,7 +116,7 @@ def follow_user(session: requests.Session, token: str, target_id: str) -> dict:
     return reports[0] if reports else {}
 
 
-def load_edges(path: str) -> list[tuple[int, int]]:
+def load_edges_from_file(path: str) -> list[tuple[int, int]]:
     edges = []
     with open(path) as f:
         for line in f:
@@ -128,20 +129,38 @@ def load_edges(path: str) -> list[tuple[int, int]]:
     return edges
 
 
+def load_edges(path: str) -> list[tuple[int, int]]:
+    """Load edges from a single file or all *.edges files in a directory."""
+    p = pathlib.Path(path)
+    if p.is_dir():
+        files = sorted(p.glob("*.edges"))
+        if not files:
+            raise FileNotFoundError(f"No *.edges files found in {path}")
+        edges = []
+        for f in files:
+            file_edges = load_edges_from_file(str(f))
+            edges.extend(file_edges)
+            print(f"  {f.name}: {len(file_edges)} edges")
+        return edges
+    return load_edges_from_file(path)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Bootstrap littlex5 database")
     parser.add_argument("--base-url", default="localhost:8000")
     parser.add_argument("--tweets-per-user", type=int, default=5)
-    parser.add_argument("--edges-file", default="edges.txt")
+    parser.add_argument("--edges-file", default="facebook",
+                        help="Path to an edges file or directory of *.edges files")
     parser.add_argument("--password", default="password")
     args = parser.parse_args()
 
     random.seed(42)
 
     # Load edges and discover unique user IDs
+    print(f"Loading edges from {args.edges_file}...")
     edges = load_edges(args.edges_file)
     user_ids = sorted({uid for src, dst in edges for uid in (src, dst)})
-    print(f"Loaded {len(edges)} edges, {len(user_ids)} unique users from {args.edges_file}")
+    print(f"Loaded {len(edges)} edges, {len(user_ids)} unique users")
 
     session = make_session(args.base_url)
 
