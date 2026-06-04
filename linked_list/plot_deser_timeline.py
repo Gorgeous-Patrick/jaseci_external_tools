@@ -1,18 +1,11 @@
 #!/usr/bin/env python3
-"""Visualize the prefetch pipeline as a timeline (waterfall) chart.
+"""Visualize the deserialization pipeline as a timeline (waterfall) chart.
 
 Each step starts where the previous one ends, showing the sequential
-flow of time through the prefetch pipeline.
-
-Steps:
-  1. MongoDB find_raw
-  2. Redis (bulk_exists + bulk_put_raw)
-  3. Deserialize + _compute_hash
-  4. Promote to L1
-  5. Snapshot field hashes
+flow of time through deserializing all anchors during prefetch.
 
 Usage:
-    python plot_prefetch_timeline.py [path/to/jac_server.prof]
+    python plot_deser_timeline.py [path/to/jac_server.prof]
 """
 
 import pstats
@@ -25,10 +18,6 @@ def load_stats(prof_path):
     stats = pstats.Stats(prof_path, stream=open("/dev/null", "w"))
     result = {}
     for (filename, lineno, funcname), (cc, nc, tt, ct, caller_dict) in stats.stats.items():
-        # For ScaleTieredMemory.prefetch, keep only the override (main.impl)
-        # not the super call (memory.impl) — the super is already inside it.
-        if funcname == "ScaleTieredMemory.prefetch" and "memory.impl" in filename:
-            continue
         if funcname not in result:
             result[funcname] = {"nc": 0, "tt": 0.0, "ct": 0.0}
         result[funcname]["nc"] += nc
@@ -41,6 +30,10 @@ def ct(s, fn):
     return s.get(fn, {"ct": 0})["ct"] * 1000
 
 
+def tt(s, fn):
+    return s.get(fn, {"tt": 0})["tt"] * 1000
+
+
 def nc(s, fn):
     return s.get(fn, {"nc": 0})["nc"]
 
@@ -49,37 +42,49 @@ def main():
     prof_path = sys.argv[1] if len(sys.argv) > 1 else "profiles/limit_1000/trial_9/jac_server.prof"
     s = load_stats(prof_path)
 
-    total_prefetch = ct(s, "ScaleTieredMemory.prefetch") or ct(s, "prefetch")
-    n_snapshot = nc(s, "_snapshot_field_hashes")
+    total_deser = ct(s, "deserialize")
     n_deser = nc(s, "deserialize")
 
-    # Step 1: MongoDB find_raw
-    mongo_ms = ct(s, "MongoBackend.find_raw") or ct(s, "find_raw")
-
-    # Step 2: Redis bulk_put_raw (MSET)
-    redis_ms = ct(s, "RedisBackend.bulk_put_raw") or ct(s, "bulk_put_raw") or ct(s, "bulk_exists")
-
-    # Step 3: Deserialize + _compute_hash
-    # Approximate prefetch's share of deserialize by snapshot count
-    deser_total = ct(s, "deserialize")
-    if n_deser > 0 and n_snapshot > 0:
-        deser_ms = deser_total * (n_snapshot / n_deser)
+    # _compute_hash: 999 of N calls are from deserialize (1 per anchor)
+    compute_hash_total = ct(s, "_compute_hash")
+    n_hash = nc(s, "_compute_hash")
+    if n_hash > 0 and n_deser > 0:
+        hash_in_deser = compute_hash_total * (n_deser / n_hash)
     else:
-        deser_ms = deser_total
+        hash_in_deser = compute_hash_total
 
-    # Step 4: Snapshot field hashes
-    snapshot_ms = ct(s, "_snapshot_field_hashes")
+    # UUID construction (self-time)
+    uuid_ms = tt(s, "UUID.__init__")
+
+    # Permission deserialization
+    permission_ms = ct(s, "_deserialize_permission")
+
+    # _id_to_stub (edge stubs)
+    stub_ms = ct(s, "_id_to_stub")
+
+    # Archetype reconstruction (self-time only, excluding get_type_hints)
+    arch_self = tt(s, "_deserialize_archetype")
+
+    # Anchor-level self-time
+    anchor_self = tt(s, "_deserialize_anchor")
+
+    # get_type_hints: compute by subtraction to avoid double-counting
+    non_typing = hash_in_deser + uuid_ms + permission_ms + stub_ms + arch_self + anchor_self
+    typing_in_deser = max(0, total_deser - non_typing)
 
     # Build timeline
     steps = [
-        ("MongoDB\nfind_raw", mongo_ms, "#4e79a7"),
-        ("Redis\nMSET", redis_ms, "#f28e2b"),
-        ("Deserialize", deser_ms, "#59a14f"),
-        ("Snapshot\nfield hashes", snapshot_ms, "#e15759"),
+        ("get_type_hints\n(typing reflection)", typing_in_deser, "#b07aa1"),
+        ("_compute_hash\n(re-serialize+hash)", hash_in_deser, "#e15759"),
+        ("UUID\nconstruction", uuid_ms, "#f28e2b"),
+        ("Permission\ndeserialize", permission_ms, "#76b7b2"),
+        ("Edge stub\ncreation", stub_ms, "#edc948"),
+        ("Archetype\nreconstruction", arch_self, "#59a14f"),
+        ("Anchor\nsetup", anchor_self, "#4e79a7"),
     ]
 
     accounted = sum(w for _, w, _ in steps)
-    other = max(0, total_prefetch - accounted)
+    other = max(0, total_deser - accounted)
     if other > 1:
         steps.append(("Other", other, "#bab0ac"))
 
@@ -94,7 +99,7 @@ def main():
     small_labels = []
     for label, width, color in steps:
         ax.barh(bar_y, width, left=offset, height=0.6, color=color, edgecolor="white", linewidth=0.5)
-        if width > total_prefetch * 0.06:
+        if width > total_deser * 0.06:
             ax.text(
                 offset + width / 2, bar_y,
                 f"{label}\n{width:.0f}ms",
@@ -104,6 +109,7 @@ def main():
             small_labels.append((offset, width, label, color))
         offset += width
 
+    # Stagger small labels below the bar at different y levels
     for i, (x, w, label, color) in enumerate(small_labels):
         mid = x + w / 2
         y_text = 0.8 - (i % 3) * 0.7
@@ -115,18 +121,19 @@ def main():
         )
 
     ax.set_ylim(-1.5, bar_y + 0.8)
+
     ax.set_xlim(0, offset * 1.02)
     ax.set_yticks([])
     ax.set_xlabel("Time (ms)")
     ax.set_title(
-        f"Prefetch Pipeline Timeline ({total_prefetch:.0f}ms total, {n_snapshot} anchors)",
+        f"Deserialization Breakdown ({total_deser:.0f}ms total, {n_deser} anchors)",
         fontsize=11, fontweight="bold",
     )
     ax.grid(axis="x", alpha=0.3)
 
     plt.tight_layout()
 
-    out = prof_path.rsplit("/", 1)[0] + "/prefetch_timeline.png" if "/" in prof_path else "prefetch_timeline.png"
+    out = prof_path.rsplit("/", 1)[0] + "/deser_timeline.png" if "/" in prof_path else "deser_timeline.png"
     plt.savefig(out, dpi=200, bbox_inches="tight")
     print(f"Saved to {out}")
     plt.close()

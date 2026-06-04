@@ -98,25 +98,34 @@ def main():
     n_visits = nc(s, "Traverse.visit_item") or nc(s, "visit_item") or nc(s, "_visit_recursive")
 
     # Draw waterfall
-    fig, ax = plt.subplots(figsize=(16, 3))
+    fig, ax = plt.subplots(figsize=(16, 5))
 
+    bar_y = 2.0
     offset = 0.0
+    small_labels = []
     for label, width, color in steps:
-        ax.barh(0, width, left=offset, height=0.5, color=color, edgecolor="white", linewidth=0.5)
-        if width > total_walker * 0.03:
+        ax.barh(bar_y, width, left=offset, height=0.6, color=color, edgecolor="white", linewidth=0.5)
+        if width > total_walker * 0.06:
             ax.text(
-                offset + width / 2, 0,
+                offset + width / 2, bar_y,
                 f"{label}\n{width:.0f}ms",
                 ha="center", va="center", fontsize=8, fontweight="bold",
             )
         else:
-            ax.text(
-                offset + width / 2, -0.35,
-                f"{label}\n{width:.0f}ms",
-                ha="center", va="top", fontsize=7,
-            )
+            small_labels.append((offset, width, label, color))
         offset += width
 
+    for i, (x, w, label, color) in enumerate(small_labels):
+        mid = x + w / 2
+        y_text = 0.8 - (i % 3) * 0.7
+        ax.annotate(
+            f"{label} ({w:.0f}ms)",
+            xy=(mid, bar_y - 0.3), xytext=(mid, y_text),
+            ha="center", va="top", fontsize=7,
+            arrowprops=dict(arrowstyle="-", color=color, lw=0.8),
+        )
+
+    ax.set_ylim(-1.5, bar_y + 0.8)
     ax.set_xlim(0, offset * 1.02)
     ax.set_yticks([])
     ax.set_xlabel("Time (ms)")
