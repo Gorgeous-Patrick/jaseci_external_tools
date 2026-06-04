@@ -50,7 +50,6 @@ def format_ms(seconds: float) -> str:
 
 def reachable_from(entry_key, raw: dict) -> set:
     """BFS from entry_key following callee edges; returns set of reachable keys."""
-    # Build callee map: caller -> [callees]
     callee_map: dict = defaultdict(list)
     for callee_key, (cc, nc, tt, ct, callers) in raw.items():
         for caller_key in callers:
@@ -69,7 +68,6 @@ def reachable_from(entry_key, raw: dict) -> set:
 
 def analyze(prof_path: str, top_n: int, trials: int) -> None:
     stats = pstats.Stats(prof_path, stream=open("/dev/null", "w"))
-    # stats.stats: {(file, lineno, func): (prim_calls, total_calls, tottime, cumtime, callers)}
     raw = stats.stats
 
     # Find _jac_walker_execute and BFS to get its subtree
@@ -82,40 +80,50 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
     tier_funcs: dict[str, list] = defaultdict(list)
     mongo_request_calls: dict[str, int] = {}
     mongo_request_cumtime: dict[str, float] = {}
-    ttg_cumtime = 0.0
-    prefetch_cumtime = 0.0
-    prefetch_bulk_exists_cumtime = 0.0
-    prefetch_find_raw_cumtime = 0.0
-    prefetch_bulk_put_raw_cumtime = 0.0
+
+    # Key function tracking
+    key_funcs: dict[str, dict] = {}
+    KEY_FUNC_NAMES = {
+        "get_ttg_prefetch_list", "ScaleTieredMemory.prefetch",
+        "MongoBackend.find_raw", "RedisBackend.bulk_put_raw",
+        "RedisBackend.bulk_exists",
+        "deserialize", "_compute_hash", "_snapshot_field_hashes",
+        "_get_field_types", "get_type_hints",
+        "osp_spawn", "_visit_recursive", "_build_plan_from_path",
+        "_filter_has_predicates", "_filter_type_name", "getclosurevars",
+        "plan_chain_ordered", "resolve_chain_ordered", "_materialize_ids",
+        "_sv_on_complete",
+    }
 
     for key in subtree:
         filename, lineno, funcname = key
         cc, nc, tt, ct, _callers = raw[key]
         tier = classify(filename)
         tier_tottime[tier] += tt / trials
-        # Per-function table shows cumtime (useful) alongside self-time
         tier_funcs[tier].append((ct / trials, tt / trials, nc, funcname, filename, lineno))
+
         short_funcname = funcname.split(".")[-1]
         if tier == "L3 MongoDB" and short_funcname in MONGO_REQUEST_FUNCS and "memory_hierarchy.mongo" in filename:
             mongo_request_calls[short_funcname] = mongo_request_calls.get(short_funcname, 0) + nc
             mongo_request_cumtime[short_funcname] = mongo_request_cumtime.get(short_funcname, 0.0) + ct
-        if funcname == "get_ttg_prefetch_list":
-            ttg_cumtime = ct / trials
-        elif funcname == "ScaleTieredMemory.prefetch":
-            prefetch_cumtime = ct / trials
-        elif funcname == "RedisBackend.bulk_exists":
-            prefetch_bulk_exists_cumtime = ct / trials
-        elif funcname == "MongoBackend.find_raw":
-            prefetch_find_raw_cumtime = ct / trials
-        elif funcname == "RedisBackend.bulk_put_raw":
-            prefetch_bulk_put_raw_cumtime = ct / trials
+
+        if funcname in KEY_FUNC_NAMES:
+            # Skip super.prefetch entry (memory.impl), keep only override (main.impl)
+            if funcname == "ScaleTieredMemory.prefetch" and "memory.impl" in filename:
+                continue
+            if funcname not in key_funcs:
+                key_funcs[funcname] = {"nc": 0, "tt": 0.0, "ct": 0.0}
+            key_funcs[funcname]["nc"] += nc
+            key_funcs[funcname]["tt"] += tt / trials
+            key_funcs[funcname]["ct"] += ct / trials
 
     total_ref = entry_cumtime if entry_cumtime > 0 else sum(entry[2] for entry in raw.values()) / trials
 
-    # Derive L1 time: coordination tottime minus what it spent calling L2/L3.
-    # Since tottime already excludes called functions, L1 dict ops are embedded
-    # in coordination tottime (they are inlined / not separate function calls).
-    # We label the coordination tier as "L1 + coordination overhead" accordingly.
+    def kf_ct(fn):
+        return key_funcs.get(fn, {"ct": 0})["ct"] * 1000
+
+    def kf_nc(fn):
+        return key_funcs.get(fn, {"nc": 0})["nc"]
 
     # -----------------------------------------------------------------------
     # Summary table
@@ -138,35 +146,67 @@ def analyze(prof_path: str, top_n: int, trials: int) -> None:
     print(f"{'-'*65}")
     ref_label = "Total (_jac_walker_execute)" if entry_cumtime > 0 else "Total profiled"
     print(f"  {ref_label:<20}  {format_ms(total_ref)}")
-    if ttg_cumtime > 0 or prefetch_cumtime > 0:
-        print(f"{'='*65}")
-        print(f"  TTG breakdown (cum-time/req):")
-        if ttg_cumtime > 0:
-            print(f"    {'get_ttg_prefetch_list':<28}  {format_ms(ttg_cumtime)}")
-        if prefetch_cumtime > 0:
-            print(f"    {'prefetch':<28}  {format_ms(prefetch_cumtime)}")
-            if prefetch_bulk_exists_cumtime > 0:
-                print(f"      {'bulk_exists (L2)':<26}  {format_ms(prefetch_bulk_exists_cumtime)}")
-            if prefetch_find_raw_cumtime > 0:
-                print(f"      {'find_raw (L3)':<26}  {format_ms(prefetch_find_raw_cumtime)}")
-            if prefetch_bulk_put_raw_cumtime > 0:
-                print(f"      {'bulk_put_raw (L2)':<26}  {format_ms(prefetch_bulk_put_raw_cumtime)}")
     print(f"{'='*65}\n")
+
+    # -----------------------------------------------------------------------
+    # Prefetch pipeline breakdown
+    # -----------------------------------------------------------------------
+    prefetch_ct = kf_ct("ScaleTieredMemory.prefetch")
+    if prefetch_ct > 0:
+        print(f"  Prefetch Pipeline ({prefetch_ct:.0f}ms)")
+        print(f"  {'-'*55}")
+        print(f"    {'MongoDB find_raw':<35}  {kf_ct('MongoBackend.find_raw'):>8.1f}ms")
+        print(f"    {'Redis bulk_put_raw':<35}  {kf_ct('RedisBackend.bulk_put_raw'):>8.1f}ms")
+        bulk_exists = kf_ct("RedisBackend.bulk_exists")
+        if bulk_exists > 0:
+            print(f"    {'Redis bulk_exists':<35}  {bulk_exists:>8.1f}ms")
+        print(f"    {'Deserialize':<35}  {kf_ct('deserialize'):>8.1f}ms  ({kf_nc('deserialize')} calls)")
+        print(f"      {'get_type_hints':<33}  {kf_ct('get_type_hints'):>8.1f}ms  ({kf_nc('get_type_hints')} calls)")
+        print(f"      {'_compute_hash':<33}  {kf_ct('_compute_hash'):>8.1f}ms  ({kf_nc('_compute_hash')} calls)")
+        snapshot = kf_ct("_snapshot_field_hashes")
+        if snapshot > 0:
+            print(f"    {'_snapshot_field_hashes':<35}  {snapshot:>8.1f}ms  ({kf_nc('_snapshot_field_hashes')} calls)")
+        ttg = kf_ct("get_ttg_prefetch_list")
+        if ttg > 0:
+            print(f"    {'TTG (get_ttg_prefetch_list)':<35}  {ttg:>8.1f}ms")
+        print()
+
+    # -----------------------------------------------------------------------
+    # Walker runtime breakdown
+    # -----------------------------------------------------------------------
+    walker_ct = kf_ct("osp_spawn")
+    if walker_ct > 0:
+        print(f"  Walker Runtime ({walker_ct:.0f}ms)")
+        print(f"  {'-'*55}")
+        # User code: visit_item self-time
+        for key in subtree:
+            fn = key[2]
+            if "visit_item" in fn or fn in ("visit_item", "Traverse.visit_item"):
+                user_tt = raw[key][2] / trials * 1000
+                user_nc = raw[key][1]
+                print(f"    {'User code (self-time)':<35}  {user_tt:>8.1f}ms  ({user_nc} calls)")
+                break
+        print(f"    {'Plan building':<35}  {kf_ct('_build_plan_from_path'):>8.1f}ms  ({kf_nc('_build_plan_from_path')} calls)")
+        filter_total = kf_ct("_filter_has_predicates") + kf_ct("_filter_type_name") + kf_ct("getclosurevars")
+        print(f"      {'Filter analysis (bytecode+inspect)':<33}  {filter_total:>8.1f}ms")
+        print(f"    {'Topology index resolution':<35}  {kf_ct('plan_chain_ordered'):>8.1f}ms  ({kf_nc('plan_chain_ordered')} calls)")
+        print(f"    {'Materialize from L1':<35}  {kf_ct('_materialize_ids'):>8.1f}ms  ({kf_nc('_materialize_ids')} calls)")
+        print(f"    {'Commit (_sv_on_complete)':<35}  {kf_ct('_sv_on_complete'):>8.1f}ms")
+        print()
 
     # -----------------------------------------------------------------------
     # MongoDB request counts
     # -----------------------------------------------------------------------
     if mongo_request_calls:
         total_mongo_calls = sum(mongo_request_calls.values())
-        print(f"  MongoDB requests (total across {trials} trials: {total_mongo_calls},  avg/req: {total_mongo_calls/trials:.1f})")
+        print(f"  MongoDB requests (total: {total_mongo_calls},  avg/req: {total_mongo_calls/trials:.1f})")
         print(f"  {'function':<12}  {'total calls':>11}  {'avg/req':>9}  {'cum/req':>12}  {'avg/call':>12}")
         print(f"  {'-'*62}")
         for funcname in sorted(mongo_request_calls, key=lambda f: mongo_request_calls[f], reverse=True):
             calls = mongo_request_calls[funcname]
             ct = mongo_request_cumtime.get(funcname, 0.0)
             avg_call = ct / calls if calls else 0.0
-            note = "  (generator: counts docs yielded, not queries)" if funcname == "find_raw" else ""
-            print(f"  {funcname:<12}  {calls:>11}  {calls/trials:>9.1f}  {format_ms(ct/trials)}  {format_ms(avg_call)}{note}")
+            print(f"  {funcname:<12}  {calls:>11}  {calls/trials:>9.1f}  {format_ms(ct/trials)}  {format_ms(avg_call)}")
         print()
 
     # -----------------------------------------------------------------------
@@ -192,7 +232,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Memory tier profiling summary")
     parser.add_argument("prof", help="Path to .prof file")
     parser.add_argument("--top", type=int, default=10, help="Top N functions per tier")
-    parser.add_argument("--trials", type=int, default=10, help="Number of trials to average over")
+    parser.add_argument("--trials", type=int, default=1, help="Number of trials to average over")
     args = parser.parse_args()
     analyze(args.prof, args.top, args.trials)
 

@@ -120,10 +120,8 @@ def main():
     stats = {k: {"avg": [], "std": []} for k in all_backends}
 
     for n in node_counts:
-        # For X nodes, take X-1 edges (linked list has N-1 edges for N nodes)
-        n_ids = all_node_ids[:n]
-        e_ids = all_edge_ids[:max(n - 1, 0)]
-        ids = n_ids + e_ids
+        # Only fetch nodes — Jac's prefetcher and planner no longer materialize edges
+        ids = all_node_ids[:n]
 
         # Pre-read values from Redis for write benchmarks
         values = r.mget(ids)
@@ -167,50 +165,31 @@ def main():
         "redis_seq_set": "tab:olive",
     }
     labels = {
-        "mongo_batch": "MongoDB ($in)",
-        "mongo_seq": "MongoDB (sequential)",
-        "redis_mget": "Redis (mget)",
-        "redis_seq": "Redis (sequential get)",
-        "redis_mset": "Redis (mset)",
-        "redis_seq_set": "Redis (sequential set)",
+        "mongo_batch": "Batched MongoDB Read",
+        "mongo_seq": "Sequential MongoDB Read",
+        "redis_mget": "Batched Redis Read",
+        "redis_seq": "Sequential Redis Read",
+        "redis_mset": "Batched Redis Write",
+        "redis_seq_set": "Sequential Redis Write",
     }
 
-    def linreg(xs, ys):
-        n = len(xs)
-        sx = sum(xs)
-        sy = sum(ys)
-        sxy = sum(x * y for x, y in zip(xs, ys))
-        sx2 = sum(x * x for x in xs)
-        a = (n * sxy - sx * sy) / (n * sx2 - sx * sx)
-        b = (sy - a * sx) / n
-        return a, b
-
-    # Convert node counts to object counts (1 node = 1 node anchor + 1 edge anchor)
-    plot_objects = [n * 2 for n in plot_nodes]
-
-    print(f"\nLinear fit (ms):")
     for k in stats:
         avg_ms = [v * 1000 for v in stats[k]["avg"]]
         std_ms = [v * 1000 for v in stats[k]["std"]]
 
-        ax.plot(plot_objects, avg_ms, label=labels[k], color=colors[k])
+        ax.plot(plot_nodes, avg_ms, label=labels[k], color=colors[k], marker=".")
         ax.fill_between(
-            plot_objects,
+            plot_nodes,
             [a - s for a, s in zip(avg_ms, std_ms)],
             [a + s for a, s in zip(avg_ms, std_ms)],
-            alpha=0.2, color=colors[k],
+            alpha=0.15, color=colors[k],
         )
 
-        a, b = linreg(plot_objects, avg_ms)
-        ax.plot(plot_objects, [a * x + b for x in plot_objects], "--", color=colors[k], alpha=0.7,
-                label=f"{labels[k]} fit: {a:.4f}x + {b:.4f}")
-        print(f"  {labels[k]:.<30s} {a:.4f} * objects + {b:.4f}")
-
-    ax.set_xlabel("Number of objects fetched")
+    ax.set_xlabel("Number of nodes fetched")
     ax.set_ylabel("Time (ms)")
-    ax.set_title("Batch Fetch: MongoDB vs Redis")
+    ax.set_title("Raw Database Performance: MongoDB vs Redis (no Jac overhead)")
     ax.legend()
-    ax.grid(True)
+    ax.grid(True, alpha=0.3)
 
     fig.savefig(args.plot, dpi=300, bbox_inches="tight")
     plt.close(fig)

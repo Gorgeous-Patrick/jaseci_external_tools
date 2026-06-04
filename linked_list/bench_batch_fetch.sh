@@ -33,10 +33,14 @@ JAC_PID=$!
 sleep 10
 
 echo "=== Registering user ==="
-http --ignore-stdin POST $base_url/user/register username=user password=password || true
+http --ignore-stdin POST $base_url/user/register \
+  identities:='[{"type":"username","value":"user"}]' \
+  credential:='{"type":"password","password":"password"}' || true
 
 echo "=== Building linked list (JAC_LIST_SIZE=$JAC_LIST_SIZE) ==="
-token=$(http --ignore-stdin POST $base_url/user/login username=user password=password | jq ".data.token" -r)
+token=$(http --ignore-stdin POST $base_url/user/login \
+  identity:='{"type":"username","value":"user"}' \
+  credential:='{"type":"password","password":"password"}' | jq ".data.token" -r)
 http --ignore-stdin -A bearer -a "$token" POST "$base_url/function/setup_graph" > /dev/null
 echo "Linked list created."
 
