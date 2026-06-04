@@ -109,15 +109,6 @@ def main():
                 ha="center", va="center", fontsize=8, fontweight="bold",
             )
 
-    # Add percentage annotation
-    hash_total = hash_serialize + hash_json
-    ax.axvline(x=total_deser - hash_total, color="red", linestyle="--", alpha=0.5)
-    ax.text(
-        total_deser - hash_total + 0.001, len(deser_steps) - 0.5,
-        f"← _compute_hash: {hash_total / total_deser * 100:.0f}% of total",
-        fontsize=8, color="red",
-    )
-
     # --- Stacked bar: overall comparison ---
     ax2 = axes[1]
 
