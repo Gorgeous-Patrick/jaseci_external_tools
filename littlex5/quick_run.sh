@@ -50,10 +50,13 @@ for walker in "${WALKERS[@]}"; do
   for i in 1 2 3 4 5 6 7 8 9 10; do
     TRIAL_DIR="$JAC_PROFILE_DIR/${walker}/trial_${i}"
     LOG_TRIAL="logs/jac_server_${walker}_limit${PREFETCH_LIMIT}_trial${i}.log"
+    _profile_csv="$TRIAL_DIR/profile.csv"
 
     docker exec redis redis-cli FLUSHALL > /dev/null 2>&1 || true
 
-    JAC_PROFILE_DIR="$TRIAL_DIR" jac start > "$LOG_TRIAL" 2>&1 &
+    mkdir -p "$TRIAL_DIR"
+    JAC_PROFILE_DIR="$TRIAL_DIR" JAC_PROFILE_CSV="$_profile_csv" \
+      jac start > "$LOG_TRIAL" 2>&1 &
     JAC_PID=$!
     sleep 12
 
@@ -73,9 +76,20 @@ for walker in "${WALKERS[@]}"; do
     e2e_ms=$(awk "BEGIN {printf \"%.3f\", $e2e_time * 1000}")
     echo "  Trial $i: ${e2e_ms}ms  HTTP=$http_status  resp=${resp_size}bytes"
 
+    # Read breakdown from JAC_PROFILE_CSV if it was written
+    topo_idx_ms=""; ttg_ms=""; prefetch_ms=""; walker_ms=""
+    if [ -f "$_profile_csv" ]; then
+      last_row=$(tail -1 "$_profile_csv")
+      topo_idx_ms=$(echo "$last_row" | awk -F',' '{print $6}')
+      ttg_ms=$(echo "$last_row" | awk -F',' '{print $7}')
+      prefetch_ms=$(echo "$last_row" | awk -F',' '{print $8}')
+      walker_ms=$(echo "$last_row" | awk -F',' '{print $9}')
+      echo "    breakdown: topo=${topo_idx_ms}ms ttg=${ttg_ms}ms prefetch=${prefetch_ms}ms walker=${walker_ms}ms"
+    fi
+
     # Append to results CSV if provided
     if [ -n "$JAC_RESULTS_FILE" ]; then
-      echo "$walker,$PREFETCH_LIMIT,$i,$e2e_ms,$http_status,$resp_size" >> "$JAC_RESULTS_FILE"
+      echo "$walker,$PREFETCH_LIMIT,$i,$e2e_ms,$topo_idx_ms,$ttg_ms,$prefetch_ms,$walker_ms" >> "$JAC_RESULTS_FILE"
     fi
 
     kill $JAC_PID 2>/dev/null || true

@@ -13,7 +13,7 @@ echo "Limits: ${PREFETCH_LIMITS[*]}"
 echo ""
 
 # Write CSV header
-echo "walker,prefetch_limit,trial,e2e_ms,http_status,resp_size" > "$RESULTS_FILE"
+echo "walker,prefetch_limit,trial,e2e_ms,topo_idx_ms,ttg_ms,prefetch_ms,walker_ms" > "$RESULTS_FILE"
 
 for limit in "${PREFETCH_LIMITS[@]}"; do
   echo "========================================"
@@ -27,7 +27,6 @@ for limit in "${PREFETCH_LIMITS[@]}"; do
 
   # Ensure prefetching is set correctly
   if [ "$limit" -eq 0 ]; then
-    # Disable prefetching entirely when limit is 0
     sed -i 's/prefetching = .*/prefetching = "none"/' jac.toml 2>/dev/null || true
   else
     sed -i 's/prefetching = .*/prefetching = "ttg"/' jac.toml 2>/dev/null || true
