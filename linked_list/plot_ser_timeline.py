@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
-"""Visualize serialize/deserialize timeline per anchor from profiling data."""
+"""Visualize per-anchor cost breakdown for prefetch and walker runtime paths.
+
+Left panel:  Prefetch path (MongoDB bulk → deserialize → L1)
+Right panel: Walker runtime path (L2 miss → L3 fetch → deserialize → L2 write → L1)
+
+Usage:
+    python plot_ser_timeline.py [path/to/jac_server.prof]
+"""
 
 import pstats
 import sys
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-import numpy as np
 
 
 def load_stats(prof_path):
@@ -32,7 +38,7 @@ def main():
     prof_path = sys.argv[1] if len(sys.argv) > 1 else "profiles/limit_0/trial_1/jac_server.prof"
     s, cal = load_stats(prof_path)
 
-    n_anchors = s["deserialize"]["nc"]
+    n_anchors = s.get("deserialize", {"nc": 1})["nc"]
 
     # Per-anchor times (ms)
     def ct(fn):
@@ -41,124 +47,111 @@ def main():
     def tt(fn):
         return s.get(fn, {"tt": 0})["tt"] * 1000 / n_anchors
 
-    def caller_ct(fn, caller):
-        return cal.get(fn, {}).get(caller, {"ct": 0})["ct"] * 1000 / n_anchors
-
-    # Deserialize breakdown
+    # --- Deserialize breakdown (per anchor) ---
     total_deser = ct("deserialize")
-    compute_hash = ct("_compute_hash")
-    hash_serialize = caller_ct("serialize", "_compute_hash")
-    hash_json = compute_hash - hash_serialize
-    uuid_creation = ct("UUID.__init__") * 2 / (s["UUID.__init__"]["nc"] / n_anchors)  # approximate
-    deser_permission = ct("_deserialize_permission")
-    deser_archetype = ct("_deserialize_archetype")
-    id_to_stub = ct("_id_to_stub")
-    deser_anchor_self = tt("_deserialize_anchor")
-    deser_other = total_deser - compute_hash - deser_permission - deser_archetype - id_to_stub - deser_anchor_self
+    compute_hash = ct("_compute_hash") * (n_anchors / s.get("_compute_hash", {"nc": 1})["nc"])
+    get_type_hints = ct("get_type_hints") * (n_anchors / s.get("get_type_hints", {"nc": 1})["nc"])
+    uuid_total = tt("UUID.__init__")
+    permission = ct("_deserialize_permission")
+    stub = ct("_id_to_stub")
+    arch_self = tt("_deserialize_archetype")
+    anchor_self = tt("_deserialize_anchor")
 
-    # Serialize breakdown (for Redis write path)
-    ser_for_redis = caller_ct("serialize", "RedisBackend.bulk_put")
-    ser_value_tt = tt("_serialize_value")
-    ser_attrs_tt = tt("_serialize_attrs")
+    # Compute get_type_hints by subtraction for accuracy
+    non_typing = compute_hash + uuid_total + permission + stub + arch_self + anchor_self
+    typing_in_deser = max(0, total_deser - non_typing)
 
-    # Build waterfall data for deserialize
-    deser_steps = [
-        ("UUID creation", uuid_creation if uuid_creation > 0 else deser_other, "#4e79a7"),
-        ("_deserialize_permission", deser_permission, "#59a14f"),
-        ("_deserialize_archetype", deser_archetype, "#76b7b2"),
-        ("_id_to_stub (edges)", id_to_stub, "#edc948"),
-        ("_anchor self work", deser_anchor_self, "#b07aa1"),
-        ("_compute_hash:\n  serialize", hash_serialize, "#e15759"),
-        ("_compute_hash:\n  json.dumps+hash", hash_json, "#ff9d9a"),
-    ]
+    # --- Redis write per anchor (during walker batch_get miss path) ---
+    redis_put_total = s.get("RedisBackend.put", {"ct": 0})["ct"] * 1000
+    redis_put_nc = s.get("RedisBackend.put", {"nc": 1})["nc"]
+    redis_put_per = redis_put_total / redis_put_nc if redis_put_nc > 0 else 0
 
+    # --- MongoDB per anchor (during walker batch_get miss path) ---
+    mongo_batch = s.get("MongoBackend.batch_get", {"ct": 0})["ct"] * 1000
+    mongo_nc = s.get("MongoBackend.batch_get", {"nc": 1})["nc"]
+    mongo_per = mongo_batch / mongo_nc if mongo_nc > 0 else 0
+
+    # --- Redis MGET per anchor (during walker batch_get) ---
+    redis_mget = s.get("RedisBackend.batch_get", {"ct": 0})["ct"] * 1000
+    redis_mget_nc = s.get("RedisBackend.batch_get", {"nc": 1})["nc"]
+    redis_mget_per = redis_mget / redis_mget_nc if redis_mget_nc > 0 else 0
+
+    # --- Snapshot per anchor ---
+    snapshot_total = s.get("_snapshot_field_hashes", {"ct": 0})["ct"] * 1000
+    snapshot_nc = s.get("_snapshot_field_hashes", {"nc": 1})["nc"]
+    snapshot_per = snapshot_total / snapshot_nc if snapshot_nc > 0 else 0
+
+    # ─── Figure ───
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
-    # --- Deserialize waterfall ---
-    ax = axes[0]
-    y_pos = 0
-    starts = []
-    widths = []
-    colors = []
-    labels = []
-    offset = 0.0
+    # ─── Left: Prefetch per-anchor ───
+    ax1 = axes[0]
+    prefetch_parts = [
+        ("get_type_hints\n(typing reflection)", typing_in_deser, "#b07aa1"),
+        ("_compute_hash\n(re-serialize+hash)", compute_hash, "#e15759"),
+        ("UUID construction", uuid_total, "#f28e2b"),
+        ("Permission", permission, "#76b7b2"),
+        ("Edge stubs", stub, "#edc948"),
+        ("Archetype recon.", arch_self, "#59a14f"),
+        ("Anchor setup", anchor_self, "#4e79a7"),
+    ]
 
-    for label, width, color in deser_steps:
-        starts.append(offset)
-        widths.append(width)
-        colors.append(color)
-        labels.append(label)
-        offset += width
+    bottom = 0
+    for label, val, color in prefetch_parts:
+        ax1.bar(0, val, bottom=bottom, color=color, width=0.5, edgecolor="white")
+        if val > total_deser * 0.03:
+            ax1.text(0, bottom + val / 2, f"{val:.3f}ms", ha="center", va="center", fontsize=8, fontweight="bold")
+        bottom += val
+    ax1.text(0, bottom + 0.005, f"{bottom:.3f}ms", ha="center", fontsize=9, fontweight="bold")
+    ax1.set_xticks([0])
+    ax1.set_xticklabels(["Prefetch\n(per anchor)"], fontsize=9)
+    ax1.set_ylabel("Time (ms)")
+    ax1.set_title("Prefetch: Deserialize 1 anchor")
 
-    y_positions = range(len(deser_steps))
-    bars = ax.barh(y_positions, widths, left=starts, color=colors, height=0.6, edgecolor="white")
-
-    ax.set_yticks(list(y_positions))
-    ax.set_yticklabels(labels, fontsize=9)
-    ax.invert_yaxis()
-    ax.set_xlabel("Time (ms)")
-    ax.set_title(f"Deserialize 1 anchor ({total_deser:.3f}ms total)")
-
-    # Add time labels on bars
-    for bar, w in zip(bars, widths):
-        if w > 0.003:
-            ax.text(
-                bar.get_x() + bar.get_width() / 2,
-                bar.get_y() + bar.get_height() / 2,
-                f"{w:.3f}",
-                ha="center", va="center", fontsize=8, fontweight="bold",
-            )
-
-    # --- Stacked bar: overall comparison ---
+    # ─── Right: Walker runtime per-anchor (L2 miss path) ───
     ax2 = axes[1]
+    walker_parts = [
+        ("Redis MGET", redis_mget_per, "#76b7b2"),
+        ("MongoDB query", mongo_per, "#4e79a7"),
+        ("get_type_hints", typing_in_deser, "#b07aa1"),
+        ("_compute_hash", compute_hash, "#e15759"),
+        ("Other deser", uuid_total + permission + stub + arch_self + anchor_self, "#59a14f"),
+        ("_snapshot_field_hashes", snapshot_per, "#ff9d9a"),
+        ("Redis PUT\n(write-back)", redis_put_per, "#f28e2b"),
+    ]
+    # Filter zero values
+    walker_parts = [(l, v, c) for l, v, c in walker_parts if v > 0.001]
 
-    actual_deser = total_deser - compute_hash
-    categories = {
-        "deserialize\n(per anchor)": [
-            ("Actual deserialization", actual_deser, "#4e79a7"),
-            ("_compute_hash\n(re-serialize+json+hash)", compute_hash, "#e15759"),
-        ],
-        "serialize\n(for Redis, per anchor)": [
-            ("_serialize_value", ser_for_redis, "#f28e2b"),
-        ],
-        "serialize\n(for hash, per anchor)": [
-            ("_serialize_value (inside hash)", hash_serialize, "#e15759"),
-        ],
-    }
-
-    x_pos = 0
-    x_ticks = []
-    x_labels = []
-    for cat_label, parts in categories.items():
-        bottom = 0
-        for part_label, val, color in parts:
-            bar = ax2.bar(x_pos, val, bottom=bottom, color=color, width=0.5, edgecolor="white")
-            if val > 0.005:
-                ax2.text(
-                    x_pos, bottom + val / 2,
-                    f"{val:.3f}ms",
-                    ha="center", va="center", fontsize=8, fontweight="bold",
-                )
-            bottom += val
-        ax2.text(x_pos, bottom + 0.002, f"{bottom:.3f}ms", ha="center", fontsize=9, fontweight="bold")
-        x_ticks.append(x_pos)
-        x_labels.append(cat_label)
-        x_pos += 1
-
-    ax2.set_xticks(x_ticks)
-    ax2.set_xticklabels(x_labels, fontsize=9)
+    bottom = 0
+    for label, val, color in walker_parts:
+        ax2.bar(0, val, bottom=bottom, color=color, width=0.5, edgecolor="white")
+        if val > 0.01:
+            ax2.text(0, bottom + val / 2, f"{val:.3f}ms", ha="center", va="center", fontsize=8, fontweight="bold")
+        bottom += val
+    ax2.text(0, bottom + 0.01, f"{bottom:.3f}ms", ha="center", fontsize=9, fontweight="bold")
+    ax2.set_xticks([0])
+    ax2.set_xticklabels(["Walker fetch\n(per anchor, L2 miss)"], fontsize=9)
     ax2.set_ylabel("Time (ms)")
-    ax2.set_title("Per-anchor cost breakdown")
+    ax2.set_title("Walker: Fetch 1 anchor (no prefetch)")
 
     # Legend
     legend_patches = [
-        mpatches.Patch(color="#4e79a7", label="Actual deser work"),
-        mpatches.Patch(color="#e15759", label="_compute_hash (redundant serialize)"),
-        mpatches.Patch(color="#f28e2b", label="Serialize for Redis"),
+        mpatches.Patch(color="#4e79a7", label="MongoDB"),
+        mpatches.Patch(color="#76b7b2", label="Redis read"),
+        mpatches.Patch(color="#f28e2b", label="Redis write"),
+        mpatches.Patch(color="#b07aa1", label="get_type_hints"),
+        mpatches.Patch(color="#e15759", label="_compute_hash"),
+        mpatches.Patch(color="#ff9d9a", label="_snapshot_field_hashes"),
+        mpatches.Patch(color="#59a14f", label="Other deser work"),
+        mpatches.Patch(color="#edc948", label="Edge stubs"),
     ]
-    ax2.legend(handles=legend_patches, fontsize=8, loc="upper right")
+    fig.legend(handles=legend_patches, loc="lower center", ncol=4, fontsize=8)
 
-    plt.tight_layout()
+    plt.suptitle(
+        f"Per-Anchor Cost: Prefetch vs Walker Runtime\n({n_anchors} anchors)",
+        fontsize=12, fontweight="bold",
+    )
+    plt.tight_layout(rect=[0, 0.08, 1, 0.93])
     out = "ser_deser_timeline.png"
     plt.savefig(out, dpi=300, bbox_inches="tight")
     print(f"Saved to {out}")
