@@ -50,24 +50,18 @@ def main():
     s = load_stats(prof_path)
 
     total_prefetch = ct(s, "ScaleTieredMemory.prefetch") or ct(s, "prefetch")
-    n_snapshot = nc(s, "_snapshot_field_hashes")
     n_deser = nc(s, "deserialize")
 
     # Step 1: MongoDB find_raw
     mongo_ms = ct(s, "MongoBackend.find_raw") or ct(s, "find_raw")
 
     # Step 2: Redis bulk_put_raw (MSET)
-    redis_ms = ct(s, "RedisBackend.bulk_put_raw") or ct(s, "bulk_put_raw") or ct(s, "bulk_exists")
+    redis_ms = ct(s, "RedisBackend.bulk_put_raw") or ct(s, "bulk_put_raw")
 
-    # Step 3: Deserialize + _compute_hash
-    # Approximate prefetch's share of deserialize by snapshot count
-    deser_total = ct(s, "deserialize")
-    if n_deser > 0 and n_snapshot > 0:
-        deser_ms = deser_total * (n_snapshot / n_deser)
-    else:
-        deser_ms = deser_total
+    # Step 3: Deserialize
+    deser_ms = ct(s, "deserialize")
 
-    # Step 4: Snapshot field hashes
+    # Step 4: Snapshot field hashes (may be 0 if removed from prefetch)
     snapshot_ms = ct(s, "_snapshot_field_hashes")
 
     # Build timeline
@@ -119,7 +113,7 @@ def main():
     ax.set_yticks([])
     ax.set_xlabel("Time (ms)")
     ax.set_title(
-        f"Prefetch Pipeline Timeline ({total_prefetch:.0f}ms total, {n_snapshot} anchors)",
+        f"Prefetch Pipeline Timeline ({total_prefetch:.0f}ms total, {n_deser} anchors)",
         fontsize=11, fontweight="bold",
     )
     ax.grid(axis="x", alpha=0.3)
