@@ -35,19 +35,37 @@ THEMED_HINTS = [
 
 
 class TweetPool:
-    def __init__(self, ollama: OllamaClient):
+    def __init__(self, ollama: OllamaClient, save_path: str = "tweet_pool.json"):
         self.ollama = ollama
         self.tweets: list[str] = []
+        self.save_path = save_path
 
     def generate(self, pool_size: int, batch_size: int = 20) -> list[str]:
-        """Generate a pool of tweets via repeated batch calls to Ollama."""
-        self.tweets = []
-        batches_needed = (pool_size + batch_size - 1) // batch_size
+        """Generate a pool of tweets via repeated batch calls to Ollama.
 
-        print(f"Generating tweet pool: {pool_size} tweets in {batches_needed} batches...")
+        Saves incrementally after each batch so progress survives interruptions.
+        If a partial pool file already exists, resumes from where it left off.
+        """
+        # Resume from partial pool if it exists
+        p = Path(self.save_path)
+        if p.exists():
+            existing = json.loads(p.read_text())
+            if len(existing) >= pool_size:
+                self.tweets = existing[:pool_size]
+                print(f"Pool already complete ({len(self.tweets)} tweets) at {self.save_path}")
+                return self.tweets
+            self.tweets = existing
+            print(f"Resuming pool generation from {len(self.tweets)}/{pool_size} tweets")
+        else:
+            self.tweets = []
+
+        remaining = pool_size - len(self.tweets)
+        batches_needed = (remaining + batch_size - 1) // batch_size
+
+        print(f"Generating tweet pool: {remaining} more tweets in {batches_needed} batches...")
 
         for i in range(batches_needed):
-            theme = THEMED_HINTS[i % len(THEMED_HINTS)]
+            theme = THEMED_HINTS[(len(self.tweets) // batch_size) % len(THEMED_HINTS)]
             prompt = POOL_PROMPT.format(batch_size=batch_size, theme_hint=theme)
 
             response = self.ollama.generate(
@@ -56,6 +74,10 @@ class TweetPool:
 
             batch = self._parse_tweets(response)
             self.tweets.extend(batch)
+
+            # Save after every batch
+            self._save_incremental()
+
             print(f"  Batch {i+1}/{batches_needed}: got {len(batch)} tweets "
                   f"(pool total: {len(self.tweets)})")
 
@@ -63,8 +85,12 @@ class TweetPool:
                 break
 
         self.tweets = self.tweets[:pool_size]
+        self._save_incremental()
         print(f"Tweet pool ready: {len(self.tweets)} tweets")
         return self.tweets
+
+    def _save_incremental(self) -> None:
+        Path(self.save_path).write_text(json.dumps(self.tweets, indent=2))
 
     def _parse_tweets(self, response: str) -> list[str]:
         tweets = []
@@ -87,16 +113,3 @@ class TweetPool:
         # With replacement for large counts
         return [random.choice(self.tweets) for _ in range(count)]
 
-    def save(self, path: str) -> None:
-        """Save pool to disk for reuse across runs."""
-        Path(path).write_text(json.dumps(self.tweets, indent=2))
-        print(f"Saved pool ({len(self.tweets)} tweets) to {path}")
-
-    def load(self, path: str) -> bool:
-        """Load pool from disk. Returns True if successful."""
-        p = Path(path)
-        if not p.exists():
-            return False
-        self.tweets = json.loads(p.read_text())
-        print(f"Loaded pool ({len(self.tweets)} tweets) from {path}")
-        return True

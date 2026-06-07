@@ -68,7 +68,7 @@ def main() -> None:
     ollama = OllamaClient(base_url=args.ollama_url, model=args.ollama_model)
     api = LittlexAPI(base_url=args.server_url)
     sim = UserSimulator(ollama=ollama, api=api, password=args.password)
-    pool = TweetPool(ollama=ollama)
+    pool = TweetPool(ollama=ollama, save_path=args.pool_file)
 
     n_users = args.users
     m_tweets = args.tweets_per_user
@@ -85,12 +85,8 @@ def main() -> None:
     print(f"Estimated total Ollama calls: ~{pool_calls + bio_calls + follow_calls}")
     print()
 
-    # Phase 0: Generate or load tweet pool
-    if pool.load(args.pool_file):
-        pass  # Loaded from disk
-    else:
-        pool.generate(args.pool_size, batch_size=args.pool_batch_size)
-        pool.save(args.pool_file)
+    # Phase 0: Generate or load/resume tweet pool
+    pool.generate(args.pool_size, batch_size=args.pool_batch_size)
     print()
 
     if args.generate_pool_only:
