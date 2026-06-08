@@ -41,20 +41,19 @@ class TweetPool:
         self.save_path = save_path
 
     def generate(self, pool_size: int, batch_size: int = 20) -> list[str]:
-        """Generate a pool of tweets via repeated batch calls to Ollama.
+        """Generate tweets until the pool has at least pool_size entries.
 
-        Saves incrementally after each batch so progress survives interruptions.
-        If a partial pool file already exists, resumes from where it left off.
+        - Never truncates or removes existing tweets.
+        - Appends new tweets and saves after each batch.
+        - If the file already has >= pool_size tweets, does nothing.
         """
-        # Resume from partial pool if it exists
+        # Load existing pool (never discard anything)
         p = Path(self.save_path)
         if p.exists():
-            existing = json.loads(p.read_text())
-            if len(existing) >= pool_size:
-                self.tweets = existing[:pool_size]
-                print(f"Pool already complete ({len(self.tweets)} tweets) at {self.save_path}")
+            self.tweets = json.loads(p.read_text())
+            if len(self.tweets) >= pool_size:
+                print(f"Pool already has {len(self.tweets)} tweets (>= {pool_size}) at {self.save_path}")
                 return self.tweets
-            self.tweets = existing
             print(f"Resuming pool generation from {len(self.tweets)}/{pool_size} tweets")
         else:
             self.tweets = []
@@ -62,7 +61,7 @@ class TweetPool:
         remaining = pool_size - len(self.tweets)
         batches_needed = (remaining + batch_size - 1) // batch_size
 
-        print(f"Generating tweet pool: {remaining} more tweets in {batches_needed} batches...")
+        print(f"Generating {remaining} more tweets in {batches_needed} batches...")
 
         for i in range(batches_needed):
             theme = THEMED_HINTS[(len(self.tweets) // batch_size) % len(THEMED_HINTS)]
@@ -75,8 +74,8 @@ class TweetPool:
             batch = self._parse_tweets(response)
             self.tweets.extend(batch)
 
-            # Save after every batch
-            self._save_incremental()
+            # Save after every batch (append-only, never truncate)
+            self._save()
 
             print(f"  Batch {i+1}/{batches_needed}: got {len(batch)} tweets "
                   f"(pool total: {len(self.tweets)})")
@@ -84,35 +83,12 @@ class TweetPool:
             if len(self.tweets) >= pool_size:
                 break
 
-        self.tweets = self.tweets[:pool_size]
-        self._save_incremental()
         print(f"Tweet pool ready: {len(self.tweets)} tweets")
         return self.tweets
 
-    def _save_incremental(self) -> None:
+    def _save(self) -> None:
+        """Write current pool to disk. Only adds — never called after removals."""
         Path(self.save_path).write_text(json.dumps(self.tweets, indent=2))
-
-    def _is_meta_line(self, text: str) -> bool:
-        """Detect preamble/meta lines the model outputs instead of actual tweets."""
-        lower = text.lower()
-        meta_patterns = [
-            "here are",
-            "here's",
-            "sure,",
-            "sure!",
-            "certainly",
-            "of course",
-            "i'll",
-            "i will",
-            "below are",
-            "the following",
-            "unique tweets",
-            "short tweets",
-            "tweets for",
-            "as requested",
-            "let me",
-        ]
-        return any(lower.startswith(p) or p in lower[:50] for p in meta_patterns)
 
     def _parse_tweets(self, response: str) -> list[str]:
         tweets = []
@@ -123,19 +99,29 @@ class TweetPool:
             cleaned = re.sub(r"^\d+[\.\)]\s*", "", line)
             if not cleaned or len(cleaned) > 280 or len(cleaned) <= 10:
                 continue
-            if self._is_meta_line(cleaned):
+            # Skip only obvious preamble (exact patterns)
+            if re.match(r"^here are .*\d+.*tweets", cleaned, re.IGNORECASE):
                 continue
             tweets.append(cleaned)
         return tweets
 
     def clean(self) -> int:
-        """Remove meta-lines from an already-generated pool. Returns count removed."""
+        """Remove meta-lines from the pool. Only called via --clean-pool.
+
+        Uses a narrow regex to only catch obvious LLM preamble like:
+        "Here are the 20 unique tweets:" / "Here are 20 tweets for you:"
+        """
         before = len(self.tweets)
-        self.tweets = [t for t in self.tweets if not self._is_meta_line(t)]
+        self.tweets = [
+            t for t in self.tweets
+            if not re.match(r"^here are .*\d+.*tweets", t, re.IGNORECASE)
+        ]
         removed = before - len(self.tweets)
         if removed:
-            self._save_incremental()
+            self._save()
             print(f"Cleaned pool: removed {removed} meta-lines ({len(self.tweets)} remaining)")
+        else:
+            print("Nothing to clean.")
         return removed
 
     def sample(self, count: int) -> list[str]:
