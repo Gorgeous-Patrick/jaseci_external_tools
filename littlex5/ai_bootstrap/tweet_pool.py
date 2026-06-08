@@ -92,6 +92,28 @@ class TweetPool:
     def _save_incremental(self) -> None:
         Path(self.save_path).write_text(json.dumps(self.tweets, indent=2))
 
+    def _is_meta_line(self, text: str) -> bool:
+        """Detect preamble/meta lines the model outputs instead of actual tweets."""
+        lower = text.lower()
+        meta_patterns = [
+            "here are",
+            "here's",
+            "sure,",
+            "sure!",
+            "certainly",
+            "of course",
+            "i'll",
+            "i will",
+            "below are",
+            "the following",
+            "unique tweets",
+            "short tweets",
+            "tweets for",
+            "as requested",
+            "let me",
+        ]
+        return any(lower.startswith(p) or p in lower[:50] for p in meta_patterns)
+
     def _parse_tweets(self, response: str) -> list[str]:
         tweets = []
         for line in response.splitlines():
@@ -99,10 +121,22 @@ class TweetPool:
             if not line:
                 continue
             cleaned = re.sub(r"^\d+[\.\)]\s*", "", line)
-            # Skip lines that look like meta-text rather than tweets
-            if cleaned and len(cleaned) <= 280 and len(cleaned) > 10:
-                tweets.append(cleaned)
+            if not cleaned or len(cleaned) > 280 or len(cleaned) <= 10:
+                continue
+            if self._is_meta_line(cleaned):
+                continue
+            tweets.append(cleaned)
         return tweets
+
+    def clean(self) -> int:
+        """Remove meta-lines from an already-generated pool. Returns count removed."""
+        before = len(self.tweets)
+        self.tweets = [t for t in self.tweets if not self._is_meta_line(t)]
+        removed = before - len(self.tweets)
+        if removed:
+            self._save_incremental()
+            print(f"Cleaned pool: removed {removed} meta-lines ({len(self.tweets)} remaining)")
+        return removed
 
     def sample(self, count: int) -> list[str]:
         """Randomly sample tweets from the pool (with replacement if needed)."""

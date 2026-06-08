@@ -54,6 +54,8 @@ def parse_args() -> argparse.Namespace:
                         help="Path to save/load tweet pool JSON (default: tweet_pool.json)")
     parser.add_argument("--generate-pool-only", action="store_true",
                         help="Only generate the tweet pool and exit (no user simulation)")
+    parser.add_argument("--clean-pool", action="store_true",
+                        help="Remove meta-lines from existing pool file and exit")
     parser.add_argument("--seed", type=int, default=None,
                         help="Random seed for reproducibility")
     return parser.parse_args()
@@ -85,8 +87,15 @@ def main() -> None:
     print(f"Estimated total Ollama calls: ~{pool_calls + bio_calls + follow_calls}")
     print()
 
+    # Clean existing pool if requested
+    if args.clean_pool:
+        pool.generate(args.pool_size, batch_size=args.pool_batch_size)
+        pool.clean()
+        return
+
     # Phase 0: Generate or load/resume tweet pool
     pool.generate(args.pool_size, batch_size=args.pool_batch_size)
+    pool.clean()  # Always strip meta-lines
     print()
 
     if args.generate_pool_only:
