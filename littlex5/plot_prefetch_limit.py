@@ -25,7 +25,7 @@ def main():
     walkers = sorted(df["walker"].unique())
     has_breakdown = all(c in df.columns for c in ["topo_idx_ms", "ttg_ms", "prefetch_ms", "walker_ms"])
 
-    fig, axes = plt.subplots(1, len(walkers), figsize=(7 * len(walkers), 6), sharey=True)
+    fig, axes = plt.subplots(1, len(walkers), figsize=(7 * len(walkers), 6))
     if len(walkers) == 1:
         axes = [axes]
 

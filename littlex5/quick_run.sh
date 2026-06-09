@@ -7,7 +7,7 @@ export JAC_PROFILE_DIR=${JAC_PROFILE_DIR:-profiles}
 # Which walkers to benchmark (read-heavy ones)
 WALKERS=("get_profile" "load_feed")
 # Pick a user with decent connectivity
-TEST_USER=${TEST_USER:-user3}
+TEST_USER=${TEST_USER:-sim_user_3}
 TEST_PASSWORD=${TEST_PASSWORD:-password}
 
 # Restart docker compose
@@ -21,6 +21,10 @@ if [ -f jac_db.dump ]; then
     echo "=== Restoring MongoDB from dump ==="
     docker cp jac_db.dump mongodb:/tmp/jac_db.dump
     docker exec mongodb mongorestore --archive=/tmp/jac_db.dump --drop 2>&1 | tail -3
+    # Clear stale topology index data (binary format may differ across branches)
+    docker exec mongodb mongosh --quiet --eval \
+      'db.getSiblingDB("jac_db").getCollection("_anchors").updateMany({}, {$unset: {"data.topology_index_data": ""}})' \
+      > /dev/null 2>&1 || true
 else
     echo "=== No jac_db.dump found — using existing data ==="
 fi
@@ -58,7 +62,11 @@ for walker in "${WALKERS[@]}"; do
     JAC_PROFILE_DIR="$TRIAL_DIR" JAC_PROFILE_CSV="$_profile_csv" \
       jac start > "$LOG_TRIAL" 2>&1 &
     JAC_PID=$!
-    sleep 12
+    echo "    Waiting for server..."
+    for _attempt in $(seq 1 60); do
+      curl -sf "http://$base_url/docs" > /dev/null 2>&1 && break
+      sleep 1
+    done
 
     token=$(curl -s -X POST "http://$base_url/user/login" \
       -H "Content-Type: application/json" \
