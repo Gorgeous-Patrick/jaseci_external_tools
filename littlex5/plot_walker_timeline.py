@@ -25,13 +25,20 @@ import matplotlib.pyplot as plt
 def load_stats(prof_path):
     stats = pstats.Stats(prof_path, stream=open("/dev/null", "w"))
     result = {}
+    callers = {}
     for (filename, lineno, funcname), (cc, nc, tt, ct, caller_dict) in stats.stats.items():
         if funcname not in result:
             result[funcname] = {"nc": 0, "tt": 0.0, "ct": 0.0}
+            callers[funcname] = {}
         result[funcname]["nc"] += nc
         result[funcname]["tt"] += tt
         result[funcname]["ct"] += ct
-    return result
+        for (cf, cl, cfn), (ccc, cnc, ctt, cct) in caller_dict.items():
+            if cfn not in callers[funcname]:
+                callers[funcname][cfn] = {"nc": 0, "ct": 0.0}
+            callers[funcname][cfn]["nc"] += cnc
+            callers[funcname][cfn]["ct"] += cct
+    return result, callers
 
 
 def ct(s, fn):
@@ -46,6 +53,11 @@ def nc(s, fn):
     return s.get(fn, {"nc": 0})["nc"]
 
 
+def caller_ct(cal, fn, caller):
+    """Cumulative time of `fn` when called by `caller`."""
+    return cal.get(fn, {}).get(caller, {"ct": 0})["ct"] * 1000
+
+
 # Walker ability names for littlex5 walkers
 WALKER_ABILITIES = [
     "run", "give", "apply", "gather", "deliver", "tally",
@@ -55,7 +67,7 @@ WALKER_ABILITIES = [
 
 def main():
     prof_path = sys.argv[1] if len(sys.argv) > 1 else "profiles/limit_5000/get_profile/trial_1/jac_server.prof"
-    s = load_stats(prof_path)
+    s, cal = load_stats(prof_path)
 
     total_walker = ct(s, "osp_spawn")
 
@@ -83,14 +95,20 @@ def main():
     # Step 5: Materialize from L1
     materialize_ms = ct(s, "_materialize_ids")
 
-    # Step 6: L3 (MongoDB) fetch time
-    mongo_ms = ct(s, "MongoBackend.batch_get") or ct(s, "MongoBackend.get")
+    # Step 6-8: L3/deser/Redis during walker runtime.
+    # MongoBackend.batch_get / .get are walker-only (prefetcher uses find_raw,
+    # commit uses sync), so no caller subtraction needed.
+    mongo_ms = ct(s, "MongoBackend.batch_get") + ct(s, "MongoBackend.get")
 
-    # Step 7: Deserialization
-    deser_ms = ct(s, "deserialize")
+    # Deserialization happens in both prefetch and walker. Subtract prefetch
+    # contribution using caller info.
+    prefetch_deser = caller_ct(cal, "deserialize", "_load_anchor") \
+        + caller_ct(cal, "deserialize", "prefetch")
+    deser_ms = max(0, ct(s, "deserialize") - prefetch_deser)
 
-    # Step 8: L2 (Redis) write-back
-    redis_put_ms = ct(s, "RedisBackend.put") or ct(s, "bulk_put_raw")
+    # RedisBackend.put is called from walker's L3-hit promotion path.
+    # Prefetcher uses bulk_put_raw instead, so no subtraction needed.
+    redis_put_ms = ct(s, "RedisBackend.put")
 
     # Step 9: Commit
     commit_ms = ct(s, "_sv_on_complete")
