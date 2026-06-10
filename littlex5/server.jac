@@ -239,12 +239,12 @@ walker load_feed {
         reports: list[list[TweetView]] = [];
 
     can run with Root entry {
-        mine = [-->[?:Profile]];
-        if mine {
-            me = mine[0];
-            visit [me-->[?:Tweet]];
-            visit [me->:Follow:->[?:Profile]-->[?:Tweet]];
-        }
+        visit [-->[?:Profile]];
+    }
+
+    can collect with Profile entry {
+        visit [-->[?:Tweet]];
+        visit [->:Follow:->[?:Profile]-->[?:Tweet]];
     }
 
     can gather with Tweet entry {
