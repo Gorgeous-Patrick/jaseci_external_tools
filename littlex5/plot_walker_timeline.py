@@ -83,7 +83,16 @@ def main():
     # Step 5: Materialize from L1
     materialize_ms = ct(s, "_materialize_ids")
 
-    # Step 6: Commit
+    # Step 6: L3 (MongoDB) fetch time
+    mongo_ms = ct(s, "MongoBackend.batch_get") or ct(s, "MongoBackend.get")
+
+    # Step 7: Deserialization
+    deser_ms = ct(s, "deserialize")
+
+    # Step 8: L2 (Redis) write-back
+    redis_put_ms = ct(s, "RedisBackend.put") or ct(s, "bulk_put_raw")
+
+    # Step 9: Commit
     commit_ms = ct(s, "_sv_on_complete")
 
     # Build timeline
@@ -93,6 +102,9 @@ def main():
         ("Filter analysis\n(bytecode+inspect)", filter_total, "#b07aa1"),
         ("Topology index\nresolution", topo_ms, "#f28e2b"),
         ("Materialize\nfrom L1", materialize_ms, "#76b7b2"),
+        ("L3 fetch\n(MongoDB)", mongo_ms, "#4e79a7"),
+        ("Deserialize", deser_ms, "#ff9d9a"),
+        ("L2 write-back\n(Redis)", redis_put_ms, "#f28e2b"),
         ("Commit", commit_ms, "#e15759"),
     ]
 
