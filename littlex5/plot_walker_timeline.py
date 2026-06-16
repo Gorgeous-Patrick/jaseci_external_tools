@@ -96,15 +96,11 @@ def main():
     materialize_ms = ct(s, "_materialize_ids")
 
     # Step 6-8: L3/deser/Redis during walker runtime.
-    # MongoBackend.batch_get / .get are walker-only (prefetcher uses find_raw,
-    # commit uses sync), so no caller subtraction needed.
-    mongo_ms = ct(s, "MongoBackend.batch_get") + ct(s, "MongoBackend.get")
-
-    # Deserialization happens in both prefetch and walker. Subtract prefetch
-    # contribution using caller info.
-    prefetch_deser = caller_ct(cal, "deserialize", "_load_anchor") \
-        + caller_ct(cal, "deserialize", "prefetch")
-    deser_ms = max(0, ct(s, "deserialize") - prefetch_deser)
+    # All MongoDB methods (get, batch_get, execute_plan) include
+    # deserialization (_load_anchor) in their cumulative time, so
+    # deserialization is not broken out as a separate step.
+    mongo_ms = ct(s, "MongoBackend.batch_get") + ct(s, "MongoBackend.get") \
+        + ct(s, "MongoBackend.execute_plan")
 
     # RedisBackend.put is called from walker's L3-hit promotion path.
     # Prefetcher uses bulk_put_raw instead, so no subtraction needed.
@@ -120,8 +116,7 @@ def main():
         ("Filter analysis\n(bytecode+inspect)", filter_total, "#b07aa1"),
         ("Topology index\nresolution", topo_ms, "#f28e2b"),
         ("Materialize\nfrom L1", materialize_ms, "#76b7b2"),
-        ("L3 fetch\n(MongoDB)", mongo_ms, "#4e79a7"),
-        ("Deserialize", deser_ms, "#ff9d9a"),
+        ("L3 fetch+deser\n(MongoDB)", mongo_ms, "#4e79a7"),
         ("L2 write-back\n(Redis)", redis_put_ms, "#f28e2b"),
         ("Commit", commit_ms, "#e15759"),
     ]
