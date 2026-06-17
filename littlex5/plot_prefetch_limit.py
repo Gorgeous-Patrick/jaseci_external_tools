@@ -31,7 +31,7 @@ def main():
 
     for ax, walker in zip(axes, walkers):
         wdf = df[df["walker"] == walker]
-        grouped = wdf.groupby("prefetch_limit").mean(numeric_only=True).reset_index()
+        grouped = wdf.groupby("prefetch_limit").median(numeric_only=True).reset_index()
         grouped = grouped.sort_values("prefetch_limit")
 
         x = np.arange(len(grouped))
@@ -68,13 +68,13 @@ def main():
 
     axes[0].set_ylabel("Time (ms)")
     if has_breakdown:
-        axes[-1].legend(loc="upper right")
-    fig.suptitle("LittleX E2E Time vs Prefetch Limit\n(cold Redis, 10 trials each, averaged)",
+        axes[-1].legend(loc="upper left", bbox_to_anchor=(1.02, 1), borderaxespad=0)
+    fig.suptitle("LittleX E2E Time vs Prefetch Limit\n(cold Redis, median)",
                  fontsize=13, fontweight="bold")
     plt.tight_layout()
 
     output_file = csv_file.replace(".csv", ".png")
-    plt.savefig(output_file, dpi=150)
+    plt.savefig(output_file, dpi=150, bbox_inches="tight")
     print(f"Saved plot to {output_file}")
 
 
