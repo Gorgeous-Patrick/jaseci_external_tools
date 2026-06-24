@@ -2,7 +2,7 @@
 set -e
 
 # Configuration
-PREFETCH_LIMITS=(0 2500 5000 7500 10000)
+PREFETCH_LIMITS=(0 10000)
 # PREFETCH_LIMITS=(10000 15000)
 RESULTS_FILE="sweep_prefetch_limit.csv"
 
