@@ -1,0 +1,77 @@
+=== LittleX Prefetch Limit Sweep ===
+Limits: 0 1000000
+
+========================================
+Testing: prefetch_limit=0
+========================================
+=== Restarting docker compose ===
+ Container mongodb Stopping 
+ Container redis Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Container mongodb Removed 
+ Network littlex5_default Removing 
+ Network littlex5_default Removed 
+ Network littlex5_default Creating 
+ Network littlex5_default Created 
+ Container mongodb Creating 
+ Container redis Creating 
+ Container mongodb Created 
+ Container redis Created 
+ Container mongodb Starting 
+ Container redis Starting 
+ Container redis Started 
+ Container mongodb Started 
+=== Restoring MongoDB from dump ===
+2026-06-30T06:09:35.410+0000	finished restoring jac_db._anchors (1453000 documents, 0 failures)
+2026-06-30T06:09:35.410+0000	Failed: jac_db._anchors: error restoring from archive '/tmp/jac_db.dump': (InterruptedAtShutdown) interrupted at shutdown
+2026-06-30T06:09:35.410+0000	1453000 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+Error: Connection reset by peer
+=== Stopping any running jac server ===
+=== E2E Timing (10 trials per walker, server restarted each trial) ===
+prefetch_limit=0  user=sim_user_3
+
+--- Walker: load_feed ---
+    Waiting for server...
+  Trial 1: 1351.673ms  HTTP=200  resp=3148179bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=924.226ms
+    hit rate: L1=91.7%  L1=2806 L2=0 L3=216 MISS=37
+    Waiting for server...
+  Trial 2: 2923.724ms  HTTP=200  resp=7432761bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=1938.501ms
+    hit rate: L1=96.3%  L1=6606 L2=0 L3=235 MISS=18
+    Waiting for server...
+  Trial 3: 4336.733ms  HTTP=200  resp=10816455bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=2849.241ms
+    hit rate: L1=97.4%  L1=9606 L2=0 L3=250 MISS=3
+
+=== Done ===
+Server logs: logs/
+========================================
+Testing: prefetch_limit=1000000
+========================================
+=== Restarting docker compose ===
+ Container redis Stopping 
+ Container mongodb Stopping 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container mongodb Removed 
+ Network littlex5_default Removing 
+ Network littlex5_default Removed 
+ Network littlex5_default Creating 
+ Network littlex5_default Created 
+ Container mongodb Creating 
+ Container redis Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container redis Starting 
+ Container mongodb Starting 
+ Container redis Started 
+ Container mongodb Started 

@@ -243,8 +243,11 @@ walker load_feed {
     }
 
     can collect with Profile entry {
-        visit [-->[?:Tweet]];
-        visit [->:Follow:->[?:Profile]-->[?:Tweet]];
+        # TEMPORARY: typed Post edges so the TTG planner can include Tweets
+        # in the prefetch plan. Real fix is runtime-side (planner should
+        # handle generic out-edges too, with cardinality guards).
+        visit [->:Post:->[?:Tweet]];
+        visit [->:Follow:->[?:Profile]->:Post:->[?:Tweet]];
     }
 
     can gather with Tweet entry {

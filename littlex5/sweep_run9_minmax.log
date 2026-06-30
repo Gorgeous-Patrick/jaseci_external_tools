@@ -1,0 +1,115 @@
+=== LittleX Prefetch Limit Sweep ===
+Limits: 0 1000000
+
+========================================
+Testing: prefetch_limit=0
+========================================
+=== Restarting docker compose ===
+ Container mongodb Stopping 
+ Container redis Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container redis Stopped 
+ Container redis Removing 
+ Container mongodb Removed 
+ Container redis Removed 
+ Network littlex5_default Removing 
+ Network littlex5_default Removed 
+ Network littlex5_default Creating 
+ Network littlex5_default Created 
+ Container mongodb Creating 
+ Container redis Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container mongodb Starting 
+ Container redis Starting 
+ Container redis Started 
+ Container mongodb Started 
+=== Restoring MongoDB from dump ===
+2026-06-30T05:36:36.741+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"updated_at_-1", "v":2}, Key:bson.D{bson.E{Key:"updated_at", Value:-1}}, PartialFilterExpression:bson.D(nil)}
+2026-06-30T05:36:36.741+0000	no indexes to restore for collection jac_db._migrations
+2026-06-30T05:36:41.283+0000	2270008 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (10 trials per walker, server restarted each trial) ===
+prefetch_limit=0  user=sim_user_3
+
+--- Walker: load_feed ---
+    Waiting for server...
+  Trial 1: 4172.963ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=2760.216ms
+    hit rate: L1=97.6%  L1=10206 L2=0 L3=253 MISS=0
+    Waiting for server...
+  Trial 2: 4070.745ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=2654.459ms
+    hit rate: L1=97.6%  L1=10206 L2=0 L3=253 MISS=0
+    Waiting for server...
+  Trial 3: 4067.021ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=2663.298ms
+    hit rate: L1=97.6%  L1=10206 L2=0 L3=253 MISS=0
+
+=== Done ===
+Server logs: logs/
+========================================
+Testing: prefetch_limit=1000000
+========================================
+=== Restarting docker compose ===
+ Container redis Stopping 
+ Container mongodb Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Container mongodb Removed 
+ Network littlex5_default Removing 
+ Network littlex5_default Removed 
+ Network littlex5_default Creating 
+ Network littlex5_default Created 
+ Container mongodb Creating 
+ Container redis Creating 
+ Container mongodb Created 
+ Container redis Created 
+ Container redis Starting 
+ Container mongodb Starting 
+ Container redis Started 
+ Container mongodb Started 
+=== Restoring MongoDB from dump ===
+2026-06-30T05:37:57.656+0000	index: &idx.IndexDocument{Options:bson.M{"name":"identities.value_normalized_1", "sparse":true, "unique":true, "v":2}, Key:bson.D{bson.E{Key:"identities.value_normalized", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-06-30T05:37:57.656+0000	no indexes to restore for collection jac_db._migrations
+2026-06-30T05:38:02.200+0000	2270008 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (10 trials per walker, server restarted each trial) ===
+prefetch_limit=1000000  user=sim_user_3
+
+--- Walker: load_feed ---
+    Waiting for server...
+  Trial 1: 4303.526ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.623ms ttg=235.824ms prefetch=0.495ms walker=2487.726ms
+    hit rate: L1=98.1%  L1=10306 L2=0 L3=203 MISS=0
+    Waiting for server...
+  Trial 2: 4246.828ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.640ms ttg=224.696ms prefetch=0.358ms walker=2455.479ms
+    hit rate: L1=98.1%  L1=10306 L2=0 L3=203 MISS=0
+    Waiting for server...
+  Trial 3: 4299.691ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.671ms ttg=225.341ms prefetch=0.307ms walker=2486.083ms
+    hit rate: L1=98.1%  L1=10306 L2=0 L3=203 MISS=0
+
+=== Done ===
+Server logs: logs/
+
+========================================
+Sweep complete!
+Results saved to: sweep_prefetch_limit.csv
+========================================
+walker,prefetch_limit,trial,e2e_ms,topo_idx_ms,ttg_ms,prefetch_ms,walker_ms,l1_hit_rate,l1,l2,l3,miss
+load_feed,0,1,4172.963,0.000,0.000,0.000,2760.216,97.6,10206,0,253,0
+load_feed,0,2,4070.745,0.000,0.000,0.000,2654.459,97.6,10206,0,253,0
+load_feed,0,3,4067.021,0.000,0.000,0.000,2663.298,97.6,10206,0,253,0
+load_feed,1000000,1,4303.526,2.623,235.824,0.495,2487.726,98.1,10306,0,203,0
+load_feed,1000000,2,4246.828,2.640,224.696,0.358,2455.479,98.1,10306,0,203,0
+load_feed,1000000,3,4299.691,2.671,225.341,0.307,2486.083,98.1,10306,0,203,0
