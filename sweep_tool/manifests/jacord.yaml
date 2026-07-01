@@ -1,0 +1,26 @@
+name: jacord
+description: |
+  Discord-lite chat backend: workspaces → channels → messages, with
+  reply trees per message and User nodes for authorship.  The
+  load_channel walker fetches every top-level message in a channel
+  plus one hop of replies — the shape of a chat app's page-load query.
+
+app_dir: ../../../jacord
+
+scripts:
+  sweep: sweep_prefetch_limit.sh
+
+outputs:
+  results_csv: sweep_prefetch_limit.csv
+  logs_dir: logs
+  profiles_dir: profiles
+
+parameters:
+  - name: SWEEP_PREFETCH_LIMITS
+    label: Prefetch limits
+    kind: int_list
+    default: [0, 500, 1000, 2000, 3000, 5000]
+    help: >
+      Space-separated integer list.  Working set per request is
+      ~200-500 anchors (100 msgs × ~2-3 replies avg), so limits above
+      5000 mostly waste Mongo capacity.
