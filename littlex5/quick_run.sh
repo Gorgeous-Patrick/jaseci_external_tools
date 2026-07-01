@@ -80,16 +80,30 @@ for walker in "${WALKERS[@]}"; do
       -d "{\"identity\":{\"type\":\"username\",\"value\":\"$TEST_USER\"},\"credential\":{\"type\":\"password\",\"password\":\"$TEST_PASSWORD\"}}" \
       | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['token'])")
 
-    http_out=$(curl -s -w "%{http_code}\n%{time_total}" -o "$_tmpfile" -X POST \
+    # Mongo op-counter diff. Sampled *after* login (login itself hits the
+    # users collection) so the diff isolates the walker's own DB load.
+    mongo_q_before=""; mongo_q_after=""; mongo_q=""
+    if [ -n "$JAC_COUNT_MONGO" ]; then
+      mongo_q_before=$(docker exec mongodb mongosh jac_db --quiet --eval 'print(Number(db.serverStatus().opcounters.query))' 2>/dev/null)
+    fi
+
+    _resp_file="logs/walker_resp_${walker}_limit${PREFETCH_LIMIT}_trial${i}.json"
+    http_out=$(curl -s -w "%{http_code}\n%{time_total}" -o "$_resp_file" -X POST \
       -H "Authorization: Bearer $token" \
       -H "Content-Type: application/json" \
       -d "{}" \
       "http://$base_url/walker/$walker")
     http_status=$(echo "$http_out" | head -1)
     e2e_time=$(echo "$http_out" | tail -1)
-    resp_size=$(wc -c < "$_tmpfile")
+    resp_size=$(wc -c < "$_resp_file")
     e2e_ms=$(awk "BEGIN {printf \"%.3f\", $e2e_time * 1000}")
     echo "  Trial $i: ${e2e_ms}ms  HTTP=$http_status  resp=${resp_size}bytes"
+
+    if [ -n "$JAC_COUNT_MONGO" ]; then
+      mongo_q_after=$(docker exec mongodb mongosh jac_db --quiet --eval 'print(Number(db.serverStatus().opcounters.query))' 2>/dev/null)
+      mongo_q=$((mongo_q_after - mongo_q_before))
+      echo "    mongo queries: $mongo_q"
+    fi
 
     # Read breakdown from JAC_PROFILE_CSV if it was written
     topo_idx_ms=""; ttg_ms=""; prefetch_ms=""; walker_ms=""
@@ -103,6 +117,9 @@ for walker in "${WALKERS[@]}"; do
     fi
 
     # Roll up the per-anchor access_log into one-line tier counts + L1 hit-rate.
+    # Rows now include plan-execution events (sentinel id) alongside per-anchor
+    # gets — they're indistinguishable from real reads in the counter, which is
+    # intentional: each row is "one tier-touch", whether by a get or a plan.
     hit_rate=""; l1=""; l2=""; l3=""; miss=""
     if [ -s "$_access_log" ]; then
       read hit_rate l1 l2 l3 miss < <(python3 -c "
@@ -120,7 +137,7 @@ print(f\"{c['L1']*100/total:.1f} {c['L1']} {c['L2']} {c['L3']} {c['MISS']}\")
 
     # Append to results CSV if provided
     if [ -n "$JAC_RESULTS_FILE" ]; then
-      echo "$walker,$PREFETCH_LIMIT,$i,$e2e_ms,$topo_idx_ms,$ttg_ms,$prefetch_ms,$walker_ms,$hit_rate,$l1,$l2,$l3,$miss" >> "$JAC_RESULTS_FILE"
+      echo "$walker,$PREFETCH_LIMIT,$i,$e2e_ms,$topo_idx_ms,$ttg_ms,$prefetch_ms,$walker_ms,$hit_rate,$l1,$l2,$l3,$miss,$mongo_q" >> "$JAC_RESULTS_FILE"
     fi
 
     kill $JAC_PID 2>/dev/null || true

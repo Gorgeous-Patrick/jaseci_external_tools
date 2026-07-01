@@ -1,0 +1,145 @@
+=== LittleX Prefetch Limit Sweep ===
+Limits: 0 2500 5000 7500 10000 12500
+
+========================================
+Testing: prefetch_limit=0
+========================================
+=== Restarting docker compose ===
+ Container redis Stopping 
+ Container mongodb Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container mongodb Removed 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Network littlex5_default Removing 
+ Network littlex5_default Removed 
+ Network littlex5_default Creating 
+ Network littlex5_default Created 
+ Container redis Creating 
+ Container mongodb Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container mongodb Starting 
+ Container redis Starting 
+ Container redis Started 
+ Container mongodb Started 
+=== Restoring MongoDB from dump ===
+2026-06-30T18:42:27.238+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"arch_type_1_type_1", "v":2}, Key:bson.D{bson.E{Key:"arch_type", Value:1}, bson.E{Key:"type", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-06-30T18:42:27.238+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"updated_at_-1", "v":2}, Key:bson.D{bson.E{Key:"updated_at", Value:-1}}, PartialFilterExpression:bson.D(nil)}
+2026-06-30T18:42:31.820+0000	2270008 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (10 trials per walker, server restarted each trial) ===
+prefetch_limit=0  user=sim_user_3
+
+--- Walker: load_feed ---
+    Waiting for server...
+  Trial 1: 7590.379ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=6102.074ms
+    hit rate: L1=97.6%  L1=10206 L2=0 L3=254 MISS=0
+    Waiting for server...
+  Trial 2: 7487.906ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=6017.175ms
+    hit rate: L1=97.6%  L1=10206 L2=0 L3=254 MISS=0
+    Waiting for server...
+  Trial 3: 7545.253ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=6065.676ms
+    hit rate: L1=97.6%  L1=10206 L2=0 L3=254 MISS=0
+
+=== Done ===
+Server logs: logs/
+========================================
+Testing: prefetch_limit=2500
+========================================
+=== Restarting docker compose ===
+ Container mongodb Stopping 
+ Container redis Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Container mongodb Removed 
+ Network littlex5_default Removing 
+ Network littlex5_default Removed 
+ Network littlex5_default Creating 
+ Network littlex5_default Created 
+ Container mongodb Creating 
+ Container redis Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container mongodb Starting 
+ Container redis Starting 
+ Container mongodb Started 
+ Container redis Started 
+=== Restoring MongoDB from dump ===
+2026-06-30T18:43:43.079+0000	jac_db._anchors  884MB
+2026-06-30T18:43:46.079+0000	jac_db._anchors  1.02GB
+2026-06-30T18:43:49.079+0000	jac_db._anchors  1.17GB
+=== Clearing Redis ===
+Error response from daemon: No such container: redis
+=== Stopping any running jac server ===
+=== E2E Timing (10 trials per walker, server restarted each trial) ===
+prefetch_limit=0  user=sim_user_3
+
+--- Walker: load_feed ---
+    Waiting for server...
+  Trial 1: 2202.213ms  HTTP=200  resp=2922549bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=1782.654ms
+    hit rate: L1=91.1%  L1=2606 L2=0 L3=216 MISS=38
+    Waiting for server...
+  Trial 2: 5301.120ms  HTTP=200  resp=7432761bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=4260.607ms
+    hit rate: L1=96.3%  L1=6606 L2=0 L3=236 MISS=18
+    Waiting for server...
+  Trial 3: 7887.028ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=6405.994ms
+    hit rate: L1=97.6%  L1=10206 L2=0 L3=254 MISS=0
+
+=== Done ===
+Server logs: logs/
+========================================
+Testing: prefetch_limit=5000
+========================================
+=== Restarting docker compose ===
+ Container redis Stopping 
+ Container mongodb Stopping 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container mongodb Removed 
+ Network littlex5_default Removing 
+ Network littlex5_default Removed 
+ Network littlex5_default Creating 
+ Network littlex5_default Created 
+ Container mongodb Creating 
+ Container redis Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container mongodb Starting 
+ Container redis Starting 
+ Container redis Started 
+ Container mongodb Started 
+=== Restoring MongoDB from dump ===
+2026-06-30T18:44:47.426+0000	finished restoring jac_db.users (5003 documents, 0 failures)
+2026-06-30T18:44:47.426+0000	dropping collection jac_db._anchors before restoring
+2026-06-30T18:44:47.430+0000	restoring jac_db._anchors from archive '/tmp/jac_db.dump'
+=== Clearing Redis ===
+Error response from daemon: container b22803fd919f606e3cec4d6394712b2b0d4575e84c76ef269e425e868d118f4b is not running
+=== Stopping any running jac server ===
+=== E2E Timing (10 trials per walker, server restarted each trial) ===
+prefetch_limit=0  user=sim_user_3
+
+--- Walker: load_feed ---
+    Waiting for server...
+  Trial 1: 2536.733ms  HTTP=200  resp=2020110bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=1317.996ms
+    hit rate: L1=85.6%  L1=3012 L2=207 L3=213 MISS=87
+    Waiting for server...
+  Trial 2: 9976.609ms  HTTP=200  resp=7432761bytes
+    hit rate: L1=96.0%  L1=12212 L2=230 L3=236 MISS=41
