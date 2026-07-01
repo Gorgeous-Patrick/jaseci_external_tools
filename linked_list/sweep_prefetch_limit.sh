@@ -1,8 +1,14 @@
 #!/bin/bash
 set -e
 
-# Configuration — edit these to match your experiment
-PREFETCH_LIMITS=(0 250 500 750 1000 1250)
+# Configuration — SWEEP_PREFETCH_LIMITS (space-separated ints) and
+# JAC_LIST_SIZE can be overridden by env vars; standalone use picks
+# up the defaults below.
+if [ -n "$SWEEP_PREFETCH_LIMITS" ]; then
+  read -ra PREFETCH_LIMITS <<< "$SWEEP_PREFETCH_LIMITS"
+else
+  PREFETCH_LIMITS=(0 250 500 750 1000 1250)
+fi
 LIST_SIZE=${JAC_LIST_SIZE:-1000}
 TRIALS=10
 

@@ -54,6 +54,21 @@ with tab_run:
     st.caption(m.description)
     st.write(f"**app_dir**: `{m.app_dir}`  ·  **script**: `{m.sweep_script}`")
 
+    # Status + kill controls.  Detected via the PID file the runner
+    # writes; robust across Streamlit restarts.
+    running, live_pid = sweep_runner.is_running(m)
+    col_status, col_kill = st.columns([3, 1])
+    with col_status:
+        if running:
+            st.warning(f"⏳ Sweep is running (pid={live_pid}).")
+        else:
+            st.info("No sweep is currently running for this app.")
+    with col_kill:
+        if running and st.button("Stop sweep", type="secondary", key="run_kill"):
+            msg = sweep_runner.kill(m)
+            st.success(msg)
+            st.rerun()
+
     with st.form("sweep_form"):
         form_values: dict = {}
         for p in m.parameters:
@@ -89,6 +104,25 @@ with tab_run:
                 "\n".join(f"{k}={v}" for k, v in sorted(info.env_overrides.items()))
             )
 
+    # Sweep output viewer.  Always visible (independent of whether we
+    # just submitted) so the user can come back to the tab and check on
+    # a long-running sweep.
+    st.divider()
+    st.subheader("Sweep output")
+    log_path = sweep_runner.stdout_log_path(m)
+    st.caption(f"tail of `{log_path}`")
+    if st.button("Refresh", key="run_refresh_log"):
+        st.rerun()
+    if log_path.exists():
+        text = log_path.read_text()
+        # Show only the last ~15KB so a giant log doesn't slow the tab.
+        max_bytes = 15_000
+        if len(text) > max_bytes:
+            text = "…(truncated head)…\n" + text[-max_bytes:]
+        st.code(text or "(empty)", language="text")
+    else:
+        st.info(f"No sweep has produced output at `{log_path}` yet.")
+
 
 # ---------------------------------------------------------------------------
 # TAB 2 — Analyze
@@ -116,27 +150,29 @@ with tab_analyze:
             f"`{m.results_csv}` and/or `{m.logs_dir}/` under `{m.app_dir}`."
         )
     else:
-        if not df.empty:
-            st.plotly_chart(
-                charts.e2e_stack(df),
-                use_container_width=True,
-                key="chart_e2e_stack",
-            )
-        if logs:
-            st.plotly_chart(
-                charts.hit_counts_request_done(logs),
-                use_container_width=True,
-                key="chart_hit_counts_request_done",
-            )
-            st.plotly_chart(
-                charts.hit_counts_pw_phase(logs),
-                use_container_width=True,
-                key="chart_hit_counts_pw_phase",
-            )
-            st.plotly_chart(
-                charts.worker_times(logs),
-                use_container_width=True,
-                key="chart_worker_times",
+        # Render each chart only if it has data; otherwise the panel is
+        # a blank axes block, which is confusing.  Older sweeps predate
+        # the [HIT-STATS-SERIES] / [PREFETCH-WORKER-TIMES] markers, so
+        # log-based charts come back empty for them.
+        chart_specs = [
+            ("chart_e2e_stack", charts.e2e_stack, (df,)),
+            ("chart_hit_counts_request_done", charts.hit_counts_request_done, (logs,)),
+            ("chart_hit_counts_pw_phase", charts.hit_counts_pw_phase, (logs,)),
+            ("chart_worker_times", charts.worker_times, (logs,)),
+        ]
+        rendered_any = False
+        for key, fn, args in chart_specs:
+            fig = fn(*args)
+            if not fig.data:  # empty figure — skip
+                continue
+            st.plotly_chart(fig, use_container_width=True, key=key)
+            rendered_any = True
+        if not rendered_any:
+            st.info(
+                "The data on disk is missing the log markers this "
+                "tool visualizes.  Re-run the sweep with the current "
+                "jaclang runtime to see the hit-stats / worker-times "
+                "charts."
             )
 
 
