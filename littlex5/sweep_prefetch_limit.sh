@@ -2,7 +2,15 @@
 set -e
 
 # Configuration
-PREFETCH_LIMITS=(0 2500 5000 7500 10000 12500)
+# PREFETCH_LIMITS can be overridden by the SWEEP_PREFETCH_LIMITS env var
+# (space-separated integers). Same for TRIALS_PER_LIMIT -> SWEEP_TRIALS.
+# The sweep_tool frontend uses these to parameterise runs; standalone use
+# just picks up the defaults below.
+if [ -n "$SWEEP_PREFETCH_LIMITS" ]; then
+  read -ra PREFETCH_LIMITS <<< "$SWEEP_PREFETCH_LIMITS"
+else
+  PREFETCH_LIMITS=(0 2500 5000 7500 10000 12500)
+fi
 RESULTS_FILE="sweep_prefetch_limit.csv"
 
 # Clean all previous data

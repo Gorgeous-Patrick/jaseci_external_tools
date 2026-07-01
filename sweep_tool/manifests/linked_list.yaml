@@ -1,0 +1,28 @@
+name: linked_list
+description: |
+  Synthetic linked-list benchmark.  Walker traverses a pointer-chain
+  graph of configurable length; used to isolate deserialization and
+  prefetch behaviour without the noise of a real social graph.
+
+app_dir: ../../linked_list
+
+scripts:
+  sweep: sweep_prefetch_limit.sh
+
+outputs:
+  results_csv: sweep_prefetch_limit.csv
+  logs_dir: logs
+  profiles_dir: profiles
+
+parameters:
+  - name: SWEEP_PREFETCH_LIMITS
+    label: Prefetch limits
+    kind: int_list
+    default: [0, 250, 500, 750, 1000, 1250]
+    help: >
+      Space-separated integer list of prefetch caps.
+  - name: JAC_LIST_SIZE
+    label: List size (nodes)
+    kind: int
+    default: 1000
+    help: Number of nodes in the linked list under test.

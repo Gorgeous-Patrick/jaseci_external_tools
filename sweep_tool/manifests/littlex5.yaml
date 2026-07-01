@@ -1,0 +1,25 @@
+name: littlex5
+description: |
+  littleX social feed benchmark.  Runs the load_feed walker against a
+  seeded MongoDB + Redis pair (~3959-user Facebook ego graph, 5 tweets
+  per user, ~170K follow edges).
+
+app_dir: ../../littlex5
+
+scripts:
+  sweep: sweep_prefetch_limit.sh
+
+outputs:
+  results_csv: sweep_prefetch_limit.csv
+  logs_dir: logs
+  profiles_dir: profiles
+
+parameters:
+  - name: SWEEP_PREFETCH_LIMITS
+    label: Prefetch limits
+    kind: int_list
+    default: [0, 2500, 5000, 7500, 10000, 12500]
+    help: >
+      Space-separated integer list.  Each value runs one config with
+      that many anchor IDs in the TTG prefetch plan.  0 disables
+      prefetching entirely.
