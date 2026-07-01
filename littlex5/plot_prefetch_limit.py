@@ -1,13 +1,29 @@
 #!/usr/bin/env python3
 """Plot prefetch limit sweep results for littlex5 (sweep_prefetch_limit.csv).
 
-CSV format: walker,prefetch_limit,trial,e2e_ms,topo_idx_ms,ttg_ms,prefetch_ms,walker_ms
+Two side-by-side bars per prefetch_limit:
+
+  * LEFT — E2E stack: walker + ttg + topo + misc.  Total height = e2e.
+           Prefetch is intentionally excluded from the stack because
+           under `async_prefetch="thread"` it overlaps with walker time
+           and stacking would double-count.
+  * RIGHT — Prefetcher wall time (max across per-worker durations
+            recorded by TieredMemory.prefetch).  Standalone bar so
+            the reader can see, at a glance, how much of the walker
+            phase the prefetch was still running for.
+
+CSV format:
+    walker,prefetch_limit,trial,e2e_ms,topo_idx_ms,ttg_ms,
+    prefetch_ms,walker_ms,l1_hit_rate,l1,l2,l3,miss,mongo_q
+
+(prefetch_ms here is real wall time — the max per-worker duration —
+after the runtime fix in `impl/memory.impl.jac`.)
 """
 
-import pandas as pd
+import sys
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
+import pandas as pd
 
 
 def main():
@@ -23,9 +39,12 @@ def main():
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
     walkers = sorted(df["walker"].unique())
-    has_breakdown = all(c in df.columns for c in ["topo_idx_ms", "ttg_ms", "prefetch_ms", "walker_ms"])
+    has_breakdown = all(
+        c in df.columns
+        for c in ["topo_idx_ms", "ttg_ms", "prefetch_ms", "walker_ms"]
+    )
 
-    fig, axes = plt.subplots(1, len(walkers), figsize=(7 * len(walkers), 6))
+    fig, axes = plt.subplots(1, len(walkers), figsize=(8 * len(walkers), 6))
     if len(walkers) == 1:
         axes = [axes]
 
@@ -34,34 +53,60 @@ def main():
         grouped = wdf.groupby("prefetch_limit").median(numeric_only=True).reset_index()
         grouped = grouped.sort_values("prefetch_limit")
 
-        x = np.arange(len(grouped))
-        width = 0.6
+        n = len(grouped)
+        group_x = np.arange(n)
+        # Two side-by-side bars per group: e2e stack (left), prefetch (right).
+        bar_w = 0.38
+        x_e2e = group_x - bar_w / 2
+        x_pf = group_x + bar_w / 2
 
         if has_breakdown and not grouped["walker_ms"].isna().all():
             ew = grouped["walker_ms"].fillna(0).values
-            ep = grouped["prefetch_ms"].fillna(0).values
             eg = grouped["ttg_ms"].fillna(0).values
             et = grouped["topo_idx_ms"].fillna(0).values
             ee = grouped["e2e_ms"].fillna(0).values
-            em = np.maximum(ee - (ew + ep + eg + et), 0)
+            # Misc = e2e minus the accounted-for additive components.
+            # Prefetch is NOT subtracted here — it's overlapping with
+            # walker time under thread mode and its share is already
+            # baked into walker_ms.
+            em = np.maximum(ee - (ew + eg + et), 0)
 
-            ax.bar(x, ew, width,                     label="Walker",        color="steelblue")
-            ax.bar(x, ep, width, bottom=ew,          label="Prefetcher",    color="orange")
-            ax.bar(x, eg, width, bottom=ew+ep,       label="TTG Generator", color="green")
-            ax.bar(x, et, width, bottom=ew+ep+eg,    label="Load topology", color="purple")
-            ax.bar(x, em, width, bottom=ew+ep+eg+et, label="Misc",          color="lightgray")
+            # LEFT bar: e2e stack.
+            ax.bar(x_e2e, ew, bar_w, label="Walker", color="steelblue")
+            ax.bar(x_e2e, eg, bar_w, bottom=ew, label="TTG Generator", color="seagreen")
+            ax.bar(x_e2e, et, bar_w, bottom=ew + eg, label="Load topology", color="purple")
+            ax.bar(x_e2e, em, bar_w, bottom=ew + eg + et, label="Misc", color="lightgray")
 
             for i, total in enumerate(ee):
-                ax.text(x[i], total + 5, f"{total:.0f}ms", ha="center", va="bottom", fontsize=9, fontweight="bold")
+                ax.text(
+                    x_e2e[i], total + 5, f"{total:.0f}",
+                    ha="center", va="bottom",
+                    fontsize=8, fontweight="bold", color="black",
+                )
+
+            # RIGHT bar: prefetch wall time only.
+            ep = grouped["prefetch_ms"].fillna(0).values
+            ax.bar(x_pf, ep, bar_w, label="Prefetcher (wall)", color="orange")
+
+            for i, val in enumerate(ep):
+                ax.text(
+                    x_pf[i], val + 5, f"{val:.0f}",
+                    ha="center", va="bottom",
+                    fontsize=8, fontweight="bold", color="darkorange",
+                )
         else:
-            # Fallback: just e2e bars
+            # Fallback: just e2e bars, no per-phase breakdown available.
             ee = grouped["e2e_ms"].fillna(0).values
-            ax.bar(x, ee, width, color="steelblue", alpha=0.85)
+            ax.bar(group_x, ee, 0.6, color="steelblue", alpha=0.85, label="E2E")
             for i, total in enumerate(ee):
-                ax.text(x[i], total + 5, f"{total:.0f}ms", ha="center", va="bottom", fontsize=9, fontweight="bold")
+                ax.text(
+                    group_x[i], total + 5, f"{total:.0f}ms",
+                    ha="center", va="bottom",
+                    fontsize=9, fontweight="bold",
+                )
 
         ax.set_xlabel("Prefetch Limit")
-        ax.set_xticks(x)
+        ax.set_xticks(group_x)
         ax.set_xticklabels([str(int(v)) for v in grouped["prefetch_limit"].values])
         ax.set_title(f"Walker: {walker}")
         ax.grid(axis="y", alpha=0.3)
@@ -69,8 +114,11 @@ def main():
     axes[0].set_ylabel("Time (ms)")
     if has_breakdown:
         axes[-1].legend(loc="upper left", bbox_to_anchor=(1.02, 1), borderaxespad=0)
-    fig.suptitle("LittleX E2E Time vs Prefetch Limit\n(cold Redis, median)",
-                 fontsize=13, fontweight="bold")
+    fig.suptitle(
+        "LittleX E2E vs Prefetch Limit  ·  "
+        "left bar = e2e stack, right bar = prefetch wall time  ·  cold Redis, median",
+        fontsize=11, fontweight="bold",
+    )
     plt.tight_layout()
 
     output_file = csv_file.replace(".csv", ".png")

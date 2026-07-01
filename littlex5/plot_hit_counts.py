@@ -1,21 +1,27 @@
 #!/usr/bin/env python3
-"""Plot cumulative tier-hit counts at each checkpoint, grouped by prefetch_limit.
+"""Plot cumulative tier-hit counts, grouped by prefetch_limit.
 
-Companion to plot_hit_stats.py. Where plot_hit_stats.py shows the L1
-hit-rate percentage per bar, this one shows the *absolute number* of
-tier accesses at each checkpoint, stacked by tier (L1 / L2 / L3 / MISS).
+Two panels sharing the same X grouping:
 
-Bar height at a checkpoint = total accesses accumulated up to that
-event. Stack colours reveal *which tier* answered those accesses.
+  TOP    — request_done only.  One stacked bar per prefetch_limit,
+           height = total accesses over the whole request, split by tier
+           (L1/L2/L3/MISS).  The headline "how much did the walker read
+           and from where" number.
 
-Parses `[HIT-STATS-SERIES]` info lines from jac server logs. Log
-filenames must match:
+  BOTTOM — pw phase only.  Each pw checkpoint is its own stacked bar
+           within the group.  Reveals what tier the walker's early
+           reads landed on while the prefetch workers were still
+           writing L1.  Under thread mode with fast workers the pw bars
+           are often tiny and very similar; that's expected and itself
+           informative.
+
+Both panels drop any tier that is always zero from their legend
+(usually L2 and MISS on load_feed).  Trials are median-aggregated per
+tier so noise doesn't smear the picture.
+
+Log filenames must match:
 
     jac_server_<walker>_limit<N>_trial<I>.log
-
-Missing checkpoints (e.g. no prefetch phase at limit=0) render as an
-empty stack. Trials are median-aggregated per tier so noise doesn't
-smear the picture.
 
 Usage:
     python3 plot_hit_counts.py logs/jac_server_*.log
@@ -43,7 +49,6 @@ _FILE_RE = re.compile(r"limit(\d+)_trial(\d+)\.log$")
 
 
 def parse_series_from_line(line: str):
-    """Return the list-of-(label, dict) if the line has our marker."""
     try:
         rec = json.loads(line)
         msg = rec.get("msg", "")
@@ -75,15 +80,13 @@ def collect(paths: list[str]):
 
 
 def _canonicalize_label(label: str) -> str:
-    """prefetch_pre_write_shard=<N>  ->  pw (order preserved within series)."""
     if label.startswith("prefetch_pre_write_shard="):
         return "pw"
     return label
 
 
 def _build_count_matrix(by_limit):
-    """Return (limits, checkpoint_labels, mat[i, j, k]) where k indexes
-    the four TIERS. Median across trials per tier."""
+    """Return (limits, checkpoint_labels, mat[i, j, k])."""
     limits = sorted(by_limit.keys())
 
     max_pw = 0
@@ -104,10 +107,7 @@ def _build_count_matrix(by_limit):
 
     mat = np.zeros((len(limits), len(checkpoint_labels), len(TIERS)))
     for i, lim in enumerate(limits):
-        # For each (checkpoint, tier), collect values across trials then median.
-        cell_vals = [
-            [[] for _ in TIERS] for _ in checkpoint_labels
-        ]
+        cell_vals = [[[] for _ in TIERS] for _ in checkpoint_labels]
         for series in by_limit[lim]:
             pw_idx = 0
             for lab, snap in series:
@@ -128,37 +128,31 @@ def _build_count_matrix(by_limit):
     return limits, checkpoint_labels, mat
 
 
-def plot(by_limit, out: str | None):
-    if not by_limit:
-        print("No [HIT-STATS-SERIES] lines found.", file=sys.stderr)
-        sys.exit(1)
-
-    limits, cps, mat = _build_count_matrix(by_limit)
-    n_lim, n_cp, _ = mat.shape
-
-    fig, ax = plt.subplots(figsize=(max(9, 1.6 * n_lim + 2), 5.5))
-
+def _draw_stacked_group(
+    ax,
+    group_x,
+    limits,
+    checkpoints,
+    counts_3d,
+    tier_active,
+    annotate_totals: bool,
+    color_by_tier: bool = True,
+):
+    """counts_3d shape: (n_limits, n_checkpoints, len(TIERS))."""
+    n_lim = counts_3d.shape[0]
+    n_cp = counts_3d.shape[1]
     bar_w = 0.8 / max(n_cp, 1)
-    group_x = np.arange(n_lim)
+    labelled_tiers = set()
 
-    # Skip tiers that are always zero from the legend so a viewer isn't
-    # told about L2/MISS on runs where they never fire. Still draw the
-    # zero-height bar so all stacks stay aligned; just don't register
-    # the label.
-    tier_active = {tier: bool(mat[:, :, k].max() > 0) for k, tier in enumerate(TIERS)}
-
-    # Draw one stacked bar per (limit, checkpoint). Register each active
-    # tier's label exactly once.
-    labelled = set()
-    for j, cp in enumerate(cps):
+    for j in range(n_cp):
         offset = (j - (n_cp - 1) / 2) * bar_w
         bottom = np.zeros(n_lim)
         for k, tier in enumerate(TIERS):
-            heights = mat[:, j, k]
+            heights = counts_3d[:, j, k]
             label = None
-            if tier_active[tier] and tier not in labelled:
+            if color_by_tier and tier_active[tier] and tier not in labelled_tiers:
                 label = tier
-                labelled.add(tier)
+                labelled_tiers.add(tier)
             ax.bar(
                 group_x + offset,
                 heights,
@@ -171,50 +165,121 @@ def plot(by_limit, out: str | None):
             )
             bottom += heights
 
-        # Small caption naming the checkpoint under the bar cluster,
-        # rotated so it doesn't collide with neighbours.
-        # Only annotate the middle group to avoid clutter.
-        if n_lim > 0:
-            mid = n_lim // 2
-            ax.text(
-                group_x[mid] + offset,
-                -mat[mid].sum(axis=1).max() * 0.02,
-                cp,
-                rotation=90,
-                ha="center",
-                va="top",
-                fontsize=6.5,
-                color="dimgray",
-            )
-
-    # Annotate final (request_done) bar with the total accesses.
-    if "request_done" in cps:
-        j = cps.index("request_done")
-        offset = (j - (n_cp - 1) / 2) * bar_w
-        totals = mat[:, j, :].sum(axis=1)
-        for i, t in enumerate(totals):
-            if t > 0:
-                ax.text(
-                    group_x[i] + offset,
-                    t + totals.max() * 0.01,
-                    f"{int(t)}",
-                    ha="center",
-                    va="bottom",
-                    fontsize=7,
-                )
+        if annotate_totals:
+            for i, total in enumerate(bottom):
+                if total > 0:
+                    ax.text(
+                        group_x[i] + offset,
+                        total + bottom.max() * 0.015,
+                        f"{int(total)}",
+                        ha="center",
+                        va="bottom",
+                        fontsize=7,
+                    )
 
     ax.set_xticks(group_x)
     ax.set_xticklabels([str(l) for l in limits])
     ax.set_xlabel("prefetch_limit")
-    ax.set_ylabel("Cumulative accesses  (count)")
-    ax.set_title(
-        "Tier-hit counts at each checkpoint, grouped by prefetch_limit  "
-        "·  median over trials  ·  "
-        f"{n_cp} checkpoints per group",
+    ax.grid(axis="y", alpha=0.25)
+
+
+def plot(by_limit, out: str | None):
+    if not by_limit:
+        print("No [HIT-STATS-SERIES] lines found.", file=sys.stderr)
+        sys.exit(1)
+
+    limits, cps, mat = _build_count_matrix(by_limit)
+    n_lim = mat.shape[0]
+
+    # Which tiers actually show data anywhere? Skip empty ones from legends.
+    tier_active = {tier: bool(mat[:, :, k].max() > 0) for k, tier in enumerate(TIERS)}
+
+    # Separate the checkpoint matrix into (a) request_done column and
+    # (b) the pw* columns.
+    if "request_done" in cps:
+        rd_idx = cps.index("request_done")
+        rd_mat = mat[:, rd_idx : rd_idx + 1, :]  # (n_lim, 1, len(TIERS))
+    else:
+        rd_mat = np.zeros((n_lim, 0, len(TIERS)))
+
+    pw_indices = [j for j, c in enumerate(cps) if c.startswith("pw")]
+    pw_mat = mat[:, pw_indices, :]
+    pw_labels = [cps[j] for j in pw_indices]
+
+    # Two-panel figure: top = request_done totals, bottom = pw phase.
+    fig, (ax_top, ax_bot) = plt.subplots(
+        2, 1,
+        figsize=(max(9, 1.6 * n_lim + 2), 8),
+        gridspec_kw={"height_ratios": [1, 1]},
+    )
+    group_x = np.arange(n_lim)
+
+    # ---- top panel: request_done ----
+    _draw_stacked_group(
+        ax_top,
+        group_x,
+        limits,
+        ["request_done"],
+        rd_mat,
+        tier_active,
+        annotate_totals=True,
+    )
+    ax_top.set_ylabel("Cumulative accesses at request_done")
+    ax_top.set_title("Total accesses per request, by tier", fontsize=10, pad=18)
+    if any(tier_active[t] for t in TIERS):
+        ax_top.legend(title="tier", loc="upper left", fontsize=9)
+
+    # ---- bottom panel: pw phase ----
+    _draw_stacked_group(
+        ax_bot,
+        group_x,
+        limits,
+        pw_labels,
+        pw_mat,
+        tier_active,
+        annotate_totals=False,
+    )
+    ax_bot.set_ylabel("Cumulative accesses at each pw checkpoint")
+    ax_bot.set_title(
+        f"Prefetch-phase accesses — {len(pw_labels)} pw checkpoint(s) per group",
         fontsize=10,
     )
-    ax.grid(axis="y", alpha=0.25)
-    ax.legend(title="tier", loc="upper left", fontsize=9)
+
+    # Add per-bar pw labels directly under each bar, sitting between the
+    # bars and the major prefetch_limit tick label.  We use ax.text with
+    # axis coordinates on X and figure coordinates on Y so the labels sit
+    # at a fixed vertical offset regardless of Y-scale.  Minor xticks
+    # would collide with major xticks at the same position (that's why
+    # pw3 was invisible — the group-center major tick hid it).
+    if pw_labels:
+        bar_w = 0.8 / max(len(pw_labels), 1)
+        # Push the major (prefetch_limit) tick label down to make room.
+        ax_bot.tick_params(axis="x", which="major", pad=22, length=0)
+        # Text annotations for each pw bar.
+        from matplotlib.transforms import blended_transform_factory
+        trans = blended_transform_factory(ax_bot.transData, ax_bot.transAxes)
+        for i in range(n_lim):
+            for j, lab in enumerate(pw_labels):
+                offset = (j - (len(pw_labels) - 1) / 2) * bar_w
+                ax_bot.text(
+                    group_x[i] + offset,
+                    -0.02,             # slightly below the axis, in axes coords
+                    lab,
+                    ha="center",
+                    va="top",
+                    fontsize=6,
+                    rotation=90,
+                    transform=trans,
+                    clip_on=False,
+                )
+
+    if any(tier_active[t] for t in TIERS):
+        ax_bot.legend(title="tier", loc="upper left", fontsize=9)
+
+    fig.suptitle(
+        "Hit-stats counts, grouped by prefetch_limit  ·  median over trials",
+        fontsize=11,
+    )
     fig.tight_layout()
 
     if out:

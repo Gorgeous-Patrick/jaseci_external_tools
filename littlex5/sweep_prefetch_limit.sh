@@ -2,7 +2,7 @@
 set -e
 
 # Configuration
-PREFETCH_LIMITS=(0 1000000)
+PREFETCH_LIMITS=(0 2500 5000 7500 10000 12500)
 RESULTS_FILE="sweep_prefetch_limit.csv"
 
 # Clean all previous data
@@ -13,7 +13,7 @@ echo "Limits: ${PREFETCH_LIMITS[*]}"
 echo ""
 
 # Write CSV header
-echo "walker,prefetch_limit,trial,e2e_ms,topo_idx_ms,ttg_ms,prefetch_ms,walker_ms,l1_hit_rate,l1,l2,l3,miss" > "$RESULTS_FILE"
+echo "walker,prefetch_limit,trial,e2e_ms,topo_idx_ms,ttg_ms,prefetch_ms,walker_ms,l1_hit_rate,l1,l2,l3,miss,mongo_q" > "$RESULTS_FILE"
 
 for limit in "${PREFETCH_LIMITS[@]}"; do
   echo "========================================"
