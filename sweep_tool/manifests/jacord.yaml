@@ -5,6 +5,11 @@ description: |
   load_channel walker fetches every top-level message in a channel
   plus one hop of replies — the shape of a chat app's page-load query.
 
+  The benchmark dump (dumps/big.dump) is a single large channel:
+  ~7425 messages (2500 top-level + ~4925 flat replies), one user, all
+  authored locally.  Node working set per request is ~7426, so the
+  prefetch sweep saturates around limit 8000.
+
 app_dir: ../../../jacord
 
 scripts:
@@ -19,8 +24,10 @@ parameters:
   - name: SWEEP_PREFETCH_LIMITS
     label: Prefetch limits
     kind: int_list
-    default: [0, 500, 1000, 2000, 3000, 5000]
+    default: [0, 500, 1000, 2000, 4000, 6000, 8000, 12000, 20000, 30000]
     help: >
-      Space-separated integer list.  Working set per request is
-      ~200-500 anchors (100 msgs × ~2-3 replies avg), so limits above
-      5000 mostly waste Mongo capacity.
+      Space-separated integer list.  Node working set for the big.dump
+      channel is ~7426 anchors, so e2e/walker/L3 improve up to ~8000 and
+      then saturate flat (there is a hard ~2500 L3 floor of edge anchors
+      the node-only prefetch never covers).  Limits above ~8000 only add
+      dispatch overhead.
