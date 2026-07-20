@@ -20,6 +20,7 @@ CSV format:
 after the runtime fix in `impl/memory.impl.jac`.)
 """
 
+import os
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
@@ -28,11 +29,13 @@ import pandas as pd
 
 def main():
     csv_file = sys.argv[1] if len(sys.argv) > 1 else "sweep_prefetch_limit.csv"
+    app_name = os.path.basename(os.path.abspath(os.path.dirname(csv_file))).title()
 
     df = pd.read_csv(csv_file)
     numeric_cols = [
         "prefetch_limit", "trial", "e2e_ms",
         "topo_idx_ms", "ttg_ms", "prefetch_ms", "walker_ms",
+        "l1_hit_rate",
     ]
     for col in numeric_cols:
         if col in df.columns:
@@ -43,6 +46,7 @@ def main():
         c in df.columns
         for c in ["topo_idx_ms", "ttg_ms", "prefetch_ms", "walker_ms"]
     )
+    has_hit_rate = "l1_hit_rate" in df.columns
 
     fig, axes = plt.subplots(1, len(walkers), figsize=(8 * len(walkers), 6))
     if len(walkers) == 1:
@@ -111,12 +115,36 @@ def main():
         ax.set_title(f"Walker: {walker}")
         ax.grid(axis="y", alpha=0.3)
 
+        if has_hit_rate and not grouped["l1_hit_rate"].isna().all():
+            ax2 = ax.twinx()
+            hit = grouped["l1_hit_rate"].fillna(0).values
+            ax2.plot(
+                group_x, hit,
+                color="crimson", marker="o", linewidth=2,
+                label="L1 hit rate",
+            )
+            ax2.set_ylabel("L1 hit rate (%)", color="crimson")
+            ax2.set_ylim(0, 105)
+            ax2.tick_params(axis="y", labelcolor="crimson")
+            for i, val in enumerate(hit):
+                ax2.text(
+                    group_x[i], val + 2, f"{val:.0f}%",
+                    ha="center", va="bottom",
+                    fontsize=8, color="crimson",
+                )
+
     axes[0].set_ylabel("Time (ms)")
     if has_breakdown:
         axes[-1].legend(loc="upper left", bbox_to_anchor=(1.02, 1), borderaxespad=0)
+    subtitle_bits = [
+        "left bar = e2e stack",
+        "right bar = prefetch wall time",
+    ]
+    if has_hit_rate:
+        subtitle_bits.append("red line = L1 hit rate (%, right axis)")
+    subtitle_bits.append("cold Redis, median")
     fig.suptitle(
-        "LittleX E2E vs Prefetch Limit  ·  "
-        "left bar = e2e stack, right bar = prefetch wall time  ·  cold Redis, median",
+        f"{app_name} E2E vs Prefetch Limit  ·  " + "  ·  ".join(subtitle_bits),
         fontsize=11, fontweight="bold",
     )
     plt.tight_layout()
