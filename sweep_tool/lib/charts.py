@@ -34,6 +34,7 @@ def e2e_stack(df: pd.DataFrame) -> go.Figure:
     prefetch = med.get("prefetch_ms", pd.Series(dtype=float)).fillna(0)
     e2e = med.get("e2e_ms", pd.Series(dtype=float)).fillna(0)
     misc = np.maximum(e2e - (walker + ttg + topo), 0)
+    hit_rate = med["l1_hit_rate"].fillna(0) if "l1_hit_rate" in med.columns else None
 
     fig = go.Figure()
     # E2E stack (left bar of each pair).
@@ -63,7 +64,16 @@ def e2e_stack(df: pd.DataFrame) -> go.Figure:
         marker_color="orange", offsetgroup="prefetch",
         hovertemplate="prefetch wall: %{y:.0f} ms<extra></extra>",
     )
-    fig.update_layout(
+    # L1 hit rate overlay on secondary y-axis when present.
+    if hit_rate is not None:
+        fig.add_scatter(
+            x=limits, y=hit_rate, name="L1 hit rate",
+            mode="lines+markers", yaxis="y2",
+            line=dict(color="crimson", width=2),
+            marker=dict(color="crimson", size=7),
+            hovertemplate="L1 hit: %{y:.1f}%<extra></extra>",
+        )
+    layout_kwargs = dict(
         barmode="stack",
         title="E2E vs Prefetch Limit — left bar = e2e stack, right bar = prefetch wall (median over trials)",
         xaxis_title="prefetch_limit",
@@ -72,6 +82,14 @@ def e2e_stack(df: pd.DataFrame) -> go.Figure:
         template="plotly_white",
         margin=dict(l=60, r=20, t=60, b=60),
     )
+    if hit_rate is not None:
+        layout_kwargs["yaxis2"] = dict(
+            title=dict(text="L1 hit rate (%)", font=dict(color="crimson")),
+            tickfont=dict(color="crimson"),
+            overlaying="y", side="right", range=[0, 105],
+            showgrid=False,
+        )
+    fig.update_layout(**layout_kwargs)
     return fig
 
 
