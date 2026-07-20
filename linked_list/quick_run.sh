@@ -59,14 +59,25 @@ sleep 2
 
 PREFETCH_LIMIT=$(grep 'prefetch_limit' jac.toml | sed 's/.*= *//')
 
+# Ensure `[run] access_log = ""` exists in jac.toml so we can sed it per trial.
+# Idempotent: only adds the line if missing.
+if ! grep -q '^access_log' jac.toml; then
+  sed -i '/^\[run\]/a access_log = ""' jac.toml
+fi
+
 echo "=== E2E Timing (10 trials, server restarted each trial, prefetch_limit=$PREFETCH_LIMIT) ==="
 _tmpfile=$(mktemp)
 for i in 1 2 3 4 5 6 7 8 9 10; do
   NODE="${NODES[0]}"
   TRIAL_DIR="$JAC_PROFILE_DIR/trial_${i}"
   LOG_TRIAL="logs/jac_server_limit${PREFETCH_LIMIT}_trial${i}.log"
+  _access_log="logs/access_log_limit${PREFETCH_LIMIT}_trial${i}.csv"
 
   docker exec redis redis-cli FLUSHALL > /dev/null 2>&1 || true
+
+  # Per-trial access_log path (sed-patch jac.toml — the [run] section read at startup).
+  rm -f "$_access_log"
+  sed -i "s|^access_log = .*|access_log = \"$_access_log\"|" jac.toml
 
   JAC_LIST_SIZE=$JAC_LIST_SIZE JAC_PROFILE_DIR="$TRIAL_DIR" \
     jac start > "$LOG_TRIAL" 2>&1 &
@@ -88,6 +99,25 @@ for i in 1 2 3 4 5 6 7 8 9 10; do
   e2e_ms=$(awk "BEGIN {printf \"%.3f\", $e2e_time * 1000}")
   echo "Trial $i: ${e2e_ms}ms  HTTP=$http_status  response_size=${resp_size}bytes  (log: $LOG_TRIAL)"
 
+  # Roll up the per-anchor access_log into one-line tier counts + L1 hit-rate.
+  # Rows include plan-execution events (sentinel id) alongside per-anchor gets
+  # — they're indistinguishable from real reads in the counter, which is
+  # intentional: each row is "one tier-touch", whether by a get or a plan.
+  hit_rate=""; l1=""; l2=""; l3=""; miss=""
+  if [ -s "$_access_log" ]; then
+    read hit_rate l1 l2 l3 miss < <(python3 -c "
+import csv
+from collections import Counter
+c = Counter()
+with open('$_access_log') as f:
+    for r in csv.DictReader(f):
+        c[r['tier']] += 1
+total = sum(c.values()) or 1
+print(f\"{c['L1']*100/total:.1f} {c['L1']} {c['L2']} {c['L3']} {c['MISS']}\")
+")
+    echo "    hit rate: L1=${hit_rate}%  L1=${l1} L2=${l2} L3=${l3} MISS=${miss}"
+  fi
+
   # Append to results CSV if provided
   if [ -n "$JAC_RESULTS_FILE" ] && [ -f "$JAC_PROFILE_CSV" ]; then
     last_row=$(tail -1 "$JAC_PROFILE_CSV")
@@ -95,7 +125,7 @@ for i in 1 2 3 4 5 6 7 8 9 10; do
     ttg_ms=$(echo "$last_row" | awk -F',' '{print $7}')
     prefetch_ms=$(echo "$last_row" | awk -F',' '{print $8}')
     walker_ms=$(echo "$last_row" | awk -F',' '{print $9}')
-    echo "$PREFETCH_LIMIT,$i,$e2e_ms,$topo_idx_ms,$ttg_ms,$prefetch_ms,$walker_ms" >> "$JAC_RESULTS_FILE"
+    echo "Traverse,$PREFETCH_LIMIT,$i,$e2e_ms,$topo_idx_ms,$ttg_ms,$prefetch_ms,$walker_ms,$hit_rate,$l1,$l2,$l3,$miss," >> "$JAC_RESULTS_FILE"
   fi
 
   kill $JAC_PID 2>/dev/null || true
@@ -104,6 +134,10 @@ for i in 1 2 3 4 5 6 7 8 9 10; do
 done
 
 rm -f "$_tmpfile"
+
+# Restore access_log to empty so a stray `jac start` outside the sweep doesn't
+# silently keep writing into the last trial's path.
+sed -i 's|^access_log = .*|access_log = ""|' jac.toml
 
 echo ""
 echo "=== Done ==="

@@ -23,7 +23,7 @@ echo "Limits     : ${PREFETCH_LIMITS[*]}"
 echo ""
 
 # Write CSV header
-echo "prefetch_limit,trial,e2e_ms,topo_idx_ms,ttg_ms,prefetch_ms,walker_ms" > "$RESULTS_FILE"
+echo "walker,prefetch_limit,trial,e2e_ms,topo_idx_ms,ttg_ms,prefetch_ms,walker_ms,l1_hit_rate,l1,l2,l3,miss,mongo_q" > "$RESULTS_FILE"
 
 for limit in "${PREFETCH_LIMITS[@]}"; do
   echo "========================================"
