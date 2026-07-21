@@ -233,6 +233,81 @@ def worker_times(logs: list[TrialLog]) -> go.Figure:
     return fig
 
 
+def coverage(df: pd.DataFrame, logs: list[TrialLog]) -> go.Figure:
+    """Overfetch and undercoverage per prefetch limit.
+
+    Overfetch = plan_size - distinct_covered, the plan slots that never
+    served a walker read from L1/L2.  distinct_covered is the count of
+    unique anchor IDs in the sibling access_log with tier L1 or L2
+    (i.e. served from a TTG-populated cache tier), so a walker that reads
+    the same node twice doesn't inflate coverage.
+
+    Undercoverage = l3 + miss, the walker's tier touches that fell
+    through the plan to the on-demand cache-through path.
+
+    Both are counts per request (median over trials).  If the log-side
+    coverage info is missing (older runs, or the access_log wasn't
+    written), the overfetch trace is skipped.
+    """
+    if df.empty:
+        return go.Figure()
+
+    # Undercoverage from the CSV.
+    if "l3" not in df.columns or "miss" not in df.columns:
+        return go.Figure()
+    under = (
+        df.assign(under=lambda d: d["l3"].fillna(0) + d["miss"].fillna(0))
+        .groupby("prefetch_limit")["under"]
+        .median()
+        .reset_index()
+        .sort_values("prefetch_limit")
+    )
+
+    # Overfetch from the per-trial coverage log + access_log.
+    over_rows = [
+        {
+            "prefetch_limit": tl.limit,
+            "overfetch": max(tl.plan_size - tl.distinct_covered, 0),
+        }
+        for tl in logs
+        if tl.plan_size > 0 and tl.distinct_ids_by_tier
+    ]
+    if over_rows:
+        over = (
+            pd.DataFrame(over_rows)
+            .groupby("prefetch_limit")["overfetch"]
+            .median()
+            .reset_index()
+            .sort_values("prefetch_limit")
+        )
+    else:
+        over = None
+
+    limits = under["prefetch_limit"].astype(int).astype(str).tolist()
+    fig = go.Figure()
+    fig.add_bar(
+        x=limits, y=under["under"], name="Undercoverage (L3 + MISS)",
+        marker_color="#d62728",
+        hovertemplate="undercoverage: %{y:.0f}<extra></extra>",
+    )
+    if over is not None and not over.empty:
+        over_limits = over["prefetch_limit"].astype(int).astype(str).tolist()
+        fig.add_bar(
+            x=over_limits, y=over["overfetch"], name="Overfetch (plan - distinct L1/L2 IDs)",
+            marker_color="#ff7f0e",
+            hovertemplate="overfetch: %{y:.0f}<extra></extra>",
+        )
+    fig.update_layout(
+        barmode="group",
+        title="Overfetch vs undercoverage (median over trials, per prefetch limit)",
+        xaxis_title="prefetch_limit",
+        yaxis_title="Nodes",
+        template="plotly_white",
+        margin=dict(l=60, r=20, t=60, b=60),
+    )
+    return fig
+
+
 def csv_raw(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
         return df
