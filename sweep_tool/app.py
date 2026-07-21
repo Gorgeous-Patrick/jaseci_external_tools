@@ -45,6 +45,46 @@ tab_run, tab_analyze, tab_raw = st.tabs(["Run", "Analyze", "Raw data"])
 # ---------------------------------------------------------------------------
 with tab_run:
     st.header("Run a sweep")
+
+    # ---- Run all (shepherd over every manifest, sequential) ----
+    st.subheader("Run all sweeps")
+    st.caption(
+        "Kicks off every manifest's sweep sequentially with each app's "
+        "default parameters.  All apps share MongoDB/Redis container "
+        "names, so parallel isn't safe."
+    )
+    all_running, all_pid = sweep_runner.is_run_all_running()
+    ra_status, ra_kill, ra_launch = st.columns([3, 1, 1])
+    with ra_status:
+        if all_running:
+            st.warning(f"⏳ Run-all is in progress (shepherd pid={all_pid}).")
+        else:
+            st.info("No run-all sweep is currently in progress.")
+    with ra_kill:
+        if all_running and st.button("Stop all", type="secondary", key="run_all_kill"):
+            msg = sweep_runner.kill_run_all()
+            st.success(msg)
+            st.rerun()
+    with ra_launch:
+        if not all_running and st.button("Run all", type="primary", key="run_all_go"):
+            info = sweep_runner.kickoff_all(manifests)
+            st.success(
+                f"Launched shepherd (pid={info.pid}) over "
+                f"{len(manifests)} manifest(s).  Watch progress in "
+                f"`{info.stdout_log}` or the Analyze tab per app."
+            )
+            st.rerun()
+    if sweep_runner.run_all_log_path().exists():
+        with st.expander("Tail of run_all.log", expanded=False):
+            text = sweep_runner.run_all_log_path().read_text()
+            max_bytes = 15_000
+            if len(text) > max_bytes:
+                text = "…(truncated head)…\n" + text[-max_bytes:]
+            st.code(text or "(empty)", language="text")
+
+    st.divider()
+
+    # ---- Per-app sweep (existing single-manifest form) ----
     app_name = st.selectbox(
         "App",
         [m.name for m in manifests],

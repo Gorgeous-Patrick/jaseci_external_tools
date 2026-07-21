@@ -73,15 +73,10 @@ for i in 1 2 3 4 5 6 7 8 9 10; do
   TRIAL_DIR="$JAC_PROFILE_DIR/trial_${i}"
   LOG_TRIAL="logs/jac_server_limit${PREFETCH_LIMIT}_trial${i}.log"
 
-  # access_log is opt-in per sweep (JAC_ACCESS_LOG=1) — it adds per-tier-touch
-  # CSV writes to every walker request, which biases e2e_ms.  Off by default
-  # so latency numbers reflect production TTG behaviour.
-  _access_log=""
-  if [ -n "$JAC_ACCESS_LOG" ]; then
-    _access_log="logs/access_log_limit${PREFETCH_LIMIT}_trial${i}.csv"
-    rm -f "$_access_log"
-    sed -i "s|^access_log = .*|access_log = \"$_access_log\"|" jac.toml
-  fi
+  # Per-trial access_log path (sed-patch jac.toml — the [run] section read at startup).
+  _access_log="logs/access_log_limit${PREFETCH_LIMIT}_trial${i}.csv"
+  rm -f "$_access_log"
+  sed -i "s|^access_log = .*|access_log = \"$_access_log\"|" jac.toml
 
   docker exec redis redis-cli FLUSHALL > /dev/null 2>&1 || true
 
