@@ -1,0 +1,319 @@
+=== LittleX Prefetch Limit Sweep ===
+Limits: 0 2500 5000 7500 10000 12500
+
+========================================
+Testing: prefetch_limit=0
+========================================
+=== Restarting docker compose ===
+ Network littlex5_default Removing 
+ Network littlex5_default Removed 
+ Network littlex5_default Creating 
+ Network littlex5_default Created 
+ Container redis Creating 
+ Container mongodb Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container mongodb Starting 
+ Container redis Starting 
+ Container redis Started 
+ Container mongodb Started 
+=== Restoring MongoDB from dump ===
+2026-07-22T04:23:05.133+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"arch_type_1_type_1", "v":2}, Key:bson.D{bson.E{Key:"arch_type", Value:1}, bson.E{Key:"type", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T04:23:05.133+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"updated_at_-1", "v":2}, Key:bson.D{bson.E{Key:"updated_at", Value:-1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T04:23:09.551+0000	2270008 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (10 trials per walker, server restarted each trial) ===
+prefetch_limit=0  user=sim_user_3
+
+--- Walker: load_feed ---
+    Waiting for server...
+  Trial 1: 4041.528ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=2617.453ms
+    hit rate: L1=49.9%  L1=10206 L2=0 L3=10253 MISS=0
+    Waiting for server...
+  Trial 2: 4023.823ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=2604.032ms
+    hit rate: L1=49.9%  L1=10206 L2=0 L3=10253 MISS=0
+    Waiting for server...
+  Trial 3: 4048.120ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=2598.419ms
+    hit rate: L1=49.9%  L1=10206 L2=0 L3=10253 MISS=0
+
+=== Done ===
+Server logs: logs/
+========================================
+Testing: prefetch_limit=2500
+========================================
+=== Restarting docker compose ===
+ Container redis Stopping 
+ Container mongodb Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container mongodb Removed 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Network littlex5_default Removing 
+ Network littlex5_default Removed 
+ Network littlex5_default Creating 
+ Network littlex5_default Created 
+ Container mongodb Creating 
+ Container redis Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container redis Starting 
+ Container mongodb Starting 
+ Container mongodb Started 
+ Container redis Started 
+=== Restoring MongoDB from dump ===
+2026-07-22T04:24:26.783+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"arch_type_1_type_1", "v":2}, Key:bson.D{bson.E{Key:"arch_type", Value:1}, bson.E{Key:"type", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T04:24:26.783+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"updated_at_-1", "v":2}, Key:bson.D{bson.E{Key:"updated_at", Value:-1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T04:24:31.286+0000	2270008 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (10 trials per walker, server restarted each trial) ===
+prefetch_limit=2500  user=sim_user_3
+
+--- Walker: load_feed ---
+    Waiting for server...
+  Trial 1: 3771.952ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.672ms ttg=92.492ms prefetch=19.386ms walker=2240.721ms
+    hit rate: L1=61.5%  L1=12604 L2=0 L3=7905 MISS=0
+    Waiting for server...
+  Trial 2: 3768.245ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.703ms ttg=87.860ms prefetch=18.583ms walker=2241.436ms
+    hit rate: L1=61.6%  L1=12638 L2=0 L3=7871 MISS=0
+    Waiting for server...
+  Trial 3: 3745.072ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.644ms ttg=85.412ms prefetch=16.727ms walker=2217.336ms
+    hit rate: L1=61.7%  L1=12646 L2=0 L3=7863 MISS=0
+
+=== Done ===
+Server logs: logs/
+========================================
+Testing: prefetch_limit=5000
+========================================
+=== Restarting docker compose ===
+ Container redis Stopping 
+ Container mongodb Stopping 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container mongodb Removed 
+ Network littlex5_default Removing 
+ Network littlex5_default Removed 
+ Network littlex5_default Creating 
+ Network littlex5_default Created 
+ Container redis Creating 
+ Container mongodb Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container mongodb Starting 
+ Container redis Starting 
+ Container redis Started 
+ Container mongodb Started 
+=== Restoring MongoDB from dump ===
+2026-07-22T04:25:47.554+0000	index: &idx.IndexDocument{Options:bson.M{"name":"status_1", "v":2}, Key:bson.D{bson.E{Key:"status", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T04:25:47.554+0000	no indexes to restore for collection jac_db._migrations
+2026-07-22T04:25:52.025+0000	2270008 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (10 trials per walker, server restarted each trial) ===
+prefetch_limit=5000  user=sim_user_3
+
+--- Walker: load_feed ---
+    Waiting for server...
+  Trial 1: 3488.976ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.659ms ttg=90.902ms prefetch=34.649ms walker=1965.761ms
+    hit rate: L1=73.7%  L1=15123 L2=0 L3=5386 MISS=0
+    Waiting for server...
+  Trial 2: 3504.134ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.681ms ttg=87.342ms prefetch=24.560ms walker=1950.932ms
+    hit rate: L1=73.7%  L1=15124 L2=0 L3=5385 MISS=0
+    Waiting for server...
+  Trial 3: 3487.134ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.720ms ttg=86.831ms prefetch=22.994ms walker=1940.184ms
+    hit rate: L1=73.7%  L1=15124 L2=0 L3=5385 MISS=0
+
+=== Done ===
+Server logs: logs/
+========================================
+Testing: prefetch_limit=7500
+========================================
+=== Restarting docker compose ===
+ Container redis Stopping 
+ Container mongodb Stopping 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container mongodb Removed 
+ Network littlex5_default Removing 
+ Network littlex5_default Removed 
+ Network littlex5_default Creating 
+ Network littlex5_default Created 
+ Container mongodb Creating 
+ Container redis Creating 
+ Container mongodb Created 
+ Container redis Created 
+ Container mongodb Starting 
+ Container redis Starting 
+ Container redis Started 
+ Container mongodb Started 
+=== Restoring MongoDB from dump ===
+2026-07-22T04:27:07.279+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"arch_type_1_type_1", "v":2}, Key:bson.D{bson.E{Key:"arch_type", Value:1}, bson.E{Key:"type", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T04:27:07.279+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"updated_at_-1", "v":2}, Key:bson.D{bson.E{Key:"updated_at", Value:-1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T04:27:11.792+0000	2270008 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (10 trials per walker, server restarted each trial) ===
+prefetch_limit=7500  user=sim_user_3
+
+--- Walker: load_feed ---
+    Waiting for server...
+  Trial 1: 3215.524ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.685ms ttg=94.873ms prefetch=49.923ms walker=1683.494ms
+    hit rate: L1=85.9%  L1=17613 L2=0 L3=2896 MISS=0
+    Waiting for server...
+  Trial 2: 3173.963ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.765ms ttg=91.666ms prefetch=31.412ms walker=1651.657ms
+    hit rate: L1=85.9%  L1=17620 L2=0 L3=2889 MISS=0
+    Waiting for server...
+  Trial 3: 3177.899ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.649ms ttg=87.986ms prefetch=33.435ms walker=1646.570ms
+    hit rate: L1=85.9%  L1=17620 L2=0 L3=2889 MISS=0
+
+=== Done ===
+Server logs: logs/
+========================================
+Testing: prefetch_limit=10000
+========================================
+=== Restarting docker compose ===
+ Container mongodb Stopping 
+ Container redis Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container mongodb Removed 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Network littlex5_default Removing 
+ Network littlex5_default Removed 
+ Network littlex5_default Creating 
+ Network littlex5_default Created 
+ Container redis Creating 
+ Container mongodb Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container redis Starting 
+ Container mongodb Starting 
+ Container redis Started 
+ Container mongodb Started 
+=== Restoring MongoDB from dump ===
+2026-07-22T04:28:25.922+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"arch_type_1_type_1", "v":2}, Key:bson.D{bson.E{Key:"arch_type", Value:1}, bson.E{Key:"type", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T04:28:25.922+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"updated_at_-1", "v":2}, Key:bson.D{bson.E{Key:"updated_at", Value:-1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T04:28:30.369+0000	2270008 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (10 trials per walker, server restarted each trial) ===
+prefetch_limit=10000  user=sim_user_3
+
+--- Walker: load_feed ---
+    Waiting for server...
+  Trial 1: 2905.196ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.826ms ttg=92.768ms prefetch=54.853ms walker=1371.504ms
+    hit rate: L1=98.1%  L1=20113 L2=0 L3=396 MISS=0
+    Waiting for server...
+  Trial 2: 2896.033ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.702ms ttg=89.189ms prefetch=43.986ms walker=1363.413ms
+    hit rate: L1=98.1%  L1=20112 L2=0 L3=397 MISS=0
+    Waiting for server...
+  Trial 3: 2897.153ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.670ms ttg=90.561ms prefetch=47.135ms walker=1359.198ms
+    hit rate: L1=98.0%  L1=20105 L2=0 L3=404 MISS=0
+
+=== Done ===
+Server logs: logs/
+========================================
+Testing: prefetch_limit=12500
+========================================
+=== Restarting docker compose ===
+ Container mongodb Stopping 
+ Container redis Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Container mongodb Removed 
+ Network littlex5_default Removing 
+ Network littlex5_default Removed 
+ Network littlex5_default Creating 
+ Network littlex5_default Created 
+ Container mongodb Creating 
+ Container redis Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container redis Starting 
+ Container mongodb Starting 
+ Container redis Started 
+ Container mongodb Started 
+=== Restoring MongoDB from dump ===
+2026-07-22T04:29:43.296+0000	index: &idx.IndexDocument{Options:bson.M{"name":"identities.value_normalized_1", "sparse":true, "unique":true, "v":2}, Key:bson.D{bson.E{Key:"identities.value_normalized", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T04:29:43.296+0000	index: &idx.IndexDocument{Options:bson.M{"name":"status_1", "v":2}, Key:bson.D{bson.E{Key:"status", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T04:29:47.765+0000	2270008 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (10 trials per walker, server restarted each trial) ===
+prefetch_limit=12500  user=sim_user_3
+
+--- Walker: load_feed ---
+    Waiting for server...
+  Trial 1: 2902.699ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.650ms ttg=103.490ms prefetch=59.114ms walker=1352.306ms
+    hit rate: L1=99.0%  L1=20301 L2=0 L3=208 MISS=0
+    Waiting for server...
+  Trial 2: 2884.974ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.639ms ttg=100.899ms prefetch=40.301ms walker=1337.986ms
+    hit rate: L1=99.1%  L1=20319 L2=0 L3=190 MISS=0
+    Waiting for server...
+  Trial 3: 2872.913ms  HTTP=200  resp=11492823bytes
+    breakdown: topo=2.672ms ttg=102.368ms prefetch=52.464ms walker=1334.373ms
+    hit rate: L1=98.5%  L1=20202 L2=0 L3=307 MISS=0
+
+=== Done ===
+Server logs: logs/
+
+========================================
+Sweep complete!
+Results saved to: sweep_prefetch_limit.csv
+========================================
+walker,prefetch_limit,trial,e2e_ms,topo_idx_ms,ttg_ms,prefetch_ms,walker_ms,l1_hit_rate,l1,l2,l3,miss,mongo_q
+load_feed,0,1,4041.528,0.000,0.000,0.000,2617.453,49.9,10206,0,10253,0,
+load_feed,0,2,4023.823,0.000,0.000,0.000,2604.032,49.9,10206,0,10253,0,
+load_feed,0,3,4048.120,0.000,0.000,0.000,2598.419,49.9,10206,0,10253,0,
+load_feed,2500,1,3771.952,2.672,92.492,19.386,2240.721,61.5,12604,0,7905,0,
+load_feed,2500,2,3768.245,2.703,87.860,18.583,2241.436,61.6,12638,0,7871,0,
+load_feed,2500,3,3745.072,2.644,85.412,16.727,2217.336,61.7,12646,0,7863,0,
+load_feed,5000,1,3488.976,2.659,90.902,34.649,1965.761,73.7,15123,0,5386,0,
+load_feed,5000,2,3504.134,2.681,87.342,24.560,1950.932,73.7,15124,0,5385,0,
+load_feed,5000,3,3487.134,2.720,86.831,22.994,1940.184,73.7,15124,0,5385,0,
+load_feed,7500,1,3215.524,2.685,94.873,49.923,1683.494,85.9,17613,0,2896,0,
+load_feed,7500,2,3173.963,2.765,91.666,31.412,1651.657,85.9,17620,0,2889,0,
+load_feed,7500,3,3177.899,2.649,87.986,33.435,1646.570,85.9,17620,0,2889,0,
+load_feed,10000,1,2905.196,2.826,92.768,54.853,1371.504,98.1,20113,0,396,0,
+load_feed,10000,2,2896.033,2.702,89.189,43.986,1363.413,98.1,20112,0,397,0,
+load_feed,10000,3,2897.153,2.670,90.561,47.135,1359.198,98.0,20105,0,404,0,
+load_feed,12500,1,2902.699,2.650,103.490,59.114,1352.306,99.0,20301,0,208,0,
+load_feed,12500,2,2884.974,2.639,100.899,40.301,1337.986,99.1,20319,0,190,0,
+load_feed,12500,3,2872.913,2.672,102.368,52.464,1334.373,98.5,20202,0,307,0,

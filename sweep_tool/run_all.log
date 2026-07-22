@@ -1,0 +1,508 @@
+
+=== jacord ===
+=== Jacord Prefetch Limit Sweep ===
+Limits: 0 500 1000 2000 4000 6000 8000 12000 20000 30000
+
+========================================
+Testing: prefetch_limit=0
+========================================
+=== Restarting docker compose ===
+ Container mongodb Stopping 
+ Container redis Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container mongodb Removed 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Network jacord_default Removing 
+ Network jacord_default Removed 
+ Network jacord_default Creating 
+ Network jacord_default Created 
+ Container redis Creating 
+ Container mongodb Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container mongodb Starting 
+ Container redis Starting 
+ Container mongodb Started 
+ Container redis Started 
+=== Restoring MongoDB from dump ===
+2026-07-22T03:47:40.144+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"updated_at_-1", "v":2}, Key:bson.D{bson.E{Key:"updated_at", Value:-1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:47:40.144+0000	no indexes to restore for collection jac_db._migrations
+2026-07-22T03:47:40.197+0000	22292 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (3 trials, server restarted each trial, prefetch_limit=0) ===
+
+  Trial 1: 8213.384ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=7314.791ms
+    hit rate: L1=82.3%  L1=34633 L2=3 L3=7430 MISS=0
+  Trial 2: 8159.271ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=7263.462ms
+    hit rate: L1=82.3%  L1=34633 L2=3 L3=7430 MISS=0
+  Trial 3: 8316.224ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=0.000ms ttg=0.000ms prefetch=0.000ms walker=7407.229ms
+    hit rate: L1=82.3%  L1=34633 L2=3 L3=7430 MISS=0
+=== Done ===
+========================================
+Testing: prefetch_limit=500
+========================================
+=== Restarting docker compose ===
+ Container mongodb Stopping 
+ Container redis Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container mongodb Removed 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Network jacord_default Removing 
+ Network jacord_default Removed 
+ Network jacord_default Creating 
+ Network jacord_default Created 
+ Container mongodb Creating 
+ Container redis Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container redis Starting 
+ Container mongodb Starting 
+ Container redis Started 
+ Container mongodb Started 
+=== Restoring MongoDB from dump ===
+2026-07-22T03:48:35.761+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"arch_type_1_type_1", "v":2}, Key:bson.D{bson.E{Key:"arch_type", Value:1}, bson.E{Key:"type", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:48:35.761+0000	no indexes to restore for collection jac_db._migrations
+2026-07-22T03:48:35.817+0000	22292 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (3 trials, server restarted each trial, prefetch_limit=500) ===
+
+  Trial 1: 8238.515ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=46.686ms ttg=5.682ms prefetch=6.251ms walker=7292.952ms
+    hit rate: L1=82.3%  L1=34634 L2=3 L3=7430 MISS=0
+  Trial 2: 8041.137ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=44.262ms ttg=5.671ms prefetch=6.037ms walker=7101.007ms
+    hit rate: L1=83.5%  L1=35121 L2=15 L3=6931 MISS=0
+  Trial 3: 8216.729ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=44.626ms ttg=5.935ms prefetch=5.499ms walker=7274.464ms
+    hit rate: L1=82.3%  L1=34634 L2=3 L3=7430 MISS=0
+=== Done ===
+========================================
+Testing: prefetch_limit=1000
+========================================
+=== Restarting docker compose ===
+ Container redis Stopping 
+ Container mongodb Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container mongodb Removed 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Network jacord_default Removing 
+ Network jacord_default Removed 
+ Network jacord_default Creating 
+ Network jacord_default Created 
+ Container mongodb Creating 
+ Container redis Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container mongodb Starting 
+ Container redis Starting 
+ Container mongodb Started 
+ Container redis Started 
+=== Restoring MongoDB from dump ===
+2026-07-22T03:49:31.368+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"arch_type_1_type_1", "v":2}, Key:bson.D{bson.E{Key:"arch_type", Value:1}, bson.E{Key:"type", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:49:31.368+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"updated_at_-1", "v":2}, Key:bson.D{bson.E{Key:"updated_at", Value:-1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:49:31.430+0000	22292 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (3 trials, server restarted each trial, prefetch_limit=1000) ===
+
+  Trial 1: 8047.049ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=43.777ms ttg=6.019ms prefetch=9.297ms walker=7108.081ms
+    hit rate: L1=84.1%  L1=35362 L2=274 L3=6431 MISS=0
+  Trial 2: 8117.016ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=43.406ms ttg=6.124ms prefetch=6.730ms walker=7175.080ms
+    hit rate: L1=84.7%  L1=35610 L2=26 L3=6431 MISS=0
+  Trial 3: 8085.374ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=45.162ms ttg=6.035ms prefetch=8.225ms walker=7145.595ms
+    hit rate: L1=84.5%  L1=35531 L2=105 L3=6431 MISS=0
+=== Done ===
+========================================
+Testing: prefetch_limit=2000
+========================================
+=== Restarting docker compose ===
+ Container redis Stopping 
+ Container mongodb Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container mongodb Removed 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Network jacord_default Removing 
+ Network jacord_default Removed 
+ Network jacord_default Creating 
+ Network jacord_default Created 
+ Container mongodb Creating 
+ Container redis Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container redis Starting 
+ Container mongodb Starting 
+ Container mongodb Started 
+ Container redis Started 
+=== Restoring MongoDB from dump ===
+2026-07-22T03:50:26.669+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"arch_type_1_type_1", "v":2}, Key:bson.D{bson.E{Key:"arch_type", Value:1}, bson.E{Key:"type", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:50:26.669+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"updated_at_-1", "v":2}, Key:bson.D{bson.E{Key:"updated_at", Value:-1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:50:26.721+0000	22292 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (3 trials, server restarted each trial, prefetch_limit=2000) ===
+
+  Trial 1: 8169.273ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=44.480ms ttg=6.615ms prefetch=13.159ms walker=7222.882ms
+    hit rate: L1=82.3%  L1=34634 L2=3 L3=7430 MISS=0
+  Trial 2: 8184.291ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=44.282ms ttg=6.616ms prefetch=11.153ms walker=7235.488ms
+    hit rate: L1=82.3%  L1=34634 L2=3 L3=7430 MISS=0
+  Trial 3: 8043.676ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=44.640ms ttg=6.648ms prefetch=11.046ms walker=7098.962ms
+    hit rate: L1=82.3%  L1=34634 L2=3 L3=7430 MISS=0
+=== Done ===
+========================================
+Testing: prefetch_limit=4000
+========================================
+=== Restarting docker compose ===
+ Container mongodb Stopping 
+ Container redis Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container mongodb Removed 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Network jacord_default Removing 
+ Network jacord_default Removed 
+ Network jacord_default Creating 
+ Network jacord_default Created 
+ Container redis Creating 
+ Container mongodb Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container mongodb Starting 
+ Container redis Starting 
+ Container mongodb Started 
+ Container redis Started 
+=== Restoring MongoDB from dump ===
+2026-07-22T03:51:22.134+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"arch_type_1_type_1", "v":2}, Key:bson.D{bson.E{Key:"arch_type", Value:1}, bson.E{Key:"type", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:51:22.134+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"updated_at_-1", "v":2}, Key:bson.D{bson.E{Key:"updated_at", Value:-1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:51:22.182+0000	22292 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (3 trials, server restarted each trial, prefetch_limit=4000) ===
+
+  Trial 1: 7969.879ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=43.840ms ttg=15.923ms prefetch=20.471ms walker=6995.955ms
+    hit rate: L1=85.9%  L1=36133 L2=3 L3=5931 MISS=0
+  Trial 2: 8532.369ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=43.235ms ttg=15.681ms prefetch=16.901ms walker=7564.566ms
+    hit rate: L1=85.9%  L1=36133 L2=3 L3=5931 MISS=0
+  Trial 3: 7890.562ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=45.844ms ttg=19.468ms prefetch=23.942ms walker=6922.114ms
+    hit rate: L1=90.2%  L1=37937 L2=699 L3=3431 MISS=0
+=== Done ===
+========================================
+Testing: prefetch_limit=6000
+========================================
+=== Restarting docker compose ===
+ Container mongodb Stopping 
+ Container redis Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container mongodb Removed 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Network jacord_default Removing 
+ Network jacord_default Removed 
+ Network jacord_default Creating 
+ Network jacord_default Created 
+ Container redis Creating 
+ Container mongodb Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container redis Starting 
+ Container mongodb Starting 
+ Container redis Started 
+ Container mongodb Started 
+=== Restoring MongoDB from dump ===
+2026-07-22T03:52:17.553+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"updated_at_-1", "v":2}, Key:bson.D{bson.E{Key:"updated_at", Value:-1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:52:17.553+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"arch_type_1_type_1", "v":2}, Key:bson.D{bson.E{Key:"arch_type", Value:1}, bson.E{Key:"type", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:52:17.603+0000	22292 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (3 trials, server restarted each trial, prefetch_limit=6000) ===
+
+  Trial 1: 7791.346ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=44.378ms ttg=34.476ms prefetch=32.766ms walker=6805.206ms
+    hit rate: L1=90.6%  L1=38133 L2=3 L3=3931 MISS=0
+  Trial 2: 7561.185ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=44.500ms ttg=28.586ms prefetch=25.372ms walker=6581.451ms
+    hit rate: L1=90.7%  L1=38173 L2=3 L3=3891 MISS=0
+  Trial 3: 7572.471ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=44.239ms ttg=28.827ms prefetch=25.645ms walker=6584.143ms
+    hit rate: L1=90.9%  L1=38257 L2=3 L3=3807 MISS=0
+=== Done ===
+========================================
+Testing: prefetch_limit=8000
+========================================
+=== Restarting docker compose ===
+ Container mongodb Stopping 
+ Container redis Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container mongodb Removed 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Network jacord_default Removing 
+ Network jacord_default Removed 
+ Network jacord_default Creating 
+ Network jacord_default Created 
+ Container redis Creating 
+ Container mongodb Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container mongodb Starting 
+ Container redis Starting 
+ Container mongodb Started 
+ Container redis Started 
+=== Restoring MongoDB from dump ===
+2026-07-22T03:53:11.472+0000	index: &idx.IndexDocument{Options:bson.M{"name":"identities.value_normalized_1", "sparse":true, "unique":true, "v":2}, Key:bson.D{bson.E{Key:"identities.value_normalized", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:53:11.472+0000	index: &idx.IndexDocument{Options:bson.M{"name":"status_1", "v":2}, Key:bson.D{bson.E{Key:"status", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:53:11.512+0000	22292 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (3 trials, server restarted each trial, prefetch_limit=8000) ===
+
+  Trial 1: 7621.463ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=45.990ms ttg=72.612ms prefetch=40.243ms walker=6589.077ms
+    hit rate: L1=94.0%  L1=39559 L2=3 L3=2505 MISS=0
+  Trial 2: 7134.939ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=47.895ms ttg=59.375ms prefetch=29.465ms walker=6124.187ms
+    hit rate: L1=94.0%  L1=39559 L2=3 L3=2505 MISS=0
+  Trial 3: 7132.031ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=44.790ms ttg=57.336ms prefetch=32.158ms walker=6130.190ms
+    hit rate: L1=94.0%  L1=39559 L2=3 L3=2505 MISS=0
+=== Done ===
+========================================
+Testing: prefetch_limit=12000
+========================================
+=== Restarting docker compose ===
+ Container mongodb Stopping 
+ Container redis Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container mongodb Removed 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Network jacord_default Removing 
+ Network jacord_default Removed 
+ Network jacord_default Creating 
+ Network jacord_default Created 
+ Container mongodb Creating 
+ Container redis Creating 
+ Container mongodb Created 
+ Container redis Created 
+ Container redis Starting 
+ Container mongodb Starting 
+ Container mongodb Started 
+ Container redis Started 
+=== Restoring MongoDB from dump ===
+2026-07-22T03:54:04.399+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"arch_type_1_type_1", "v":2}, Key:bson.D{bson.E{Key:"arch_type", Value:1}, bson.E{Key:"type", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:54:04.399+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"updated_at_-1", "v":2}, Key:bson.D{bson.E{Key:"updated_at", Value:-1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:54:04.453+0000	22292 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (3 trials, server restarted each trial, prefetch_limit=12000) ===
+
+  Trial 1: 7220.074ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=44.443ms ttg=60.576ms prefetch=31.530ms walker=6194.798ms
+    hit rate: L1=94.0%  L1=39559 L2=3 L3=2505 MISS=0
+  Trial 2: 7182.189ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=45.542ms ttg=60.428ms prefetch=35.060ms walker=6163.045ms
+    hit rate: L1=94.0%  L1=39559 L2=3 L3=2505 MISS=0
+  Trial 3: 7152.300ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=44.287ms ttg=61.237ms prefetch=31.377ms walker=6150.939ms
+    hit rate: L1=94.0%  L1=39559 L2=3 L3=2505 MISS=0
+=== Done ===
+========================================
+Testing: prefetch_limit=20000
+========================================
+=== Restarting docker compose ===
+ Container redis Stopping 
+ Container mongodb Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container mongodb Removed 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Network jacord_default Removing 
+ Network jacord_default Removed 
+ Network jacord_default Creating 
+ Network jacord_default Created 
+ Container mongodb Creating 
+ Container redis Creating 
+ Container redis Created 
+ Container mongodb Created 
+ Container mongodb Starting 
+ Container redis Starting 
+ Container redis Started 
+ Container mongodb Started 
+=== Restoring MongoDB from dump ===
+2026-07-22T03:54:56.913+0000	index: &idx.IndexDocument{Options:bson.M{"name":"identities.value_normalized_1", "sparse":true, "unique":true, "v":2}, Key:bson.D{bson.E{Key:"identities.value_normalized", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:54:56.913+0000	index: &idx.IndexDocument{Options:bson.M{"name":"status_1", "v":2}, Key:bson.D{bson.E{Key:"status", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:54:56.961+0000	22292 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (3 trials, server restarted each trial, prefetch_limit=20000) ===
+
+  Trial 1: 7261.001ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=45.510ms ttg=58.513ms prefetch=40.205ms walker=6234.747ms
+    hit rate: L1=94.0%  L1=39559 L2=3 L3=2505 MISS=0
+  Trial 2: 7251.426ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=44.128ms ttg=63.013ms prefetch=29.623ms walker=6244.622ms
+    hit rate: L1=94.0%  L1=39559 L2=3 L3=2505 MISS=0
+  Trial 3: 7238.335ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=44.898ms ttg=60.264ms prefetch=33.309ms walker=6223.885ms
+    hit rate: L1=94.0%  L1=39559 L2=3 L3=2505 MISS=0
+=== Done ===
+========================================
+Testing: prefetch_limit=30000
+========================================
+=== Restarting docker compose ===
+ Container mongodb Stopping 
+ Container redis Stopping 
+ Container mongodb Stopped 
+ Container mongodb Removing 
+ Container mongodb Removed 
+ Container redis Stopped 
+ Container redis Removing 
+ Container redis Removed 
+ Network jacord_default Removing 
+ Network jacord_default Removed 
+ Network jacord_default Creating 
+ Network jacord_default Created 
+ Container mongodb Creating 
+ Container redis Creating 
+ Container mongodb Created 
+ Container redis Created 
+ Container mongodb Starting 
+ Container redis Starting 
+ Container mongodb Started 
+ Container redis Started 
+=== Restoring MongoDB from dump ===
+2026-07-22T03:55:49.731+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"arch_type_1_type_1", "v":2}, Key:bson.D{bson.E{Key:"arch_type", Value:1}, bson.E{Key:"type", Value:1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:55:49.731+0000	index: &idx.IndexDocument{Options:bson.M{"background":true, "name":"updated_at_-1", "v":2}, Key:bson.D{bson.E{Key:"updated_at", Value:-1}}, PartialFilterExpression:bson.D(nil)}
+2026-07-22T03:55:49.779+0000	22292 document(s) restored successfully. 0 document(s) failed to restore.
+=== Clearing Redis ===
+OK
+=== Stopping any running jac server ===
+=== E2E Timing (3 trials, server restarted each trial, prefetch_limit=30000) ===
+
+  Trial 1: 7264.140ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=44.009ms ttg=58.824ms prefetch=31.439ms walker=6253.853ms
+    hit rate: L1=94.0%  L1=39559 L2=3 L3=2505 MISS=0
+  Trial 2: 7129.186ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=44.126ms ttg=56.044ms prefetch=28.250ms walker=6121.699ms
+    hit rate: L1=94.2%  L1=39618 L2=3 L3=2446 MISS=0
+  Trial 3: 7190.276ms  HTTP=200  resp=4042861bytes
+    breakdown: topo=43.875ms ttg=56.101ms prefetch=285.700ms walker=6188.883ms
+    hit rate: L1=94.0%  L1=39559 L2=3 L3=2505 MISS=0
+=== Done ===
+
+========================================
+Sweep complete!
+Results saved to: sweep_prefetch_limit.csv
+========================================
+walker,prefetch_limit,trial,e2e_ms,topo_idx_ms,ttg_ms,prefetch_ms,walker_ms,l1_hit_rate,l1,l2,l3,miss
+load_channel,0,1,8213.384,0.000,0.000,0.000,7314.791,82.3,34633,3,7430,0
+load_channel,0,2,8159.271,0.000,0.000,0.000,7263.462,82.3,34633,3,7430,0
+load_channel,0,3,8316.224,0.000,0.000,0.000,7407.229,82.3,34633,3,7430,0
+load_channel,500,1,8238.515,46.686,5.682,6.251,7292.952,82.3,34634,3,7430,0
+load_channel,500,2,8041.137,44.262,5.671,6.037,7101.007,83.5,35121,15,6931,0
+load_channel,500,3,8216.729,44.626,5.935,5.499,7274.464,82.3,34634,3,7430,0
+load_channel,1000,1,8047.049,43.777,6.019,9.297,7108.081,84.1,35362,274,6431,0
+load_channel,1000,2,8117.016,43.406,6.124,6.730,7175.080,84.7,35610,26,6431,0
+load_channel,1000,3,8085.374,45.162,6.035,8.225,7145.595,84.5,35531,105,6431,0
+load_channel,2000,1,8169.273,44.480,6.615,13.159,7222.882,82.3,34634,3,7430,0
+load_channel,2000,2,8184.291,44.282,6.616,11.153,7235.488,82.3,34634,3,7430,0
+load_channel,2000,3,8043.676,44.640,6.648,11.046,7098.962,82.3,34634,3,7430,0
+load_channel,4000,1,7969.879,43.840,15.923,20.471,6995.955,85.9,36133,3,5931,0
+load_channel,4000,2,8532.369,43.235,15.681,16.901,7564.566,85.9,36133,3,5931,0
+load_channel,4000,3,7890.562,45.844,19.468,23.942,6922.114,90.2,37937,699,3431,0
+load_channel,6000,1,7791.346,44.378,34.476,32.766,6805.206,90.6,38133,3,3931,0
+load_channel,6000,2,7561.185,44.500,28.586,25.372,6581.451,90.7,38173,3,3891,0
+load_channel,6000,3,7572.471,44.239,28.827,25.645,6584.143,90.9,38257,3,3807,0
+load_channel,8000,1,7621.463,45.990,72.612,40.243,6589.077,94.0,39559,3,2505,0
+load_channel,8000,2,7134.939,47.895,59.375,29.465,6124.187,94.0,39559,3,2505,0
+load_channel,8000,3,7132.031,44.790,57.336,32.158,6130.190,94.0,39559,3,2505,0
+load_channel,12000,1,7220.074,44.443,60.576,31.530,6194.798,94.0,39559,3,2505,0
+load_channel,12000,2,7182.189,45.542,60.428,35.060,6163.045,94.0,39559,3,2505,0
+load_channel,12000,3,7152.300,44.287,61.237,31.377,6150.939,94.0,39559,3,2505,0
+load_channel,20000,1,7261.001,45.510,58.513,40.205,6234.747,94.0,39559,3,2505,0
+load_channel,20000,2,7251.426,44.128,63.013,29.623,6244.622,94.0,39559,3,2505,0
+load_channel,20000,3,7238.335,44.898,60.264,33.309,6223.885,94.0,39559,3,2505,0
+load_channel,30000,1,7264.140,44.009,58.824,31.439,6253.853,94.0,39559,3,2505,0
+load_channel,30000,2,7129.186,44.126,56.044,28.250,6121.699,94.2,39618,3,2446,0
+load_channel,30000,3,7190.276,43.875,56.101,285.700,6188.883,94.0,39559,3,2505,0
+
+=== linked_list ===
+=== Prefetch Limit Sweep ===
+List size  : 1000
+Limits     : 0 250 500 750 1000 1250
+
+========================================
+Testing: prefetch_limit=0
+========================================
+=== Restarting docker compose ===
+ Network linked_list_default Removing 
+ Network linked_list_default Removed 
+ Network linked_list_default Creating 
+ Network linked_list_default Created 
+ Container mongodb Creating 
+ Container redis Creating 
+ Container redis Error response from daemon: Conflict. The container name "/redis" is already in use by container "1c29dd72661588f872c7a7162b21b896835c9070637babe314760eb78d1d43d5". You have to remove (or rename) that container to be able to reuse that name. 
+ Container mongodb Error response from daemon: Conflict. The container name "/mongodb" is already in use by container "4d696cb4041ecf9688d7394000d154549f1b276e4ad704dd2fc2393219392787". You have to remove (or rename) that container to be able to reuse that name. 
+Error response from daemon: Conflict. The container name "/redis" is already in use by container "1c29dd72661588f872c7a7162b21b896835c9070637babe314760eb78d1d43d5". You have to remove (or rename) that container to be able to reuse that name.
+
+=== littlex5 ===
+=== LittleX Prefetch Limit Sweep ===
+Limits: 0 2500 5000 7500 10000 12500
+
+========================================
+Testing: prefetch_limit=0
+========================================
+=== Restarting docker compose ===
+ Network littlex5_default Removing 
+ Network littlex5_default Removed 
+ Network littlex5_default Creating 
+ Network littlex5_default Created 
+ Container redis Creating 
+ Container mongodb Creating 
+ Container mongodb Error response from daemon: Conflict. The container name "/mongodb" is already in use by container "4d696cb4041ecf9688d7394000d154549f1b276e4ad704dd2fc2393219392787". You have to remove (or rename) that container to be able to reuse that name. 
+ Container redis Error response from daemon: Conflict. The container name "/redis" is already in use by container "1c29dd72661588f872c7a7162b21b896835c9070637babe314760eb78d1d43d5". You have to remove (or rename) that container to be able to reuse that name. 
+Error response from daemon: Conflict. The container name "/mongodb" is already in use by container "4d696cb4041ecf9688d7394000d154549f1b276e4ad704dd2fc2393219392787". You have to remove (or rename) that container to be able to reuse that name.
