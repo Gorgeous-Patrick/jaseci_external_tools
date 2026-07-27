@@ -251,27 +251,23 @@ def kickoff_all(
     form_values_by_name = form_values_by_name or {}
     parts: list[str] = []
     all_env_overrides: dict[str, dict[str, str]] = {}
-    # Every app's compose file declares container_name: mongodb / redis
-    # explicitly, so `docker compose down` from one app's dir won't touch
-    # containers left running by another app's compose project.  Hard-remove
-    # both container names before each app so its `docker compose up -d`
-    # can allocate them cleanly.
-    tear_down = (
-        'docker rm -f mongodb redis > /dev/null 2>&1 || true'
-    )
+    # Between apps we cd into each app_dir and run `docker compose down -v`
+    # so the previous app's containers *and volumes* are cleaned up under
+    # the compose file that started them.  Without this the next app's
+    # `docker compose up -d` collides on the shared container names
+    # (mongodb / redis) or, worse, silently reuses a stale data volume.
     for m in manifests:
         env = m.env_from_form(form_values_by_name.get(m.name, {}))
         all_env_overrides[m.name] = env
         env_prefix = " ".join(f"{k}={shlex.quote(str(v))}" for k, v in env.items())
+        app_dir_q = shlex.quote(str(m.app_dir))
         section = (
             f'echo; echo "=== {m.name} ==="; '
-            f'{tear_down}; '
-            f'cd {shlex.quote(str(m.app_dir))} && '
-            f'{env_prefix} bash {shlex.quote(m.sweep_script)}'
+            f'cd {app_dir_q} && {env_prefix} bash {shlex.quote(m.sweep_script)}; '
+            f'echo "--- {m.name} teardown ---"; '
+            f'cd {app_dir_q} && docker compose down -v > /dev/null 2>&1 || true'
         )
         parts.append(section)
-    # Final teardown so the last app's containers don't linger.
-    parts.append(f'echo; echo "=== teardown ==="; {tear_down}')
     shepherd_cmd = "; ".join(parts)
 
     log_path = run_all_log_path()
