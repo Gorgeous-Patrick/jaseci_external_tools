@@ -68,7 +68,7 @@ fi
 
 echo "=== E2E Timing (10 trials, server restarted each trial, prefetch_limit=$PREFETCH_LIMIT) ==="
 _tmpfile=$(mktemp)
-for i in 1 2 3 4 5 6 7 8 9 10; do
+for i in $(seq 1 "${JAC_TRIALS:-30}"); do
   NODE="${NODES[0]}"
   TRIAL_DIR="$JAC_PROFILE_DIR/trial_${i}"
   LOG_TRIAL="logs/jac_server_limit${PREFETCH_LIMIT}_trial${i}.log"

@@ -53,7 +53,7 @@ _tmpfile=$(mktemp)
 for walker in "${WALKERS[@]}"; do
   echo "--- Walker: $walker ---"
 
-  for i in 1 2 3; do
+  for i in $(seq 1 "${JAC_TRIALS:-30}"); do
     TRIAL_DIR="$JAC_PROFILE_DIR/${walker}/trial_${i}"
     LOG_TRIAL="logs/jac_server_${walker}_limit${PREFETCH_LIMIT}_trial${i}.log"
     _profile_csv="$TRIAL_DIR/profile.csv"
