@@ -81,7 +81,13 @@ def parse_trial_log(path: Path) -> TrialLog | None:
     if not m:
         return None
     tl = TrialLog(limit=int(m.group(1)), trial=int(m.group(2)), source=path)
-    for line in path.read_text().splitlines():
+    # A concurrent sweep may `rm -rf logs` between glob() and read_text();
+    # treat the file as gone and skip.
+    try:
+        text = path.read_text()
+    except (FileNotFoundError, IsADirectoryError):
+        return None
+    for line in text.splitlines():
         msg = _parse_json_msg(line)
         if _HIT_STATS_MARKER in msg:
             series = _extract_after(msg, _HIT_STATS_MARKER)
@@ -118,7 +124,13 @@ def _load_access_log_distinct(logs_dir: Path, limit: int, trial: int) -> dict[st
     """
     seen: dict[str, set[str]] = {}
     for path in logs_dir.glob(f"access_log*limit{limit}_trial{trial}.csv"):
-        with open(path) as fh:
+        # Same race as parse_trial_log: a concurrent sweep may unlink the
+        # file between glob() and open().  Skip missing files.
+        try:
+            fh = open(path)
+        except FileNotFoundError:
+            continue
+        with fh:
             for row in _csv.DictReader(fh):
                 seen.setdefault(row["tier"], set()).add(row["id"])
     return {tier: len(ids) for tier, ids in seen.items()}
