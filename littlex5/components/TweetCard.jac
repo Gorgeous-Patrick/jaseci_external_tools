@@ -1,7 +1,7 @@
 """Tweet card component for Little X."""
 
 import from "lucide-react" { Heart, MessageCircle, Trash2, Repeat2 }
-sv import from ..server { TweetView }
+import from ..server { TweetView }
 
 def:pub TweetCard(
     tweet: TweetView,
@@ -124,8 +124,8 @@ def:pub TweetCard(
                                 className="lx-comment-input"
                                 placeholder="Reply..."
                                 value={commentText}
-                                onChange={lambda e: ChangeEvent { commentText = e.target.value; }}
-                                onKeyDown={lambda e: KeyboardEvent { if e.key == "Enter"
+                                onChange={lambda (e: ChangeEvent) { commentText = e.target.value; }}
+                                onKeyDown={lambda (e: KeyboardEvent) { if e.key == "Enter"
                                 and commentText.strip() {
                                     onComment(tweet.id, commentText);
                                     commentText = "";

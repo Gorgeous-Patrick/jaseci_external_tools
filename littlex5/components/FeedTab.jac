@@ -1,6 +1,6 @@
 """Home feed tab for Little X."""
 
-sv import from ..server { TweetView }
+import from ..server { TweetView }
 import from .TweetCard { TweetCard }
 import from .Composer { Composer }
 import from .WelcomeBanner { WelcomeBanner }

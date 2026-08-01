@@ -1,6 +1,6 @@
 """Channels tab for Little X: browse, create, and post in channels."""
 
-sv import from ..server { ChannelView, TweetView }
+import from ..server { ChannelView, TweetView }
 import from "lucide-react" { Hash, Users, Plus, ArrowLeft }
 import from .TweetCard { TweetCard }
 import from .Composer { Composer }
@@ -46,13 +46,13 @@ def:pub ChannelsTab(
                             className="lx-input"
                             placeholder="Channel name"
                             value={newChannelName}
-                            onChange={lambda e: ChangeEvent { newChannelName = e.target.value; }}
+                            onChange={lambda (e: ChangeEvent) { newChannelName = e.target.value; }}
                         />
                         <input
                             className="lx-input"
                             placeholder="Description (optional)"
                             value={newChannelDescription}
-                            onChange={lambda e: ChangeEvent { newChannelDescription = e.target.value; }}
+                            onChange={lambda (e: ChangeEvent) { newChannelDescription = e.target.value; }}
                         />
                         <div style={{"display": "flex", "gap": "0.5rem"}}>
                             <button
@@ -185,7 +185,7 @@ def:pub ChannelsTab(
                         avatarAlt={profileUsername}
                         placeholder={"Post in #" + selectedChannel.name}
                         value={channelComposerText}
-                        onChange={lambda v: str { channelComposerText = v; }}
+                        onChange={lambda (v: str) { channelComposerText = v; }}
                         onPost={lambda {
                             onChannelPost(channelComposerText);
                             channelComposerText = "";

@@ -1,6 +1,6 @@
 """Explore tab for Little X: discover and follow other users."""
 
-sv import from ..server { UserView }
+import from ..server { UserView }
 
 def:pub ExploreTab(
     allProfiles: list[UserView],
@@ -27,11 +27,12 @@ def:pub ExploreTab(
                                 else u.username}
                         </div>
                         <div className="lx-explore-handle">
-                            {"@" + (
-                                u.username.split("@")[0]
-                                    if "@" in u.username
-                                    else u.username
-                            )}
+                            {"@"
+                                + (
+                                    u.username.split("@")[0]
+                                        if "@" in u.username
+                                        else u.username
+                                )}
                         </div>
                         <div className="lx-explore-bio">{u.bio or "No bio yet"}</div>
                     </div>

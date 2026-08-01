@@ -31,7 +31,7 @@ def:pub Composer(
                     className="lx-composer-textarea"
                     {placeholder}
                     {value}
-                    onChange={lambda e: ChangeEvent { onChange(e.target.value); }}
+                    onChange={lambda (e: ChangeEvent) { onChange(e.target.value); }}
                     {rows}
                 />
                 <div className="lx-composer-footer">

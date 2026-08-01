@@ -6,7 +6,7 @@ for handler implementations.
 """
 
 import from "@jac/runtime" { jacSignup, jacLogin, jacLogout, jacIsLoggedIn }
-sv import from .server {
+import from .server {
     setup_profile,
     get_profile,
     get_all_profiles,
@@ -25,7 +25,7 @@ sv import from .server {
     get_channel_detail,
     create_channel_tweet
 }
-sv import from .server { UserView, TweetView, ChannelView, TrendingTag, ProfileView }
+import from .server { UserView, TweetView, ChannelView, TrendingTag, ProfileView }
 import from "lucide-react" { Feather }
 import from .components.AuthForm { AuthForm }
 import from .components.Sidebar { Sidebar }
@@ -110,9 +110,9 @@ def:pub app -> JsxElement {
                 password={authPassword}
                 error={authError}
                 loading={authLoading}
-                onUsernameChange={lambda e: ChangeEvent { authUsername = e.target.value; }}
-                onPasswordChange={lambda e: ChangeEvent { authPassword = e.target.value; }}
-                onSubmit={lambda e: FormEvent {
+                onUsernameChange={lambda (e: ChangeEvent) { authUsername = e.target.value; }}
+                onPasswordChange={lambda (e: ChangeEvent) { authPassword = e.target.value; }}
+                onSubmit={lambda (e: FormEvent) {
                     e.preventDefault();
                     if isSignup {
                         handleSignup();
@@ -191,7 +191,7 @@ def:pub app -> JsxElement {
                         {profileAvatar}
                         {profileUsername}
                         {composerText}
-                        onComposerChange={lambda v: str { composerText = v; }}
+                        onComposerChange={lambda (v: str) { composerText = v; }}
                         onPost={postTweet}
                         {feedLoading}
                         {tweets}
@@ -235,7 +235,7 @@ def:pub app -> JsxElement {
                         {profileUsername}
                         {editingBio}
                         {bioText}
-                        onBioChange={lambda v: str { bioText = v; }}
+                        onBioChange={lambda (v: str) { bioText = v; }}
                         onSaveBio={handleSaveBio}
                         onCancelEditBio={lambda { editingBio = False; }}
                         onLike={handleLike}
@@ -247,7 +247,7 @@ def:pub app -> JsxElement {
             </main>
             <RightSidebar
                 {searchQuery}
-                onSearchChange={lambda v: str { searchQuery = v; }}
+                onSearchChange={lambda (v: str) { searchQuery = v; }}
                 onSearch={handleSearch}
                 onClearSearch={lambda {
                     searchQuery = "";

@@ -1,7 +1,7 @@
 """Right sidebar for Little X: search, trending, and suggestions."""
 
 import from "lucide-react" { Search, X }
-sv import from ..server { UserView, TrendingTag }
+import from ..server { UserView, TrendingTag }
 
 def:pub RightSidebar(
     searchQuery: str,
@@ -25,10 +25,10 @@ def:pub RightSidebar(
                         className="lx-search-input"
                         placeholder="Search Little-X"
                         value={searchQuery}
-                        onChange={lambda e: ChangeEvent { onSearchChange(
+                        onChange={lambda (e: ChangeEvent) { onSearchChange(
                             e.target.value
                         ); }}
-                        onKeyDown={lambda e: KeyboardEvent { if e.key == "Enter" {
+                        onKeyDown={lambda (e: KeyboardEvent) { if e.key == "Enter" {
                             onSearch(searchQuery);
                         }}}
                     />

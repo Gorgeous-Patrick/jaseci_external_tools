@@ -1,6 +1,6 @@
 """Profile tab for Little X."""
 
-sv import from ..server { ProfileView }
+import from ..server { ProfileView }
 import from .TweetCard { TweetCard }
 
 def:pub ProfileTab(
@@ -47,7 +47,7 @@ def:pub ProfileTab(
                             rows={3}
                             placeholder="Write your bio..."
                             value={bioText}
-                            onChange={lambda e: ChangeEvent { onBioChange(
+                            onChange={lambda (e: ChangeEvent) { onBioChange(
                                 e.target.value
                             ); }}
                         />
