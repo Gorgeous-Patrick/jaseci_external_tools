@@ -1,24 +1,29 @@
-INFO - Admin portal endpoints registered at /admin
-INFO - LLM telemetry: litellm not available, skipping litellm callback
-INFO - LLM telemetry: byllm not available, skipping agent callback
-INFO - LLM telemetry endpoints registered: /admin/llm/telemetry/{summary,traces,traces/{id},filters}
-INFO - Log query endpoints registered: /admin/logs/{,services,trace/{id}}
-INFO - Trace query endpoints registered: /admin/traces/{,services,{id}}
-INFO - No emailer provider configured - email features disabled. Set [plugins.scale.emailer] provider = 'smtp' (or a custom 'module.path:ClassName') in jac.toml to enable.
+Jac API Server running on http://0.0.0.0:8000
+Module: main
 
-  JAC DEV SERVER v0.16.1
+Available endpoints:
+  POST /user/register - Create a new user
+  POST /user/login - Login and get auth token
+  GET  /user/info - Get current user information (auth required)
+  PUT  /user/username - Update username (auth required)
+  PUT  /user/password - Update password (auth required)
+  GET /functions - List all functions
+  GET /walkers - List all walkers
+  GET /function/<name> - Get function signature
+  GET /walker/<name> - Get walker info
+  POST /function/<name> - Call a function
+  POST /walker/<name> - Spawn a walker
+  GET /cl/<name> - Render HTML page for client function
+
+Press Ctrl+C to stop the server
+
+  jac dev server v0.35.0
 
   ➜  Local:     http://localhost:8000/
 
-  🚀 Server ready
+  Server ready
 
-  JAC DEV SERVER v0.16.1
-
-  ➜  Local:     http://localhost:8000/
-
-  🚀 Server ready
-
-{"ts": "2026-07-29T00:14:02.002570Z", "level": "INFO", "service": "unknown", "trace_id": null, "msg": "127.0.0.1:33964 - \"POST /user/login HTTP/1.1\" 200"}
+127.0.0.1 - "POST /user/login HTTP/1.1" 200 -
 0
 1
 2
@@ -1019,7 +1024,4 @@ INFO - No emailer provider configured - email features disabled. Set [plugins.sc
 997
 998
 999
-{"ts": "2026-07-29T00:14:02.762373Z", "level": "INFO", "service": "unknown", "trace_id": "f6558f35-ece2-4403-8be6-e3b9e4ff03be", "msg": "[trace=f6558f35] [PREFETCH-WORKER-TIMES] []"}
-{"ts": "2026-07-29T00:14:02.801048Z", "level": "INFO", "service": "unknown", "trace_id": "f6558f35-ece2-4403-8be6-e3b9e4ff03be", "msg": "[trace=f6558f35] [HIT-STATS-SERIES] [('walker_done', {'L1': 1003, 'L2': 0, 'L3': 1002, 'MISS': 0}), ('request_done', {'L1': 1003, 'L2': 0, 'L3': 1002, 'MISS': 0})]"}
-{"ts": "2026-07-29T00:14:02.850931Z", "level": "INFO", "service": "unknown", "trace_id": null, "msg": "127.0.0.1:33976 - \"POST /walker/Traverse/919870bf-c73a-426e-b34b-77fb6bddcac8 HTTP/1.1\" 200"}
-{"ts": "2026-07-29T00:14:02.901870Z", "level": "WARNING", "service": "unknown", "trace_id": null, "msg": "drain: started (timeout=10.0s, inflight=0)"}
+127.0.0.1 - "POST /walker/Traverse/6ee6c025-97fc-4be9-b785-d72e463b1079 HTTP/1.1" 200 -
