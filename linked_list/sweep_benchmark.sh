@@ -4,6 +4,11 @@ set -e
 # Configuration - sweep list sizes
 LIST_SIZES=(100 1000)
 
+# jac binary to benchmark. Set to a full path to test a specific build, e.g.
+#   export JAC_BIN=~/Space/jaseci/jac/zig-out/bin/jac
+# Defaults to `jac` on PATH. Exported so quick_run.sh uses the same binary.
+export JAC_BIN="${JAC_BIN:-jac}"
+
 # Results file
 RESULTS_FILE="sweep_results_e2e.csv"
 PROFILE_CSV="profile_results.csv"

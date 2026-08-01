@@ -11,6 +11,11 @@ if [ -n "$SWEEP_PREFETCH_LIMITS" ]; then
 else
   PREFETCH_LIMITS=(0 2500 5000 7500 10000 12500)
 fi
+# jac binary to benchmark. Set to a full path to test a specific build, e.g.
+#   export JAC_BIN=~/Space/jaseci/jac/zig-out/bin/jac
+# Defaults to `jac` on PATH. Exported so quick_run.sh uses the same binary.
+export JAC_BIN="${JAC_BIN:-jac}"
+
 RESULTS_FILE="sweep_prefetch_limit.csv"
 
 # Clean all previous data

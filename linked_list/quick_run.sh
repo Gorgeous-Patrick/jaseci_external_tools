@@ -5,6 +5,12 @@ export base_url="localhost:8000"
 export JAC_LIST_SIZE=${JAC_LIST_SIZE:-100}
 export JAC_PROFILE_DIR=${JAC_PROFILE_DIR:-profiles}
 
+# jac binary to benchmark. Point this at a specific build to test it, e.g.
+#   export JAC_BIN=~/Space/jaseci/jac/zig-out/bin/jac
+# Defaults to whatever `jac` is on PATH. Sweep scripts export their own JAC_BIN,
+# which this inherits.
+export JAC_BIN="${JAC_BIN:-jac}"
+
 # Restart docker compose
 echo "=== Restarting docker compose ==="
 docker compose down
@@ -13,7 +19,7 @@ sleep 5
 
 # Clean previous state
 echo "=== Cleaning previous state ==="
-yes | jac clean || true
+yes | "$JAC_BIN" clean || true
 
 # Clear Redis
 echo "=== Clearing Redis ==="
@@ -29,7 +35,7 @@ LOG_1="logs/jac_server_setup.log"
 
 echo "=== Starting jac server (log: $LOG_1) ==="
 JAC_LIST_SIZE=$JAC_LIST_SIZE JAC_DISABLE_GC=1 \
-  jac start > "$LOG_1" 2>&1 &
+  "$JAC_BIN" start > "$LOG_1" 2>&1 &
 JAC_PID=$!
 sleep 10
 
@@ -55,7 +61,7 @@ docker exec redis redis-cli FLUSHALL || true
 
 echo "=== Stopping setup server ==="
 kill $JAC_PID 2>/dev/null || true
-pkill -f "jac start" 2>/dev/null || true
+pkill -f "$(basename "$JAC_BIN") start" 2>/dev/null || true
 sleep 2
 
 PREFETCH_LIMIT=$(grep 'prefetch_limit' jac.toml | sed 's/.*= *//')
@@ -82,7 +88,7 @@ for i in $(seq 1 "${JAC_TRIALS:-30}"); do
 
   JAC_LIST_SIZE=$JAC_LIST_SIZE JAC_PROFILE_DIR="$TRIAL_DIR" \
     JAC_DISABLE_GC=1 \
-    jac start > "$LOG_TRIAL" 2>&1 &
+    "$JAC_BIN" start > "$LOG_TRIAL" 2>&1 &
   JAC_PID=$!
   sleep 10
 
@@ -131,7 +137,7 @@ print(f\"{c['L1']*100/total:.1f} {c['L1']} {c['L2']} {c['L3']} {c['MISS']}\")
   fi
 
   kill $JAC_PID 2>/dev/null || true
-  pkill -f "jac start" 2>/dev/null || true
+  pkill -f "$(basename "$JAC_BIN") start" 2>/dev/null || true
   sleep 2
 done
 

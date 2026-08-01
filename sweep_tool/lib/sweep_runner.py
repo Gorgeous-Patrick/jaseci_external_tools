@@ -21,6 +21,13 @@ from .manifest import Manifest
 
 _RUN_ALL_ROOT = Path(__file__).resolve().parent.parent  # sweep_tool/
 
+# Default jac binary every sweep runs against. Points at the locally-built
+# zig `jac`; override in the UI (or by exporting JAC_BIN before launching the
+# app). The sweep scripts read ${JAC_BIN:-jac}, so this flows straight through.
+DEFAULT_JAC_BIN = os.environ.get("JAC_BIN") or str(
+    Path.home() / "Space" / "jaseci" / "jac" / "zig-out" / "bin" / "jac"
+)
+
 
 @dataclass
 class LaunchInfo:
@@ -125,9 +132,17 @@ def kill(manifest: Manifest, timeout_sec: float = 5.0) -> str:
     return f"stopped pid={pid} via {outcome}"
 
 
-def kickoff(manifest: Manifest, form_values: dict) -> LaunchInfo:
-    """Start the sweep as a detached subprocess.  Returns immediately."""
+def kickoff(
+    manifest: Manifest, form_values: dict, jac_bin: str | None = None
+) -> LaunchInfo:
+    """Start the sweep as a detached subprocess.  Returns immediately.
+
+    ``jac_bin`` selects which jac binary the sweep runs against; it is
+    exported as JAC_BIN, which the sweep scripts honour via ${JAC_BIN:-jac}.
+    """
     env_overrides = manifest.env_from_form(form_values)
+    if jac_bin:
+        env_overrides["JAC_BIN"] = jac_bin
     env = os.environ.copy()
     env.update(env_overrides)
 
@@ -240,6 +255,7 @@ def kill_run_all(timeout_sec: float = 5.0) -> str:
 def kickoff_all(
     manifests: list[Manifest],
     form_values_by_name: dict[str, dict] | None = None,
+    jac_bin: str | None = None,
 ) -> LaunchInfo:
     """Start every manifest's sweep in sequence via one detached shepherd.
 
@@ -258,6 +274,8 @@ def kickoff_all(
     # (mongodb / redis) or, worse, silently reuses a stale data volume.
     for m in manifests:
         env = m.env_from_form(form_values_by_name.get(m.name, {}))
+        if jac_bin:
+            env["JAC_BIN"] = jac_bin
         all_env_overrides[m.name] = env
         env_prefix = " ".join(f"{k}={shlex.quote(str(v))}" for k, v in env.items())
         app_dir_q = shlex.quote(str(m.app_dir))

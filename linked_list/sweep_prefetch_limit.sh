@@ -12,6 +12,11 @@ fi
 LIST_SIZE=${JAC_LIST_SIZE:-1000}
 TRIALS=10
 
+# jac binary to benchmark. Set to a full path to test a specific build, e.g.
+#   export JAC_BIN=~/Space/jaseci/jac/zig-out/bin/jac
+# Defaults to `jac` on PATH. Exported so quick_run.sh uses the same binary.
+export JAC_BIN="${JAC_BIN:-jac}"
+
 RESULTS_FILE="sweep_prefetch_limit.csv"
 
 # Clean all previous data

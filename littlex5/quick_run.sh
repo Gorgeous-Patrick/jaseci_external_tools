@@ -4,6 +4,11 @@ set -e
 export base_url="localhost:8000"
 export JAC_PROFILE_DIR=${JAC_PROFILE_DIR:-profiles}
 
+# jac binary to benchmark. Set to a full path to test a specific build, e.g.
+#   export JAC_BIN=~/Space/jaseci/jac/zig-out/bin/jac
+# Defaults to `jac` on PATH. Exported so quick_run.sh uses the same binary.
+export JAC_BIN="${JAC_BIN:-jac}"
+
 # Which walkers to benchmark (read-heavy ones)
 WALKERS=("load_feed")
 # Pick a user with decent connectivity
@@ -33,7 +38,7 @@ docker exec redis redis-cli FLUSHALL || true
 mkdir -p logs
 
 echo "=== Stopping any running jac server ==="
-pkill -f "jac start" 2>/dev/null || true
+pkill -f "$(basename "$JAC_BIN") start" 2>/dev/null || true
 sleep 2
 
 PREFETCH_LIMIT=$(grep 'prefetch_limit' jac.toml 2>/dev/null | sed 's/.*= *//' || echo "0")
@@ -67,7 +72,7 @@ for walker in "${WALKERS[@]}"; do
     mkdir -p "$TRIAL_DIR"
     JAC_PROFILE_DIR="$TRIAL_DIR" JAC_PROFILE_CSV="$_profile_csv" \
       JAC_DISABLE_GC=1 \
-      jac start > "$LOG_TRIAL" 2>&1 &
+      "$JAC_BIN" start > "$LOG_TRIAL" 2>&1 &
     JAC_PID=$!
     echo "    Waiting for server..."
     for _attempt in $(seq 1 60); do
@@ -141,7 +146,7 @@ print(f\"{c['L1']*100/total:.1f} {c['L1']} {c['L2']} {c['L3']} {c['MISS']}\")
     fi
 
     kill $JAC_PID 2>/dev/null || true
-    pkill -f "jac start" 2>/dev/null || true
+    pkill -f "$(basename "$JAC_BIN") start" 2>/dev/null || true
     sleep 2
   done
   echo ""

@@ -46,6 +46,22 @@ tab_run, tab_analyze, tab_raw = st.tabs(["Run", "Analyze", "Raw data"])
 with tab_run:
     st.header("Run a sweep")
 
+    # ---- jac binary (applies to every sweep launched from this tab) ----
+    jac_bin = st.text_input(
+        "jac binary (JAC_BIN)",
+        value=sweep_runner.DEFAULT_JAC_BIN,
+        key="jac_bin",
+        help=(
+            "Path to the jac binary every sweep runs against. Defaults to the "
+            "locally-built zig `jac`. Exported as JAC_BIN and honoured by each "
+            "sweep script via ${JAC_BIN:-jac}. Applies to both per-app and "
+            "Run-all sweeps."
+        ),
+    ).strip()
+    jac_bin = str(Path(jac_bin).expanduser()) if jac_bin else "jac"
+    if "/" in jac_bin and not Path(jac_bin).exists():
+        st.warning(f"JAC_BIN path does not exist: `{jac_bin}`")
+
     # ---- Run all (shepherd over every manifest, sequential) ----
     st.subheader("Run all sweeps")
     st.caption(
@@ -67,7 +83,7 @@ with tab_run:
             st.rerun()
     with ra_launch:
         if not all_running and st.button("Run all", type="primary", key="run_all_go"):
-            info = sweep_runner.kickoff_all(manifests)
+            info = sweep_runner.kickoff_all(manifests, jac_bin=jac_bin)
             st.success(
                 f"Launched shepherd (pid={info.pid}) over "
                 f"{len(manifests)} manifest(s).  Watch progress in "
@@ -134,7 +150,7 @@ with tab_run:
         submitted = st.form_submit_button("Run sweep")
 
     if submitted:
-        info = sweep_runner.kickoff(m, form_values)
+        info = sweep_runner.kickoff(m, form_values, jac_bin=jac_bin)
         st.success(
             f"Started sweep for **{app_name}** (pid={info.pid}). "
             f"Fire-and-forget — switch to the Analyze tab when it's done."
