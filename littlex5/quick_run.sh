@@ -12,7 +12,7 @@ export JAC_BIN="${JAC_BIN:-jac}"
 # Which walkers to benchmark (read-heavy ones)
 WALKERS=("load_feed")
 # Pick a user with decent connectivity
-TEST_USER=${TEST_USER:-sim_user_3}
+TEST_USER=${TEST_USER:-user56}
 TEST_PASSWORD=${TEST_PASSWORD:-password}
 
 # Restart docker compose
