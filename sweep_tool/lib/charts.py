@@ -67,11 +67,11 @@ def e2e_stack(df: pd.DataFrame) -> go.Figure:
     # L1 hit rate overlay on secondary y-axis when present.
     if hit_rate is not None:
         fig.add_scatter(
-            x=limits, y=hit_rate, name="L1 hit rate",
+            x=limits, y=hit_rate, name="Projection hit rate",
             mode="lines+markers", yaxis="y2",
             line=dict(color="crimson", width=2),
             marker=dict(color="crimson", size=7),
-            hovertemplate="L1 hit: %{y:.1f}%<extra></extra>",
+            hovertemplate="proj hit: %{y:.1f}%<extra></extra>",
         )
     layout_kwargs = dict(
         barmode="stack",
@@ -84,7 +84,7 @@ def e2e_stack(df: pd.DataFrame) -> go.Figure:
     )
     if hit_rate is not None:
         layout_kwargs["yaxis2"] = dict(
-            title=dict(text="L1 hit rate (%)", font=dict(color="crimson")),
+            title=dict(text="Projection hit rate (%)", font=dict(color="crimson")),
             tickfont=dict(color="crimson"),
             overlaying="y", side="right", range=[0, 105],
             showgrid=False,
@@ -302,6 +302,76 @@ def coverage(df: pd.DataFrame, logs: list[TrialLog]) -> go.Figure:
         title="Overfetch vs undercoverage (median over trials, per prefetch limit)",
         xaxis_title="prefetch_limit",
         yaxis_title="Nodes",
+        template="plotly_white",
+        margin=dict(l=60, r=20, t=60, b=60),
+    )
+    return fig
+
+
+DB_OPS = [
+    "node_pages", "hop_rows", "edge_endpoints", "existing_ids",
+    "filter_ids", "batch_get", "get",
+]
+DB_OP_COLOR = {
+    "node_pages": "#1f77b4",
+    "hop_rows": "#ff7f0e",
+    "edge_endpoints": "#2ca02c",
+    "existing_ids": "#9467bd",
+    "filter_ids": "#8c564b",
+    "batch_get": "#e377c2",
+    "get": "#7f7f7f",
+}
+
+
+def db_access_by_op(logs: list[TrialLog]) -> go.Figure:
+    """Stacked bar per prefetch_limit: real DB read volume (docs/rows served
+    from L3), split by storage operation, from the extended access log
+    (op,tier,n_in,n_out,type).
+
+    This is the true DB-pressure view — every request that reached the store,
+    not just the get/batch_get object path.  Prefetch's effect shows up as a
+    collapsing ``node_pages`` slice (the projection is pre-warmed) and a
+    shrinking ``hop_rows`` slice (fewer adjacency misses hit the DB).
+    Median over trials.  Empty for old-schema (id,tier,type) runs.
+    """
+    if not logs:
+        return go.Figure()
+    # limit -> op -> list of per-trial db_docs
+    by: dict[int, dict[str, list[int]]] = defaultdict(lambda: defaultdict(list))
+    any_data = False
+    for tl in logs:
+        if not tl.db_ops:
+            continue
+        any_data = True
+        for op, d in tl.db_ops.items():
+            by[tl.limit][op].append(d.get("db_docs", 0))
+    if not any_data:
+        return go.Figure()
+
+    limits = sorted(by.keys())
+    x = [str(l) for l in limits]
+    # any op present in the data but not in our known list gets appended
+    ops = DB_OPS + sorted(
+        {op for lim in by.values() for op in lim} - set(DB_OPS)
+    )
+    fig = go.Figure()
+    for op in ops:
+        y = [
+            int(np.median(by[l][op])) if by[l].get(op) else 0
+            for l in limits
+        ]
+        if max(y) == 0:
+            continue
+        fig.add_bar(
+            x=x, y=y, name=op,
+            marker_color=DB_OP_COLOR.get(op, "#333333"),
+            hovertemplate=f"{op}: %{{y}} docs<extra></extra>",
+        )
+    fig.update_layout(
+        barmode="stack",
+        title="DB read volume by operation (docs/rows from L3, median over trials)",
+        xaxis_title="prefetch_limit",
+        yaxis_title="Docs/rows read from DB",
         template="plotly_white",
         margin=dict(l=60, r=20, t=60, b=60),
     )

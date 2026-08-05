@@ -212,6 +212,7 @@ with tab_analyze:
         # log-based charts come back empty for them.
         chart_specs = [
             ("chart_e2e_stack", charts.e2e_stack, (df,)),
+            ("chart_db_access_by_op", charts.db_access_by_op, (logs,)),
             ("chart_coverage", charts.coverage, (df, logs)),
             ("chart_hit_counts_request_done", charts.hit_counts_request_done, (logs,)),
             ("chart_hit_counts_pw_phase", charts.hit_counts_pw_phase, (logs,)),
