@@ -60,6 +60,17 @@ class TrialLog:
         CSV to have been picked up."""
         return self.distinct_ids_by_tier.get("L1", 0) + self.distinct_ids_by_tier.get("L2", 0)
 
+    @property
+    def request_done_counts(self) -> dict[str, int]:
+        """Tier counts at request end from [HIT-STATS-SERIES]."""
+        for label, snap in reversed(self.hit_stats_series):
+            if label == "request_done":
+                return snap
+        for label, snap in reversed(self.hit_stats_series):
+            if label == "walker_done":
+                return snap
+        return {}
+
 
 def _parse_json_msg(line: str) -> str:
     try:
@@ -208,3 +219,62 @@ def load_csv(csv_path: Path) -> pd.DataFrame:
             continue
         df[col] = pd.to_numeric(df[col], errors="coerce")
     return df
+
+
+def apply_log_tier_counts(df: pd.DataFrame, logs: list[TrialLog]) -> pd.DataFrame:
+    """Prefer request_done tier counts from logs over CSV tier columns.
+
+    Some older app harnesses wrote placeholder zeros to l1_hit_rate/l1/l2/l3
+    even though the Jac server log contains the real [HIT-STATS-SERIES]
+    counters.  The Analyze tab should display observed runtime counters, so
+    merge those log-derived values into the dataframe when available.
+    """
+    if df.empty or not logs:
+        return df
+
+    rows: list[dict[str, float | int]] = []
+    for tl in logs:
+        counts = tl.request_done_counts
+        if not counts:
+            continue
+        l1 = int(counts.get("L1", 0))
+        l2 = int(counts.get("L2", 0))
+        l3 = int(counts.get("L3", 0))
+        miss = int(counts.get("MISS", 0))
+        total = l1 + l2 + l3 + miss
+        rows.append({
+            "prefetch_limit": tl.limit,
+            "trial": tl.trial,
+            "l1_hit_rate_log": (l1 * 100.0 / total) if total else 0.0,
+            "l1_log": l1,
+            "l2_log": l2,
+            "l3_log": l3,
+            "miss_log": miss,
+        })
+    if not rows:
+        return df
+
+    out = df.copy()
+    for col in ("prefetch_limit", "trial"):
+        if col in out.columns:
+            out[col] = pd.to_numeric(out[col], errors="coerce").astype("Int64")
+
+    log_df = pd.DataFrame(rows)
+    merged = out.merge(log_df, on=["prefetch_limit", "trial"], how="left")
+    for base, log_col in [
+        ("l1_hit_rate", "l1_hit_rate_log"),
+        ("l1", "l1_log"),
+        ("l2", "l2_log"),
+        ("l3", "l3_log"),
+        ("miss", "miss_log"),
+    ]:
+        if base in merged.columns and log_col in merged.columns:
+            merged[base] = merged[log_col].combine_first(merged[base])
+    return merged.drop(
+        columns=[
+            c for c in [
+                "l1_hit_rate_log", "l1_log", "l2_log", "l3_log", "miss_log",
+            ]
+            if c in merged.columns
+        ]
+    )

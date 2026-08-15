@@ -1,0 +1,53 @@
+name: jdrive
+description: |
+  Drive-like folder tree benchmark.  The sweep runs VisibleFolderTree against
+  a seeded JDrive tree with a visible branch and an equally-shaped hidden
+  branch.  A Python seeder talks to a running Jac server and uses normal
+  walker requests to create the folders and call TrashFolder on the hidden
+  branch, so the TTG plan sees the same static Contains->Folder shape while
+  the actual walker prunes part of the tree at runtime.
+
+app_dir: ../../../jdrive
+
+scripts:
+  sweep: sweep_prefetch_limit.sh
+
+outputs:
+  results_csv: sweep_prefetch_limit.csv
+  logs_dir: logs
+  profiles_dir: profiles
+
+parameters:
+  - name: SWEEP_PREFETCH_LIMITS
+    label: Prefetch limits
+    kind: int_list
+    default: [0, 100, 250, 500, 750, 1000, 1500]
+    help: >
+      Space-separated integer list.  0 disables TTG prefetching; positive
+      values cap the per-request TTG prefetch plan.
+
+  - name: JAC_TRIALS
+    label: Trials
+    kind: int
+    default: 30
+    help: Number of repeated VisibleFolderTree requests per prefetch limit.
+
+  - name: SWEEP_RESEED
+    label: Reseed
+    kind: enum
+    default: "0"
+    choices: ["0", "1"]
+    help: >
+      Set to 1 to rebuild jac_db.dump and sweep_seed.json before sweeping.
+
+  - name: SWEEP_SEED_VISIBLE_DEPTH
+    label: Visible depth
+    kind: int
+    default: 5
+    help: Folder depth of the visible benchmark branch, including its branch root.
+
+  - name: SWEEP_SEED_HIDDEN_DEPTH
+    label: Hidden depth
+    kind: int
+    default: 5
+    help: Folder depth of the hidden trashed branch, including its branch root.

@@ -199,6 +199,7 @@ with tab_analyze:
 
     df = parsers.load_csv(m.app_dir / m.results_csv)
     logs = parsers.parse_logs_dir(m.app_dir / m.logs_dir)
+    df = parsers.apply_log_tier_counts(df, logs)
 
     if df.empty and not logs:
         st.warning(
@@ -235,10 +236,10 @@ with tab_analyze:
 
 
 # ---------------------------------------------------------------------------
-# TAB 3 — Raw data
+# TAB 3 — Sweep data
 # ---------------------------------------------------------------------------
 with tab_raw:
-    st.header("Raw sweep CSV")
+    st.header("Sweep data")
     app_name = st.selectbox(
         "App",
         [m.name for m in manifests],
@@ -246,16 +247,21 @@ with tab_raw:
     )
     m = manifest_by_name[app_name]
     csv_path = m.app_dir / m.results_csv
-    st.caption(f"path: `{csv_path}`")
+    st.caption(
+        f"path: `{csv_path}`"
+        "  ·  tier columns prefer request_done counters from logs when available"
+    )
 
     df = parsers.load_csv(csv_path)
+    logs = parsers.parse_logs_dir(m.app_dir / m.logs_dir)
+    df = parsers.apply_log_tier_counts(df, logs)
     if df.empty:
         st.warning(f"No CSV found at `{csv_path}`.")
     else:
         st.dataframe(charts.csv_raw(df), use_container_width=True)
         st.download_button(
             "Download CSV",
-            data=csv_path.read_bytes(),
+            data=df.to_csv(index=False).encode("utf-8"),
             file_name=csv_path.name,
             mime="text/csv",
         )

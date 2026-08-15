@@ -67,11 +67,11 @@ def e2e_stack(df: pd.DataFrame) -> go.Figure:
     # L1 hit rate overlay on secondary y-axis when present.
     if hit_rate is not None:
         fig.add_scatter(
-            x=limits, y=hit_rate, name="Projection hit rate",
+            x=limits, y=hit_rate, name="L1 hit rate",
             mode="lines+markers", yaxis="y2",
             line=dict(color="crimson", width=2),
             marker=dict(color="crimson", size=7),
-            hovertemplate="proj hit: %{y:.1f}%<extra></extra>",
+            hovertemplate="L1 hit: %{y:.1f}%<extra></extra>",
         )
     layout_kwargs = dict(
         barmode="stack",
@@ -84,7 +84,7 @@ def e2e_stack(df: pd.DataFrame) -> go.Figure:
     )
     if hit_rate is not None:
         layout_kwargs["yaxis2"] = dict(
-            title=dict(text="Projection hit rate (%)", font=dict(color="crimson")),
+            title=dict(text="L1 hit rate (%)", font=dict(color="crimson")),
             tickfont=dict(color="crimson"),
             overlaying="y", side="right", range=[0, 105],
             showgrid=False,
