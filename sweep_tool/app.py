@@ -108,7 +108,10 @@ with tab_run:
     )
     m = manifest_by_name[app_name]
     st.caption(m.description)
-    st.write(f"**app_dir**: `{m.app_dir}`  ·  **script**: `{m.sweep_script}`")
+    st.write(
+        f"**app_dir**: `{m.app_dir}`  ·  **runner**: `{m.runner}`"
+        f"  ·  **script**: `{m.sweep_script}`"
+    )
 
     # Status + kill controls.  Detected via the PID file the runner
     # writes; robust across Streamlit restarts.

@@ -29,6 +29,7 @@ class Manifest:
     name: str
     description: str
     app_dir: Path                    # absolute
+    runner: str                      # "shell" | "prefetch_python"
     sweep_script: str                # relative to app_dir
     results_csv: str                 # relative to app_dir
     logs_dir: str                    # relative to app_dir
@@ -72,6 +73,7 @@ def load(path: Path) -> Manifest:
         name=data["name"],
         description=data.get("description", ""),
         app_dir=app_dir,
+        runner=data.get("runner", "shell"),
         sweep_script=scripts.get("sweep", "sweep.sh"),
         results_csv=outputs.get("results_csv", "results.csv"),
         logs_dir=outputs.get("logs_dir", "logs"),

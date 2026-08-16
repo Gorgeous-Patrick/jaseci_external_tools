@@ -24,7 +24,9 @@ import pandas as pd
 _HIT_STATS_MARKER = "[HIT-STATS-SERIES] "
 _WORKER_TIMES_MARKER = "[PREFETCH-WORKER-TIMES] "
 _TTG_COVERAGE_MARKER = "[TTG-COVERAGE] "
-_FILE_RE = re.compile(r"limit(\d+)_trial(\d+)\.log$")
+_FILE_RE = re.compile(
+    r"(?:policy(?P<policy>[A-Za-z0-9_-]+)_)?limit(?P<limit>\d+)_trial(?P<trial>\d+)\.log$"
+)
 _COVERAGE_RE = re.compile(
     r"prefetched_by_type=(\{[^}]*\})\s+index_by_type=(\{[^}]*\})\s+max_length=(\d+)"
 )
@@ -37,6 +39,7 @@ class TrialLog:
     limit: int
     trial: int
     source: Path
+    policy: str = ""
     hit_stats_series: list[tuple[str, dict[str, int]]] = field(default_factory=list)
     worker_times_ms: list[float] = field(default_factory=list)
     ttg_coverage_raw: str = ""
@@ -94,7 +97,12 @@ def parse_trial_log(path: Path) -> TrialLog | None:
     m = _FILE_RE.search(str(path))
     if not m:
         return None
-    tl = TrialLog(limit=int(m.group(1)), trial=int(m.group(2)), source=path)
+    tl = TrialLog(
+        limit=int(m.group("limit")),
+        trial=int(m.group("trial")),
+        policy=m.group("policy") or "",
+        source=path,
+    )
     # A concurrent sweep may `rm -rf logs` between glob() and read_text();
     # treat the file as gone and skip.
     try:
@@ -128,7 +136,15 @@ def parse_trial_log(path: Path) -> TrialLog | None:
     return tl
 
 
-def _load_access_log_distinct(logs_dir: Path, limit: int, trial: int) -> dict[str, int]:
+def _access_log_globs(logs_dir: Path, limit: int, trial: int, policy: str = "") -> list[Path]:
+    if policy:
+        return list(logs_dir.glob(f"access_log*policy{policy}_limit{limit}_trial{trial}.csv"))
+    return list(logs_dir.glob(f"access_log*limit{limit}_trial{trial}.csv"))
+
+
+def _load_access_log_distinct(
+    logs_dir: Path, limit: int, trial: int, policy: str = ""
+) -> dict[str, int]:
     """Distinct anchor ID count per tier from the sibling access_log CSV.
 
     Filename patterns:
@@ -137,7 +153,7 @@ def _load_access_log_distinct(logs_dir: Path, limit: int, trial: int) -> dict[st
     Glob catches both.  Returns {} if no file matches.
     """
     seen: dict[str, set[str]] = {}
-    for path in logs_dir.glob(f"access_log*limit{limit}_trial{trial}.csv"):
+    for path in _access_log_globs(logs_dir, limit, trial, policy):
         # Same race as parse_trial_log: a concurrent sweep may unlink the
         # file between glob() and open().  Skip missing files.
         try:
@@ -161,7 +177,7 @@ _DB_OPS = [
 
 
 def _load_access_log_db_ops(
-    logs_dir: Path, limit: int, trial: int
+    logs_dir: Path, limit: int, trial: int, policy: str = ""
 ) -> dict[str, dict[str, int]]:
     """Per-op DB traffic from the sibling access_log (new schema:
     op,tier,n_in,n_out,type).
@@ -172,7 +188,7 @@ def _load_access_log_db_ops(
     Empty if the log is the old id,tier,type schema or missing.
     """
     agg: dict[str, dict[str, int]] = {}
-    for path in logs_dir.glob(f"access_log*limit{limit}_trial{trial}.csv"):
+    for path in _access_log_globs(logs_dir, limit, trial, policy):
         try:
             fh = open(path)
         except FileNotFoundError:
@@ -204,8 +220,10 @@ def parse_logs_dir(logs_dir: Path) -> list[TrialLog]:
         tl = parse_trial_log(p)
         if tl is None:
             continue
-        tl.distinct_ids_by_tier = _load_access_log_distinct(logs_dir, tl.limit, tl.trial)
-        tl.db_ops = _load_access_log_db_ops(logs_dir, tl.limit, tl.trial)
+        tl.distinct_ids_by_tier = _load_access_log_distinct(
+            logs_dir, tl.limit, tl.trial, tl.policy
+        )
+        tl.db_ops = _load_access_log_db_ops(logs_dir, tl.limit, tl.trial, tl.policy)
         out.append(tl)
     return out
 
@@ -215,7 +233,7 @@ def load_csv(csv_path: Path) -> pd.DataFrame:
         return pd.DataFrame()
     df = pd.read_csv(csv_path)
     for col in df.columns:
-        if col in {"walker"}:
+        if col in {"walker", "policy", "oracle_file"}:
             continue
         df[col] = pd.to_numeric(df[col], errors="coerce")
     return df
@@ -243,6 +261,7 @@ def apply_log_tier_counts(df: pd.DataFrame, logs: list[TrialLog]) -> pd.DataFram
         miss = int(counts.get("MISS", 0))
         total = l1 + l2 + l3 + miss
         rows.append({
+            "policy": tl.policy,
             "prefetch_limit": tl.limit,
             "trial": tl.trial,
             "l1_hit_rate_log": (l1 * 100.0 / total) if total else 0.0,
@@ -260,7 +279,12 @@ def apply_log_tier_counts(df: pd.DataFrame, logs: list[TrialLog]) -> pd.DataFram
             out[col] = pd.to_numeric(out[col], errors="coerce").astype("Int64")
 
     log_df = pd.DataFrame(rows)
-    merged = out.merge(log_df, on=["prefetch_limit", "trial"], how="left")
+    merge_cols = ["prefetch_limit", "trial"]
+    if "policy" in out.columns and "policy" in log_df.columns:
+        merge_cols.insert(0, "policy")
+    else:
+        log_df = log_df.drop(columns=["policy"], errors="ignore")
+    merged = out.merge(log_df, on=merge_cols, how="left")
     for base, log_col in [
         ("l1_hit_rate", "l1_hit_rate_log"),
         ("l1", "l1_log"),

@@ -15,19 +15,48 @@ TIERS = ["L1", "L2", "L3", "MISS"]
 TIER_COLOR = {"L1": "#2ca02c", "L2": "#e6b800", "L3": "#ff7f0e", "MISS": "#d62728"}
 
 
+def _df_group_cols(df: pd.DataFrame) -> list[str]:
+    if "policy" in df.columns:
+        return ["policy", "prefetch_limit"]
+    return ["prefetch_limit"]
+
+
+def _df_labels(df: pd.DataFrame) -> list[str]:
+    if "policy" in df.columns:
+        return [
+            f"{row.policy}:{int(row.prefetch_limit)}"
+            for row in df[["policy", "prefetch_limit"]].itertuples(index=False)
+        ]
+    return df["prefetch_limit"].astype(int).astype(str).tolist()
+
+
+def _log_key(tl: TrialLog) -> tuple[str, int]:
+    return (tl.policy or "", tl.limit)
+
+
+def _log_label(key: tuple[str, int]) -> str:
+    policy, limit = key
+    return f"{policy}:{limit}" if policy else str(limit)
+
+
+def _sort_log_keys(keys) -> list[tuple[str, int]]:
+    return sorted(keys, key=lambda k: (k[0], k[1]))
+
+
 def e2e_stack(df: pd.DataFrame) -> go.Figure:
     """Grouped stacked-vs-side-by-side bar: for each prefetch_limit,
     left bar is e2e stack (walker + ttg + topo + misc), right bar is the
     honest prefetcher wall time."""
     if df.empty:
         return go.Figure()
+    group_cols = _df_group_cols(df)
     med = (
-        df.groupby("prefetch_limit")
+        df.groupby(group_cols)
         .median(numeric_only=True)
         .reset_index()
-        .sort_values("prefetch_limit")
+        .sort_values(group_cols)
     )
-    limits = med["prefetch_limit"].astype(int).astype(str).tolist()
+    limits = _df_labels(med)
     walker = med.get("walker_ms", pd.Series(dtype=float)).fillna(0)
     ttg = med.get("ttg_ms", pd.Series(dtype=float)).fillna(0)
     topo = med.get("topo_idx_ms", pd.Series(dtype=float)).fillna(0)
@@ -97,16 +126,16 @@ def hit_counts_request_done(logs: list[TrialLog]) -> go.Figure:
     """Cumulative tier hits at request_done, stacked, grouped by limit."""
     if not logs:
         return go.Figure()
-    by_limit_tier: dict[int, dict[str, list[int]]] = defaultdict(lambda: {t: [] for t in TIERS})
+    by_limit_tier: dict[tuple[str, int], dict[str, list[int]]] = defaultdict(lambda: {t: [] for t in TIERS})
     for tl in logs:
         for label, snap in tl.hit_stats_series:
             if label == "request_done":
                 for t in TIERS:
-                    by_limit_tier[tl.limit][t].append(snap.get(t, 0))
+                    by_limit_tier[_log_key(tl)][t].append(snap.get(t, 0))
     if not by_limit_tier:
         return go.Figure()
-    limits = sorted(by_limit_tier.keys())
-    x = [str(l) for l in limits]
+    limits = _sort_log_keys(by_limit_tier.keys())
+    x = [_log_label(l) for l in limits]
 
     fig = go.Figure()
     for tier in TIERS:
@@ -149,13 +178,13 @@ def hit_counts_pw_phase(logs: list[TrialLog]) -> go.Figure:
                 n += 1
         return n
 
-    limits = sorted({tl.limit for tl in logs})
+    limits = _sort_log_keys({_log_key(tl) for tl in logs})
     max_pw = max((_pw_index(tl.hit_stats_series) for tl in logs), default=0)
     if max_pw == 0:
         return go.Figure()
 
     # (limit, pw_idx) -> tier -> list of counts
-    cell: dict[tuple[int, int], dict[str, list[int]]] = defaultdict(
+    cell: dict[tuple[tuple[str, int], int], dict[str, list[int]]] = defaultdict(
         lambda: {t: [] for t in TIERS}
     )
     for tl in logs:
@@ -164,10 +193,10 @@ def hit_counts_pw_phase(logs: list[TrialLog]) -> go.Figure:
             if _folded(lab) != "pw":
                 continue
             for t in TIERS:
-                cell[(tl.limit, idx)][t].append(snap.get(t, 0))
+                cell[(_log_key(tl), idx)][t].append(snap.get(t, 0))
             idx += 1
 
-    x_limits = [str(l) for l in limits]
+    x_limits = [_log_label(l) for l in limits]
     fig = go.Figure()
     added_tier_legend: set[str] = set()
     for pw in range(max_pw):
@@ -210,17 +239,17 @@ def worker_times(logs: list[TrialLog]) -> go.Figure:
     rows = []
     for tl in logs:
         for i, ms in enumerate(tl.worker_times_ms):
-            rows.append({"limit": tl.limit, "worker_idx": i, "ms": ms})
+            rows.append({"case": _log_label(_log_key(tl)), "worker_idx": i, "ms": ms})
     if not rows:
         return go.Figure()
     df = pd.DataFrame(rows)
     fig = go.Figure()
-    for lim in sorted(df["limit"].unique()):
-        s = df[df["limit"] == lim]
+    for case in sorted(df["case"].unique()):
+        s = df[df["case"] == case]
         fig.add_box(
-            y=s["ms"], name=str(int(lim)),
+            y=s["ms"], name=str(case),
             boxmean=True,
-            hovertemplate="%{y:.1f} ms<extra>limit=" + str(int(lim)) + "</extra>",
+            hovertemplate="%{y:.1f} ms<extra>" + str(case) + "</extra>",
         )
     fig.update_layout(
         title="Per-worker prefetch wall time (max of the box ≈ prefetch_ms CSV column)",
@@ -255,18 +284,20 @@ def coverage(df: pd.DataFrame, logs: list[TrialLog]) -> go.Figure:
     # Undercoverage from the CSV.
     if "l3" not in df.columns or "miss" not in df.columns:
         return go.Figure()
+    group_cols = _df_group_cols(df)
     under = (
         df.assign(under=lambda d: d["l3"].fillna(0) + d["miss"].fillna(0))
-        .groupby("prefetch_limit")["under"]
+        .groupby(group_cols)["under"]
         .median()
         .reset_index()
-        .sort_values("prefetch_limit")
+        .sort_values(group_cols)
     )
 
     # Overfetch from the per-trial coverage log + access_log.
     over_rows = [
         {
             "prefetch_limit": tl.limit,
+            "policy": tl.policy,
             "overfetch": max(tl.plan_size - tl.distinct_covered, 0),
         }
         for tl in logs
@@ -275,15 +306,15 @@ def coverage(df: pd.DataFrame, logs: list[TrialLog]) -> go.Figure:
     if over_rows:
         over = (
             pd.DataFrame(over_rows)
-            .groupby("prefetch_limit")["overfetch"]
+            .groupby(["policy", "prefetch_limit"] if "policy" in df.columns else ["prefetch_limit"])["overfetch"]
             .median()
             .reset_index()
-            .sort_values("prefetch_limit")
+            .sort_values(["policy", "prefetch_limit"] if "policy" in df.columns else ["prefetch_limit"])
         )
     else:
         over = None
 
-    limits = under["prefetch_limit"].astype(int).astype(str).tolist()
+    limits = _df_labels(under)
     fig = go.Figure()
     fig.add_bar(
         x=limits, y=under["under"], name="Undercoverage (L3 + MISS)",
@@ -291,7 +322,7 @@ def coverage(df: pd.DataFrame, logs: list[TrialLog]) -> go.Figure:
         hovertemplate="undercoverage: %{y:.0f}<extra></extra>",
     )
     if over is not None and not over.empty:
-        over_limits = over["prefetch_limit"].astype(int).astype(str).tolist()
+        over_limits = _df_labels(over)
         fig.add_bar(
             x=over_limits, y=over["overfetch"], name="Overfetch (plan - distinct L1/L2 IDs)",
             marker_color="#ff7f0e",
@@ -336,20 +367,20 @@ def db_access_by_op(logs: list[TrialLog]) -> go.Figure:
     """
     if not logs:
         return go.Figure()
-    # limit -> op -> list of per-trial db_docs
-    by: dict[int, dict[str, list[int]]] = defaultdict(lambda: defaultdict(list))
+    # (policy, limit) -> op -> list of per-trial db_docs
+    by: dict[tuple[str, int], dict[str, list[int]]] = defaultdict(lambda: defaultdict(list))
     any_data = False
     for tl in logs:
         if not tl.db_ops:
             continue
         any_data = True
         for op, d in tl.db_ops.items():
-            by[tl.limit][op].append(d.get("db_docs", 0))
+            by[_log_key(tl)][op].append(d.get("db_docs", 0))
     if not any_data:
         return go.Figure()
 
-    limits = sorted(by.keys())
-    x = [str(l) for l in limits]
+    limits = _sort_log_keys(by.keys())
+    x = [_log_label(l) for l in limits]
     # any op present in the data but not in our known list gets appended
     ops = DB_OPS + sorted(
         {op for lim in by.values() for op in lim} - set(DB_OPS)
@@ -381,4 +412,5 @@ def db_access_by_op(logs: list[TrialLog]) -> go.Figure:
 def csv_raw(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
         return df
-    return df.sort_values(["prefetch_limit", "trial"])
+    cols = ["policy", "prefetch_limit", "trial"] if "policy" in df.columns else ["prefetch_limit", "trial"]
+    return df.sort_values(cols)

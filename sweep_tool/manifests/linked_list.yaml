@@ -5,6 +5,7 @@ description: |
   prefetch behaviour without the noise of a real social graph.
 
 app_dir: ../../linked_list
+runner: prefetch_python
 
 scripts:
   sweep: sweep_prefetch_limit.sh
@@ -15,6 +16,41 @@ outputs:
   profiles_dir: profiles
 
 parameters:
+  - name: SWEEP_POLICIES
+    label: Prefetch policies
+    kind: str
+    default: "oracle none ttg"
+    help: >
+      Space-separated policies to run. Supported: none, ttg, oracle,
+      history, manual. Oracle defaults to auto-record then replay.
+
+  - name: SWEEP_ORACLE_MODE
+    label: Oracle mode
+    kind: enum
+    default: "auto"
+    choices: ["auto", "file"]
+    help: >
+      auto records a no-prefetch access set before each measured oracle
+      trial; file replays existing UUID files.
+
+  - name: SWEEP_ORACLE_DIR
+    label: Oracle dir
+    kind: str
+    default: "oracle_plans"
+    help: Directory for generated/read oracle UUID files.
+
+  - name: TEST_USER
+    label: Benchmark user
+    kind: str
+    default: "user"
+    help: Matches quick_run.sh's live setup account.
+
+  - name: TEST_PASSWORD
+    label: Benchmark password
+    kind: str
+    default: "password"
+    help: Matches quick_run.sh's live setup password.
+
   - name: SWEEP_PREFETCH_LIMITS
     label: Prefetch limits
     kind: int_list
@@ -26,3 +62,9 @@ parameters:
     kind: int
     default: 1000
     help: Number of nodes in the linked list under test.
+
+  - name: JAC_TRIALS
+    label: Trials
+    kind: int
+    default: 30
+    help: Number of repeated Traverse requests per case.

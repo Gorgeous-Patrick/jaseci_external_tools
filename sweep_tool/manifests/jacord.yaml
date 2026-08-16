@@ -11,6 +11,7 @@ description: |
   prefetch sweep saturates around limit 8000.
 
 app_dir: ../../../jacord
+runner: prefetch_python
 
 scripts:
   sweep: sweep_prefetch_limit.sh
@@ -21,6 +22,50 @@ outputs:
   profiles_dir: profiles
 
 parameters:
+  - name: SWEEP_POLICIES
+    label: Prefetch policies
+    kind: str
+    default: "oracle none ttg"
+    help: >
+      Space-separated policies to run. Supported: none, ttg, oracle,
+      history, manual. Oracle defaults to auto-record then replay.
+
+  - name: SWEEP_ORACLE_MODE
+    label: Oracle mode
+    kind: enum
+    default: "auto"
+    choices: ["auto", "file"]
+    help: >
+      auto records a no-prefetch access set before each measured oracle
+      trial; file replays existing UUID files.
+
+  - name: SWEEP_ORACLE_DIR
+    label: Oracle dir
+    kind: str
+    default: "oracle_plans"
+    help: Directory for generated/read oracle UUID files.
+
+  - name: TEST_USER
+    label: Benchmark user
+    kind: str
+    default: "user_0000"
+    help: Matches bootstrap.py's primary benchmark user.
+
+  - name: TEST_PASSWORD
+    label: Benchmark password
+    kind: str
+    default: "password"
+    help: Matches bootstrap.py's seeded password.
+
+  - name: JACORD_DUMP
+    label: Jacord dump
+    kind: str
+    default: "dumps/big.dump"
+    help: >
+      Mongo dump restored for each Jacord case. The default includes both
+      auth users and graph anchors; jac_db.dump may point at graph-only
+      dumps that cannot satisfy user_0000/password login.
+
   - name: SWEEP_PREFETCH_LIMITS
     label: Prefetch limits
     kind: int_list
@@ -31,3 +76,9 @@ parameters:
       then saturate flat (there is a hard ~2500 L3 floor of edge anchors
       the node-only prefetch never covers).  Limits above ~8000 only add
       dispatch overhead.
+
+  - name: JAC_TRIALS
+    label: Trials
+    kind: int
+    default: 30
+    help: Number of repeated load_channel requests per case.

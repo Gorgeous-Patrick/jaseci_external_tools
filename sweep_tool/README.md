@@ -11,6 +11,7 @@ sweep_tool/
 ├── lib/
 │   ├── manifest.py        # loader
 │   ├── sweep_runner.py    # subprocess + archiving
+│   ├── prefetch_exp/      # Python prefetch policy sweep backend
 │   ├── parsers.py         # CSV + jac server log parsers
 │   └── charts.py          # Plotly chart builders
 ├── results/<app>/<ts>/    # sweep outputs archived per run
@@ -37,6 +38,8 @@ streamlit run app.py
 2. Drop a YAML into `manifests/` with:
    - `name`, `description`
    - `app_dir` (relative to the manifest file)
+   - optional `runner: prefetch_python` for the Python TTG/policy runner;
+     omit it to keep launching `scripts.sweep` as a shell script
    - `scripts.sweep` (relative to `app_dir`)
    - `outputs.results_csv`, `outputs.logs_dir`, `outputs.profiles_dir`
    - `parameters` — list of form fields.  `kind` is one of
@@ -52,6 +55,30 @@ streamlit run app.py
   (e2e stack, hit-count breakdown, prefetch-phase snapshots, worker
   time distribution).
 - **Raw data**: the results CSV as a table, downloadable.
+
+## Python prefetch policy runner
+
+The manifests for JSearch, Jacord, LittleX5, and LinkedList use
+`runner: prefetch_python`.  The Streamlit launcher runs:
+
+```bash
+python -m lib.prefetch_exp.cli --manifest manifests/<app>.yaml
+```
+
+The backend accepts the same manifest parameters as environment variables.
+Useful knobs:
+
+- `SWEEP_POLICIES="oracle none ttg"` — space-separated policy list.
+- `SWEEP_PREFETCH_LIMITS="500 1000 2000"` — positive limits for predictive
+  policies; `none` runs once at limit 0.
+- `SWEEP_ORACLE_MODE=auto` — run a non-counted `prefetching="none"` request,
+  extract first-touch UUIDs from its access log, then replay with
+  `prefetching="oracle"`.
+- `SWEEP_ORACLE_MODE=file` — read existing UUID files from
+  `SWEEP_ORACLE_DIR` or `SWEEP_ORACLE_FILE`.
+
+The result CSV keeps the old timing/tier columns and adds `policy` and
+`oracle_file`.
 
 ## Notes
 

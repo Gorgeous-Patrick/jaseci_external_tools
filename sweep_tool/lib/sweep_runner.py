@@ -12,6 +12,7 @@ import os
 import shlex
 import signal
 import subprocess
+import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -21,12 +22,22 @@ from .manifest import Manifest
 
 _RUN_ALL_ROOT = Path(__file__).resolve().parent.parent  # sweep_tool/
 
-# Default jac binary every sweep runs against. Points at the locally-built
-# zig `jac`; override in the UI (or by exporting JAC_BIN before launching the
-# app). The sweep scripts read ${JAC_BIN:-jac}, so this flows straight through.
-DEFAULT_JAC_BIN = os.environ.get("JAC_BIN") or str(
-    Path.home() / "Space" / "jaseci" / "jac" / "zig-out" / "bin" / "jac"
-)
+
+def default_jac_bin() -> str:
+    """Prefer the editable jaseci_env runtime over older standalone builds."""
+    if os.environ.get("JAC_BIN"):
+        return os.environ["JAC_BIN"]
+    candidates = [
+        Path.home() / "Space" / "jaseci_env" / "jaseci" / ".venv" / "bin" / "jac",
+        Path.home() / "Space" / "jaseci" / "jac" / "zig-out" / "bin" / "jac",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return str(candidate)
+    return "jac"
+
+
+DEFAULT_JAC_BIN = default_jac_bin()
 
 
 @dataclass
@@ -151,9 +162,23 @@ def kickoff(
     # parent's handle can be closed safely — the child keeps writing.
     log_fh = open(log_path, "w", buffering=1)  # line-buffered
     try:
+        if manifest.runner == "prefetch_python":
+            cmd = [
+                sys.executable,
+                "-m",
+                "lib.prefetch_exp.cli",
+                "--manifest",
+                str(manifest.manifest_path),
+            ]
+            if jac_bin:
+                cmd.extend(["--jac-bin", jac_bin])
+            cwd = str(_RUN_ALL_ROOT)
+        else:
+            cmd = ["bash", manifest.sweep_script]
+            cwd = str(manifest.app_dir)
         proc = subprocess.Popen(
-            ["bash", manifest.sweep_script],
-            cwd=str(manifest.app_dir),
+            cmd,
+            cwd=cwd,
             env=env,
             stdout=log_fh,
             stderr=subprocess.STDOUT,
@@ -279,9 +304,19 @@ def kickoff_all(
         all_env_overrides[m.name] = env
         env_prefix = " ".join(f"{k}={shlex.quote(str(v))}" for k, v in env.items())
         app_dir_q = shlex.quote(str(m.app_dir))
+        manifest_q = shlex.quote(str(m.manifest_path))
+        jac_arg = f" --jac-bin {shlex.quote(jac_bin)}" if jac_bin else ""
+        if m.runner == "prefetch_python":
+            run_cmd = (
+                f"cd {shlex.quote(str(_RUN_ALL_ROOT))} && "
+                f"{env_prefix} {shlex.quote(sys.executable)} "
+                f"-m lib.prefetch_exp.cli --manifest {manifest_q}{jac_arg}"
+            )
+        else:
+            run_cmd = f"cd {app_dir_q} && {env_prefix} bash {shlex.quote(m.sweep_script)}"
         section = (
             f'echo; echo "=== {m.name} ==="; '
-            f'cd {app_dir_q} && {env_prefix} bash {shlex.quote(m.sweep_script)}; '
+            f'{run_cmd}; '
             f'echo "--- {m.name} teardown ---"; '
             f'cd {app_dir_q} && docker compose down -v > /dev/null 2>&1 || true'
         )
