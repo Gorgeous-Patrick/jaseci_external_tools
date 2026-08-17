@@ -68,7 +68,8 @@ python -m lib.prefetch_exp.cli --manifest manifests/<app>.yaml
 The backend accepts the same manifest parameters as environment variables.
 Useful knobs:
 
-- `SWEEP_POLICIES="oracle none ttg"` — space-separated policy list.
+- `SWEEP_POLICIES="oracle none ttg"` — space-separated policy list. Supported
+  values include `none`, `ttg`, `oracle`, `markov`, `history`, and `manual`.
 - `SWEEP_PREFETCH_LIMITS="500 1000 2000"` — positive limits for predictive
   policies; `none` runs once at limit 0.
 - `SWEEP_ORACLE_MODE=auto` — run a non-counted `prefetching="none"` request,
@@ -76,9 +77,14 @@ Useful knobs:
   `prefetching="oracle"`.
 - `SWEEP_ORACLE_MODE=file` — read existing UUID files from
   `SWEEP_ORACLE_DIR` or `SWEEP_ORACLE_FILE`.
+- `SWEEP_MARKOV_MODE=auto` — run a non-counted `prefetching="none"` request,
+  train a first-order UUID Markov model from its access log, then replay with
+  `prefetching="markov"`.
+- `SWEEP_MARKOV_MODE=file` — read existing model JSON files from
+  `SWEEP_MARKOV_DIR` or `SWEEP_MARKOV_FILE`.
 
 The result CSV keeps the old timing/tier columns and adds `policy` and
-`oracle_file`.
+`oracle_file` / `model_file`.
 
 ## Notes
 

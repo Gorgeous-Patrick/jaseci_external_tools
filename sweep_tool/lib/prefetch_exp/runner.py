@@ -5,13 +5,13 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
-from lib.prefetch_exp import metrics, oracle, process
+from lib.prefetch_exp import markov, metrics, oracle, process
 from lib.prefetch_exp.adapters import make_adapter
 from lib.prefetch_exp.config_edit import RunConfigEditor
 from lib.prefetch_exp.models import CaseState, RequestSpec, SweepOptions, TrialResult
 
 
-SUPPORTED_POLICIES = {"none", "ttg", "oracle", "history", "manual"}
+SUPPORTED_POLICIES = {"none", "ttg", "oracle", "markov", "history", "manual"}
 
 
 def run_sweep(options: SweepOptions) -> None:
@@ -27,6 +27,7 @@ def run_sweep(options: SweepOptions) -> None:
     print(f"limits  : {' '.join(str(x) for x in options.limits)}")
     print(f"trials  : {options.trials}")
     print(f"oracle  : mode={options.oracle_mode} dir={options.oracle_dir}")
+    print(f"markov  : mode={options.markov_mode} dir={options.markov_dir}")
     print("")
 
     adapter.clean_outputs()
@@ -49,7 +50,7 @@ def run_sweep(options: SweepOptions) -> None:
                 print("========================================")
                 print(f"Case: policy={policy} prefetch_limit={limit}")
                 print("========================================")
-                editor.patch(_config_values(policy, limit, access_log="", oracle_file=""))
+                editor.patch(_config_values("none", 0, access_log=""))
                 state = adapter.prepare_case(policy, limit)
                 if state.request is None:
                     raise RuntimeError(f"{adapter.name} did not prepare a request")
@@ -83,11 +84,15 @@ def _run_trial(
     options: SweepOptions,
 ) -> TrialResult:
     spec = _require_request(state)
+    oracle_file: Path | None = None
+    model_file: Path | None = None
     if policy == "oracle":
         oracle_file = _oracle_for_trial(adapter, editor, state, spec, limit, trial, options)
         effective_policy = "oracle"
+    elif policy == "markov":
+        model_file = _markov_for_trial(adapter, editor, state, spec, limit, trial, options)
+        effective_policy = "markov"
     else:
-        oracle_file = Path()
         effective_policy = policy
 
     log_path, access_log, profile_dir, profile_csv = _trial_paths(adapter, spec, effective_policy, limit, trial)
@@ -96,7 +101,8 @@ def _run_trial(
             effective_policy,
             limit,
             access_log=str(access_log),
-            oracle_file=str(oracle_file) if oracle_file else "",
+            oracle_file=str(oracle_file) if oracle_file is not None else "",
+            markov_file=str(model_file) if model_file is not None else "",
         )
     )
     adapter.flush_redis()
@@ -138,7 +144,8 @@ def _run_trial(
         l3=counts.get("l3", ""),
         miss=counts.get("miss", ""),
         mongo_q=mongo_q,
-        oracle_file=str(oracle_file) if oracle_file else "",
+        oracle_file=str(oracle_file) if oracle_file is not None else "",
+        model_file=str(model_file) if model_file is not None else "",
     )
 
 
@@ -178,6 +185,7 @@ def _oracle_for_trial(
             0,
             access_log=str(record_access_log),
             oracle_file="",
+            markov_file="",
         )
     )
     adapter.flush_redis()
@@ -195,6 +203,73 @@ def _oracle_for_trial(
     return output_path
 
 
+def _markov_for_trial(
+    adapter,
+    editor: RunConfigEditor,
+    state: CaseState,
+    spec: RequestSpec,
+    limit: int,
+    trial: int,
+    options: SweepOptions,
+) -> Path:
+    explicit = options.env.get("SWEEP_MARKOV_FILE") or options.env.get("JAC_PREFETCH_MARKOV_FILE")
+    if options.markov_mode == "file":
+        path = Path(explicit) if explicit else markov.markov_model_path(
+            options.markov_dir, adapter.name, spec.walker, spec.target_id, limit, trial
+        )
+        path = path if path.is_absolute() else adapter.app_dir / path
+        if not path.exists():
+            raise FileNotFoundError(f"markov model file does not exist: {path}")
+        return path
+    if options.markov_mode != "auto":
+        raise ValueError(f"unsupported SWEEP_MARKOV_MODE={options.markov_mode!r}")
+
+    output_path = Path(explicit) if explicit else markov.markov_model_path(
+        options.markov_dir, adapter.name, spec.walker, spec.target_id, limit, trial
+    )
+    output_path = output_path if output_path.is_absolute() else adapter.app_dir / output_path
+
+    logs_dir = adapter.app_dir / adapter.options.manifest.logs_dir
+    safe_walker = _safe(spec.walker)
+    record_log = logs_dir / f"markov_train_{safe_walker}_limit{limit}_trial{trial}.log"
+    record_access_log = logs_dir / f"markov_train_access_{safe_walker}_limit{limit}_trial{trial}.csv"
+    editor.patch(
+        _config_values(
+            "none",
+            0,
+            access_log=str(record_access_log),
+            oracle_file="",
+            markov_file="",
+        )
+    )
+    adapter.flush_redis()
+    proc = None
+    try:
+        proc = adapter.start_server(record_log)
+        resp = adapter.post(spec.path, spec.body, token=state.token)
+        adapter.validate_response(spec, resp.json())
+    finally:
+        process.stop_process(proc)
+        adapter.stop_stale_servers()
+    model = markov.write_markov_model_from_access_log(
+        record_access_log,
+        output_path,
+        app_name=adapter.name,
+        walker=spec.walker,
+        target_id=spec.target_id,
+        start_id=spec.target_id,
+        limit=limit,
+    )
+    print(
+        "    markov train: wrote "
+        f"{model.get('distinct_ids', 0)} distinct UUID(s), "
+        f"plan={len(model.get('plans', {}).get(model.get('start_id', ''), {}).get('plan', []))} "
+        f"to {output_path}"
+    )
+    adapter.flush_redis()
+    return output_path
+
+
 def _trial_paths(adapter, spec: RequestSpec, policy: str, limit: int, trial: int):
     logs_dir = adapter.app_dir / adapter.options.manifest.logs_dir
     profiles_dir = adapter.app_dir / adapter.options.manifest.profiles_dir
@@ -207,7 +282,13 @@ def _trial_paths(adapter, spec: RequestSpec, policy: str, limit: int, trial: int
     return log_path, access_log, profile_dir, profile_csv
 
 
-def _config_values(policy: str, limit: int, access_log: str, oracle_file: str) -> dict[str, object]:
+def _config_values(
+    policy: str,
+    limit: int,
+    access_log: str,
+    oracle_file: str = "",
+    markov_file: str = "",
+) -> dict[str, object]:
     effective = "none" if policy == "none" or limit <= 0 else policy
     return {
         "access_log": access_log,
@@ -215,6 +296,7 @@ def _config_values(policy: str, limit: int, access_log: str, oracle_file: str) -
         "prefetching": effective,
         "prefetch_limit": int(limit),
         "prefetch_oracle_file": oracle_file,
+        "prefetch_markov_file": markov_file,
     }
 
 

@@ -233,7 +233,7 @@ def load_csv(csv_path: Path) -> pd.DataFrame:
         return pd.DataFrame()
     df = pd.read_csv(csv_path)
     for col in df.columns:
-        if col in {"walker", "policy", "oracle_file"}:
+        if col in {"walker", "policy", "oracle_file", "model_file"}:
             continue
         df[col] = pd.to_numeric(df[col], errors="coerce")
     return df

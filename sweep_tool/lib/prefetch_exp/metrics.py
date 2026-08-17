@@ -24,6 +24,7 @@ RESULT_COLUMNS = [
     "miss",
     "mongo_q",
     "oracle_file",
+    "model_file",
 ]
 
 
@@ -78,4 +79,3 @@ def append_result(path: Path, row: dict[str, object]) -> None:
     with open(path, "a", newline="") as fh:
         writer = csv.DictWriter(fh, fieldnames=RESULT_COLUMNS, extrasaction="ignore")
         writer.writerow({key: row.get(key, "") for key in RESULT_COLUMNS})
-

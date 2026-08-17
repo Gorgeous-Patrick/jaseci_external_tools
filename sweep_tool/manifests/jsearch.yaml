@@ -25,7 +25,8 @@ parameters:
     default: "oracle none ttg"
     help: >
       Space-separated policies to run. Supported: none, ttg, oracle,
-      history, manual. Oracle defaults to auto-record then replay.
+      markov, history, manual. Oracle and Markov default to auto-record
+      then replay.
 
   - name: SWEEP_ORACLE_MODE
     label: Oracle mode
@@ -41,6 +42,21 @@ parameters:
     kind: str
     default: "oracle_plans"
     help: Directory for generated/read oracle UUID files.
+
+  - name: SWEEP_MARKOV_MODE
+    label: Markov mode
+    kind: enum
+    default: "auto"
+    choices: ["auto", "file"]
+    help: >
+      auto trains a first-order Markov model from a no-prefetch access log
+      before each measured trial; file replays existing model files.
+
+  - name: SWEEP_MARKOV_DIR
+    label: Markov dir
+    kind: str
+    default: "markov_models"
+    help: Directory for generated/read Markov model JSON files.
 
   - name: TEST_USER
     label: Benchmark user

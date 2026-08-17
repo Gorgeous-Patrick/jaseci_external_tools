@@ -42,6 +42,8 @@ class SweepOptions:
     trials: int
     oracle_mode: str
     oracle_dir: Path
+    markov_mode: str
+    markov_dir: Path
     count_mongo: bool
     env: dict[str, str]
 
@@ -59,6 +61,8 @@ class SweepOptions:
             trials=int(env.get("JAC_TRIALS") or env.get("SWEEP_TRIALS") or "30"),
             oracle_mode=(env.get("SWEEP_ORACLE_MODE") or "auto").strip().lower(),
             oracle_dir=Path(env.get("SWEEP_ORACLE_DIR") or (manifest.app_dir / "oracle_plans")),
+            markov_mode=(env.get("SWEEP_MARKOV_MODE") or "auto").strip().lower(),
+            markov_dir=Path(env.get("SWEEP_MARKOV_DIR") or (manifest.app_dir / "markov_models")),
             count_mongo=bool(env.get("JAC_COUNT_MONGO")),
             env=env,
         )
@@ -82,6 +86,7 @@ class TrialResult:
     miss: str = ""
     mongo_q: str = ""
     oracle_file: str = ""
+    model_file: str = ""
 
 
 def _split_words(raw: str) -> list[str]:
