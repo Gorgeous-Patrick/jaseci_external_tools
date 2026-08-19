@@ -5,10 +5,11 @@ description: |
   load_channel walker fetches every top-level message in a channel
   plus one hop of replies — the shape of a chat app's page-load query.
 
-  The benchmark dump (dumps/big.dump) is a single large channel:
-  ~7425 messages (2500 top-level + ~4925 flat replies), one user, all
-  authored locally.  Node working set per request is ~7426, so the
-  prefetch sweep saturates around limit 8000.
+  For pooled Markov, jac_db.dump should point at a multi-channel dump
+  seeded with bootstrap.py --users 200 --benchmark-channels 20
+  --messages 1000 or larger.  The current default dump has 20 similarly
+  sized load_channel entry points, each with at least 1000 top-level
+  messages, and a shared author pool.
 
 app_dir: ../../../jacord
 runner: prefetch_python
@@ -25,11 +26,11 @@ parameters:
   - name: SWEEP_POLICIES
     label: Prefetch policies
     kind: str
-    default: "oracle none ttg"
+    default: "oracle ttg markov1-pooled coaccess-pooled none"
     help: >
       Space-separated policies to run. Supported: none, ttg, oracle,
-      markov, history, manual. Oracle and Markov default to auto-record
-      then replay.
+      markov, markov1-pooled, coaccess, coaccess-pooled, history, manual.
+      Oracle, Markov, and co-access default to auto-record then replay.
 
   - name: SWEEP_ORACLE_MODE
     label: Oracle mode
@@ -61,6 +62,55 @@ parameters:
     default: "markov_models"
     help: Directory for generated/read Markov model JSON files.
 
+  - name: SWEEP_MARKOV_TRAIN_NS
+    label: Markov train Ns
+    kind: int_list
+    default: [10]
+    help: >
+      Training request counts swept by markov1-pooled. Each N produces
+      result rows labeled markov1-pooled-N<N>.
+
+  - name: SWEEP_MARKOV_POOL_SEED
+    label: Markov pool seed
+    kind: int
+    default: 42
+    help: Seed used to shuffle the adapter's seeded spawn pool before training selection.
+
+  - name: SWEEP_COACCESS_MODE
+    label: Co-access mode
+    kind: enum
+    default: "auto"
+    choices: ["auto", "file"]
+    help: >
+      auto trains a co-access clustering model from no-prefetch access logs;
+      file replays existing model files.
+
+  - name: SWEEP_COACCESS_DIR
+    label: Co-access dir
+    kind: str
+    default: "coaccess_models"
+    help: Directory for generated/read co-access model JSON files.
+
+  - name: SWEEP_COACCESS_TRAIN_NS
+    label: Co-access train Ns
+    kind: int_list
+    default: [10]
+    help: >
+      Training request counts swept by coaccess-pooled. Each N produces
+      result rows labeled coaccess-pooled-N<N>.
+
+  - name: SWEEP_COACCESS_POOL_SEED
+    label: Co-access pool seed
+    kind: int
+    default: 42
+    help: Seed used to shuffle the adapter's seeded spawn pool before training selection.
+
+  - name: SWEEP_COACCESS_CLUSTER_THRESHOLD
+    label: Co-access cluster threshold
+    kind: str
+    default: "0.05"
+    help: Greedy transaction-clustering Jaccard threshold.
+
   - name: TEST_USER
     label: Benchmark user
     kind: str
@@ -76,25 +126,57 @@ parameters:
   - name: JACORD_DUMP
     label: Jacord dump
     kind: str
-    default: "dumps/big.dump"
+    default: "jac_db.dump"
     help: >
-      Mongo dump restored for each Jacord case. The default includes both
-      auth users and graph anchors; jac_db.dump may point at graph-only
-      dumps that cannot satisfy user_0000/password login.
+      Mongo dump restored for each Jacord case. The default matches the
+      legacy Jacord shell scripts and follows the jac_db.dump symlink. The
+      Jacord adapter fails if this configured dump is missing. A stale
+      dumps/big.dump UI value is treated as jac_db.dump.
+
+  - name: JACORD_CHANNEL_ID
+    label: Jacord channel
+    kind: str
+    default: ""
+    help: >
+      Optional fixed channel UUID for load_channel. Leave blank to let the
+      adapter select a benchmark channel from the restored dump.
+
+  - name: JACORD_CHANNEL_PICK
+    label: Channel picker
+    kind: enum
+    default: "largest"
+    choices: ["largest", "first"]
+    help: >
+      How to select a channel when JACORD_CHANNEL_ID is blank. largest probes
+      candidate channels once and reuses the largest target for the whole
+      sweep; first preserves the old lexicographic selection behavior.
+
+  - name: JACORD_CHANNEL_SCAN_LIMIT
+    label: Channel scan
+    kind: int
+    default: 1000
+    help: Maximum number of ListChannelIds results to consider for automatic channel selection.
+
+  - name: JACORD_MIN_CHANNEL_MESSAGES
+    label: Min messages
+    kind: int
+    default: 1000
+    help: >
+      Fail the Jacord sweep if the selected load_channel target reports fewer
+      messages. Set to 0 to disable this guard.
 
   - name: SWEEP_PREFETCH_LIMITS
     label: Prefetch limits
     kind: int_list
-    default: [0, 500, 1000, 2000, 4000, 6000, 8000, 12000, 20000, 30000]
+    default: [500, 1000, 2000, 4000, 6000, 8000, 12000]
     help: >
-      Space-separated integer list.  Node working set for the big.dump
-      channel is ~7426 anchors, so e2e/walker/L3 improve up to ~8000 and
-      then saturate flat (there is a hard ~2500 L3 floor of edge anchors
-      the node-only prefetch never covers).  Limits above ~8000 only add
-      dispatch overhead.
+      Space-separated integer list.  Jacord load_channel requests can touch
+      several thousand anchors once replies/authors are included; this default
+      captures the low-cap region and includes saturated points for oracle and
+      TTG.
 
   - name: JAC_TRIALS
     label: Trials
     kind: int
-    default: 30
-    help: Number of repeated load_channel requests per case.
+    default: 10
+    help: Number of repeated measured load_channel requests per case.

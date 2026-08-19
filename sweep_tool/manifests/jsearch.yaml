@@ -25,8 +25,8 @@ parameters:
     default: "oracle none ttg"
     help: >
       Space-separated policies to run. Supported: none, ttg, oracle,
-      markov, history, manual. Oracle and Markov default to auto-record
-      then replay.
+      markov, markov1-pooled, history, manual. Oracle and Markov default
+      to auto-record then replay.
 
   - name: SWEEP_ORACLE_MODE
     label: Oracle mode
@@ -58,6 +58,20 @@ parameters:
     default: "markov_models"
     help: Directory for generated/read Markov model JSON files.
 
+  - name: SWEEP_MARKOV_TRAIN_NS
+    label: Markov train Ns
+    kind: int_list
+    default: [5]
+    help: >
+      Training request counts swept by markov1-pooled. Each N produces
+      result rows labeled markov1-pooled-N<N>.
+
+  - name: SWEEP_MARKOV_POOL_SEED
+    label: Markov pool seed
+    kind: int
+    default: 42
+    help: Seed used to shuffle the adapter's seeded spawn pool before training selection.
+
   - name: TEST_USER
     label: Benchmark user
     kind: str
@@ -82,7 +96,7 @@ parameters:
     label: Trials
     kind: int
     default: 30
-    help: Number of repeated SearchIndex requests per prefetch limit.
+    help: Number of repeated measured SearchIndex requests per prefetch limit.
 
   - name: SWEEP_RESEED
     label: Reseed

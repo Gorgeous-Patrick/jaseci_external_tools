@@ -5,13 +5,13 @@ from __future__ import annotations
 import json
 import os
 import shutil
-import subprocess
 import time
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any
 
 from lib.prefetch_exp import process
+from lib.prefetch_exp.db import make_db_manager
 from lib.prefetch_exp.models import CaseState, RequestSpec, SweepOptions
 
 
@@ -28,6 +28,17 @@ class BenchmarkAdapter(ABC):
 
     def __init__(self, options: SweepOptions):
         self.options = options
+        self.db_manager = make_db_manager(
+            app_name=self.name,
+            app_dir=self.app_dir,
+            default_mongo_uri=self.mongo_uri,
+            default_redis_url=self.redis_url,
+            mongo_container=self.mongo_container,
+            redis_container=self.redis_container,
+            env=self.options.env,
+        )
+        self.mongo_uri = self.db_manager.mongo_uri
+        self.redis_url = self.db_manager.redis_url
 
     @property
     def app_dir(self) -> Path:
@@ -71,6 +82,12 @@ class BenchmarkAdapter(ABC):
     @abstractmethod
     def prepare_request(self, policy: str, limit: int) -> CaseState:
         """Return token and target walker request for measured trials."""
+
+    def spawn_pool(self, state: CaseState) -> list[RequestSpec]:
+        """Return candidate requests for pooled predictor training/testing."""
+        if state.request is None:
+            return []
+        return [state.request]
 
     def validate_response(self, spec: RequestSpec, payload: dict[str, Any]) -> None:
         if not payload:
@@ -126,59 +143,41 @@ class BenchmarkAdapter(ABC):
     def auth_summary(self) -> str:
         return f"user={self.user_name()} source={self.credential_source}"
 
+    def db_summary(self) -> str:
+        return self.db_manager.summary()
+
     def compose_down(self) -> None:
-        process.run(["docker", "compose", "down", "--remove-orphans"], self.app_dir, check=False)
+        self.db_manager.compose_down()
 
     def compose_up(self) -> None:
-        result = process.run(
-            ["docker", "compose", "up", "-d"],
-            self.app_dir,
-            check=False,
-            stdout=subprocess.PIPE,
-        )
-        if result.returncode == 0:
-            return
-        output = result.stdout or ""
-        if "Conflict. The container name" in output:
-            print("docker compose name conflict; removing stale benchmark containers")
-            process.run(
-                ["docker", "rm", "-f", self.mongo_container, self.redis_container],
-                self.app_dir,
-                check=False,
-            )
-            process.run(["docker", "compose", "up", "-d"], self.app_dir)
-            return
-        print(output)
-        result.check_returncode()
+        self.db_manager.compose_up()
 
     def flush_redis(self) -> None:
-        process.run(
-            ["docker", "exec", self.redis_container, "redis-cli", "FLUSHALL"],
-            self.app_dir,
-            check=False,
-        )
+        self.db_manager.flush_redis()
 
     def restore_dump_if_present(self, dump_name: str = "jac_db.dump") -> None:
-        dump_path = self.app_dir / dump_name
-        if not dump_path.exists():
+        if not self.db_manager.dump_exists(dump_name):
             print(f"=== No {dump_name} found for {self.name}; using current MongoDB state ===")
             return
-        process.run(
-            ["docker", "cp", "-L", dump_name, f"{self.mongo_container}:/tmp/jac_db.dump"],
-            self.app_dir,
-        )
-        process.run(
-            [
-                "docker",
-                "exec",
-                self.mongo_container,
-                "mongorestore",
-                "--archive=/tmp/jac_db.dump",
-                "--drop",
-            ],
-            self.app_dir,
-            check=False,
-        )
+        self.db_manager.restore_dump(dump_name)
+
+    def dump_exists(self, dump_name: str = "jac_db.dump") -> bool:
+        return self.db_manager.dump_exists(dump_name)
+
+    def dump_description(self, dump_name: str = "jac_db.dump") -> str:
+        return self.db_manager.dump_description(dump_name)
+
+    def drop_jac_db(self) -> None:
+        self.db_manager.drop_jac_db()
+
+    def drop_non_system_databases(self) -> None:
+        self.db_manager.drop_non_system_databases()
+
+    def mongodump_to_app(self, dump_name: str = "jac_db.dump") -> None:
+        self.db_manager.mongodump_to_app(dump_name)
+
+    def mongo_query_count(self) -> str:
+        return self.db_manager.mongo_query_count()
 
     def stop_stale_servers(self) -> None:
         basename = os.path.basename(self.options.jac_bin)

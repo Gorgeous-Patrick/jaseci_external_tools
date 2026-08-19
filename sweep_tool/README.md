@@ -86,6 +86,41 @@ Useful knobs:
 The result CSV keeps the old timing/tier columns and adds `policy` and
 `oracle_file` / `model_file`.
 
+## Two-machine DB mode
+
+By default, sweeps use local Docker for MongoDB and Redis:
+
+```toml
+[db]
+mode = "local_docker"
+```
+
+To run Streamlit/Jac on Machine 1 and MongoDB/Redis on Machine 2, edit
+`sweep_tool/local.toml`:
+
+```toml
+[db]
+mode = "remote_ssh"
+host = "MACHINE2_HOST_OR_IP"
+ssh_user = "patrickli"
+remote_app_root = "/abs/path/to/benchmark/apps/on/machine2"
+```
+
+In remote mode, the Python prefetch runner SSHes to Machine 2 for
+`docker compose up/down`, Mongo restore/drop/dump, and Redis flush. Jac
+still starts on Machine 1, with `MONGODB_URI` and `REDIS_URL` pointed at
+Machine 2. If `mongo_uri` / `redis_url` are omitted, each app keeps its
+local port and replaces `localhost` with `db.host`.
+
+Copy dump files to Machine 2 once before the sweep, under the matching
+remote app directory, for example `jacord/jac_db.dump` or
+`littlex5/jac_db.dump`. Then run the dry checker from the
+`jaseci_external_tools` repo root:
+
+```bash
+python tools/check_remote_db.py --app jacord
+```
+
 ## Notes
 
 - Sweep runs can take minutes; the tool is fire-and-forget.  The Analyze

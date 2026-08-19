@@ -27,23 +27,7 @@ class LinkedListAdapter(BenchmarkAdapter):
         time.sleep(5)
         self._jac_clean()
         self.flush_redis()
-        process.run(
-            [
-                "docker",
-                "exec",
-                self.mongo_container,
-                "mongosh",
-                "--quiet",
-                "--eval",
-                (
-                    "db.getMongo().getDBNames().forEach(function(d){"
-                    'if(d!="admin"&&d!="local"&&d!="config"){'
-                    "db.getSiblingDB(d).dropDatabase()}})"
-                ),
-            ],
-            self.app_dir,
-            check=False,
-        )
+        self.drop_non_system_databases()
         self.stop_stale_servers()
 
     def prepare_request(self, policy: str, limit: int) -> CaseState:
@@ -74,8 +58,26 @@ class LinkedListAdapter(BenchmarkAdapter):
                 path=f"/walker/{walker}/{first_node}",
                 body={},
                 target_id=first_node,
+                request_id=first_node,
             ),
+            extra={"nodes": [str(node) for node in nodes]},
         )
+
+    def spawn_pool(self, state: CaseState) -> list[RequestSpec]:
+        walker = self.options.env.get("WALKER") or "Traverse"
+        nodes = [str(node) for node in state.extra.get("nodes", [])]
+        if not nodes:
+            return super().spawn_pool(state)
+        return [
+            RequestSpec(
+                walker=walker,
+                path=f"/walker/{walker}/{node_id}",
+                body={},
+                target_id=node_id,
+                request_id=node_id,
+            )
+            for node_id in nodes
+        ]
 
     def _jac_clean(self) -> None:
         env = {**os.environ.copy(), **self.options.env, "JAC_BIN": self.options.jac_bin}

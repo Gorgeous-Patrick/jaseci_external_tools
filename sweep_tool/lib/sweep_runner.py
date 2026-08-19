@@ -17,6 +17,8 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
+from lib.prefetch_exp import db as db_config
+
 from .manifest import Manifest
 
 
@@ -292,11 +294,9 @@ def kickoff_all(
     form_values_by_name = form_values_by_name or {}
     parts: list[str] = []
     all_env_overrides: dict[str, dict[str, str]] = {}
-    # Between apps we cd into each app_dir and run `docker compose down -v`
-    # so the previous app's containers *and volumes* are cleaned up under
-    # the compose file that started them.  Without this the next app's
-    # `docker compose up -d` collides on the shared container names
-    # (mongodb / redis) or, worse, silently reuses a stale data volume.
+    # Between apps, tear down the DB compose project that belongs to the app.
+    # In remote_ssh mode this command is emitted as an SSH docker-compose
+    # teardown so run-all does not touch local MongoDB/Redis containers.
     for m in manifests:
         env = m.env_from_form(form_values_by_name.get(m.name, {}))
         if jac_bin:
@@ -318,7 +318,7 @@ def kickoff_all(
             f'echo; echo "=== {m.name} ==="; '
             f'{run_cmd}; '
             f'echo "--- {m.name} teardown ---"; '
-            f'cd {app_dir_q} && docker compose down -v > /dev/null 2>&1 || true'
+            f'{db_config.run_all_teardown_shell(m.name, m.app_dir, remove_volumes=True)}'
         )
         parts.append(section)
     shepherd_cmd = "; ".join(parts)

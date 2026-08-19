@@ -17,12 +17,56 @@ class JSearchAdapter(BenchmarkAdapter):
     default_user = "sweep_user"
     default_password = "password"
     credential_source = "seed_sweep_db.py / sweep_seed.json"
+    default_query_pool = [
+        "database latency cache",
+        "database query index",
+        "database storage replica",
+        "database document shard",
+        "redis cache latency",
+        "mongodb document query",
+        "compiler static analysis",
+        "compiler runtime walker",
+        "compiler optimizer bytecode",
+        "typing source function",
+        "program analysis call",
+        "runtime walker optimizer",
+        "cloud service request",
+        "cloud endpoint container",
+        "cloud deploy region",
+        "autoscale network gateway",
+        "trace worker service",
+        "container request endpoint",
+        "search ranking term",
+        "search snippet corpus",
+        "bm25 inverted index",
+        "document phrase score",
+        "ranking token page",
+        "corpus search index",
+        "security identity token",
+        "security audit access",
+        "permission session risk",
+        "secret encryption policy",
+        "login identity session",
+        "audit access token",
+        "analytics metric dashboard",
+        "analytics trend forecast",
+        "event segment report",
+        "sample model signal",
+        "pipeline metric trend",
+        "dashboard event forecast",
+        "database compiler runtime",
+        "cloud security identity",
+        "search analytics ranking",
+        "cache service pipeline",
+        "trace metric request",
+        "storage document score",
+    ]
 
     def prepare_sweep(self) -> None:
         self._assert_seed_credentials_match_env()
         if (
             self.options.env.get("SWEEP_RESEED") == "1"
-            or not (self.app_dir / "jac_db.dump").exists()
+            or not self.dump_exists("jac_db.dump")
             or not (self.app_dir / "sweep_seed.json").exists()
         ):
             self._prepare_seed_dump()
@@ -42,12 +86,7 @@ class JSearchAdapter(BenchmarkAdapter):
         seed = self.json_file("sweep_seed.json")
         index_id = str(seed["index_id"])
         query = str(seed.get("query") or self.options.env.get("JSEARCH_QUERY") or "database latency cache")
-        body = {
-            "query": query,
-            "max_results": int(self.options.env.get("JSEARCH_MAX_RESULTS") or "20"),
-            "max_pages": int(self.options.env.get("JSEARCH_MAX_PAGES") or "300"),
-            "cpu_rounds": int(self.options.env.get("JSEARCH_CPU_ROUNDS") or "500"),
-        }
+        body = self._body_for_query(query)
         return CaseState(
             token=token,
             request=RequestSpec(
@@ -55,8 +94,25 @@ class JSearchAdapter(BenchmarkAdapter):
                 path=f"/walker/{self.options.env.get('WALKER') or 'SearchIndex'}/{index_id}",
                 body=body,
                 target_id=index_id,
+                request_id=query,
             ),
         )
+
+    def spawn_pool(self, state: CaseState) -> list[RequestSpec]:
+        if state.request is None:
+            return []
+        walker = self.options.env.get("WALKER") or "SearchIndex"
+        index_id = state.request.target_id
+        return [
+            RequestSpec(
+                walker=walker,
+                path=f"/walker/{walker}/{index_id}",
+                body=self._body_for_query(query),
+                target_id=index_id,
+                request_id=query,
+            )
+            for query in self._query_pool()
+        ]
 
     def validate_response(self, spec: RequestSpec, payload: dict) -> None:
         reports = payload.get("data", {}).get("reports") or []
@@ -64,16 +120,35 @@ class JSearchAdapter(BenchmarkAdapter):
         if not report.get("results"):
             print("warning: JSearch returned no results")
 
+    def _body_for_query(self, query: str) -> dict:
+        return {
+            "query": query,
+            "max_results": int(self.options.env.get("JSEARCH_MAX_RESULTS") or "20"),
+            "max_pages": int(self.options.env.get("JSEARCH_MAX_PAGES") or "300"),
+            "cpu_rounds": int(self.options.env.get("JSEARCH_CPU_ROUNDS") or "500"),
+        }
+
+    def _query_pool(self) -> list[str]:
+        raw = self.options.env.get("JSEARCH_QUERY_POOL", "").strip()
+        if raw:
+            queries = [item.strip() for item in raw.replace("\n", "|").split("|")]
+            return [query for query in queries if query]
+        try:
+            seed_query = str(self.json_file("sweep_seed.json").get("query") or "").strip()
+        except FileNotFoundError:
+            seed_query = ""
+        queries: list[str] = []
+        for query in [seed_query, *self.default_query_pool]:
+            if query and query not in queries:
+                queries.append(query)
+        return queries
+
     def _prepare_seed_dump(self) -> None:
         print("=== Preparing JSearch sweep seed dump ===")
         (self.app_dir / self.options.manifest.logs_dir).mkdir(parents=True, exist_ok=True)
         self.compose_down()
         self.compose_up()
-        process.run(
-            ["docker", "exec", self.mongo_container, "mongosh", "jac_db", "--quiet", "--eval", "db.dropDatabase()"],
-            self.app_dir,
-            check=False,
-        )
+        self.drop_jac_db()
         self.flush_redis()
         self.stop_stale_servers()
 
@@ -86,6 +161,7 @@ class JSearchAdapter(BenchmarkAdapter):
                 "TEST_USER": self.user_name(),
                 "TEST_PASSWORD": self.password(),
                 "MONGODB_URI": self.mongo_uri,
+                "REDIS_URL": self.redis_url,
             }
             process.run([self.options.python_bin, "seed_sweep_db.py"], self.app_dir, env=env)
         finally:
@@ -93,15 +169,8 @@ class JSearchAdapter(BenchmarkAdapter):
             self.stop_stale_servers()
 
         self.flush_redis()
-        process.run(
-            ["docker", "exec", self.mongo_container, "mongodump", "--db", "jac_db", "--archive=/tmp/jac_db.dump"],
-            self.app_dir,
-        )
-        process.run(
-            ["docker", "cp", f"{self.mongo_container}:/tmp/jac_db.dump", "jac_db.dump"],
-            self.app_dir,
-        )
-        print("=== Seed dump ready: jac_db.dump ===")
+        self.mongodump_to_app("jac_db.dump")
+        print(f"=== Seed dump ready: {self.dump_description('jac_db.dump')} ===")
 
     def _assert_seed_credentials_match_env(self) -> None:
         explicit = self.options.env.get("TEST_USER")

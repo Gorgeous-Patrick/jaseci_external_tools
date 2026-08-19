@@ -13,6 +13,28 @@ from .parsers import TrialLog
 
 TIERS = ["L1", "L2", "L3", "MISS"]
 TIER_COLOR = {"L1": "#2ca02c", "L2": "#e6b800", "L3": "#ff7f0e", "MISS": "#d62728"}
+POLICY_COLOR = {
+    "oracle": "#2ca02c",
+    "ttg": "#1f77b4",
+    "none": "#7f7f7f",
+    "markov": "#9467bd",
+    "markov1-pooled": "#8c564b",
+    "coaccess": "#e377c2",
+    "coaccess-pooled": "#bcbd22",
+    "history": "#ff7f0e",
+    "manual": "#17becf",
+}
+POLICY_ORDER = {
+    "oracle": 0,
+    "none": 1,
+    "ttg": 2,
+    "markov": 3,
+    "markov1-pooled": 4,
+    "coaccess": 5,
+    "coaccess-pooled": 6,
+    "history": 7,
+    "manual": 8,
+}
 
 
 def _df_group_cols(df: pd.DataFrame) -> list[str]:
@@ -41,6 +63,294 @@ def _log_label(key: tuple[str, int]) -> str:
 
 def _sort_log_keys(keys) -> list[tuple[str, int]]:
     return sorted(keys, key=lambda k: (k[0], k[1]))
+
+
+def _policy_sort_key(policy: str) -> tuple[int, str]:
+    base = _policy_base(policy)
+    return (POLICY_ORDER.get(base, len(POLICY_ORDER)), policy)
+
+
+def _policy_color(policy: str) -> str | None:
+    return POLICY_COLOR.get(policy) or POLICY_COLOR.get(_policy_base(policy))
+
+
+def _policy_base(policy: str) -> str:
+    if policy.startswith("markov1-pooled"):
+        return "markov1-pooled"
+    if policy.startswith("coaccess-pooled"):
+        return "coaccess-pooled"
+    return policy
+
+
+def _format_limit(value: float) -> str:
+    value = float(value)
+    return str(int(value)) if value.is_integer() else f"{value:g}"
+
+
+def _hide_repeated_none_baseline(df: pd.DataFrame) -> pd.DataFrame:
+    if "policy" not in df.columns:
+        return df
+    is_none = df["policy"].astype(str).str.lower() == "none"
+    is_nonzero_limit = pd.to_numeric(df["prefetch_limit"], errors="coerce").fillna(0) > 0
+    return df[~(is_none & is_nonzero_limit)]
+
+
+def _positioned_policy_limit_bars(
+    df: pd.DataFrame,
+) -> tuple[pd.DataFrame, list[float], float]:
+    """Add compact numeric x positions for per-limit grouped policy bars."""
+    out = df.copy()
+    limits = sorted(out["prefetch_limit"].unique())
+    limit_index = {limit: i for i, limit in enumerate(limits)}
+    policies_by_limit = {
+        limit: sorted(
+            out.loc[out["prefetch_limit"] == limit, "policy"].unique(),
+            key=_policy_sort_key,
+        )
+        for limit in limits
+    }
+    max_bars = max((len(policies) for policies in policies_by_limit.values()), default=1)
+    bar_width = min(0.30, 0.78 / max_bars)
+
+    x = []
+    for row in out.itertuples(index=False):
+        policies_at_limit = policies_by_limit[row.prefetch_limit]
+        rank = policies_at_limit.index(row.policy)
+        offset = (rank - (len(policies_at_limit) - 1) / 2) * bar_width
+        x.append(limit_index[row.prefetch_limit] + offset)
+
+    out["_x"] = x
+    out["_limit_order"] = out["prefetch_limit"].map(limit_index)
+    out["_policy_order"] = out["policy"].map(
+        lambda policy: POLICY_ORDER.get(_policy_base(policy), len(POLICY_ORDER))
+    )
+    out = out.sort_values(["_limit_order", "_policy_order", "policy"]).reset_index(drop=True)
+    return out, limits, bar_width
+
+
+def l1_hit_rate_by_policy(df: pd.DataFrame) -> go.Figure:
+    """Grouped bars of median L1 hit rate by prefetch limit and policy."""
+    if df.empty or "l1_hit_rate" not in df.columns or "prefetch_limit" not in df.columns:
+        return go.Figure()
+
+    work = df.copy()
+    work["l1_hit_rate"] = pd.to_numeric(work["l1_hit_rate"], errors="coerce")
+    work["prefetch_limit"] = pd.to_numeric(work["prefetch_limit"], errors="coerce")
+    work = work.dropna(subset=["l1_hit_rate", "prefetch_limit"])
+    if work.empty:
+        return go.Figure()
+    if "policy" not in work.columns:
+        work["policy"] = "default"
+    work["policy"] = work["policy"].fillna("default").astype(str).str.lower()
+    work = _hide_repeated_none_baseline(work)
+    if work.empty:
+        return go.Figure()
+
+    stats = (
+        work.groupby(["policy", "prefetch_limit"])["l1_hit_rate"]
+        .agg(
+            median="median",
+            p25=lambda s: s.quantile(0.25),
+            p75=lambda s: s.quantile(0.75),
+            trials="count",
+        )
+        .reset_index()
+        .sort_values(["policy", "prefetch_limit"])
+    )
+    if stats.empty:
+        return go.Figure()
+
+    fig = go.Figure()
+    stats, limits, bar_width = _positioned_policy_limit_bars(stats)
+    policies = sorted(stats["policy"].unique(), key=_policy_sort_key)
+    for policy in policies:
+        s = stats[stats["policy"] == policy].sort_values("prefetch_limit")
+        upper = np.maximum(s["p75"] - s["median"], 0)
+        lower = np.maximum(s["median"] - s["p25"], 0)
+        custom = np.stack(
+            [s["prefetch_limit"], s["p25"], s["p75"], s["trials"]],
+            axis=-1,
+        )
+        fig.add_bar(
+            x=s["_x"],
+            y=s["median"],
+            width=[bar_width * 0.86] * len(s),
+            name=policy,
+            marker_color=_policy_color(policy),
+            error_y=dict(
+                type="data",
+                array=upper,
+                arrayminus=lower,
+                visible=bool((upper > 0).any() or (lower > 0).any()),
+                thickness=1.2,
+                width=3,
+            ),
+            customdata=custom,
+            hovertemplate=(
+                "policy=%{fullData.name}<br>"
+                "prefetch_limit=%{customdata[0]:.0f}<br>"
+                "median L1=%{y:.1f}%<br>"
+                "IQR=%{customdata[1]:.1f}%-"
+                "%{customdata[2]:.1f}%<br>"
+                "trials=%{customdata[3]:.0f}"
+                "<extra></extra>"
+            ),
+        )
+
+    fig.update_layout(
+        title="L1 hit rate by policy (median over trials)",
+        barmode="overlay",
+        xaxis=dict(
+            title="prefetch_limit",
+            tickmode="array",
+            tickvals=list(range(len(limits))),
+            ticktext=[_format_limit(limit) for limit in limits],
+        ),
+        yaxis_title="L1 hit rate (%)",
+        yaxis=dict(range=[0, 105], ticksuffix="%"),
+        legend_title="policy",
+        template="plotly_white",
+        margin=dict(l=60, r=20, t=60, b=60),
+    )
+    return fig
+
+
+def cache_tier_mix(df: pd.DataFrame) -> go.Figure:
+    """100% stacked tier mix bars by prefetch limit and policy."""
+    tier_cols = {"L1": "l1", "L2": "l2", "L3": "l3", "MISS": "miss"}
+    required = {"prefetch_limit", *tier_cols.values()}
+    if df.empty or not required.issubset(df.columns):
+        return go.Figure()
+
+    work = df.copy()
+    for col in required:
+        work[col] = pd.to_numeric(work[col], errors="coerce")
+    work = work.dropna(subset=["prefetch_limit"])
+    if work.empty:
+        return go.Figure()
+    if "policy" not in work.columns:
+        work["policy"] = "default"
+    work["policy"] = work["policy"].fillna("default").astype(str).str.lower()
+    work = _hide_repeated_none_baseline(work)
+    if work.empty:
+        return go.Figure()
+
+    med = (
+        work.groupby(["policy", "prefetch_limit"])[list(tier_cols.values())]
+        .median()
+        .reset_index()
+        .sort_values(["policy", "prefetch_limit"])
+    )
+    med["total"] = med[list(tier_cols.values())].fillna(0).sum(axis=1)
+    med = med[med["total"] > 0].copy()
+    if med.empty:
+        return go.Figure()
+
+    for tier, col in tier_cols.items():
+        med[f"{tier}_pct"] = med[col].fillna(0) * 100.0 / med["total"]
+
+    med, _limits, bar_width = _positioned_policy_limit_bars(med)
+    fig = go.Figure()
+    for tier, col in tier_cols.items():
+        custom = [
+            [row.policy, row.prefetch_limit, getattr(row, col), row.total]
+            for row in med.itertuples(index=False)
+        ]
+        fig.add_bar(
+            x=med["_x"],
+            y=med[f"{tier}_pct"],
+            width=[bar_width * 0.86] * len(med),
+            name=tier,
+            marker_color=TIER_COLOR[tier],
+            customdata=custom,
+            hovertemplate=(
+                "policy=%{customdata[0]}<br>"
+                "prefetch_limit=%{customdata[1]:.0f}<br>"
+                f"{tier}=%{{customdata[2]:.0f}} / "
+                "%{customdata[3]:.0f}<br>"
+                "share=%{y:.1f}%"
+                "<extra></extra>"
+            ),
+        )
+
+    fig.update_layout(
+        title="Cache tier mix by policy (median counts, normalized to 100%)",
+        barmode="stack",
+        xaxis=dict(
+            title="prefetch_limit / policy",
+            tickmode="array",
+            tickvals=med["_x"],
+            ticktext=[
+                f"{_format_limit(row.prefetch_limit)}<br>{row.policy}"
+                for row in med.itertuples(index=False)
+            ],
+            tickangle=0,
+        ),
+        yaxis=dict(title="Share of tier touches", range=[0, 100], ticksuffix="%"),
+        legend_title="tier",
+        template="plotly_white",
+        margin=dict(l=60, r=20, t=60, b=80),
+    )
+    return fig
+
+
+def hit_rate_summary(df: pd.DataFrame) -> pd.DataFrame:
+    """Compact per-policy summary for the Analyze tab."""
+    required = {"prefetch_limit", "l1_hit_rate", "l1", "l2", "l3", "miss"}
+    if df.empty or not required.issubset(df.columns):
+        return pd.DataFrame()
+
+    work = df.copy()
+    if "policy" not in work.columns:
+        work["policy"] = "default"
+    work["policy"] = work["policy"].fillna("default").astype(str).str.lower()
+    for col in required:
+        work[col] = pd.to_numeric(work[col], errors="coerce")
+    work = work.dropna(subset=["prefetch_limit", "l1_hit_rate"])
+    if work.empty:
+        return pd.DataFrame()
+    work["undercoverage"] = work["l3"].fillna(0) + work["miss"].fillna(0)
+
+    med = (
+        work.groupby(["policy", "prefetch_limit"])
+        .agg(
+            l1_hit_rate=("l1_hit_rate", "median"),
+            undercoverage=("undercoverage", "median"),
+            l1=("l1", "median"),
+            l2=("l2", "median"),
+            l3=("l3", "median"),
+            miss=("miss", "median"),
+            trials=("trial", "count") if "trial" in work.columns else ("l1_hit_rate", "count"),
+        )
+        .reset_index()
+    )
+    if med.empty:
+        return pd.DataFrame()
+
+    rows = []
+    for policy in sorted(med["policy"].unique(), key=_policy_sort_key):
+        p = med[med["policy"] == policy].sort_values("prefetch_limit")
+        best_hit = p.sort_values(
+            ["l1_hit_rate", "undercoverage", "prefetch_limit"],
+            ascending=[False, True, True],
+        ).iloc[0]
+        best_under = p.sort_values(
+            ["undercoverage", "l1_hit_rate", "prefetch_limit"],
+            ascending=[True, False, True],
+        ).iloc[0]
+        rows.append(
+            {
+                "policy": policy,
+                "best_l1_hit_rate": f"{best_hit.l1_hit_rate:.1f}%",
+                "best_l1_limit": int(best_hit.prefetch_limit),
+                "lowest_undercoverage": int(best_under.undercoverage),
+                "lowest_undercoverage_limit": int(best_under.prefetch_limit),
+                "median_L1_at_best": int(best_hit.l1),
+                "median_L3_at_best": int(best_hit.l3),
+                "trials_at_best": int(best_hit.trials),
+            }
+        )
+    return pd.DataFrame(rows)
 
 
 def e2e_stack(df: pd.DataFrame) -> go.Figure:

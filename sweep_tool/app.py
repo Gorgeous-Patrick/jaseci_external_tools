@@ -20,17 +20,21 @@ from lib import parsers, charts, sweep_runner
 
 APP_ROOT = Path(__file__).resolve().parent
 MANIFEST_DIR = APP_ROOT / "manifests"
+DEFAULT_PAIR_APPS = ("linked_list", "jacord")
 
 
 st.set_page_config(page_title="Sweep tool", layout="wide")
 
 
 @st.cache_data
-def load_manifests() -> list[mf.Manifest]:
+def load_manifests(_cache_key: tuple[tuple[str, int], ...]) -> list[mf.Manifest]:
     return mf.discover(MANIFEST_DIR)
 
 
-manifests = load_manifests()
+manifest_cache_key = tuple(
+    sorted((p.name, p.stat().st_mtime_ns) for p in MANIFEST_DIR.glob("*.yaml"))
+)
+manifests = load_manifests(manifest_cache_key)
 if not manifests:
     st.error(f"No manifests found in {MANIFEST_DIR}. Add one and rerun.")
     st.stop()
@@ -66,11 +70,12 @@ with tab_run:
     st.subheader("Run all sweeps")
     st.caption(
         "Kicks off every manifest's sweep sequentially with each app's "
-        "default parameters.  All apps share MongoDB/Redis container "
+        "default parameters. Presets use the same default-parameter path. "
+        "All apps share MongoDB/Redis container "
         "names, so parallel isn't safe."
     )
     all_running, all_pid = sweep_runner.is_run_all_running()
-    ra_status, ra_kill, ra_launch = st.columns([3, 1, 1])
+    ra_status, ra_kill, ra_launch, ra_pair = st.columns([3, 1, 1, 2])
     with ra_status:
         if all_running:
             st.warning(f"⏳ Run-all is in progress (shepherd pid={all_pid}).")
@@ -88,6 +93,29 @@ with tab_run:
                 f"Launched shepherd (pid={info.pid}) over "
                 f"{len(manifests)} manifest(s).  Watch progress in "
                 f"`{info.stdout_log}` or the Analyze tab per app."
+            )
+            st.rerun()
+    with ra_pair:
+        pair_manifests = [
+            manifest_by_name[name] for name in DEFAULT_PAIR_APPS if name in manifest_by_name
+        ]
+        missing_pair = [name for name in DEFAULT_PAIR_APPS if name not in manifest_by_name]
+        if missing_pair:
+            st.warning(f"Missing preset manifest(s): {', '.join(missing_pair)}")
+        elif (
+            not all_running
+            and st.button(
+                "Run LinkedList + Jacord",
+                type="primary",
+                key="run_linked_jacord_defaults",
+                help="Runs linked_list and jacord sequentially with manifest default values.",
+            )
+        ):
+            info = sweep_runner.kickoff_all(pair_manifests, jac_bin=jac_bin)
+            app_list = ", ".join(m.name for m in pair_manifests)
+            st.success(
+                f"Launched default sweeps for {app_list} "
+                f"(shepherd pid={info.pid}). Watch progress in `{info.stdout_log}`."
             )
             st.rerun()
     if sweep_runner.run_all_log_path().exists():
@@ -210,11 +238,18 @@ with tab_analyze:
             f"`{m.results_csv}` and/or `{m.logs_dir}/` under `{m.app_dir}`."
         )
     else:
+        summary = charts.hit_rate_summary(df)
+        if not summary.empty:
+            st.subheader("Hit-rate summary")
+            st.dataframe(summary, use_container_width=True, hide_index=True)
+
         # Render each chart only if it has data; otherwise the panel is
         # a blank axes block, which is confusing.  Older sweeps predate
         # the [HIT-STATS-SERIES] / [PREFETCH-WORKER-TIMES] markers, so
         # log-based charts come back empty for them.
         chart_specs = [
+            ("chart_l1_hit_rate_by_policy", charts.l1_hit_rate_by_policy, (df,)),
+            ("chart_cache_tier_mix", charts.cache_tier_mix, (df,)),
             ("chart_e2e_stack", charts.e2e_stack, (df,)),
             ("chart_db_access_by_op", charts.db_access_by_op, (logs,)),
             ("chart_coverage", charts.coverage, (df, logs)),
