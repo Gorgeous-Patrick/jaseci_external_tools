@@ -8,6 +8,7 @@ description: |
   the actual walker prunes part of the tree at runtime.
 
 app_dir: ../../../jdrive
+runner: prefetch_python
 
 scripts:
   sweep: sweep_prefetch_limit.sh
@@ -18,6 +19,106 @@ outputs:
   profiles_dir: profiles
 
 parameters:
+  - name: SWEEP_POLICIES
+    label: Prefetch policies
+    kind: str
+    default: "oracle ttg markov1-pooled coaccess-pooled none"
+    help: >
+      Space-separated policies to run. Supported: none, ttg, oracle,
+      markov, markov1-pooled, coaccess, coaccess-pooled, history, manual.
+      Oracle, Markov, and co-access default to auto-record then replay.
+
+  - name: SWEEP_ORACLE_MODE
+    label: Oracle mode
+    kind: enum
+    default: "auto"
+    choices: ["auto", "file"]
+    help: >
+      auto records a no-prefetch access set before each measured oracle
+      trial; file replays existing UUID files.
+
+  - name: SWEEP_ORACLE_DIR
+    label: Oracle dir
+    kind: str
+    default: "oracle_plans"
+    help: Directory for generated/read oracle UUID files.
+
+  - name: SWEEP_MARKOV_MODE
+    label: Markov mode
+    kind: enum
+    default: "auto"
+    choices: ["auto", "file"]
+    help: >
+      auto trains a first-order Markov model from a no-prefetch access log
+      before each measured trial; file replays existing model files.
+
+  - name: SWEEP_MARKOV_DIR
+    label: Markov dir
+    kind: str
+    default: "markov_models"
+    help: Directory for generated/read Markov model JSON files.
+
+  - name: SWEEP_MARKOV_TRAIN_NS
+    label: Markov train Ns
+    kind: int_list
+    default: [10]
+    help: >
+      Training request counts swept by markov1-pooled. Each N produces
+      result rows labeled markov1-pooled-N<N>.
+
+  - name: SWEEP_MARKOV_POOL_SEED
+    label: Markov pool seed
+    kind: int
+    default: 42
+    help: Seed used to shuffle the adapter's seeded spawn pool before training selection.
+
+  - name: SWEEP_COACCESS_MODE
+    label: Co-access mode
+    kind: enum
+    default: "auto"
+    choices: ["auto", "file"]
+    help: >
+      auto trains a co-access clustering model from no-prefetch access logs;
+      file replays existing model files.
+
+  - name: SWEEP_COACCESS_DIR
+    label: Co-access dir
+    kind: str
+    default: "coaccess_models"
+    help: Directory for generated/read co-access model JSON files.
+
+  - name: SWEEP_COACCESS_TRAIN_NS
+    label: Co-access train Ns
+    kind: int_list
+    default: [10]
+    help: >
+      Training request counts swept by coaccess-pooled. Each N produces
+      result rows labeled coaccess-pooled-N<N>.
+
+  - name: SWEEP_COACCESS_POOL_SEED
+    label: Co-access pool seed
+    kind: int
+    default: 42
+    help: Seed used to shuffle the adapter's seeded spawn pool before training selection.
+
+  - name: SWEEP_COACCESS_CLUSTER_THRESHOLD
+    label: Co-access cluster threshold
+    kind: str
+    default: "0.05"
+    help: Greedy transaction-clustering Jaccard threshold.
+
+  - name: TEST_USER
+    label: Benchmark user
+    kind: str
+    default: "sweep_user"
+    help: Matches seed_sweep_db.py's default username.
+
+  - name: TEST_PASSWORD
+    label: Benchmark password
+    kind: str
+    default: "password"
+    help: Matches seed_sweep_db.py's default password.
+
   - name: SWEEP_PREFETCH_LIMITS
     label: Prefetch limits
     kind: int_list
@@ -29,7 +130,7 @@ parameters:
   - name: JAC_TRIALS
     label: Trials
     kind: int
-    default: 30
+    default: 10
     help: Number of repeated VisibleFolderTree requests per prefetch limit.
 
   - name: SWEEP_RESEED
@@ -39,6 +140,8 @@ parameters:
     choices: ["0", "1"]
     help: >
       Set to 1 to rebuild jac_db.dump and sweep_seed.json before sweeping.
+      The Python full-sweep adapter also rebuilds automatically when the
+      existing seed lacks enough held-out training roots for pooled policies.
 
   - name: SWEEP_SEED_VISIBLE_DEPTH
     label: Visible depth
@@ -51,3 +154,9 @@ parameters:
     kind: int
     default: 5
     help: Folder depth of the hidden trashed branch, including its branch root.
+
+  - name: SWEEP_SEED_TRAIN_ROOTS
+    label: Train roots
+    kind: int
+    default: 10
+    help: Number of independent training roots seeded for pooled Markov/co-access.
