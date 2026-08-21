@@ -8,9 +8,31 @@ from lib.prefetch_exp.models import CaseState, RequestSpec
 
 
 class LittleX5Adapter(BenchmarkAdapter):
-    default_user = "user56"
+    default_user = "sim_user_56"
     default_password = "password"
-    credential_source = "bootstrap.py users + quick_run.sh benchmark target"
+    credential_source = "backup.dump seeded sim_user benchmark target"
+    default_dump = "backup.dump"
+
+    def server_command(self) -> list[str]:
+        cmd = [self.options.jac_bin, "start", "server.jac"]
+        if self.profile_name:
+            cmd.extend(["--profile", self.profile_name])
+        return cmd
+
+    def restore_dump_if_present(self, dump_name: str = "jac_db.dump") -> None:
+        configured = self._configured_dump()
+        self.options.env["LITTLEX_DUMP"] = configured
+        if not self.dump_exists(configured):
+            raise FileNotFoundError(
+                "Configured LittleX dump does not exist: "
+                f"{self.dump_description(configured)}. Set LITTLEX_DUMP to a valid dump; "
+                "the LittleX sweep will not silently fall back to jac_db.dump."
+            )
+        print(
+            "=== LittleX restoring configured dump: "
+            f"{configured} -> {self.dump_description(configured)} ==="
+        )
+        super().restore_dump_if_present(configured)
 
     def prepare_request(self, policy: str, limit: int) -> CaseState:
         token = self.setup_token(f"jac_server_prepare_{policy}_limit{limit}.log")
@@ -58,16 +80,14 @@ class LittleX5Adapter(BenchmarkAdapter):
             self.options.env.get("SWEEP_MARKOV_POOL_SIZE")
             or str(max(max(self.options.markov_train_ns), max(self.options.coaccess_train_ns)) + 1)
         )
-        edge_dir = self.app_dir / "facebook"
-        user_ids: set[int] = set()
-        for path in sorted(edge_dir.glob("*.edges")):
-            with open(path) as fh:
-                for line in fh:
-                    parts = line.split()
-                    if len(parts) < 2:
-                        continue
-                    user_ids.add(int(parts[0]))
-                    user_ids.add(int(parts[1]))
-            if len(user_ids) >= desired:
-                break
-        return [f"user{uid}" for uid in sorted(user_ids)[:desired]]
+        prefix = self.options.env.get("LITTLEX_USER_POOL_PREFIX") or "sim_user_"
+        start = int(self.options.env.get("LITTLEX_USER_POOL_START") or "0")
+        return [f"{prefix}{idx}" for idx in range(start, start + desired)]
+
+    def _configured_dump(self) -> str:
+        configured = (
+            self.options.env.get("LITTLEX_DUMP")
+            or self.options.env.get("LITTLEX5_DUMP")
+            or self.default_dump
+        ).strip()
+        return configured or self.default_dump

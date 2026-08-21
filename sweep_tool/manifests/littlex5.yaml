@@ -1,8 +1,8 @@
 name: littlex5
 description: |
   littleX social feed benchmark.  Runs the load_feed walker against a
-  seeded MongoDB + Redis pair (~3959-user Facebook ego graph, 5 tweets
-  per user, ~170K follow edges).
+  seeded MongoDB + Redis pair from backup.dump (~5000 simulated users,
+  2.26M anchors, 250K follow edges).
 
 app_dir: ../../littlex5
 runner: prefetch_python
@@ -19,11 +19,11 @@ parameters:
   - name: SWEEP_POLICIES
     label: Prefetch policies
     kind: str
-    default: "oracle none ttg"
+    default: "oracle ttg markov1-pooled coaccess-pooled none"
     help: >
       Space-separated policies to run. Supported: none, ttg, oracle,
-      markov, markov1-pooled, history, manual. Oracle and Markov default
-      to auto-record then replay.
+      markov, markov1-pooled, coaccess, coaccess-pooled. Oracle, Markov,
+      and co-access default to auto-record then replay.
 
   - name: SWEEP_ORACLE_MODE
     label: Oracle mode
@@ -69,11 +69,54 @@ parameters:
     default: 42
     help: Seed used to shuffle the adapter's seeded spawn pool before training selection.
 
+  - name: SWEEP_COACCESS_MODE
+    label: Co-access mode
+    kind: enum
+    default: "auto"
+    choices: ["auto", "file"]
+    help: >
+      auto trains a co-access clustering model from no-prefetch access logs;
+      file replays existing model files.
+
+  - name: SWEEP_COACCESS_DIR
+    label: Co-access dir
+    kind: str
+    default: "coaccess_models"
+    help: Directory for generated/read co-access model JSON files.
+
+  - name: SWEEP_COACCESS_TRAIN_NS
+    label: Co-access train Ns
+    kind: int_list
+    default: [5]
+    help: >
+      Training request counts swept by coaccess-pooled. Each N produces
+      result rows labeled coaccess-pooled-N<N>.
+
+  - name: SWEEP_COACCESS_POOL_SEED
+    label: Co-access pool seed
+    kind: int
+    default: 42
+    help: Seed used to shuffle the adapter's seeded spawn pool before training selection.
+
+  - name: SWEEP_COACCESS_CLUSTER_THRESHOLD
+    label: Co-access cluster threshold
+    kind: str
+    default: "0.05"
+    help: Greedy transaction-clustering Jaccard threshold.
+
+  - name: LITTLEX_DUMP
+    label: LittleX dump
+    kind: str
+    default: "backup.dump"
+    help: >
+      MongoDB archive restored before each case. The default backup.dump is
+      the large LittleX seed; use jac_db.dump only for the small smoke dataset.
+
   - name: TEST_USER
     label: Benchmark user
     kind: str
-    default: "user56"
-    help: Matches quick_run.sh's selected seeded LittleX user.
+    default: "sim_user_56"
+    help: Matches backup.dump's selected seeded LittleX user.
 
   - name: TEST_PASSWORD
     label: Benchmark password

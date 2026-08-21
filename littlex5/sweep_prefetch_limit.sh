@@ -15,6 +15,7 @@ fi
 #   export JAC_BIN=~/Space/jaseci/jac/zig-out/bin/jac
 # Defaults to `jac` on PATH. Exported so quick_run.sh uses the same binary.
 export JAC_BIN="${JAC_BIN:-jac}"
+export LITTLEX_DUMP="${LITTLEX_DUMP:-backup.dump}"
 
 RESULTS_FILE="sweep_prefetch_limit.csv"
 
@@ -23,6 +24,7 @@ rm -rf logs profiles
 
 echo "=== LittleX Prefetch Limit Sweep ==="
 echo "Limits: ${PREFETCH_LIMITS[*]}"
+echo "Dump: $LITTLEX_DUMP"
 echo ""
 
 # Write CSV header

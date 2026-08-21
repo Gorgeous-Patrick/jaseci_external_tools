@@ -59,8 +59,11 @@ class SweepOptions:
     @classmethod
     def from_env(cls, manifest: "Manifest", jac_bin: str | None = None) -> "SweepOptions":
         env = os.environ.copy()
+        for key, value in _manifest_defaults(manifest).items():
+            env.setdefault(key, value)
         resolved_jac = jac_bin or env.get("JAC_BIN") or _default_jac_bin()
         python_bin = env.get("PYTHON_BIN") or _sibling_python(resolved_jac) or "python3"
+        app_dir = manifest.app_dir
         return cls(
             manifest=manifest,
             jac_bin=resolved_jac,
@@ -73,13 +76,13 @@ class SweepOptions:
                 or "30"
             ),
             oracle_mode=(env.get("SWEEP_ORACLE_MODE") or "auto").strip().lower(),
-            oracle_dir=Path(env.get("SWEEP_ORACLE_DIR") or (manifest.app_dir / "oracle_plans")),
+            oracle_dir=_env_path(env, "SWEEP_ORACLE_DIR", app_dir / "oracle_plans", app_dir),
             markov_mode=(env.get("SWEEP_MARKOV_MODE") or "auto").strip().lower(),
-            markov_dir=Path(env.get("SWEEP_MARKOV_DIR") or (manifest.app_dir / "markov_models")),
+            markov_dir=_env_path(env, "SWEEP_MARKOV_DIR", app_dir / "markov_models", app_dir),
             markov_train_ns=_parse_int_list(env.get("SWEEP_MARKOV_TRAIN_NS"), [5]),
             markov_pool_seed=int(env.get("SWEEP_MARKOV_POOL_SEED") or "42"),
             coaccess_mode=(env.get("SWEEP_COACCESS_MODE") or "auto").strip().lower(),
-            coaccess_dir=Path(env.get("SWEEP_COACCESS_DIR") or (manifest.app_dir / "coaccess_models")),
+            coaccess_dir=_env_path(env, "SWEEP_COACCESS_DIR", app_dir / "coaccess_models", app_dir),
             coaccess_train_ns=_parse_int_list(
                 env.get("SWEEP_COACCESS_TRAIN_NS") or env.get("SWEEP_MARKOV_TRAIN_NS"),
                 [5],
@@ -139,6 +142,18 @@ def _parse_int_list(raw: str | None, default: list[int]) -> list[int]:
         if item.strip():
             out.append(int(item))
     return out or list(default)
+
+
+def _manifest_defaults(manifest: "Manifest") -> dict[str, str]:
+    return manifest.env_from_form({})
+
+
+def _env_path(env: dict[str, str], name: str, default: Path, base_dir: Path) -> Path:
+    raw = env.get(name)
+    if not raw:
+        return default
+    path = Path(raw).expanduser()
+    return path if path.is_absolute() else base_dir / path
 
 
 def _sibling_python(jac_bin: str) -> str:

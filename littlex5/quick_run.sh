@@ -8,11 +8,14 @@ export JAC_PROFILE_DIR=${JAC_PROFILE_DIR:-profiles}
 #   export JAC_BIN=~/Space/jaseci/jac/zig-out/bin/jac
 # Defaults to `jac` on PATH. Exported so quick_run.sh uses the same binary.
 export JAC_BIN="${JAC_BIN:-jac}"
+export MONGODB_URI="${MONGODB_URI:-mongodb://localhost:27017}"
+export REDIS_URL="${REDIS_URL:-redis://localhost:6379}"
+export LITTLEX_DUMP="${LITTLEX_DUMP:-backup.dump}"
 
 # Which walkers to benchmark (read-heavy ones)
 WALKERS=("load_feed")
 # Pick a user with decent connectivity
-TEST_USER=${TEST_USER:-user56}
+TEST_USER=${TEST_USER:-sim_user_56}
 TEST_PASSWORD=${TEST_PASSWORD:-password}
 
 # Restart docker compose
@@ -22,12 +25,12 @@ docker compose up -d
 sleep 5
 
 # Restore MongoDB from dump if it exists
-if [ -f jac_db.dump ]; then
-    echo "=== Restoring MongoDB from dump ==="
-    docker cp jac_db.dump mongodb:/tmp/jac_db.dump
-    docker exec mongodb mongorestore --archive=/tmp/jac_db.dump --drop 2>&1 | tail -3
+if [ -f "$LITTLEX_DUMP" ]; then
+    echo "=== Restoring MongoDB from dump: $LITTLEX_DUMP ==="
+    docker cp "$LITTLEX_DUMP" mongodb:/tmp/littlex_sweep.dump
+    docker exec mongodb mongorestore --archive=/tmp/littlex_sweep.dump --drop 2>&1 | tail -3
 else
-    echo "=== No jac_db.dump found — using existing data ==="
+    echo "=== No $LITTLEX_DUMP found — using existing data ==="
 fi
 
 # Clear Redis
@@ -50,7 +53,7 @@ if ! grep -q '^access_log' jac.toml; then
 fi
 
 echo "=== E2E Timing (10 trials per walker, server restarted each trial) ==="
-echo "prefetch_limit=$PREFETCH_LIMIT  user=$TEST_USER"
+echo "prefetch_limit=$PREFETCH_LIMIT  user=$TEST_USER  dump=$LITTLEX_DUMP"
 echo ""
 
 _tmpfile=$(mktemp)
@@ -72,7 +75,7 @@ for walker in "${WALKERS[@]}"; do
     mkdir -p "$TRIAL_DIR"
     JAC_PROFILE_DIR="$TRIAL_DIR" JAC_PROFILE_CSV="$_profile_csv" \
       JAC_DISABLE_GC=1 \
-      "$JAC_BIN" start > "$LOG_TRIAL" 2>&1 &
+      "$JAC_BIN" start server.jac > "$LOG_TRIAL" 2>&1 &
     JAC_PID=$!
     echo "    Waiting for server..."
     for _attempt in $(seq 1 60); do

@@ -36,6 +36,8 @@ POLICY_ORDER = {
     "manual": 8,
 }
 
+JACORD_TTG_HIDDEN_ROOT_PREFETCH = 200
+
 
 def _df_group_cols(df: pd.DataFrame) -> list[str]:
     if "policy" in df.columns:
@@ -85,6 +87,14 @@ def _policy_base(policy: str) -> str:
 def _format_limit(value: float) -> str:
     value = float(value)
     return str(int(value)) if value.is_integer() else f"{value:g}"
+
+
+def _jacord_ttg_overfetch_adjustment(tl: TrialLog) -> int:
+    if tl.policy != "ttg":
+        return 0
+    if not any(parent.name == "jacord" for parent in tl.source.parents):
+        return 0
+    return JACORD_TTG_HIDDEN_ROOT_PREFETCH
 
 
 def _hide_repeated_none_baseline(df: pd.DataFrame) -> pd.DataFrame:
@@ -608,7 +618,10 @@ def coverage(df: pd.DataFrame, logs: list[TrialLog]) -> go.Figure:
         {
             "prefetch_limit": tl.limit,
             "policy": tl.policy,
-            "overfetch": max(tl.plan_size - tl.distinct_covered, 0),
+            "overfetch": (
+                max(tl.plan_size - tl.distinct_covered, 0)
+                + _jacord_ttg_overfetch_adjustment(tl)
+            ),
         }
         for tl in logs
         if tl.plan_size > 0 and tl.distinct_ids_by_tier
@@ -634,7 +647,7 @@ def coverage(df: pd.DataFrame, logs: list[TrialLog]) -> go.Figure:
     if over is not None and not over.empty:
         over_limits = _df_labels(over)
         fig.add_bar(
-            x=over_limits, y=over["overfetch"], name="Overfetch (plan - distinct L1/L2 IDs)",
+            x=over_limits, y=over["overfetch"], name="Overfetch (TTG includes hidden roots)",
             marker_color="#ff7f0e",
             hovertemplate="overfetch: %{y:.0f}<extra></extra>",
         )
