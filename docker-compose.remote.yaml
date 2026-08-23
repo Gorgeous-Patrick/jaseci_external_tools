@@ -1,0 +1,67 @@
+# Remote-machine runner for the published experiment image.
+#
+# This compose file does not need the source checkout. It pulls the GHCR image,
+# serves the Streamlit app on port 8501, and keeps generated app outputs in
+# Docker named volumes initialized from the packaged image contents.
+
+name: jac-prefetch-experiment
+
+services:
+  sweep:
+    image: ghcr.io/gorgeous-patrick/jaseci_external_tools:latest
+    container_name: jac-prefetch-sweep
+    restart: unless-stopped
+    ports:
+      - "${STREAMLIT_PORT:-8501}:8501"
+    environment:
+      JAC_BIN: /usr/local/bin/jac
+      STREAMLIT_SERVER_PORT: "8501"
+      SWEEP_DB_MODE: "${SWEEP_DB_MODE:-remote_ssh}"
+      SWEEP_DB_HOST: "${SWEEP_DB_HOST:-clarity2}"
+      SWEEP_DB_REMOTE_APP_ROOT: "${SWEEP_DB_REMOTE_APP_ROOT:-/home/baichuan/jaseci_remote_apps}"
+      SWEEP_DB_SSH_OPTIONS: "${SWEEP_DB_SSH_OPTIONS:--F /root/.ssh/config}"
+    volumes:
+      - ${HOME}/.ssh:/root/.ssh:ro
+      - jacord_app:/workspace/jacord
+      - jdrive_app:/workspace/jdrive
+      - jsearch_app:/workspace/jsearch
+      - linked_list_app:/workspace/jaseci_external_tools/linked_list
+      - littlex5_app:/workspace/jaseci_external_tools/littlex5
+      # Optional for local_docker mode on the remote host.
+      # - /var/run/docker.sock:/var/run/docker.sock
+      # Optional to override the packaged remote DB config.
+      # - ./local.toml:/workspace/jaseci_external_tools/sweep_tool/local.toml:ro
+    command: ["streamlit"]
+
+  export-results:
+    image: ghcr.io/gorgeous-patrick/jaseci_external_tools:latest
+    profiles: ["tools"]
+    volumes:
+      - ./exports:/exports
+      - jacord_app:/workspace/jacord:ro
+      - jdrive_app:/workspace/jdrive:ro
+      - jsearch_app:/workspace/jsearch:ro
+      - linked_list_app:/workspace/jaseci_external_tools/linked_list:ro
+      - littlex5_app:/workspace/jaseci_external_tools/littlex5:ro
+    command:
+      - bash
+      - -lc
+      - |
+        set -euo pipefail
+        mkdir -p /exports
+        tar --ignore-failed-read -czf /exports/sweep-results.tar.gz \
+          -C /workspace \
+          jacord/sweep_prefetch_limit.csv jacord/logs jacord/profiles jacord/oracle_plans jacord/markov_models jacord/coaccess_models \
+          jdrive/sweep_prefetch_limit.csv jdrive/logs jdrive/profiles jdrive/oracle_plans jdrive/markov_models jdrive/coaccess_models \
+          jsearch/sweep_prefetch_limit.csv jsearch/logs jsearch/profiles jsearch/oracle_plans jsearch/markov_models jsearch/coaccess_models \
+          -C /workspace/jaseci_external_tools \
+          linked_list/sweep_prefetch_limit.csv linked_list/logs linked_list/profiles linked_list/oracle_plans linked_list/markov_models linked_list/coaccess_models \
+          littlex5/sweep_prefetch_limit.csv littlex5/logs littlex5/profiles littlex5/oracle_plans littlex5/markov_models littlex5/coaccess_models
+        echo /exports/sweep-results.tar.gz
+
+volumes:
+  jacord_app:
+  jdrive_app:
+  jsearch_app:
+  linked_list_app:
+  littlex5_app:

@@ -1,0 +1,78 @@
+# syntax=docker/dockerfile:1
+FROM python:3.12-slim-bookworm
+
+LABEL org.opencontainers.image.source="https://github.com/Gorgeous-Patrick/jaseci_external_tools" \
+      org.opencontainers.image.title="jaseci_external_tools experiment runner" \
+      org.opencontainers.image.description="Containerized Jac prefetch sweep experiments with Streamlit UI"
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    JASECI_ENV_ROOT=/workspace \
+    JAC_BIN=/usr/local/bin/jac \
+    PYTHONPATH=/workspace/jaseci/jac-scale
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        bash \
+        ca-certificates \
+        curl \
+        docker-compose \
+        docker.io \
+        git \
+        openssh-client \
+        procps \
+    && rm -rf /var/lib/apt/lists/*
+
+# The sweep code calls `docker compose`. Debian's lightweight package set
+# commonly provides `docker-compose` v1 but not the v2 CLI plugin, so make the
+# command form work for local_docker mode. Remote SSH mode runs Docker on the
+# remote host and does not use this shim.
+RUN printf '%s\n' \
+        '#!/bin/sh' \
+        'if [ "$1" = "compose" ]; then' \
+        '  shift' \
+        '  exec docker-compose "$@"' \
+        'fi' \
+        'exec /usr/bin/docker "$@"' \
+        > /usr/local/bin/docker \
+    && chmod +x /usr/local/bin/docker
+
+WORKDIR /workspace
+
+COPY jaseci/jac /workspace/jaseci/jac
+COPY jaseci/jac-scale /workspace/jaseci/jac-scale
+COPY jaseci_external_tools/sweep_tool /workspace/jaseci_external_tools/sweep_tool
+COPY jaseci_external_tools/tools /workspace/jaseci_external_tools/tools
+COPY jaseci_external_tools/linked_list /workspace/jaseci_external_tools/linked_list
+COPY jaseci_external_tools/littlex5 /workspace/jaseci_external_tools/littlex5
+COPY jacord /workspace/jacord
+COPY jdrive /workspace/jdrive
+COPY jsearch /workspace/jsearch
+
+RUN python -m pip install --upgrade pip setuptools wheel \
+    && python -m pip install -e /workspace/jaseci/jac \
+    && python -m pip install \
+        -r /workspace/jaseci/jac-scale/jac_scale.egg-info/requires.txt \
+        -r /workspace/jaseci_external_tools/sweep_tool/requirements.txt \
+        matplotlib \
+        requests \
+    && python - <<'PY'
+import site
+from pathlib import Path
+
+site_packages = Path(site.getsitepackages()[0])
+(site_packages / "jac_scale_local.pth").write_text("/workspace/jaseci/jac-scale\n")
+PY
+
+RUN python -c "import jaclang, jac_scale"
+
+COPY jaseci_external_tools/docker/entrypoint.sh /usr/local/bin/experiment
+COPY jaseci_external_tools/docker/run_all_sweeps.py /usr/local/bin/run-all-sweeps
+RUN chmod +x /usr/local/bin/experiment /usr/local/bin/run-all-sweeps
+
+WORKDIR /workspace/jaseci_external_tools/sweep_tool
+EXPOSE 8501 8000
+ENTRYPOINT ["experiment"]
+CMD ["streamlit"]

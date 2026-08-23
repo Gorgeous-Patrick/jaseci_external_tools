@@ -1,0 +1,24 @@
+services:
+  sweep:
+    build:
+      context: ..
+      dockerfile: jaseci_external_tools/Dockerfile.experiment
+    image: jac-prefetch-experiment:latest
+    ports:
+      - "8501:8501"
+    environment:
+      JAC_BIN: /usr/local/bin/jac
+      SWEEP_DB_MODE: ${SWEEP_DB_MODE:-remote_ssh}
+      SWEEP_DB_HOST: ${SWEEP_DB_HOST:-clarity2}
+      SWEEP_DB_REMOTE_APP_ROOT: ${SWEEP_DB_REMOTE_APP_ROOT:-/home/baichuan/jaseci_remote_apps}
+      SWEEP_DB_SSH_OPTIONS: "${SWEEP_DB_SSH_OPTIONS:--F /root/.ssh/config}"
+    volumes:
+      - ../jacord:/workspace/jacord
+      - ../jdrive:/workspace/jdrive
+      - ../jsearch:/workspace/jsearch
+      - ./linked_list:/workspace/jaseci_external_tools/linked_list
+      - ./littlex5:/workspace/jaseci_external_tools/littlex5
+      - ${HOME}/.ssh:/root/.ssh:ro
+      # Uncomment for local_docker mode.
+      # - /var/run/docker.sock:/var/run/docker.sock
+    command: ["streamlit"]
