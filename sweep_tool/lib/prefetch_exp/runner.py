@@ -572,6 +572,7 @@ def _run_trial(
         process.stop_process(proc)
         adapter.stop_stale_servers()
 
+    _assert_trial_profiles(profile_dir, profile_csv)
     mongo_after = _mongo_query_count(adapter) if options.count_mongo else ""
     counts = metrics.tier_counts(access_log)
     profile = metrics.profile_breakdown(profile_csv)
@@ -821,6 +822,21 @@ def _trial_paths(adapter, spec: RequestSpec, policy: str, limit: int, trial: int
     profile_dir = profiles_dir / f"policy_{safe_policy}" / f"limit_{limit}" / safe_walker / f"trial_{trial}"
     profile_csv = profile_dir / "profile.csv"
     return log_path, access_log, profile_dir, profile_csv
+
+
+def _assert_trial_profiles(profile_dir: Path, profile_csv: Path) -> None:
+    missing = []
+    raw_profile = profile_dir / "jac_server.prof"
+    if not profile_csv.exists():
+        missing.append(str(profile_csv))
+    if not raw_profile.exists():
+        missing.append(str(raw_profile))
+    if missing:
+        raise RuntimeError(
+            "profiling output missing after measured trial. "
+            "Ensure the active Jac config has [serve] profile = true. "
+            f"Missing: {', '.join(missing)}"
+        )
 
 
 def _config_values(
