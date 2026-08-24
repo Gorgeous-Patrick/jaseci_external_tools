@@ -91,7 +91,7 @@ class JacordAdapter(BenchmarkAdapter):
             )
             token = state.token or self.login()
             resp = self.post("/walker/ListChannelIds", {"limit": scan_limit}, token=token)
-            reports = resp.json().get("data", {}).get("reports") or []
+            reports = self._reports_or_raise(resp, "Jacord ListChannelIds")
             ids = [str(x) for x in (reports[0] if reports else [])]
             specs: list[RequestSpec] = []
             for channel_id in ids:
@@ -132,7 +132,7 @@ class JacordAdapter(BenchmarkAdapter):
 
         scan_limit = self._int_env("JACORD_CHANNEL_SCAN_LIMIT", self.default_channel_scan_limit)
         resp = self.post("/walker/ListChannelIds", {"limit": scan_limit}, token=token)
-        reports = resp.json().get("data", {}).get("reports") or []
+        reports = self._reports_or_raise(resp, "Jacord ListChannelIds")
         ids = [str(x) for x in (reports[0] if reports else [])]
         if not ids:
             raise RuntimeError("Jacord ListChannelIds returned no channel IDs")
@@ -171,8 +171,27 @@ class JacordAdapter(BenchmarkAdapter):
 
     def _count_channel_messages(self, walker: str, channel_id: str, token: str) -> int:
         resp = self.post(f"/walker/{walker}/{channel_id}", {}, token=token)
-        reports = resp.json().get("data", {}).get("reports") or []
+        reports = self._reports_or_raise(resp, f"Jacord {walker}({channel_id})")
         return len(reports)
+
+    def _reports_or_raise(self, resp, context: str) -> list:
+        body = resp.body.decode("utf-8", errors="replace")[:500]
+        if resp.status >= 400:
+            raise RuntimeError(f"{context} failed: HTTP {resp.status} {body}")
+        try:
+            data = resp.json()
+        except Exception as exc:
+            raise RuntimeError(
+                f"{context} returned non-JSON HTTP {resp.status}: {body}"
+            ) from exc
+        if data.get("error"):
+            raise RuntimeError(f"{context} returned error: {data.get('error')}")
+        payload = data.get("data")
+        if not isinstance(payload, dict):
+            raise RuntimeError(
+                f"{context} returned invalid payload HTTP {resp.status}: {body}"
+            )
+        return payload.get("reports") or []
 
     def _validate_channel_size(self, channel_id: str, message_count: int) -> None:
         min_messages = self._int_env(

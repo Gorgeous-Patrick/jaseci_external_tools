@@ -99,12 +99,15 @@ RUN rm -rf /workspace/jaseci/jac-scale/jac_scale.egg-info \
         "docker>=7.1.0,<8.0.0" \
         matplotlib \
         requests \
-    && jac install -e /workspace/jaseci/jac-scale --no-deps --quiet
+    && jac install -e /workspace/jaseci/jac-scale --no-deps --quiet \
+    && python -m pip install -e /workspace/jaseci/jac --no-deps --force-reinstall \
+    && rm -rf /root/.cache/jac
 
 RUN python - <<'PY'
 import importlib.metadata as metadata
 import sys
 import sysconfig
+from pathlib import Path
 
 import jaclang
 import jac_scale
@@ -112,6 +115,8 @@ import jac_scale
 assert sysconfig.get_config_var("Py_GIL_DISABLED") == 1, sys.version
 if hasattr(sys, "_is_gil_enabled"):
     assert not sys._is_gil_enabled(), "free-threaded Python is running with the GIL enabled"
+assert metadata.version("jaclang") == "0.16.1"
+assert Path(jaclang.__file__).resolve().is_relative_to("/workspace/jaseci/jac"), jaclang.__file__
 
 jac_entry_points = {
     entry_point.name: entry_point.value
