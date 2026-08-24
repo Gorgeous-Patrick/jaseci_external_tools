@@ -1,13 +1,33 @@
 # syntax=docker/dockerfile:1
-FROM python:3.12-slim-bookworm
+ARG PYTHON_STANDALONE_URL=https://github.com/astral-sh/python-build-standalone/releases/download/20260814/cpython-3.14.7%2B20260814-x86_64-unknown-linux-gnu-freethreaded%2Bpgo%2Blto-full.tar.zst
+
+FROM debian:bookworm-slim AS python-runtime
+ARG PYTHON_STANDALONE_URL
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        zstd \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -fL "$PYTHON_STANDALONE_URL" -o /tmp/python.tar.zst \
+    && mkdir -p /opt/python \
+    && tar -I zstd -xf /tmp/python.tar.zst -C /tmp \
+    && mv /tmp/python/install/* /opt/python/ \
+    && rm -rf /tmp/python /tmp/python.tar.zst
+
+FROM debian:bookworm-slim
 
 LABEL org.opencontainers.image.source="https://github.com/Gorgeous-Patrick/jaseci_external_tools" \
       org.opencontainers.image.title="jaseci_external_tools experiment runner" \
       org.opencontainers.image.description="Containerized Jac prefetch sweep experiments with Streamlit UI"
 
+COPY --from=python-runtime /opt/python/ /usr/local/
+
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
+    PYTHON_GIL=0 \
     PIP_NO_CACHE_DIR=1 \
     JASECI_ENV_ROOT=/workspace \
     JAC_BIN=/usr/local/bin/jac \
@@ -21,6 +41,8 @@ RUN apt-get update \
         docker-compose \
         docker.io \
         git \
+        libgcc-s1 \
+        libstdc++6 \
         openssh-client \
         procps \
     && rm -rf /var/lib/apt/lists/*
@@ -51,22 +73,45 @@ COPY jacord /workspace/jacord
 COPY jdrive /workspace/jdrive
 COPY jsearch /workspace/jsearch
 
-RUN python -m pip install --upgrade pip setuptools wheel \
+RUN rm -rf /workspace/jaseci/jac-scale/jac_scale.egg-info \
+    && python -m pip install --upgrade pip setuptools wheel \
+    && python -m pip install \
+        "llvmlite==0.47.0" \
+        "bcrypt==5.0.0" \
     && python -m pip install -e /workspace/jaseci/jac \
     && python -m pip install \
-        -r /workspace/jaseci/jac-scale/jac_scale.egg-info/requires.txt \
         -r /workspace/jaseci_external_tools/sweep_tool/requirements.txt \
+        "rich>=13.0.0" \
+        "python-dotenv>=1.2.1,<2.0.0" \
+        "fastapi>=0.121.3,<0.122.0" \
+        "uvicorn[standard]>=0.38.0,<0.39.0" \
+        "pyjwt>=2.10.1,<2.11.0" \
+        "fastapi-sso>=0.21.0,<1.0.0" \
+        "python-multipart>=0.0.21,<1.0.0" \
+        "aiohttp>=3.9.0,<4.0.0" \
+        "sqlalchemy>=2.0.0,<3.0.0" \
+        "email-validator>=2.3.0,<3.0.0" \
+        "pymongo>=4.15.4,<5.0.0" \
+        "redis>=7.1.0,<8.0.0" \
+        "prometheus-client>=0.21.0,<1.0.0" \
+        "apscheduler>=3.11.2,<4.0.0" \
+        "kubernetes>=34.1.0,<35.0.0" \
+        "docker>=7.1.0,<8.0.0" \
         matplotlib \
         requests \
-    && python - <<'PY'
-import site
-from pathlib import Path
+    && python -c 'import site; from pathlib import Path; Path(site.getsitepackages()[0], "jac_scale_local.pth").write_text("/workspace/jaseci/jac-scale\n")'
 
-site_packages = Path(site.getsitepackages()[0])
-(site_packages / "jac_scale_local.pth").write_text("/workspace/jaseci/jac-scale\n")
+RUN python - <<'PY'
+import sys
+import sysconfig
+
+import jaclang
+import jac_scale
+
+assert sysconfig.get_config_var("Py_GIL_DISABLED") == 1, sys.version
+if hasattr(sys, "_is_gil_enabled"):
+    assert not sys._is_gil_enabled(), "free-threaded Python is running with the GIL enabled"
 PY
-
-RUN python -c "import jaclang, jac_scale"
 
 COPY jaseci_external_tools/docker/entrypoint.sh /usr/local/bin/experiment
 COPY jaseci_external_tools/docker/run_all_sweeps.py /usr/local/bin/run-all-sweeps

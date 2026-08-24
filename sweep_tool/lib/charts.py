@@ -4,6 +4,8 @@ in each app's own plot_* scripts)."""
 from __future__ import annotations
 
 from collections import defaultdict
+from pathlib import Path
+import pstats
 
 import numpy as np
 import pandas as pd
@@ -37,6 +39,9 @@ POLICY_ORDER = {
 }
 
 JACORD_TTG_HIDDEN_ROOT_PREFETCH = 200
+
+MEMORY_SOCKET_FUNC_MARKERS = ("recv", "recv_into", "send", "sendall")
+MEMORY_SOCKET_CALLER_MARKERS = ("/site-packages/redis/", "/site-packages/pymongo/")
 
 
 def _df_group_cols(df: pd.DataFrame) -> list[str]:
@@ -304,6 +309,129 @@ def cache_tier_mix(df: pd.DataFrame) -> go.Figure:
     return fig
 
 
+def db_request_count(df: pd.DataFrame, logs: list[TrialLog]) -> go.Figure:
+    """Median number of requests that reached the backing store.
+
+    Prefer the extended access log's operation-level call counts. Older runs
+    only have tier rows, so fall back to L3+MISS counts from the sweep CSV.
+    """
+    fig = _db_request_count_from_logs(logs)
+    if fig.data:
+        return fig
+    return _db_request_count_from_csv(df)
+
+
+def _db_request_count_from_logs(logs: list[TrialLog]) -> go.Figure:
+    by: dict[tuple[str, int], dict[str, list[int]]] = defaultdict(lambda: defaultdict(list))
+    any_data = False
+    for tl in logs:
+        if not tl.db_ops:
+            continue
+        any_data = True
+        for op, d in tl.db_ops.items():
+            by[_log_key(tl)][op].append(d.get("db_calls", 0))
+    if not any_data:
+        return go.Figure()
+
+    limits = _sort_log_keys(by.keys())
+    x = [_log_label(limit) for limit in limits]
+    ops = DB_OPS + sorted({op for lim in by.values() for op in lim} - set(DB_OPS))
+    fig = go.Figure()
+    for op in ops:
+        y = [int(np.median(by[limit][op])) if by[limit].get(op) else 0 for limit in limits]
+        if max(y) == 0:
+            continue
+        fig.add_bar(
+            x=x,
+            y=y,
+            name=op,
+            marker_color=DB_OP_COLOR.get(op, "#333333"),
+            hovertemplate=f"{op}: %{{y}} DB requests<extra></extra>",
+        )
+    fig.update_layout(
+        barmode="stack",
+        title="DB request count by operation (L3/DB calls, median over trials)",
+        xaxis_title="policy / prefetch_limit",
+        yaxis_title="DB requests",
+        template="plotly_white",
+        margin=dict(l=60, r=20, t=60, b=60),
+    )
+    return fig
+
+
+def _db_request_count_from_csv(df: pd.DataFrame) -> go.Figure:
+    required = {"prefetch_limit", "l3", "miss"}
+    if df.empty or not required.issubset(df.columns):
+        return go.Figure()
+
+    work = df.copy()
+    if "policy" not in work.columns:
+        work["policy"] = "default"
+    work["policy"] = work["policy"].fillna("default").astype(str).str.lower()
+    for col in required:
+        work[col] = pd.to_numeric(work[col], errors="coerce")
+    work = work.dropna(subset=["prefetch_limit"])
+    if work.empty:
+        return go.Figure()
+    work["db_requests"] = work["l3"].fillna(0) + work["miss"].fillna(0)
+    work = _hide_repeated_none_baseline(work)
+    if work.empty:
+        return go.Figure()
+
+    med = (
+        work.groupby(["policy", "prefetch_limit"])
+        .agg(
+            db_requests=("db_requests", "median"),
+            l3=("l3", "median"),
+            miss=("miss", "median"),
+            trials=("trial", "count") if "trial" in work.columns else ("db_requests", "count"),
+        )
+        .reset_index()
+    )
+    if med.empty:
+        return go.Figure()
+
+    med, limits, bar_width = _positioned_policy_limit_bars(med)
+    fig = go.Figure()
+    for policy in sorted(med["policy"].unique(), key=_policy_sort_key):
+        s = med[med["policy"] == policy].sort_values("prefetch_limit")
+        custom = np.stack(
+            [s["prefetch_limit"], s["l3"], s["miss"], s["trials"]],
+            axis=-1,
+        )
+        fig.add_bar(
+            x=s["_x"],
+            y=s["db_requests"],
+            width=[bar_width * 0.86] * len(s),
+            name=policy,
+            marker_color=_policy_color(policy),
+            customdata=custom,
+            hovertemplate=(
+                "policy=" + policy + "<br>"
+                "prefetch_limit=%{customdata[0]:.0f}<br>"
+                "DB requests=%{y:.0f}<br>"
+                "L3=%{customdata[1]:.0f}<br>"
+                "MISS=%{customdata[2]:.0f}<br>"
+                "trials=%{customdata[3]:.0f}"
+                "<extra></extra>"
+            ),
+        )
+    fig.update_layout(
+        title="DB request count (L3 + MISS tier touches, median over trials)",
+        xaxis=dict(
+            title="prefetch_limit",
+            tickmode="array",
+            tickvals=list(range(len(limits))),
+            ticktext=[_format_limit(limit) for limit in limits],
+        ),
+        yaxis_title="DB requests",
+        legend_title="policy",
+        template="plotly_white",
+        margin=dict(l=60, r=20, t=60, b=60),
+    )
+    return fig
+
+
 def hit_rate_summary(df: pd.DataFrame) -> pd.DataFrame:
     """Compact per-policy summary for the Analyze tab."""
     required = {"prefetch_limit", "l1_hit_rate", "l1", "l2", "l3", "miss"}
@@ -366,7 +494,7 @@ def hit_rate_summary(df: pd.DataFrame) -> pd.DataFrame:
 def e2e_stack(df: pd.DataFrame) -> go.Figure:
     """Grouped stacked-vs-side-by-side bar: for each prefetch_limit,
     left bar is e2e stack (walker + ttg + topo + misc), right bar is the
-    honest prefetcher wall time."""
+    background prefetch elapsed time."""
     if df.empty:
         return go.Figure()
     group_cols = _df_group_cols(df)
@@ -407,11 +535,11 @@ def e2e_stack(df: pd.DataFrame) -> go.Figure:
         marker_color="lightgray", offsetgroup="e2e",
         hovertemplate="misc: %{y:.0f} ms<extra></extra>",
     )
-    # Prefetcher wall (right bar).  Distinct offsetgroup to sit alongside.
+    # Background prefetch (right bar). Distinct offsetgroup to sit alongside.
     fig.add_bar(
-        x=limits, y=prefetch, name="Prefetcher (wall)",
+        x=limits, y=prefetch, name="Background prefetch",
         marker_color="orange", offsetgroup="prefetch",
-        hovertemplate="prefetch wall: %{y:.0f} ms<extra></extra>",
+        hovertemplate="background prefetch: %{y:.0f} ms<extra></extra>",
     )
     # L1 hit rate overlay on secondary y-axis when present.
     if hit_rate is not None:
@@ -424,7 +552,7 @@ def e2e_stack(df: pd.DataFrame) -> go.Figure:
         )
     layout_kwargs = dict(
         barmode="stack",
-        title="E2E vs Prefetch Limit — left bar = e2e stack, right bar = prefetch wall (median over trials)",
+        title="E2E vs Prefetch Limit - left bar = e2e stack, right bar = background prefetch (median over trials)",
         xaxis_title="prefetch_limit",
         yaxis_title="Time (ms)",
         legend_title="",
@@ -440,6 +568,265 @@ def e2e_stack(df: pd.DataFrame) -> go.Figure:
         )
     fig.update_layout(**layout_kwargs)
     return fig
+
+
+def memory_time_reduction(df: pd.DataFrame, profiles_dir: Path) -> go.Figure:
+    """Median socket I/O self-time spent below Redis/PyMongo.
+
+    This intentionally uses caller-attributed cProfile self time for socket
+    send/recv calls, not cumulative time. It excludes serializer, cache
+    bookkeeping, and most client-library CPU, keeping this chart focused on
+    blocking storage I/O rather than surrounding walker CPU.
+    """
+    profile_rows = _load_memory_profile_rows(profiles_dir)
+    if profile_rows.empty:
+        return go.Figure()
+    work = _join_profiles_to_sweep_rows(df, profile_rows)
+    if work.empty:
+        return go.Figure()
+
+    stats = (
+        work.groupby(["policy", "prefetch_limit"])
+        .agg(
+            memory_median=("memory_ms", "median"),
+            memory_p25=("memory_ms", lambda s: s.quantile(0.25)),
+            memory_p75=("memory_ms", lambda s: s.quantile(0.75)),
+            prefetch_median=("prefetch_ms", "median"),
+            prefetch_p25=("prefetch_ms", lambda s: s.quantile(0.25)),
+            prefetch_p75=("prefetch_ms", lambda s: s.quantile(0.75)),
+            trials=("memory_ms", "count"),
+        )
+        .reset_index()
+    )
+    stats = _hide_repeated_none_baseline(stats)
+    if stats.empty:
+        return go.Figure()
+
+    baseline = stats[
+        (stats["policy"].astype(str) == "none")
+        & (pd.to_numeric(stats["prefetch_limit"], errors="coerce").fillna(-1) == 0)
+    ]["memory_median"]
+    baseline_ms = float(baseline.iloc[0]) if not baseline.empty and baseline.iloc[0] > 0 else None
+    if baseline_ms:
+        stats["reduction_pct"] = 100.0 * (baseline_ms - stats["memory_median"]) / baseline_ms
+    else:
+        stats["reduction_pct"] = np.nan
+
+    stats, limits, bar_width = _positioned_policy_limit_bars(stats)
+    stacked_width = bar_width * 0.86
+    fig = go.Figure()
+    for policy in sorted(stats["policy"].unique(), key=_policy_sort_key):
+        s = stats[stats["policy"] == policy].sort_values("prefetch_limit")
+        color = _policy_color(policy)
+
+        memory_upper = np.maximum(s["memory_p75"] - s["memory_median"], 0)
+        memory_lower = np.maximum(s["memory_median"] - s["memory_p25"], 0)
+        memory_custom = np.stack(
+            [
+                s["prefetch_limit"],
+                s["memory_p25"],
+                s["memory_p75"],
+                s["trials"],
+                s["reduction_pct"],
+            ],
+            axis=-1,
+        )
+        fig.add_bar(
+            x=s["_x"],
+            y=s["memory_median"],
+            width=[stacked_width] * len(s),
+            name=f"{policy} storage I/O",
+            legendgroup=policy,
+            marker_color=color,
+            error_y=dict(
+                type="data",
+                array=memory_upper,
+                arrayminus=memory_lower,
+                visible=bool((memory_upper > 0).any() or (memory_lower > 0).any()),
+                thickness=1.2,
+                width=3,
+            ),
+            customdata=memory_custom,
+            hovertemplate=(
+                "policy=" + policy + "<br>"
+                "component=blocking storage I/O<br>"
+                "prefetch_limit=%{customdata[0]:.0f}<br>"
+                "median storage I/O=%{y:.1f} ms<br>"
+                "IQR=%{customdata[1]:.1f}-"
+                "%{customdata[2]:.1f} ms<br>"
+                "reduction vs none:0=%{customdata[4]:.1f}%<br>"
+                "trials=%{customdata[3]:.0f}"
+                "<extra></extra>"
+            ),
+        )
+
+        prefetch = s.dropna(subset=["prefetch_median"])
+        if not prefetch.empty and (prefetch["prefetch_median"].fillna(0) > 0).any():
+            prefetch_upper = np.maximum(prefetch["prefetch_p75"] - prefetch["prefetch_median"], 0)
+            prefetch_lower = np.maximum(prefetch["prefetch_median"] - prefetch["prefetch_p25"], 0)
+            prefetch_custom = np.stack(
+                [
+                    prefetch["prefetch_limit"],
+                    prefetch["prefetch_p25"],
+                    prefetch["prefetch_p75"],
+                    prefetch["trials"],
+                ],
+                axis=-1,
+            )
+            fig.add_bar(
+                x=prefetch["_x"],
+                y=prefetch["prefetch_median"],
+                width=[stacked_width] * len(prefetch),
+                name=f"{policy} prefetcher",
+                legendgroup=policy,
+                marker=dict(
+                    color=color,
+                    opacity=0.72,
+                    pattern=dict(shape="/", solidity=0.28, fgcolor=color),
+                ),
+                error_y=dict(
+                    type="data",
+                    array=prefetch_upper,
+                    arrayminus=prefetch_lower,
+                    visible=bool((prefetch_upper > 0).any() or (prefetch_lower > 0).any()),
+                    thickness=1.2,
+                    width=3,
+                ),
+                customdata=prefetch_custom,
+                hovertemplate=(
+                    "policy=" + policy + "<br>"
+                    "component=background prefetch<br>"
+                    "prefetch_limit=%{customdata[0]:.0f}<br>"
+                    "median background prefetch=%{y:.1f} ms<br>"
+                    "IQR=%{customdata[1]:.1f}-"
+                    "%{customdata[2]:.1f} ms<br>"
+                    "trials=%{customdata[3]:.0f}"
+                    "<extra></extra>"
+                ),
+            )
+
+    if baseline_ms:
+        fig.add_hline(
+            y=baseline_ms,
+            line_dash="dot",
+            line_color="#7f7f7f",
+            annotation_text=f"none:0 median {baseline_ms:.0f} ms",
+            annotation_position="top left",
+        )
+
+    fig.update_layout(
+        title="Blocking storage I/O time with background prefetch time stacked",
+        barmode="stack",
+        xaxis=dict(
+            title="prefetch_limit",
+            tickmode="array",
+            tickvals=list(range(len(limits))),
+            ticktext=[_format_limit(limit) for limit in limits],
+        ),
+        yaxis=dict(title="Time (ms)"),
+        template="plotly_white",
+        legend_title="policy / component",
+        margin=dict(l=60, r=20, t=70, b=60),
+    )
+    return fig
+
+
+def _load_memory_profile_rows(profiles_dir: Path) -> pd.DataFrame:
+    if not profiles_dir.exists():
+        return pd.DataFrame()
+    rows: list[dict[str, object]] = []
+    for profile_path in sorted(profiles_dir.glob("policy_*/limit_*/*/trial_*/jac_server.prof")):
+        ident = _profile_path_identity(profiles_dir, profile_path)
+        if not ident:
+            continue
+        memory_ms = _profile_memory_self_ms(profile_path)
+        if memory_ms is None:
+            continue
+        ident["memory_ms"] = memory_ms
+        rows.append(ident)
+    return pd.DataFrame(rows)
+
+
+def _profile_path_identity(profiles_dir: Path, profile_path: Path) -> dict[str, object] | None:
+    try:
+        parts = profile_path.relative_to(profiles_dir).parts
+    except ValueError:
+        return None
+    if len(parts) < 5:
+        return None
+    policy_part, limit_part, walker, trial_part = parts[:4]
+    if not policy_part.startswith("policy_") or not limit_part.startswith("limit_"):
+        return None
+    if not trial_part.startswith("trial_"):
+        return None
+    try:
+        limit = int(limit_part.removeprefix("limit_"))
+        trial = int(trial_part.removeprefix("trial_"))
+    except ValueError:
+        return None
+    return {
+        "policy": policy_part.removeprefix("policy_"),
+        "prefetch_limit": limit,
+        "walker": walker,
+        "trial": trial,
+        "profile_path": str(profile_path),
+    }
+
+
+def _profile_memory_self_ms(profile_path: Path) -> float | None:
+    try:
+        stats = pstats.Stats(str(profile_path))
+    except Exception:
+        return None
+
+    total_sec = 0.0
+    for func, values in stats.stats.items():
+        callers = values[4]
+        total_sec += _memory_socket_self_sec(func, callers, float(values[2]))
+    return total_sec * 1000.0
+
+
+def _memory_socket_self_sec(func, callers: dict, self_sec: float) -> float:
+    filename, _line, func_name = func
+    path = str(filename).replace("\\", "/")
+    if path != "~" or not any(marker in str(func_name) for marker in MEMORY_SOCKET_FUNC_MARKERS):
+        return 0.0
+    caller_self = 0.0
+    for caller, caller_values in callers.items():
+        caller_path = str(caller[0]).replace("\\", "/")
+        if any(marker in caller_path for marker in MEMORY_SOCKET_CALLER_MARKERS):
+            caller_self += float(caller_values[2])
+    return min(caller_self, self_sec)
+
+
+def _join_profiles_to_sweep_rows(df: pd.DataFrame, profile_rows: pd.DataFrame) -> pd.DataFrame:
+    if profile_rows.empty:
+        return profile_rows
+    if df.empty:
+        return profile_rows
+
+    work = df.copy()
+    if "policy" not in work.columns:
+        work["policy"] = np.where(
+            pd.to_numeric(work.get("prefetch_limit", 0), errors="coerce").fillna(0) > 0,
+            "ttg",
+            "none",
+        )
+    if "walker" not in work.columns:
+        work["walker"] = profile_rows["walker"].iloc[0]
+
+    for col in ("prefetch_limit", "trial"):
+        work[col] = pd.to_numeric(work[col], errors="coerce").astype("Int64")
+    work["policy"] = work["policy"].astype(str)
+    work["walker"] = work["walker"].astype(str)
+
+    keys = ["policy", "prefetch_limit", "walker", "trial"]
+    keep = keys + [col for col in ("prefetch_ms",) if col in work.columns]
+    valid = work[keep].dropna(subset=keys).drop_duplicates(subset=keys)
+    out = profile_rows.merge(valid, on=keys, how="inner")
+    if "prefetch_ms" not in out.columns:
+        out["prefetch_ms"] = np.nan
+    return out if not out.empty else profile_rows
 
 
 def hit_counts_request_done(logs: list[TrialLog]) -> go.Figure:
@@ -572,7 +959,7 @@ def worker_times(logs: list[TrialLog]) -> go.Figure:
             hovertemplate="%{y:.1f} ms<extra>" + str(case) + "</extra>",
         )
     fig.update_layout(
-        title="Per-worker prefetch wall time (max of the box ≈ prefetch_ms CSV column)",
+        title="Per-worker background prefetch time (max of the box ~= prefetch_ms CSV column)",
         xaxis_title="prefetch_limit",
         yaxis_title="Worker duration (ms)",
         template="plotly_white",

@@ -8,7 +8,7 @@ name: jac-prefetch-experiment
 
 services:
   sweep:
-    image: ghcr.io/gorgeous-patrick/jaseci_external_tools:latest
+    image: ${EXPERIMENT_IMAGE:-ghcr.io/gorgeous-patrick/jaseci_external_tools:free-threaded}
     container_name: jac-prefetch-sweep
     restart: unless-stopped
     ports:
@@ -34,7 +34,7 @@ services:
     command: ["streamlit"]
 
   export-results:
-    image: ghcr.io/gorgeous-patrick/jaseci_external_tools:latest
+    image: ${EXPERIMENT_IMAGE:-ghcr.io/gorgeous-patrick/jaseci_external_tools:free-threaded}
     profiles: ["tools"]
     volumes:
       - ./exports:/exports

@@ -141,7 +141,7 @@ def _expected_dumps(adapter, manifest: mf.Manifest) -> list[str]:
     names: list[str] = []
     if hasattr(adapter, "_configured_dump"):
         names.append(adapter._configured_dump())
-    elif manifest.name in {"jsearch", "littlex5"}:
+    elif manifest.name in {"jdrive", "jsearch", "littlex5"}:
         names.append("jac_db.dump")
 
     for param in manifest.parameters:

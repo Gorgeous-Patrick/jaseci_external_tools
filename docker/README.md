@@ -6,7 +6,10 @@ benchmark app code so the prefetch experiments can move to a stable machine.
 Build from the `jaseci_env` root:
 
 ```bash
-docker build -f jaseci_external_tools/Dockerfile.experiment -t jac-prefetch-experiment:latest .
+docker build \
+  -f jaseci_external_tools/Dockerfile.experiment \
+  -t jac-prefetch-experiment:free-threaded \
+  .
 ```
 
 Run the Streamlit UI:
@@ -24,7 +27,7 @@ docker run --rm -it \
   -e SWEEP_DB_HOST=clarity2 \
   -e SWEEP_DB_REMOTE_APP_ROOT=/home/baichuan/jaseci_remote_apps \
   -e SWEEP_DB_SSH_OPTIONS="-F /root/.ssh/config" \
-  jac-prefetch-experiment:latest streamlit
+  jac-prefetch-experiment:free-threaded streamlit
 ```
 
 Run one foreground sweep:
@@ -37,7 +40,7 @@ docker run --rm -it \
   -e SWEEP_DB_HOST=clarity2 \
   -e SWEEP_DB_REMOTE_APP_ROOT=/home/baichuan/jaseci_remote_apps \
   -e SWEEP_DB_SSH_OPTIONS="-F /root/.ssh/config" \
-  jac-prefetch-experiment:latest sweep jacord
+  jac-prefetch-experiment:free-threaded sweep jacord
 ```
 
 Run all manifests sequentially:
@@ -55,7 +58,7 @@ docker run --rm -it \
   -e SWEEP_DB_HOST=clarity2 \
   -e SWEEP_DB_REMOTE_APP_ROOT=/home/baichuan/jaseci_remote_apps \
   -e SWEEP_DB_SSH_OPTIONS="-F /root/.ssh/config" \
-  jac-prefetch-experiment:latest run-all jacord jdrive jsearch linked_list littlex5
+  jac-prefetch-experiment:free-threaded run-all jacord jdrive jsearch linked_list littlex5
 ```
 
 Run the published image on a remote machine:
@@ -76,6 +79,15 @@ ssh -L 8501:localhost:8501 clarity1
 ```
 
 Then open `http://localhost:8501`.
+
+To verify the remote container is using free-threaded Python:
+
+```bash
+docker compose exec sweep python -c \
+  'import sys, sysconfig; print(sys.version); print(sysconfig.get_config_var("Py_GIL_DISABLED")); print(sys._is_gil_enabled())'
+```
+
+The second line should be `1`; the third line should be `False`.
 
 Export remote results:
 

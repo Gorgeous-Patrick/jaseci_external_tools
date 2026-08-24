@@ -48,7 +48,8 @@ class TrialLog:
     max_length: int | None = None
     distinct_ids_by_tier: dict[str, int] = field(default_factory=dict)
     # New extended access log (op,tier,n_in,n_out,type): per-op DB traffic.
-    # {op: {"calls": N, "docs": sum(n_out), "db_docs": sum(n_out @ L3/DB)}}
+    # {op: {"calls": N, "docs": sum(n_out), "db_calls": calls @ L3/DB,
+    #       "db_docs": sum(n_out @ L3/DB)}}
     db_ops: dict[str, dict[str, int]] = field(default_factory=dict)
 
     @property
@@ -183,6 +184,7 @@ def _load_access_log_db_ops(
     op,tier,n_in,n_out,type).
 
     Returns {op: {"calls": N, "docs": sum(n_out),
+                  "db_calls": calls where tier in {L3, DB},
                   "db_docs": sum(n_out where tier in {L3, DB})}}.
     ``db_docs`` is the real DB read volume (L1/L2 are cache hits, excluded).
     Empty if the log is the old id,tier,type schema or missing.
@@ -204,10 +206,11 @@ def _load_access_log_db_ops(
                     n_out = int(row.get("n_out") or 0)
                 except ValueError:
                     n_out = 0
-                d = agg.setdefault(op, {"calls": 0, "docs": 0, "db_docs": 0})
+                d = agg.setdefault(op, {"calls": 0, "docs": 0, "db_calls": 0, "db_docs": 0})
                 d["calls"] += 1
                 d["docs"] += n_out
                 if tier in ("L3", "DB"):
+                    d["db_calls"] += 1
                     d["db_docs"] += n_out
     return agg
 

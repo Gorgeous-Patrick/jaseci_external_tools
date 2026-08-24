@@ -251,6 +251,8 @@ with tab_analyze:
             ("chart_l1_hit_rate_by_policy", charts.l1_hit_rate_by_policy, (df,)),
             ("chart_cache_tier_mix", charts.cache_tier_mix, (df,)),
             ("chart_e2e_stack", charts.e2e_stack, (df,)),
+            ("chart_memory_time_reduction", charts.memory_time_reduction, (df, m.app_dir / m.profiles_dir)),
+            ("chart_db_request_count", charts.db_request_count, (df, logs)),
             ("chart_db_access_by_op", charts.db_access_by_op, (logs,)),
             ("chart_coverage", charts.coverage, (df, logs)),
             ("chart_hit_counts_request_done", charts.hit_counts_request_done, (logs,)),
