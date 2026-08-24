@@ -141,7 +141,8 @@ def login(base_url: str, username: str, password: str) -> str:
         },
     )
     data = resp.json()
-    token = data.get("data", {}).get("token")
+    payload = data.get("data")
+    token = payload.get("token") if isinstance(payload, dict) else None
     if resp.status >= 400 or not token:
         body = resp.body.decode("utf-8", errors="replace")[:500]
         raise RuntimeError(f"login failed for {username}: HTTP {resp.status} {body}")
