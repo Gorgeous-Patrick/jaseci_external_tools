@@ -137,8 +137,11 @@ class JacordAdapter(BenchmarkAdapter):
         if not ids:
             raise RuntimeError("Jacord ListChannelIds returned no channel IDs")
 
-        pick_mode = (self.options.env.get("JACORD_CHANNEL_PICK") or "largest").strip().lower()
-        if pick_mode in {"first", "lexicographic"}:
+        pick_mode = (self.options.env.get("JACORD_CHANNEL_PICK") or "first").strip().lower()
+        if pick_mode == "first":
+            channel_id = ids[0]
+            message_count = self._count_channel_messages(walker, channel_id, token)
+        elif pick_mode == "lexicographic":
             channel_id = sorted(ids)[0]
             message_count = self._count_channel_messages(walker, channel_id, token)
         elif pick_mode == "largest":

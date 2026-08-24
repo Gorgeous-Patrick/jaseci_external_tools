@@ -144,12 +144,13 @@ parameters:
   - name: JACORD_CHANNEL_PICK
     label: Channel picker
     kind: enum
-    default: "largest"
-    choices: ["largest", "first"]
+    default: "first"
+    choices: ["first", "largest"]
     help: >
-      How to select a channel when JACORD_CHANNEL_ID is blank. largest probes
-      candidate channels once and reuses the largest target for the whole
-      sweep; first preserves the old lexicographic selection behavior.
+      How to select a channel when JACORD_CHANNEL_ID is blank. first uses the
+      first channel returned by ListChannelIds without probing candidates;
+      largest probes candidate channels once and reuses the largest target for
+      the whole sweep.
 
   - name: JACORD_CHANNEL_SCAN_LIMIT
     label: Channel scan
