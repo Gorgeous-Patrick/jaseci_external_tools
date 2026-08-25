@@ -1,11 +1,15 @@
 [db]
-mode = "local_docker"
+mode = "remote_ssh"
+host = "clarity2"
+remote_app_root = "/home/baichuan/jaseci_remote_apps"
+ssh_options = ["-F", "/home/patrickli/.ssh/config"]
 
 # Two-machine setup:
 # mode = "remote_ssh"
 # host = "MACHINE2_HOST_OR_IP"
 # ssh_user = "patrickli"
 # remote_app_root = "/abs/path/to/benchmark/apps/on/machine2"
+# ssh_options = ["-F", "/home/patrickli/.ssh/config"]
 #
 # If mongo_uri/redis_url are omitted in remote_ssh mode, the sweep keeps each
 # app's local port and replaces localhost with db.host. For example, jsearch
@@ -17,3 +21,23 @@ mode = "local_docker"
 # [db.apps.jsearch]
 # mongo_uri = "mongodb://MACHINE2_HOST_OR_IP:27019"
 # redis_url = "redis://MACHINE2_HOST_OR_IP:6381"
+
+[db.apps.jacord]
+mongo_uri = "mongodb://clarity2.eecs.umich.edu:27017"
+redis_url = "redis://clarity2.eecs.umich.edu:6379"
+
+[db.apps.littlex5]
+mongo_uri = "mongodb://clarity2.eecs.umich.edu:27017"
+redis_url = "redis://clarity2.eecs.umich.edu:6379"
+
+[db.apps.linked_list]
+mongo_uri = "mongodb://clarity2.eecs.umich.edu:27017"
+redis_url = "redis://clarity2.eecs.umich.edu:6379"
+
+[db.apps.jdrive]
+mongo_uri = "mongodb://clarity2.eecs.umich.edu:27018"
+redis_url = "redis://clarity2.eecs.umich.edu:6380"
+
+[db.apps.jsearch]
+mongo_uri = "mongodb://clarity2.eecs.umich.edu:27019"
+redis_url = "redis://clarity2.eecs.umich.edu:6381"
