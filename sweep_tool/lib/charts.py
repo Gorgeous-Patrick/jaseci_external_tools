@@ -1119,8 +1119,219 @@ def db_access_by_op(logs: list[TrialLog]) -> go.Figure:
     return fig
 
 
+def churn_coverage(df: pd.DataFrame) -> go.Figure:
+    """Line chart for Jacord churn coverage."""
+    required = {"churn_rate", "policy", "coverage"}
+    if df.empty or not required.issubset(df.columns):
+        return go.Figure()
+    work = df.copy()
+    for col in ("churn_rate", "coverage", "analytic_stale_coverage"):
+        if col in work.columns:
+            work[col] = pd.to_numeric(work[col], errors="coerce")
+    work["policy"] = work["policy"].fillna("").astype(str).str.lower()
+    work = work.dropna(subset=["churn_rate", "coverage"])
+    if work.empty:
+        return go.Figure()
+
+    stats = (
+        work.groupby(["policy", "churn_rate"])["coverage"]
+        .agg(
+            median="median",
+            p25=lambda s: s.quantile(0.25),
+            p75=lambda s: s.quantile(0.75),
+            trials="count",
+        )
+        .reset_index()
+    )
+    fig = go.Figure()
+    for policy in sorted(stats["policy"].unique(), key=_policy_sort_key):
+        s = stats[stats["policy"] == policy].sort_values("churn_rate")
+        upper = np.maximum(s["p75"] - s["median"], 0)
+        lower = np.maximum(s["median"] - s["p25"], 0)
+        fig.add_scatter(
+            x=s["churn_rate"],
+            y=s["median"],
+            mode="lines+markers",
+            name=policy,
+            line=dict(color=_policy_color(policy)),
+            error_y=dict(
+                type="data",
+                array=upper,
+                arrayminus=lower,
+                visible=bool((upper > 0).any() or (lower > 0).any()),
+                thickness=1.2,
+                width=3,
+            ),
+            customdata=np.stack([s["p25"], s["p75"], s["trials"]], axis=-1),
+            hovertemplate=(
+                "policy=%{fullData.name}<br>"
+                "churn=%{x:.0f}%<br>"
+                "median coverage=%{y:.1f}%<br>"
+                "IQR=%{customdata[0]:.1f}%-"
+                "%{customdata[1]:.1f}%<br>"
+                "trials=%{customdata[2]:.0f}"
+                "<extra></extra>"
+            ),
+        )
+
+    if "analytic_stale_coverage" in work.columns:
+        ceiling = (
+            work.dropna(subset=["analytic_stale_coverage"])
+            .groupby("churn_rate")["analytic_stale_coverage"]
+            .median()
+            .reset_index()
+            .sort_values("churn_rate")
+        )
+        if not ceiling.empty:
+            fig.add_scatter(
+                x=ceiling["churn_rate"],
+                y=ceiling["analytic_stale_coverage"],
+                mode="lines",
+                name="analytic stale ceiling",
+                line=dict(color="#111111", dash="dash"),
+                hovertemplate="churn=%{x:.0f}%<br>ceiling=%{y:.1f}%<extra></extra>",
+            )
+
+    fig.update_layout(
+        title="Jacord churn coverage",
+        xaxis_title="churn rate (%)",
+        yaxis=dict(title="Coverage (%)", range=[0, 105], ticksuffix="%"),
+        template="plotly_white",
+        margin=dict(l=60, r=20, t=60, b=60),
+    )
+    return fig
+
+
+def churn_hit_rate(df: pd.DataFrame) -> go.Figure:
+    """Line chart for Jacord churn L1 hit rate."""
+    required = {"churn_rate", "policy", "l1_hit_rate"}
+    if df.empty or not required.issubset(df.columns):
+        return go.Figure()
+    work = df.copy()
+    for col in ("churn_rate", "l1_hit_rate"):
+        work[col] = pd.to_numeric(work[col], errors="coerce")
+    work["policy"] = work["policy"].fillna("").astype(str).str.lower()
+    work = work.dropna(subset=["churn_rate", "l1_hit_rate"])
+    if work.empty:
+        return go.Figure()
+
+    stats = (
+        work.groupby(["policy", "churn_rate"])["l1_hit_rate"]
+        .agg(
+            median="median",
+            p25=lambda s: s.quantile(0.25),
+            p75=lambda s: s.quantile(0.75),
+            trials="count",
+        )
+        .reset_index()
+    )
+    fig = go.Figure()
+    for policy in sorted(stats["policy"].unique(), key=_policy_sort_key):
+        s = stats[stats["policy"] == policy].sort_values("churn_rate")
+        upper = np.maximum(s["p75"] - s["median"], 0)
+        lower = np.maximum(s["median"] - s["p25"], 0)
+        fig.add_scatter(
+            x=s["churn_rate"],
+            y=s["median"],
+            mode="lines+markers",
+            name=policy,
+            line=dict(color=_policy_color(policy)),
+            error_y=dict(
+                type="data",
+                array=upper,
+                arrayminus=lower,
+                visible=bool((upper > 0).any() or (lower > 0).any()),
+                thickness=1.2,
+                width=3,
+            ),
+            customdata=np.stack([s["p25"], s["p75"], s["trials"]], axis=-1),
+            hovertemplate=(
+                "policy=%{fullData.name}<br>"
+                "churn=%{x:.0f}%<br>"
+                "median L1 hit=%{y:.1f}%<br>"
+                "IQR=%{customdata[0]:.1f}%-"
+                "%{customdata[1]:.1f}%<br>"
+                "trials=%{customdata[2]:.0f}"
+                "<extra></extra>"
+            ),
+        )
+
+    fig.update_layout(
+        title="Jacord churn hit rate",
+        xaxis_title="churn rate (%)",
+        yaxis=dict(title="L1 hit rate (%)", range=[0, 105], ticksuffix="%"),
+        template="plotly_white",
+        margin=dict(l=60, r=20, t=60, b=60),
+    )
+    return fig
+
+
+def churn_e2e(df: pd.DataFrame) -> go.Figure:
+    """Line chart for Jacord churn e2e latency."""
+    required = {"churn_rate", "policy", "e2e_ms"}
+    if df.empty or not required.issubset(df.columns):
+        return go.Figure()
+    work = df.copy()
+    for col in ("churn_rate", "e2e_ms"):
+        work[col] = pd.to_numeric(work[col], errors="coerce")
+    work["policy"] = work["policy"].fillna("").astype(str).str.lower()
+    work = work.dropna(subset=["churn_rate", "e2e_ms"])
+    if work.empty:
+        return go.Figure()
+
+    stats = (
+        work.groupby(["policy", "churn_rate"])["e2e_ms"]
+        .agg(
+            median="median",
+            p25=lambda s: s.quantile(0.25),
+            p75=lambda s: s.quantile(0.75),
+            trials="count",
+        )
+        .reset_index()
+    )
+    fig = go.Figure()
+    for policy in sorted(stats["policy"].unique(), key=_policy_sort_key):
+        s = stats[stats["policy"] == policy].sort_values("churn_rate")
+        upper = np.maximum(s["p75"] - s["median"], 0)
+        lower = np.maximum(s["median"] - s["p25"], 0)
+        fig.add_scatter(
+            x=s["churn_rate"],
+            y=s["median"],
+            mode="lines+markers",
+            name=policy,
+            line=dict(color=_policy_color(policy)),
+            error_y=dict(
+                type="data",
+                array=upper,
+                arrayminus=lower,
+                visible=bool((upper > 0).any() or (lower > 0).any()),
+                thickness=1.2,
+                width=3,
+            ),
+            hovertemplate=(
+                "policy=%{fullData.name}<br>"
+                "churn=%{x:.0f}%<br>"
+                "median e2e=%{y:.1f} ms<extra></extra>"
+            ),
+        )
+
+    fig.update_layout(
+        title="Jacord churn e2e latency",
+        xaxis_title="churn rate (%)",
+        yaxis_title="E2E latency (ms)",
+        template="plotly_white",
+        margin=dict(l=60, r=20, t=60, b=60),
+    )
+    return fig
+
+
 def csv_raw(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
         return df
-    cols = ["policy", "prefetch_limit", "trial"] if "policy" in df.columns else ["prefetch_limit", "trial"]
+    if "churn_rate" in df.columns:
+        cols = ["churn_rate", "policy", "prefetch_limit", "trial"]
+    elif "policy" in df.columns:
+        cols = ["policy", "prefetch_limit", "trial"]
+    else:
+        cols = ["prefetch_limit", "trial"]
     return df.sort_values(cols)

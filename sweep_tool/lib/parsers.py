@@ -21,6 +21,17 @@ from pathlib import Path
 import pandas as pd
 
 
+TEXT_COLUMNS = {
+    "walker",
+    "policy",
+    "runtime_policy",
+    "request_id",
+    "oracle_file",
+    "model_file",
+    "ttg_plan_file",
+    "base_dump",
+    "churn_dump",
+}
 _HIT_STATS_MARKER = "[HIT-STATS-SERIES] "
 _WORKER_TIMES_MARKER = "[PREFETCH-WORKER-TIMES] "
 _TTG_COVERAGE_MARKER = "[TTG-COVERAGE] "
@@ -236,7 +247,7 @@ def load_csv(csv_path: Path) -> pd.DataFrame:
         return pd.DataFrame()
     df = pd.read_csv(csv_path)
     for col in df.columns:
-        if col in {"walker", "policy", "oracle_file", "model_file"}:
+        if col in TEXT_COLUMNS:
             continue
         df[col] = pd.to_numeric(df[col], errors="coerce")
     return df

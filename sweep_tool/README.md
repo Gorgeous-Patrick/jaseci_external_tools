@@ -55,6 +55,8 @@ streamlit run app.py
   (e2e stack, hit-count breakdown, prefetch-phase snapshots, worker
   time distribution).
 - **Raw data**: the results CSV as a table, downloadable.
+- **Churn**: runs the Jacord same-spawn churn experiment and plots
+  coverage and L1 hit rate across churn rates.
 
 ## Python prefetch policy runner
 
@@ -85,6 +87,46 @@ Useful knobs:
 
 The result CSV keeps the old timing/tier columns and adds `policy` and
 `oracle_file` / `model_file`.
+
+## Jacord churn experiment
+
+The Churn tab runs `tools/run_jacord_churn.py`.  It answers how each
+policy behaves between perfect same-request repetition and fully disjoint
+spawn history:
+
+1. Restore the Jacord base dump and select one `load_channel` spawn.
+2. Record a pre-churn no-prefetch trace on that same channel.
+3. Build stale history, Markov, and co-access plans from that trace.
+4. For each churn rate, restore the base dump, post deterministic new
+   messages through Jacord walkers, restart the full Mongo/Redis stack,
+   verify the same channel survives, then dump Mongo to `churn_dumps/`.
+5. Measure cold post-churn runs from each dump for `oracle`, `ttg`,
+   `history`, `markov`, `coaccess`, and `none`.
+
+The default churn rates are `0 5 10 25 50`, the default budget is
+`12000`, and the default trial count is `5`.  Churn outputs are isolated
+from the normal sweep:
+
+```text
+jacord/churn_results.csv
+jacord/churn_metadata.json
+jacord/churn_logs/
+jacord/churn_profiles/
+jacord/churn_models/
+jacord/churn_dumps/
+```
+
+The CLI equivalent of the Streamlit button is:
+
+```bash
+python tools/run_jacord_churn.py --manifest manifests/jacord.yaml
+```
+
+To regenerate paper-ready churn coverage and hit-rate PDFs:
+
+```bash
+python tools/plot_jacord_churn.py --csv ../../../jacord/churn_results.csv
+```
 
 ## Two-machine DB mode
 

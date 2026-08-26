@@ -1,10 +1,11 @@
 """Streamlit entry point for the sweep tool.
 
-Three tabs, all backed by the app's live output directory on disk:
+Four tabs, all backed by the app's live output directory on disk:
 
   1. Run — kick off a sweep for a chosen app.  Fire-and-forget subprocess.
   2. Analyze — read the app's current CSV + logs, render interactive charts.
   3. Raw data — the CSV as a downloadable dataframe.
+  4. Churn — run/analyze the Jacord same-spawn churn experiment.
 
 Archiving isn't the tool's job; commit interesting runs to git.
 """
@@ -41,7 +42,7 @@ if not manifests:
 manifest_by_name = {m.name: m for m in manifests}
 
 
-tab_run, tab_analyze, tab_raw = st.tabs(["Run", "Analyze", "Raw data"])
+tab_run, tab_analyze, tab_raw, tab_churn = st.tabs(["Run", "Analyze", "Raw data", "Churn"])
 
 
 # ---------------------------------------------------------------------------
@@ -305,3 +306,134 @@ with tab_raw:
             file_name=csv_path.name,
             mime="text/csv",
         )
+
+
+# ---------------------------------------------------------------------------
+# TAB 4 — Jacord churn experiment
+# ---------------------------------------------------------------------------
+with tab_churn:
+    st.header("Jacord churn")
+    jacord_manifest = manifest_by_name.get("jacord")
+    if jacord_manifest is None:
+        st.error("The jacord manifest is not available.")
+    else:
+        st.caption(
+            "Same-spawn stale-history experiment. Generates deterministic "
+            "churn dumps by mutating Jacord through Jac walkers, restarts "
+            "the full DB stack after mutation, then measures cold runs."
+        )
+
+        running, live_pid = sweep_runner.is_jacord_churn_running(jacord_manifest)
+        col_status, col_kill = st.columns([3, 1])
+        with col_status:
+            if running:
+                st.warning(f"Jacord churn is running (pid={live_pid}).")
+            else:
+                st.info("No Jacord churn experiment is currently running.")
+        with col_kill:
+            if running and st.button("Stop churn", type="secondary", key="churn_kill"):
+                msg = sweep_runner.kill_jacord_churn(jacord_manifest)
+                st.success(msg)
+                st.rerun()
+
+        with st.form("jacord_churn_form"):
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                churn_rates = st.text_input("Churn rates (%)", value="0 5 10 25 50")
+                limit = st.number_input("Prefetch limit", value=12000, step=500)
+                trials = st.number_input("Trials", value=5, min_value=1, step=1)
+            with c2:
+                policies = st.text_input(
+                    "Policies",
+                    value="oracle ttg history markov coaccess none",
+                )
+                seed = st.number_input("Mutation seed", value=42, step=1)
+                reply_fraction = st.number_input(
+                    "Reply fraction",
+                    value=0.0,
+                    min_value=0.0,
+                    max_value=1.0,
+                    step=0.05,
+                )
+            with c3:
+                base_dump = st.text_input("Base dump", value="jac_db.dump")
+                channel_id = st.text_input("Fixed channel ID", value="")
+                restore_scope = st.selectbox(
+                    "Restore scope",
+                    ["trial", "case"],
+                    index=0,
+                    help="trial restores the churn dump before every measured trial.",
+                )
+            force_dumps = st.checkbox(
+                "Regenerate churn dumps",
+                value=False,
+                help="Leave off to reuse existing jacord/churn_dumps files.",
+            )
+            keep_outputs = st.checkbox(
+                "Keep previous churn logs/models",
+                value=False,
+                help="Leave off for a clean churn_logs/churn_profiles/churn_models run.",
+            )
+            submitted = st.form_submit_button("Run Jacord churn")
+
+        if submitted:
+            info = sweep_runner.kickoff_jacord_churn(
+                jacord_manifest,
+                {
+                    "JACORD_CHURN_RATES": churn_rates,
+                    "JACORD_CHURN_LIMIT": int(limit),
+                    "JACORD_CHURN_TRIALS": int(trials),
+                    "JACORD_CHURN_POLICIES": policies,
+                    "JACORD_CHURN_SEED": int(seed),
+                    "JACORD_CHURN_REPLY_FRACTION": float(reply_fraction),
+                    "JACORD_CHURN_BASE_DUMP": base_dump,
+                    "JACORD_CHURN_CHANNEL_ID": channel_id,
+                    "JACORD_CHURN_RESTORE_SCOPE": restore_scope,
+                    "JACORD_CHURN_FORCE_DUMPS": "1" if force_dumps else "0",
+                    "JACORD_CHURN_KEEP_OUTPUTS": "1" if keep_outputs else "0",
+                },
+                jac_bin=jac_bin,
+            )
+            st.success(
+                f"Started Jacord churn experiment (pid={info.pid}). "
+                f"Watch progress in `{info.stdout_log}`."
+            )
+            with st.expander("Env vars passed to the churn run", expanded=False):
+                st.code("\n".join(f"{k}={v}" for k, v in sorted(info.env_overrides.items())))
+            st.rerun()
+
+        st.divider()
+        log_path = sweep_runner.jacord_churn_stdout_log_path(jacord_manifest)
+        st.subheader("Churn output")
+        st.caption(f"tail of `{log_path}`")
+        if st.button("Refresh churn", key="churn_refresh"):
+            st.cache_data.clear()
+            st.rerun()
+        if log_path.exists():
+            text = log_path.read_text()
+            max_bytes = 15_000
+            if len(text) > max_bytes:
+                text = "(truncated head)\n" + text[-max_bytes:]
+            st.code(text or "(empty)", language="text")
+        else:
+            st.info(f"No churn output at `{log_path}` yet.")
+
+        churn_csv = jacord_manifest.app_dir / "churn_results.csv"
+        churn_df = parsers.load_csv(churn_csv)
+        if churn_df.empty:
+            st.warning(f"No churn CSV found at `{churn_csv}`.")
+        else:
+            for key, fig in (
+                ("chart_jacord_churn_coverage", charts.churn_coverage(churn_df)),
+                ("chart_jacord_churn_hit_rate", charts.churn_hit_rate(churn_df)),
+                ("chart_jacord_churn_e2e", charts.churn_e2e(churn_df)),
+            ):
+                if fig.data:
+                    st.plotly_chart(fig, use_container_width=True, key=key)
+            st.dataframe(charts.csv_raw(churn_df), use_container_width=True)
+            st.download_button(
+                "Download churn CSV",
+                data=churn_df.to_csv(index=False).encode("utf-8"),
+                file_name=churn_csv.name,
+                mime="text/csv",
+            )

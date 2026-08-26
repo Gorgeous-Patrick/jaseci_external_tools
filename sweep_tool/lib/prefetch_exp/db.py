@@ -85,6 +85,9 @@ class DbManager:
     def mongodump_to_app(self, dump_name: str = "jac_db.dump") -> None:
         raise NotImplementedError
 
+    def ensure_app_dir(self, rel_dir: str) -> None:
+        raise NotImplementedError
+
     def mongo_query_count(self) -> str:
         raise NotImplementedError
 
@@ -183,6 +186,8 @@ class LocalDockerDbManager(DbManager):
         )
 
     def mongodump_to_app(self, dump_name: str = "jac_db.dump") -> None:
+        target = self.app_dir / dump_name
+        target.parent.mkdir(parents=True, exist_ok=True)
         process.run(
             ["docker", "exec", self.mongo_container, "mongodump", "--db", "jac_db", "--archive=/tmp/jac_db.dump"],
             self.app_dir,
@@ -191,6 +196,9 @@ class LocalDockerDbManager(DbManager):
             ["docker", "cp", f"{self.mongo_container}:/tmp/jac_db.dump", dump_name],
             self.app_dir,
         )
+
+    def ensure_app_dir(self, rel_dir: str) -> None:
+        (self.app_dir / rel_dir).mkdir(parents=True, exist_ok=True)
 
     def mongo_query_count(self) -> str:
         try:
@@ -299,12 +307,18 @@ class RemoteSshDockerDbManager(DbManager):
         )
 
     def mongodump_to_app(self, dump_name: str = "jac_db.dump") -> None:
+        parent = str(Path(dump_name).parent)
+        if parent and parent != ".":
+            self.ensure_app_dir(parent)
         self._ssh(
             self._cd(
                 f"docker exec {shlex.quote(self.mongo_container)} "
                 f"mongodump --db jac_db --archive > {shlex.quote(dump_name)}"
             )
         )
+
+    def ensure_app_dir(self, rel_dir: str) -> None:
+        self._ssh(self._cd(f"mkdir -p {shlex.quote(rel_dir)}"))
 
     def mongo_query_count(self) -> str:
         try:

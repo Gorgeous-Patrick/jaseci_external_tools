@@ -59,10 +59,18 @@ def stdout_log_path(manifest: Manifest) -> Path:
     return manifest.app_dir / "sweep_stdout.log"
 
 
+def jacord_churn_stdout_log_path(manifest: Manifest) -> Path:
+    return manifest.app_dir / "churn_stdout.log"
+
+
 def pid_file(manifest: Manifest) -> Path:
     """Records the running sweep's PID so we can find and kill it even
     across Streamlit restarts."""
     return manifest.app_dir / "sweep.pid"
+
+
+def jacord_churn_pid_file(manifest: Manifest) -> Path:
+    return manifest.app_dir / "churn.pid"
 
 
 def is_running(manifest: Manifest) -> tuple[bool, int | None]:
@@ -77,6 +85,21 @@ def is_running(manifest: Manifest) -> tuple[bool, int | None]:
         return False, None
     try:
         os.kill(pid, 0)  # signal 0 = existence check
+    except OSError:
+        return False, pid
+    return True, pid
+
+
+def is_jacord_churn_running(manifest: Manifest) -> tuple[bool, int | None]:
+    pf = jacord_churn_pid_file(manifest)
+    if not pf.exists():
+        return False, None
+    try:
+        pid = int(pf.read_text().strip())
+    except ValueError:
+        return False, None
+    try:
+        os.kill(pid, 0)
     except OSError:
         return False, pid
     return True, pid
@@ -145,6 +168,56 @@ def kill(manifest: Manifest, timeout_sec: float = 5.0) -> str:
     return f"stopped pid={pid} via {outcome}"
 
 
+def kill_jacord_churn(manifest: Manifest, timeout_sec: float = 5.0) -> str:
+    pf = jacord_churn_pid_file(manifest)
+    if not pf.exists():
+        return "no Jacord churn experiment is currently running"
+    try:
+        pid = int(pf.read_text().strip())
+    except ValueError:
+        pf.unlink(missing_ok=True)
+        return "churn pid file was garbled; removed"
+
+    def _alive() -> bool:
+        try:
+            os.kill(pid, 0)
+        except OSError:
+            return False
+        return True
+
+    if not _alive():
+        pf.unlink(missing_ok=True)
+        return f"Jacord churn process {pid} was already gone"
+
+    try:
+        os.killpg(pid, signal.SIGTERM)
+    except OSError as e:
+        pf.unlink(missing_ok=True)
+        return f"could not signal Jacord churn pgid {pid}: {e}"
+
+    deadline = time.time() + timeout_sec
+    while time.time() < deadline and _alive():
+        time.sleep(0.1)
+
+    if _alive():
+        try:
+            os.killpg(pid, signal.SIGKILL)
+        except OSError:
+            pass
+        time.sleep(0.2)
+        outcome = "SIGKILL (after SIGTERM timeout)"
+    else:
+        outcome = "SIGTERM (graceful)"
+
+    subprocess.run(
+        ["pkill", "-9", "-f", "jac start"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    pf.unlink(missing_ok=True)
+    return f"stopped Jacord churn pid={pid} via {outcome}"
+
+
 def kickoff(
     manifest: Manifest, form_values: dict, jac_bin: str | None = None
 ) -> LaunchInfo:
@@ -193,6 +266,53 @@ def kickoff(
     return LaunchInfo(
         pid=proc.pid,
         app=manifest.name,
+        env_overrides=env_overrides,
+        stdout_log=log_path,
+    )
+
+
+def kickoff_jacord_churn(
+    manifest: Manifest,
+    form_values: dict,
+    jac_bin: str | None = None,
+) -> LaunchInfo:
+    """Start the dedicated Jacord churn experiment as a detached process."""
+    env_overrides = {
+        key: str(value)
+        for key, value in form_values.items()
+        if value is not None and str(value) != ""
+    }
+    if jac_bin:
+        env_overrides["JAC_BIN"] = jac_bin
+    env = os.environ.copy()
+    env.update(env_overrides)
+
+    log_path = jacord_churn_stdout_log_path(manifest)
+    log_fh = open(log_path, "w", buffering=1)
+    try:
+        cmd = [
+            sys.executable,
+            str(_RUN_ALL_ROOT / "tools" / "run_jacord_churn.py"),
+            "--manifest",
+            str(manifest.manifest_path),
+        ]
+        if jac_bin:
+            cmd.extend(["--jac-bin", jac_bin])
+        proc = subprocess.Popen(
+            cmd,
+            cwd=str(_RUN_ALL_ROOT),
+            env=env,
+            stdout=log_fh,
+            stderr=subprocess.STDOUT,
+            start_new_session=True,
+        )
+    finally:
+        log_fh.close()
+
+    jacord_churn_pid_file(manifest).write_text(str(proc.pid))
+    return LaunchInfo(
+        pid=proc.pid,
+        app="jacord_churn",
         env_overrides=env_overrides,
         stdout_log=log_path,
     )
