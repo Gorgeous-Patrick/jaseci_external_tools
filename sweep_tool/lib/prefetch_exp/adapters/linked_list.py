@@ -26,7 +26,7 @@ class LinkedListAdapter(BenchmarkAdapter):
         self.compose_up()
         time.sleep(5)
         self._jac_clean()
-        self.flush_redis()
+        self.clear_runtime_cache()
         self.drop_non_system_databases()
         self.stop_stale_servers()
 
@@ -49,7 +49,7 @@ class LinkedListAdapter(BenchmarkAdapter):
             process.stop_process(proc)
             self.stop_stale_servers()
 
-        self.flush_redis()
+        self.clear_runtime_cache()
         walker = self.options.env.get("WALKER") or "Traverse"
         return CaseState(
             token=token,
@@ -80,7 +80,7 @@ class LinkedListAdapter(BenchmarkAdapter):
         ]
 
     def _jac_clean(self) -> None:
-        env = {**os.environ.copy(), **self.options.env, "JAC_BIN": self.options.jac_bin}
+        env = {**os.environ.copy(), **self.server_env()}
         subprocess.run(
             [self.options.jac_bin, "clean"],
             cwd=str(self.app_dir),

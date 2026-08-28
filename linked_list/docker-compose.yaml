@@ -1,22 +1,21 @@
 services:
-  mongodb:
-    image: mongo:7
-    container_name: mongodb
+  postgres:
+    image: postgres:17-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: jac
+      POSTGRES_PASSWORD: jac
+      POSTGRES_DB: jac_db
     ports:
-      - "27017:27017"
+      - "5432:5432"
     volumes:
-      - mongodb_data:/data/db
-    restart: unless-stopped
-
-  redis:
-    image: redis:7-alpine
-    container_name: redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jac -d jac_db"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
     restart: unless-stopped
 
 volumes:
-  mongodb_data:
-  redis_data:
+  postgres_data:

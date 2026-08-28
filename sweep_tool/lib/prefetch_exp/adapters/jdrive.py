@@ -11,10 +11,8 @@ from lib.prefetch_exp.models import CaseState, RequestSpec
 
 class JDriveAdapter(BenchmarkAdapter):
     config_name = "jac.sweep.toml"
-    mongo_container = "jdrive-mongodb"
-    redis_container = "jdrive-redis"
-    mongo_uri = "mongodb://localhost:27018"
-    redis_url = "redis://localhost:6380"
+    postgres_container = "jdrive-postgres"
+    postgres_uri = "postgresql://jac:jac@localhost:5433/jac_db"
     profile_name = "sweep"
     default_user = "sweep_user"
     default_password = "password"
@@ -24,7 +22,7 @@ class JDriveAdapter(BenchmarkAdapter):
         self._assert_seed_credentials_match_env()
         if (
             self.options.env.get("SWEEP_RESEED") == "1"
-            or not self.dump_exists("jac_db.dump")
+            or not self.dump_exists("jac_db.pgdump")
             or not (self.app_dir / "sweep_seed.json").exists()
             or self._seed_training_root_count() < self._required_training_roots()
         ):
@@ -111,7 +109,6 @@ class JDriveAdapter(BenchmarkAdapter):
         self.compose_up()
         time.sleep(5)
         self.drop_jac_db()
-        self.flush_redis()
         self.stop_stale_servers()
 
         proc = None
@@ -124,8 +121,9 @@ class JDriveAdapter(BenchmarkAdapter):
                 "BASE_URL": self.base_url,
                 "TEST_USER": self.user_name(),
                 "TEST_PASSWORD": self.password(),
-                "MONGODB_URI": self.mongo_uri,
-                "REDIS_URL": self.redis_url,
+                "JAC_DB_URL": self.postgres_uri,
+                "POSTGRES_URL": self.postgres_uri,
+                "DATABASE_URL": self.postgres_uri,
                 "SWEEP_SEED_TRAIN_ROOTS": str(self._seed_train_roots_to_create()),
             }
             process.run([self.options.python_bin, "seed_sweep_db.py"], self.app_dir, env=env)
@@ -133,9 +131,8 @@ class JDriveAdapter(BenchmarkAdapter):
             process.stop_process(proc)
             self.stop_stale_servers()
 
-        self.flush_redis()
-        self.mongodump_to_app("jac_db.dump")
-        print(f"=== Seed dump ready: {self.dump_description('jac_db.dump')} ===")
+        self.dump_to_app("jac_db.pgdump")
+        print(f"=== Seed dump ready: {self.dump_description('jac_db.pgdump')} ===")
 
     def _assert_seed_credentials_match_env(self) -> None:
         explicit = self.options.env.get("TEST_USER")

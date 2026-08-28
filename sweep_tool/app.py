@@ -72,7 +72,7 @@ with tab_run:
     st.caption(
         "Kicks off every manifest's sweep sequentially with each app's "
         "default parameters. Presets use the same default-parameter path. "
-        "All apps share MongoDB/Redis container "
+        "Some apps share Postgres container "
         "names, so parallel isn't safe."
     )
     all_running, all_pid = sweep_runner.is_run_all_running()
@@ -356,7 +356,7 @@ with tab_churn:
                     step=0.05,
                 )
             with c3:
-                base_dump = st.text_input("Base dump", value="jac_db.dump")
+                base_dump = st.text_input("Base dump", value="jac_db.pgdump")
                 channel_id = st.text_input("Fixed channel ID", value="")
                 restore_scope = st.selectbox(
                     "Restore scope",

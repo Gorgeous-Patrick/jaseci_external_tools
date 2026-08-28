@@ -9,10 +9,8 @@ from lib.prefetch_exp.models import CaseState, RequestSpec
 
 class JSearchAdapter(BenchmarkAdapter):
     config_name = "jac.sweep.toml"
-    mongo_container = "jsearch-mongodb"
-    redis_container = "jsearch-redis"
-    mongo_uri = "mongodb://localhost:27019"
-    redis_url = "redis://localhost:6381"
+    postgres_container = "jsearch-postgres"
+    postgres_uri = "postgresql://jac:jac@localhost:5434/jac_db"
     profile_name = "sweep"
     default_user = "sweep_user"
     default_password = "password"
@@ -22,8 +20,8 @@ class JSearchAdapter(BenchmarkAdapter):
         "database query index",
         "database storage replica",
         "database document shard",
-        "redis cache latency",
-        "mongodb document query",
+        "postgres query latency",
+        "database row query",
         "compiler static analysis",
         "compiler runtime walker",
         "compiler optimizer bytecode",
@@ -66,7 +64,7 @@ class JSearchAdapter(BenchmarkAdapter):
         self._assert_seed_credentials_match_env()
         if (
             self.options.env.get("SWEEP_RESEED") == "1"
-            or not self.dump_exists("jac_db.dump")
+            or not self.dump_exists("jac_db.pgdump")
             or not (self.app_dir / "sweep_seed.json").exists()
         ):
             self._prepare_seed_dump()
@@ -149,7 +147,6 @@ class JSearchAdapter(BenchmarkAdapter):
         self.compose_down()
         self.compose_up()
         self.drop_jac_db()
-        self.flush_redis()
         self.stop_stale_servers()
 
         proc = None
@@ -160,17 +157,17 @@ class JSearchAdapter(BenchmarkAdapter):
                 "BASE_URL": self.base_url,
                 "TEST_USER": self.user_name(),
                 "TEST_PASSWORD": self.password(),
-                "MONGODB_URI": self.mongo_uri,
-                "REDIS_URL": self.redis_url,
+                "JAC_DB_URL": self.postgres_uri,
+                "POSTGRES_URL": self.postgres_uri,
+                "DATABASE_URL": self.postgres_uri,
             }
             process.run([self.options.python_bin, "seed_sweep_db.py"], self.app_dir, env=env)
         finally:
             process.stop_process(proc)
             self.stop_stale_servers()
 
-        self.flush_redis()
-        self.mongodump_to_app("jac_db.dump")
-        print(f"=== Seed dump ready: {self.dump_description('jac_db.dump')} ===")
+        self.dump_to_app("jac_db.pgdump")
+        print(f"=== Seed dump ready: {self.dump_description('jac_db.pgdump')} ===")
 
     def _assert_seed_credentials_match_env(self) -> None:
         explicit = self.options.env.get("TEST_USER")

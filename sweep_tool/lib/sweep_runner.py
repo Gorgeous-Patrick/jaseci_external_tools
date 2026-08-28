@@ -319,9 +319,9 @@ def kickoff_jacord_churn(
 
 
 # ---------------------------------------------------------------------------
-# "Run all" — sequential shepherd over every manifest.  Every app's
-# docker-compose.yaml uses the same container names (mongodb, redis), so
-# parallel sweeps would collide; one shepherd process runs them in order.
+# "Run all" — sequential shepherd over every manifest.  Several app
+# docker-compose.yaml files use the same Postgres container name, so parallel
+# sweeps would collide; one shepherd process runs them in order.
 # ---------------------------------------------------------------------------
 
 
@@ -406,7 +406,7 @@ def kickoff_all(
 ) -> LaunchInfo:
     """Start every manifest's sweep in sequence via one detached shepherd.
 
-    Sweeps share MongoDB and Redis (container names collide), so they
+    Sweeps share Postgres container names, so they
     cannot run in parallel.  The shepherd cd's into each app_dir and
     runs its sweep script with the app's env overrides; a failure in
     one still lets the next one start (';' not '&&').
@@ -416,7 +416,7 @@ def kickoff_all(
     all_env_overrides: dict[str, dict[str, str]] = {}
     # Between apps, tear down the DB compose project that belongs to the app.
     # In remote_ssh mode this command is emitted as an SSH docker-compose
-    # teardown so run-all does not touch local MongoDB/Redis containers.
+    # teardown so run-all does not touch local Postgres containers.
     for m in manifests:
         env = m.env_from_form(form_values_by_name.get(m.name, {}))
         if jac_bin:

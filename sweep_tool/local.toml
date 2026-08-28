@@ -1,4 +1,5 @@
 [db]
+backend = "postgres"
 mode = "remote_ssh"
 host = "clarity2"
 remote_app_root = "/home/baichuan/jaseci_remote_apps"
@@ -11,33 +12,23 @@ ssh_options = ["-F", "/home/patrickli/.ssh/config"]
 # remote_app_root = "/abs/path/to/benchmark/apps/on/machine2"
 # ssh_options = ["-F", "/home/patrickli/.ssh/config"]
 #
-# If mongo_uri/redis_url are omitted in remote_ssh mode, the sweep keeps each
-# app's local port and replaces localhost with db.host. For example, jsearch
-# keeps 27019/6381 while jacord, linked_list, and littlex5 keep 27017/6379.
-# mongo_uri = "mongodb://MACHINE2_HOST_OR_IP:27017"
-# redis_url = "redis://MACHINE2_HOST_OR_IP:6379"
-#
-# Optional per-app overrides:
-# [db.apps.jsearch]
-# mongo_uri = "mongodb://MACHINE2_HOST_OR_IP:27019"
-# redis_url = "redis://MACHINE2_HOST_OR_IP:6381"
+# If postgres_uri is omitted in remote_ssh mode, the sweep keeps each app's
+# local Postgres port and replaces localhost with db.host.
+# postgres_uri = "postgresql://jac:jac@MACHINE2_HOST_OR_IP:5432/jac_db"
 
 [db.apps.jacord]
-mongo_uri = "mongodb://clarity2.eecs.umich.edu:27017"
-redis_url = "redis://clarity2.eecs.umich.edu:6379"
+postgres_uri = "postgresql://jac:jac@clarity2.eecs.umich.edu:5432/jac_db"
 
 [db.apps.littlex5]
-mongo_uri = "mongodb://clarity2.eecs.umich.edu:27017"
-redis_url = "redis://clarity2.eecs.umich.edu:6379"
+postgres_uri = "postgresql://jac:jac@clarity2.eecs.umich.edu:5432/jac_db"
 
 [db.apps.linked_list]
-mongo_uri = "mongodb://clarity2.eecs.umich.edu:27017"
-redis_url = "redis://clarity2.eecs.umich.edu:6379"
+postgres_uri = "postgresql://jac:jac@clarity2.eecs.umich.edu:5432/jac_db"
 
 [db.apps.jdrive]
-mongo_uri = "mongodb://clarity2.eecs.umich.edu:27018"
-redis_url = "redis://clarity2.eecs.umich.edu:6380"
+postgres_uri = "postgresql://jac:jac@clarity2.eecs.umich.edu:5433/jac_db"
+postgres_container = "jdrive-postgres"
 
 [db.apps.jsearch]
-mongo_uri = "mongodb://clarity2.eecs.umich.edu:27019"
-redis_url = "redis://clarity2.eecs.umich.edu:6381"
+postgres_uri = "postgresql://jac:jac@clarity2.eecs.umich.edu:5434/jac_db"
+postgres_container = "jsearch-postgres"

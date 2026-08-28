@@ -6,6 +6,7 @@ import json
 import os
 import shutil
 import time
+import tomllib
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any
@@ -17,10 +18,8 @@ from lib.prefetch_exp.models import CaseState, RequestSpec, SweepOptions
 
 class BenchmarkAdapter(ABC):
     config_name = "jac.toml"
-    mongo_container = "mongodb"
-    redis_container = "redis"
-    mongo_uri = "mongodb://localhost:27017"
-    redis_url = "redis://localhost:6379"
+    postgres_container = "postgres"
+    postgres_uri = "postgresql://jac:jac@localhost:5432/jac_db"
     profile_name = ""
     default_user = "user"
     default_password = "password"
@@ -31,14 +30,11 @@ class BenchmarkAdapter(ABC):
         self.db_manager = make_db_manager(
             app_name=self.name,
             app_dir=self.app_dir,
-            default_mongo_uri=self.mongo_uri,
-            default_redis_url=self.redis_url,
-            mongo_container=self.mongo_container,
-            redis_container=self.redis_container,
+            default_postgres_uri=self.postgres_uri,
+            postgres_container=self.postgres_container,
             env=self.options.env,
         )
-        self.mongo_uri = self.db_manager.mongo_uri
-        self.redis_url = self.db_manager.redis_url
+        self.postgres_uri = self.db_manager.postgres_uri
 
     @property
     def app_dir(self) -> Path:
@@ -76,7 +72,7 @@ class BenchmarkAdapter(ABC):
         self.compose_up()
         time.sleep(5)
         self.restore_dump_if_present()
-        self.flush_redis()
+        self.clear_runtime_cache()
         self.stop_stale_servers()
 
     @abstractmethod
@@ -94,17 +90,32 @@ class BenchmarkAdapter(ABC):
             raise RuntimeError(f"{self.name}/{spec.walker} returned an empty response")
 
     def server_command(self) -> list[str]:
-        cmd = [self.options.jac_bin, "start"]
+        cmd = [self.options.jac_bin, "run", "--serve"]
         if self.profile_name:
             cmd.extend(["--profile", self.profile_name])
+        cmd.append(self.entry_point())
         return cmd
+
+    def entry_point(self) -> str:
+        for path in (self.config_path, self.app_dir / "jac.toml"):
+            try:
+                data = tomllib.loads(path.read_text())
+            except FileNotFoundError:
+                continue
+            project = data.get("project", {})
+            if isinstance(project, dict):
+                entry = project.get("entry-point") or project.get("entry_point")
+                if entry:
+                    return str(entry)
+        return "main.jac"
 
     def server_env(self, profile_dir: Path | None = None, profile_csv: Path | None = None) -> dict[str, str]:
         env = {
             **self.options.env,
             "JAC_BIN": self.options.jac_bin,
-            "MONGODB_URI": self.mongo_uri,
-            "REDIS_URL": self.redis_url,
+            "JAC_DB_URL": self.postgres_uri,
+            "POSTGRES_URL": self.postgres_uri,
+            "DATABASE_URL": self.postgres_uri,
         }
         if profile_dir is not None:
             env["JAC_PROFILE_DIR"] = str(profile_dir)
@@ -152,19 +163,19 @@ class BenchmarkAdapter(ABC):
     def compose_up(self) -> None:
         self.db_manager.compose_up()
 
-    def flush_redis(self) -> None:
-        self.db_manager.flush_redis()
+    def clear_runtime_cache(self) -> None:
+        self.db_manager.clear_runtime_cache()
 
-    def restore_dump_if_present(self, dump_name: str = "jac_db.dump") -> None:
+    def restore_dump_if_present(self, dump_name: str = "jac_db.pgdump") -> None:
         if not self.db_manager.dump_exists(dump_name):
-            print(f"=== No {dump_name} found for {self.name}; using current MongoDB state ===")
+            print(f"=== No {dump_name} found for {self.name}; using current database state ===")
             return
         self.db_manager.restore_dump(dump_name)
 
-    def dump_exists(self, dump_name: str = "jac_db.dump") -> bool:
+    def dump_exists(self, dump_name: str = "jac_db.pgdump") -> bool:
         return self.db_manager.dump_exists(dump_name)
 
-    def dump_description(self, dump_name: str = "jac_db.dump") -> str:
+    def dump_description(self, dump_name: str = "jac_db.pgdump") -> str:
         return self.db_manager.dump_description(dump_name)
 
     def drop_jac_db(self) -> None:
@@ -173,16 +184,21 @@ class BenchmarkAdapter(ABC):
     def drop_non_system_databases(self) -> None:
         self.db_manager.drop_non_system_databases()
 
-    def mongodump_to_app(self, dump_name: str = "jac_db.dump") -> None:
-        self.db_manager.mongodump_to_app(dump_name)
+    def dump_to_app(self, dump_name: str = "jac_db.pgdump") -> None:
+        self.db_manager.dump_to_app(dump_name)
 
-    def mongo_query_count(self) -> str:
-        return self.db_manager.mongo_query_count()
+    def db_query_count(self) -> str:
+        return self.db_manager.db_query_count()
 
     def stop_stale_servers(self) -> None:
         basename = os.path.basename(self.options.jac_bin)
-        process.run(["pkill", "-f", f"{basename} start"], self.app_dir, check=False)
-        process.run(["pkill", "-f", "jac start"], self.app_dir, check=False)
+        for pattern in (
+            f"{basename} run --serve",
+            "jac run --serve",
+            f"{basename} start",
+            "jac start",
+        ):
+            process.run(["pkill", "-f", pattern], self.app_dir, check=False)
         time.sleep(2)
 
     def setup_token(self, log_name: str = "jac_server_prepare.log") -> str:
@@ -208,10 +224,13 @@ class BenchmarkAdapter(ABC):
         failures = [
             line.strip()
             for line in text.splitlines()
-            if "MongoDB connection failed" in line or "Redis connection failed" in line
+            if "Postgres connection failed" in line
+            or "PostgreSQL connection failed" in line
+            or "database connection failed" in line
+            or ("JAC_DB_URL" in line and "failed" in line.lower())
         ]
         if failures:
             raise RuntimeError(
-                "Jac server did not connect to tiered memory; access logs would be invalid: "
+                "Jac server did not connect to Postgres; access logs would be invalid: "
                 + " | ".join(failures[:2])
             )

@@ -25,9 +25,9 @@ parameters:
     default: "oracle ttg markov1-pooled coaccess-pooled none"
     help: >
       Space-separated policies to run. Supported: none, ttg, oracle,
-      markov, markov1-pooled, coaccess, coaccess-pooled, selep-adapted,
-      selep-adapted-pooled, history, manual. Oracle, Markov, co-access,
-      and SeLeP default to auto-record/train then replay.
+      markov, markov1-pooled, coaccess, coaccess-pooled, history,
+      manual. Oracle, Markov, and co-access default to auto-record/train
+      then replay.
 
   - name: SWEEP_ORACLE_MODE
     label: Oracle mode
@@ -140,7 +140,7 @@ parameters:
     default: "0"
     choices: ["0", "1"]
     help: >
-      Set to 1 to rebuild jac_db.dump and sweep_seed.json before sweeping.
+      Set to 1 to rebuild jac_db.pgdump and sweep_seed.json before sweeping.
       The Python full-sweep adapter also rebuilds automatically when the
       existing seed lacks enough held-out training roots for pooled policies.
 

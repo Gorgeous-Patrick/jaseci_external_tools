@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate two-machine DB settings for sweep_tool remote_ssh mode."""
+"""Validate two-machine Postgres settings for sweep_tool remote_ssh mode."""
 
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ def main() -> int:
     parser.add_argument(
         "--allow-local-containers",
         action="store_true",
-        help="Do not fail if local Docker has containers named like the benchmark Mongo/Redis containers.",
+        help="Do not fail if local Docker has containers named like the benchmark Postgres containers.",
     )
     args = parser.parse_args()
 
@@ -112,22 +112,17 @@ def _check_manifest(manifest: mf.Manifest, local_container_names: set[str] | Non
             _remote_dump_description(settings, manager.remote_app_dir, dump_name, args.timeout),
         )
 
-    failures += _check_uri_reachable("MongoDB", manager.mongo_uri, 27017, args.timeout)
-    failures += _check_uri_reachable("Redis", manager.redis_url, 6379, args.timeout)
-
-    for label, uri in (("MongoDB", manager.mongo_uri), ("Redis", manager.redis_url)):
-        failures += _report(
-            f"{label} URI is remote",
-            not uri_uses_localhost(uri),
-            uri,
-        )
+    failures += _check_uri_reachable("Postgres", manager.postgres_uri, 5432, args.timeout)
+    failures += _report(
+        "Postgres URI is remote",
+        not uri_uses_localhost(manager.postgres_uri),
+        manager.postgres_uri,
+    )
 
     if local_container_names is None:
         print("OK   local Docker container check skipped: local Docker is not reachable")
     elif not args.allow_local_containers:
-        accidental = sorted(
-            local_container_names.intersection({adapter.mongo_container, adapter.redis_container})
-        )
+        accidental = sorted(local_container_names.intersection({adapter.postgres_container}))
         failures += _report(
             "no matching local DB containers",
             not accidental,
@@ -141,8 +136,8 @@ def _expected_dumps(adapter, manifest: mf.Manifest) -> list[str]:
     names: list[str] = []
     if hasattr(adapter, "_configured_dump"):
         names.append(adapter._configured_dump())
-    elif manifest.name in {"jdrive", "jsearch", "littlex5"}:
-        names.append("jac_db.dump")
+    elif manifest.name in {"jdrive", "jsearch"}:
+        names.append("jac_db.pgdump")
 
     for param in manifest.parameters:
         if not param.name.endswith("_DUMP"):
@@ -161,7 +156,7 @@ def _check_uri_reachable(label: str, uri: str, default_port: int, timeout: float
         with socket.create_connection((host, port), timeout=timeout):
             return _report(f"{label} TCP connect", True, f"{host}:{port}")
     except OSError as exc:
-            return _report(f"{label} TCP connect", False, f"{host}:{port} ({exc})")
+        return _report(f"{label} TCP connect", False, f"{host}:{port} ({exc})")
 
 
 def _remote_compose_file_exists(settings, remote_app_dir: str, timeout: float) -> bool:

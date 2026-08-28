@@ -38,11 +38,11 @@ walker Sum {
 # Find first item matching a value, report its index
 walker Find {
     has target: int;
-    has found: bool = false;
+    has found: bool = False;
 
     can visit_item with Item entry {
         if here.value == self.target {
-            self.found = true;
+            self.found = True;
             report here;
             disengage;
         }

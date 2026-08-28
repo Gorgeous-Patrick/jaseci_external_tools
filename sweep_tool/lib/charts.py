@@ -41,7 +41,14 @@ POLICY_ORDER = {
 JACORD_TTG_HIDDEN_ROOT_PREFETCH = 200
 
 MEMORY_SOCKET_FUNC_MARKERS = ("recv", "recv_into", "send", "sendall")
-MEMORY_SOCKET_CALLER_MARKERS = ("/site-packages/redis/", "/site-packages/pymongo/")
+MEMORY_SOCKET_CALLER_MARKERS = (
+    "/site-packages/psycopg/",
+    "/site-packages/psycopg2/",
+    "/jaclang/data/pg",
+    "/jaclang/data/impl/pg",
+    "/site-packages/redis/",
+    "/site-packages/pymongo/",
+)
 
 
 def _df_group_cols(df: pd.DataFrame) -> list[str]:
@@ -571,7 +578,7 @@ def e2e_stack(df: pd.DataFrame) -> go.Figure:
 
 
 def memory_time_reduction(df: pd.DataFrame, profiles_dir: Path) -> go.Figure:
-    """Median socket I/O self-time spent below Redis/PyMongo.
+    """Median socket I/O self-time spent below the storage client.
 
     This intentionally uses caller-attributed cProfile self time for socket
     send/recv calls, not cumulative time. It excludes serializer, cache

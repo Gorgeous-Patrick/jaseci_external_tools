@@ -33,7 +33,7 @@ RESULT_COLUMNS = [
     "l2",
     "l3",
     "miss",
-    "mongo_q",
+    "db_q",
     "oracle_file",
     "model_file",
 ]

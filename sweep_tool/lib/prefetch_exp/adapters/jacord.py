@@ -11,8 +11,8 @@ class JacordAdapter(BenchmarkAdapter):
     default_user = "user_0000"
     default_password = "password"
     credential_source = "bootstrap.py primary benchmark user"
-    default_dump = "jac_db.dump"
-    legacy_dump_aliases = {"dumps/big.dump"}
+    default_dump = "jac_db.pgdump"
+    legacy_dump_aliases = set()
     default_channel_scan_limit = 1000
     default_min_channel_messages = 1000
 
@@ -22,14 +22,14 @@ class JacordAdapter(BenchmarkAdapter):
         self._selected_channel_messages = -1
         self._restored_dump = ""
 
-    def restore_dump_if_present(self, dump_name: str = "jac_db.dump") -> None:
+    def restore_dump_if_present(self, dump_name: str = "jac_db.pgdump") -> None:
         configured = self._configured_dump()
         self.options.env["JACORD_DUMP"] = configured
         if not self.dump_exists(configured):
             raise FileNotFoundError(
                 "Configured Jacord dump does not exist: "
                 f"{self.dump_description(configured)}. Set JACORD_DUMP to a valid dump; the Jacord "
-                "sweep will not silently fall back to jac_db.dump."
+                "sweep will not silently fall back to jac_db.pgdump."
             )
 
         resolved = self.dump_description(configured)

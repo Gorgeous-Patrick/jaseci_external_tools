@@ -1,4 +1,4 @@
-"""Docker-backed DB lifecycle helpers for prefetch sweeps."""
+"""Docker-backed Postgres lifecycle helpers for prefetch sweeps."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import unquote, urlsplit, urlunsplit
 
 import tomllib
 
@@ -19,6 +19,8 @@ SWEEP_TOOL_ROOT = Path(__file__).resolve().parents[2]
 LOCAL_TOML = SWEEP_TOOL_ROOT / "local.toml"
 COMPOSE_FILES = ("docker-compose.yaml", "docker-compose.yml", "compose.yaml", "compose.yml")
 
+DEFAULT_POSTGRES_URI = "postgresql://jac:jac@localhost:5432/jac_db"
+
 
 @dataclass(frozen=True)
 class DbSettings:
@@ -27,8 +29,11 @@ class DbSettings:
     ssh_user: str = ""
     remote_app_root: str = ""
     remote_app_dir: str = ""
-    mongo_uri: str = ""
-    redis_url: str = ""
+    postgres_uri: str = DEFAULT_POSTGRES_URI
+    postgres_container: str = "postgres"
+    postgres_user: str = "jac"
+    postgres_password: str = "jac"
+    postgres_db: str = "jac_db"
     ssh_options: tuple[str, ...] = field(default_factory=tuple)
 
     @property
@@ -37,7 +42,7 @@ class DbSettings:
 
 
 class DbManager:
-    """Interface used by adapters for MongoDB/Redis lifecycle work."""
+    """Interface used by adapters for Postgres lifecycle work."""
 
     mode = "unknown"
 
@@ -47,16 +52,16 @@ class DbManager:
         settings: DbSettings,
         app_name: str,
         app_dir: Path,
-        mongo_container: str,
-        redis_container: str,
+        postgres_container: str,
     ):
         self.settings = settings
         self.app_name = app_name
         self.app_dir = app_dir
-        self.mongo_container = mongo_container
-        self.redis_container = redis_container
-        self.mongo_uri = settings.mongo_uri
-        self.redis_url = settings.redis_url
+        self.postgres_container = settings.postgres_container or postgres_container
+        self.postgres_uri = settings.postgres_uri
+        self.postgres_user = settings.postgres_user
+        self.postgres_password = settings.postgres_password
+        self.postgres_db = settings.postgres_db
 
     def compose_down(self, remove_volumes: bool = False) -> None:
         raise NotImplementedError
@@ -64,8 +69,8 @@ class DbManager:
     def compose_up(self) -> None:
         raise NotImplementedError
 
-    def flush_redis(self) -> None:
-        raise NotImplementedError
+    def clear_runtime_cache(self) -> None:
+        """Compatibility no-op; current Jac runtime is Postgres-only."""
 
     def restore_dump(self, dump_name: str) -> None:
         raise NotImplementedError
@@ -80,22 +85,25 @@ class DbManager:
         raise NotImplementedError
 
     def drop_non_system_databases(self) -> None:
-        raise NotImplementedError
+        self.drop_jac_db()
 
-    def mongodump_to_app(self, dump_name: str = "jac_db.dump") -> None:
+    def dump_to_app(self, dump_name: str = "jac_db.pgdump") -> None:
         raise NotImplementedError
 
     def ensure_app_dir(self, rel_dir: str) -> None:
         raise NotImplementedError
 
-    def mongo_query_count(self) -> str:
-        raise NotImplementedError
+    def db_query_count(self) -> str:
+        return ""
 
     def compose_file_exists(self) -> bool:
         raise NotImplementedError
 
     def summary(self) -> str:
-        return f"{self.mode} mongo={self.mongo_uri} redis={self.redis_url}"
+        return f"{self.mode} postgres={self.postgres_uri}"
+
+    def _pg_env(self) -> list[str]:
+        return ["-e", f"PGPASSWORD={self.postgres_password}"]
 
 
 class LocalDockerDbManager(DbManager):
@@ -118,9 +126,9 @@ class LocalDockerDbManager(DbManager):
             return
         output = result.stdout or ""
         if "Conflict. The container name" in output:
-            print("docker compose name conflict; removing stale benchmark containers")
+            print("docker compose name conflict; removing stale benchmark Postgres container")
             process.run(
-                ["docker", "rm", "-f", self.mongo_container, self.redis_container],
+                ["docker", "rm", "-f", self.postgres_container],
                 self.app_dir,
                 check=False,
             )
@@ -129,30 +137,14 @@ class LocalDockerDbManager(DbManager):
         print(output)
         result.check_returncode()
 
-    def flush_redis(self) -> None:
-        process.run(
-            ["docker", "exec", self.redis_container, "redis-cli", "FLUSHALL"],
-            self.app_dir,
-            check=False,
-        )
-
     def restore_dump(self, dump_name: str) -> None:
+        target = f"/tmp/{Path(dump_name).name}"
         process.run(
-            ["docker", "cp", "-L", dump_name, f"{self.mongo_container}:/tmp/jac_db.dump"],
+            ["docker", "cp", "-L", dump_name, f"{self.postgres_container}:{target}"],
             self.app_dir,
         )
-        process.run(
-            [
-                "docker",
-                "exec",
-                self.mongo_container,
-                "mongorestore",
-                "--archive=/tmp/jac_db.dump",
-                "--drop",
-            ],
-            self.app_dir,
-            check=False,
-        )
+        self._reset_database()
+        self._restore_from_container_path(target)
 
     def dump_exists(self, dump_name: str) -> bool:
         return (self.app_dir / dump_name).exists()
@@ -164,65 +156,110 @@ class LocalDockerDbManager(DbManager):
         return f"{dump_path.resolve()} ({dump_path.stat().st_size} bytes)"
 
     def drop_jac_db(self) -> None:
-        process.run(
-            ["docker", "exec", self.mongo_container, "mongosh", "jac_db", "--quiet", "--eval", "db.dropDatabase()"],
-            self.app_dir,
-            check=False,
-        )
+        self._reset_database()
 
-    def drop_non_system_databases(self) -> None:
+    def dump_to_app(self, dump_name: str = "jac_db.pgdump") -> None:
+        target = self.app_dir / dump_name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        container_path = f"/tmp/{Path(dump_name).name}"
         process.run(
             [
                 "docker",
                 "exec",
-                self.mongo_container,
-                "mongosh",
-                "--quiet",
-                "--eval",
-                _DROP_NON_SYSTEM_DATABASES_JS,
+                *self._pg_env(),
+                self.postgres_container,
+                "pg_dump",
+                "-U",
+                self.postgres_user,
+                "-d",
+                self.postgres_db,
+                "--format=custom",
+                "--no-owner",
+                f"--file={container_path}",
             ],
             self.app_dir,
-            check=False,
-        )
-
-    def mongodump_to_app(self, dump_name: str = "jac_db.dump") -> None:
-        target = self.app_dir / dump_name
-        target.parent.mkdir(parents=True, exist_ok=True)
-        process.run(
-            ["docker", "exec", self.mongo_container, "mongodump", "--db", "jac_db", "--archive=/tmp/jac_db.dump"],
-            self.app_dir,
         )
         process.run(
-            ["docker", "cp", f"{self.mongo_container}:/tmp/jac_db.dump", dump_name],
+            ["docker", "cp", f"{self.postgres_container}:{container_path}", dump_name],
             self.app_dir,
         )
 
     def ensure_app_dir(self, rel_dir: str) -> None:
         (self.app_dir / rel_dir).mkdir(parents=True, exist_ok=True)
 
-    def mongo_query_count(self) -> str:
-        try:
-            proc = process.run(
+    def compose_file_exists(self) -> bool:
+        return any((self.app_dir / name).is_file() for name in COMPOSE_FILES)
+
+    def _reset_database(self) -> None:
+        process.run(
+            [
+                "docker",
+                "exec",
+                *self._pg_env(),
+                self.postgres_container,
+                "dropdb",
+                "-U",
+                self.postgres_user,
+                "--if-exists",
+                "--force",
+                self.postgres_db,
+            ],
+            self.app_dir,
+            check=False,
+        )
+        process.run(
+            [
+                "docker",
+                "exec",
+                *self._pg_env(),
+                self.postgres_container,
+                "createdb",
+                "-U",
+                self.postgres_user,
+                self.postgres_db,
+            ],
+            self.app_dir,
+        )
+
+    def _restore_from_container_path(self, container_path: str) -> None:
+        if container_path.endswith(".sql"):
+            process.run(
                 [
                     "docker",
                     "exec",
-                    self.mongo_container,
-                    "mongosh",
-                    "jac_db",
-                    "--quiet",
-                    "--eval",
-                    "print(Number(db.serverStatus().opcounters.query))",
+                    *self._pg_env(),
+                    self.postgres_container,
+                    "psql",
+                    "-U",
+                    self.postgres_user,
+                    "-d",
+                    self.postgres_db,
+                    "-v",
+                    "ON_ERROR_STOP=1",
+                    "-f",
+                    container_path,
                 ],
                 self.app_dir,
-                stdout=subprocess.PIPE,
-                check=False,
             )
-            return (proc.stdout or "").strip().splitlines()[-1]
-        except Exception:
-            return ""
-
-    def compose_file_exists(self) -> bool:
-        return any((self.app_dir / name).is_file() for name in COMPOSE_FILES)
+            return
+        process.run(
+            [
+                "docker",
+                "exec",
+                *self._pg_env(),
+                self.postgres_container,
+                "pg_restore",
+                "-U",
+                self.postgres_user,
+                "-d",
+                self.postgres_db,
+                "--clean",
+                "--if-exists",
+                "--no-owner",
+                container_path,
+            ],
+            self.app_dir,
+        )
 
 
 class RemoteSshDockerDbManager(DbManager):
@@ -244,12 +281,9 @@ class RemoteSshDockerDbManager(DbManager):
             return
         output = result.stdout or ""
         if "Conflict. The container name" in output:
-            print("remote docker compose name conflict; removing stale benchmark containers")
+            print("remote docker compose name conflict; removing stale benchmark Postgres container")
             self._ssh(
-                self._cd(
-                    "docker rm -f "
-                    f"{shlex.quote(self.mongo_container)} {shlex.quote(self.redis_container)}"
-                ),
+                self._cd(f"docker rm -f {shlex.quote(self.postgres_container)}"),
                 check=False,
             )
             self._ssh(self._cd("docker compose up -d"))
@@ -257,20 +291,25 @@ class RemoteSshDockerDbManager(DbManager):
         print(output)
         result.check_returncode()
 
-    def flush_redis(self) -> None:
-        self._ssh(
-            self._cd(f"docker exec {shlex.quote(self.redis_container)} redis-cli FLUSHALL"),
-            check=False,
-        )
-
     def restore_dump(self, dump_name: str) -> None:
-        self._ssh(
-            self._cd(
-                f"docker exec -i {shlex.quote(self.mongo_container)} "
-                f"mongorestore --archive --drop < {shlex.quote(dump_name)}"
-            ),
-            check=False,
-        )
+        self._reset_database()
+        if dump_name.endswith(".sql"):
+            command = (
+                f"docker exec -i {self._pg_exec_args()} "
+                f"{shlex.quote(self.postgres_container)} psql "
+                f"-U {shlex.quote(self.postgres_user)} "
+                f"-d {shlex.quote(self.postgres_db)} "
+                f"-v ON_ERROR_STOP=1 < {shlex.quote(dump_name)}"
+            )
+        else:
+            command = (
+                f"docker exec -i {self._pg_exec_args()} "
+                f"{shlex.quote(self.postgres_container)} pg_restore "
+                f"-U {shlex.quote(self.postgres_user)} "
+                f"-d {shlex.quote(self.postgres_db)} "
+                f"--clean --if-exists --no-owner < {shlex.quote(dump_name)}"
+            )
+        self._ssh(self._cd(command))
 
     def dump_exists(self, dump_name: str) -> bool:
         result = self._ssh(self._cd(f"test -e {shlex.quote(dump_name)}"), check=False)
@@ -289,51 +328,24 @@ class RemoteSshDockerDbManager(DbManager):
         return f"{self.settings.ssh_target}:{remote_path}"
 
     def drop_jac_db(self) -> None:
-        self._ssh(
-            self._cd(
-                f"docker exec {shlex.quote(self.mongo_container)} "
-                f"mongosh jac_db --quiet --eval {shlex.quote('db.dropDatabase()')}"
-            ),
-            check=False,
-        )
+        self._reset_database()
 
-    def drop_non_system_databases(self) -> None:
-        self._ssh(
-            self._cd(
-                f"docker exec {shlex.quote(self.mongo_container)} "
-                f"mongosh --quiet --eval {shlex.quote(_DROP_NON_SYSTEM_DATABASES_JS)}"
-            ),
-            check=False,
-        )
-
-    def mongodump_to_app(self, dump_name: str = "jac_db.dump") -> None:
+    def dump_to_app(self, dump_name: str = "jac_db.pgdump") -> None:
         parent = str(Path(dump_name).parent)
         if parent and parent != ".":
             self.ensure_app_dir(parent)
         self._ssh(
             self._cd(
-                f"docker exec {shlex.quote(self.mongo_container)} "
-                f"mongodump --db jac_db --archive > {shlex.quote(dump_name)}"
+                f"docker exec {self._pg_exec_args()} "
+                f"{shlex.quote(self.postgres_container)} pg_dump "
+                f"-U {shlex.quote(self.postgres_user)} "
+                f"-d {shlex.quote(self.postgres_db)} "
+                f"--format=custom --no-owner > {shlex.quote(dump_name)}"
             )
         )
 
     def ensure_app_dir(self, rel_dir: str) -> None:
         self._ssh(self._cd(f"mkdir -p {shlex.quote(rel_dir)}"))
-
-    def mongo_query_count(self) -> str:
-        try:
-            proc = self._ssh(
-                self._cd(
-                    f"docker exec {shlex.quote(self.mongo_container)} "
-                    "mongosh jac_db --quiet --eval "
-                    f"{shlex.quote('print(Number(db.serverStatus().opcounters.query))')}"
-                ),
-                stdout=subprocess.PIPE,
-                check=False,
-            )
-            return (proc.stdout or "").strip().splitlines()[-1]
-        except Exception:
-            return ""
 
     def compose_file_exists(self) -> bool:
         joined = " || ".join(f"test -f {shlex.quote(name)}" for name in COMPOSE_FILES)
@@ -344,8 +356,29 @@ class RemoteSshDockerDbManager(DbManager):
         return (
             f"{self.mode} ssh={self.settings.ssh_target} "
             f"remote_app_dir={self.remote_app_dir} "
-            f"mongo={self.mongo_uri} redis={self.redis_url}"
+            f"postgres={self.postgres_uri}"
         )
+
+    def _reset_database(self) -> None:
+        self._ssh(
+            self._cd(
+                f"docker exec {self._pg_exec_args()} "
+                f"{shlex.quote(self.postgres_container)} dropdb "
+                f"-U {shlex.quote(self.postgres_user)} "
+                f"--if-exists --force {shlex.quote(self.postgres_db)}"
+            ),
+            check=False,
+        )
+        self._ssh(
+            self._cd(
+                f"docker exec {self._pg_exec_args()} "
+                f"{shlex.quote(self.postgres_container)} createdb "
+                f"-U {shlex.quote(self.postgres_user)} {shlex.quote(self.postgres_db)}"
+            )
+        )
+
+    def _pg_exec_args(self) -> str:
+        return f"-e PGPASSWORD={shlex.quote(self.postgres_password)}"
 
     def _cd(self, command: str) -> str:
         return f"cd {shlex.quote(self.remote_app_dir)} && {command}"
@@ -369,16 +402,14 @@ def make_db_manager(
     *,
     app_name: str,
     app_dir: Path,
-    default_mongo_uri: str,
-    default_redis_url: str,
-    mongo_container: str,
-    redis_container: str,
+    default_postgres_uri: str,
+    postgres_container: str,
     env: dict[str, str] | None = None,
 ) -> DbManager:
     settings = load_db_settings(
         app_name=app_name,
-        default_mongo_uri=default_mongo_uri,
-        default_redis_url=default_redis_url,
+        default_postgres_uri=default_postgres_uri,
+        default_postgres_container=postgres_container,
         env=env,
     )
     cls: type[DbManager]
@@ -390,16 +421,15 @@ def make_db_manager(
         settings=settings,
         app_name=app_name,
         app_dir=app_dir,
-        mongo_container=mongo_container,
-        redis_container=redis_container,
+        postgres_container=postgres_container,
     )
 
 
 def load_db_settings(
     *,
     app_name: str,
-    default_mongo_uri: str = "",
-    default_redis_url: str = "",
+    default_postgres_uri: str = DEFAULT_POSTGRES_URI,
+    default_postgres_container: str = "postgres",
     env: dict[str, str] | None = None,
     config_path: Path = LOCAL_TOML,
 ) -> DbSettings:
@@ -412,6 +442,10 @@ def load_db_settings(
     app_data = apps.get(app_name, {}) if isinstance(apps, dict) else {}
     if not isinstance(app_data, dict):
         app_data = {}
+
+    backend = _setting(env, app_data, db_data, "backend", "SWEEP_DB_BACKEND", "postgres").strip().lower()
+    if backend not in {"postgres", "postgresql", "pgsql"}:
+        raise ValueError(f"unsupported sweep DB backend {backend!r}; this sweep tool expects Postgres")
 
     mode = _setting(env, app_data, db_data, "mode", "SWEEP_DB_MODE", "local_docker").strip()
     if mode not in {"local_docker", "remote_ssh"}:
@@ -437,22 +471,23 @@ def load_db_settings(
     ).strip()
     ssh_options = _ssh_options(env, app_data, db_data)
 
-    mongo_uri = _uri_setting(
+    postgres_uri = _uri_setting(
         env,
         app_data,
         db_data,
-        "mongo_uri",
-        ("SWEEP_DB_MONGO_URI", "MONGODB_URI"),
+        "postgres_uri",
+        ("SWEEP_DB_POSTGRES_URI", "JAC_DB_URL", "POSTGRES_URL", "DATABASE_URL"),
         "",
     )
-    redis_url = _uri_setting(
-        env,
-        app_data,
-        db_data,
-        "redis_url",
-        ("SWEEP_DB_REDIS_URL", "REDIS_URL"),
-        "",
+    explicit_postgres_uri = _first_env(
+        env, ("SWEEP_DB_POSTGRES_URI", "JAC_DB_URL", "POSTGRES_URL", "DATABASE_URL")
     )
+    if (
+        mode == "local_docker"
+        and env.get("SWEEP_DB_MODE", "").strip() == "local_docker"
+        and not explicit_postgres_uri
+    ):
+        postgres_uri = ""
 
     if mode == "remote_ssh":
         if not host:
@@ -464,10 +499,43 @@ def load_db_settings(
                     "db.apps.<app>.remote_app_dir, or SWEEP_DB_REMOTE_APP_ROOT"
                 )
             remote_app_dir = str(Path(remote_app_root) / app_name)
-        if not mongo_uri and default_mongo_uri:
-            mongo_uri = _replace_uri_host(default_mongo_uri, host)
-        if not redis_url and default_redis_url:
-            redis_url = _replace_uri_host(default_redis_url, host)
+        if not postgres_uri and default_postgres_uri:
+            postgres_uri = _replace_uri_host(default_postgres_uri, host)
+
+    postgres_uri = postgres_uri or default_postgres_uri
+    uri_user, uri_password, uri_db = _postgres_parts(postgres_uri)
+    postgres_container = _setting(
+        env,
+        app_data,
+        db_data,
+        "postgres_container",
+        "SWEEP_DB_POSTGRES_CONTAINER",
+        default_postgres_container,
+    ).strip()
+    postgres_user = _setting(
+        env,
+        app_data,
+        db_data,
+        "postgres_user",
+        "SWEEP_DB_POSTGRES_USER",
+        uri_user or "jac",
+    ).strip()
+    postgres_password = _setting(
+        env,
+        app_data,
+        db_data,
+        "postgres_password",
+        "SWEEP_DB_POSTGRES_PASSWORD",
+        uri_password or "jac",
+    )
+    postgres_db = _setting(
+        env,
+        app_data,
+        db_data,
+        "postgres_db",
+        "SWEEP_DB_POSTGRES_DB",
+        uri_db or "jac_db",
+    ).strip()
 
     return DbSettings(
         mode=mode,
@@ -475,8 +543,11 @@ def load_db_settings(
         ssh_user=ssh_user,
         remote_app_root=remote_app_root,
         remote_app_dir=remote_app_dir,
-        mongo_uri=mongo_uri or default_mongo_uri,
-        redis_url=redis_url or default_redis_url,
+        postgres_uri=postgres_uri,
+        postgres_container=postgres_container,
+        postgres_user=postgres_user,
+        postgres_password=postgres_password,
+        postgres_db=postgres_db,
         ssh_options=ssh_options,
     )
 
@@ -548,6 +619,13 @@ def _uri_setting(
     return default
 
 
+def _first_env(env: dict[str, str], keys: tuple[str, ...]) -> str:
+    for key in keys:
+        if env.get(key, ""):
+            return str(env[key])
+    return ""
+
+
 def _ssh_options(env: dict[str, str], app_data: dict[str, Any], db_data: dict[str, Any]) -> tuple[str, ...]:
     raw = env.get("SWEEP_DB_SSH_OPTIONS", "")
     if raw:
@@ -558,6 +636,14 @@ def _ssh_options(env: dict[str, str], app_data: dict[str, Any], db_data: dict[st
     if isinstance(value, list):
         return tuple(str(item) for item in value)
     return ()
+
+
+def _postgres_parts(uri: str) -> tuple[str, str, str]:
+    parsed = urlsplit(uri)
+    user = unquote(parsed.username or "")
+    password = unquote(parsed.password or "")
+    database = parsed.path.lstrip("/").split("/", 1)[0] if parsed.path else ""
+    return user, password, database
 
 
 def _replace_uri_host(uri: str, host: str) -> str:
@@ -571,10 +657,3 @@ def _replace_uri_host(uri: str, host: str) -> str:
         userinfo += "@"
     port = f":{parsed.port}" if parsed.port else ""
     return urlunsplit((parsed.scheme, f"{userinfo}{host}{port}", parsed.path, parsed.query, parsed.fragment))
-
-
-_DROP_NON_SYSTEM_DATABASES_JS = (
-    "db.getMongo().getDBNames().forEach(function(d){"
-    'if(d!="admin"&&d!="local"&&d!="config"){'
-    "db.getSiblingDB(d).dropDatabase()}})"
-)

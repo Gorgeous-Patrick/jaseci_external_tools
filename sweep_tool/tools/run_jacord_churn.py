@@ -2,7 +2,7 @@
 """Run the Jacord same-spawn churn experiment.
 
 The experiment trains stale history-style predictors on one channel before
-churn, generates deterministic churned Mongo dumps by mutating through Jac
+churn, generates deterministic churned Postgres dumps by mutating through Jac
 walkers, restarts the whole storage stack after mutation, then measures cold
 post-churn runs from those dumps.
 """
@@ -26,14 +26,14 @@ SWEEP_TOOL_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SWEEP_TOOL_ROOT))
 
 from lib import manifest as mf  # noqa: E402
-from lib.prefetch_exp import coaccess, markov, metrics, oracle, process, selep_adapted  # noqa: E402
+from lib.prefetch_exp import coaccess, markov, metrics, oracle, process  # noqa: E402
 from lib.prefetch_exp.adapters import make_adapter  # noqa: E402
 from lib.prefetch_exp.config_edit import RunConfigEditor  # noqa: E402
 from lib.prefetch_exp.models import RequestSpec, SweepOptions  # noqa: E402
 
 
 DEFAULT_POLICIES = ["oracle", "ttg", "history", "markov", "coaccess", "none"]
-SUPPORTED_POLICIES = DEFAULT_POLICIES + ["selep", "selep-adapted"]
+SUPPORTED_POLICIES = DEFAULT_POLICIES
 DEFAULT_CHURN_RATES = [0, 5, 10, 25, 50]
 CHURN_COLUMNS = [
     "churn_rate",
@@ -66,7 +66,7 @@ CHURN_COLUMNS = [
     "l2",
     "l3",
     "miss",
-    "mongo_q",
+    "db_q",
     "base_dump",
     "churn_dump",
     "oracle_file",
@@ -101,8 +101,6 @@ class StalePlans:
     oracle_file: Path
     markov_file: Path
     coaccess_file: Path
-    selep_file: Path | None
-    selep_training_logs: list[Path]
     actual_ids: list[str]
     message_ids: list[str]
     message_count: int
@@ -164,8 +162,6 @@ def main() -> int:
         print(f"history file: {stale.oracle_file}")
         print(f"markov file : {stale.markov_file}")
         print(f"coaccess    : {stale.coaccess_file}")
-        if stale.selep_file is not None:
-            print(f"selep       : {stale.selep_file}")
 
         print("")
         print("=== Generating/reusing deterministic churn dumps ===")
@@ -217,8 +213,6 @@ def main() -> int:
             "base_message_count": stale.message_count,
             "base_actual_ids": len(stale.actual_ids),
             "churn_rates": args.churn_rates,
-            "selep_file": str(stale.selep_file) if stale.selep_file is not None else "",
-            "selep_training_logs": [str(path) for path in stale.selep_training_logs],
             "dumps": [
                 {
                     "rate": d.rate,
@@ -299,7 +293,7 @@ def _parse_args() -> argparse.Namespace:
         "--base-dump",
         default=os.environ.get("JACORD_CHURN_BASE_DUMP")
         or os.environ.get("JACORD_DUMP")
-        or "jac_db.dump",
+        or "jac_db.pgdump",
     )
     parser.add_argument(
         "--channel-id",
@@ -316,7 +310,7 @@ def _parse_args() -> argparse.Namespace:
         "--policies",
         type=_parse_words,
         default=_parse_words(os.environ.get("JACORD_CHURN_POLICIES", "")) or DEFAULT_POLICIES,
-        help="Policies to measure: none oracle ttg history markov coaccess selep-adapted.",
+        help="Policies to measure: none oracle ttg history markov coaccess.",
     )
     parser.add_argument(
         "--limit",
@@ -371,16 +365,7 @@ def _parse_args() -> argparse.Namespace:
         "--sanity-min-coverage",
         type=float,
         default=float(os.environ.get("JACORD_CHURN_SANITY_MIN_COVERAGE", "99.0")),
-        help="Minimum p=0 coverage required for oracle/history/markov/coaccess/selep-adapted.",
-    )
-    parser.add_argument(
-        "--selep-train-repeats",
-        type=int,
-        default=int(os.environ.get("JACORD_CHURN_SELEP_TRAIN_REPEATS", "0") or "0"),
-        help=(
-            "Pre-churn no-prefetch repeats used to train SeLeP-adapted. "
-            "Default is max(12, SWEEP_SELEP_LOOK_BACK + 8) when SeLeP is requested."
-        ),
+        help="Minimum p=0 coverage required for oracle/history/markov/coaccess.",
     )
     args = parser.parse_args()
     unknown = sorted(set(args.policies) - set(SUPPORTED_POLICIES))
@@ -434,7 +419,7 @@ def _select_request(
             access_log=str(paths.logs_dir / "select_channel_access.csv"),
         )
     )
-    adapter.flush_redis()
+    adapter.clear_runtime_cache()
     proc = None
     try:
         proc = adapter.start_server(paths.logs_dir / "select_channel.log")
@@ -478,8 +463,6 @@ def _build_stale_plans(
     stale_oracle = paths.models_dir / "history_pre_churn.uuids"
     stale_markov = paths.models_dir / "markov_pre_churn.json"
     stale_coaccess = paths.models_dir / "coaccess_pre_churn.json"
-    stale_selep: Path | None = None
-    selep_training_logs: list[Path] = []
     ids = oracle.write_oracle_from_access_log(record["access_log"], stale_oracle)
     markov.write_markov_model_from_access_log(
         record["access_log"],
@@ -500,108 +483,15 @@ def _build_stale_plans(
         limit=limit,
         cluster_threshold=adapter.options.coaccess_cluster_threshold,
     )
-    if _requests_selep_policy(args.policies):
-        stale_selep = paths.models_dir / "selep_pre_churn.json"
-        selep_training_logs = _record_selep_repeat_traces(
-            adapter,
-            editor,
-            spec,
-            paths,
-            base_record=record,
-            repeats=args.selep_train_repeats,
-        )
-        train_ids = [
-            f"{spec.request_id}:pre_churn_repeat_{idx}"
-            for idx in range(1, len(selep_training_logs) + 1)
-        ]
-        try:
-            selep_adapted.write_pooled_selep_models_from_access_logs(
-                selep_training_logs,
-                {limit: stale_selep},
-                app_name=adapter.name,
-                walker=spec.walker,
-                label="selep-adapted-churn-repeat",
-                seed=adapter.options.selep_pool_seed,
-                training_request_ids=train_ids,
-                trial_request_ids=[spec.request_id],
-                trial_count=args.trials,
-                plan_start_ids=[spec.target_id],
-                cluster_threshold=adapter.options.coaccess_cluster_threshold,
-                look_back=adapter.options.selep_look_back,
-                epochs=adapter.options.selep_epochs,
-                batch_size=adapter.options.selep_batch_size,
-                selep_repo=adapter.options.selep_repo,
-                source_commit=adapter.options.selep_source_commit,
-            )
-        except Exception as exc:
-            print(f"SeLeP-adapted churn training failed; measuring empty plan: {exc}")
-            selep_adapted.write_empty_selep_model(
-                stale_selep,
-                app_name=adapter.name,
-                walker=spec.walker,
-                label="selep-adapted-churn-repeat",
-                limit=limit,
-                seed=adapter.options.selep_pool_seed,
-                training_request_ids=train_ids,
-                trial_request_ids=[spec.request_id],
-                trial_count=args.trials,
-                plan_start_ids=[spec.target_id],
-                reason=f"pipeline_failure:{type(exc).__name__}:{exc}",
-                cluster_threshold=adapter.options.coaccess_cluster_threshold,
-                look_back=adapter.options.selep_look_back,
-                epochs=adapter.options.selep_epochs,
-                batch_size=adapter.options.selep_batch_size,
-                source_commit=adapter.options.selep_source_commit,
-            )
     return StalePlans(
         access_log=record["access_log"],
         oracle_file=stale_oracle,
         markov_file=stale_markov,
         coaccess_file=stale_coaccess,
-        selep_file=stale_selep,
-        selep_training_logs=selep_training_logs,
         actual_ids=ids,
         message_ids=record["message_ids"],
         message_count=record["message_count"],
     )
-
-
-def _record_selep_repeat_traces(
-    adapter,
-    editor: RunConfigEditor,
-    spec: RequestSpec,
-    paths: ChurnPaths,
-    *,
-    base_record: dict[str, Any],
-    repeats: int,
-) -> list[Path]:
-    needed = repeats if repeats > 0 else max(12, adapter.options.selep_look_back + 8)
-    if needed <= adapter.options.selep_look_back:
-        raise RuntimeError(
-            "SeLeP-adapted churn training needs more repeats than look_back; "
-            f"got repeats={needed}, look_back={adapter.options.selep_look_back}"
-        )
-    logs = [base_record["access_log"]]
-    base_ids = set(base_record["actual_ids"])
-    for idx in range(2, needed + 1):
-        record = _record_access_trace(
-            adapter,
-            editor,
-            spec,
-            log_path=paths.logs_dir / f"pre_churn_selep_train_{idx:03d}.log",
-            access_log=paths.logs_dir / f"pre_churn_selep_train_{idx:03d}_access.csv",
-        )
-        if record["message_count"] != base_record["message_count"]:
-            raise RuntimeError(
-                "SeLeP-adapted pre-churn repeat changed message count: "
-                f"base={base_record['message_count']} repeat={record['message_count']}"
-            )
-        if set(record["actual_ids"]) != base_ids:
-            raise RuntimeError(
-                "SeLeP-adapted pre-churn repeat did not reproduce the base access set"
-            )
-        logs.append(record["access_log"])
-    return logs
 
 
 def _ensure_churn_dump(
@@ -614,7 +504,7 @@ def _ensure_churn_dump(
     base_message_ids: list[str],
     base_message_count: int,
 ) -> ChurnDump:
-    dump_name = f"churn_dumps/jacord_churn_p{rate:02d}_seed{args.seed}.dump"
+    dump_name = f"churn_dumps/jacord_churn_p{rate:02d}_seed{args.seed}.pgdump"
     added_messages = int(round(base_message_count * (rate / 100.0)))
     if args.force_dumps or not adapter.dump_exists(dump_name):
         print(f"  generating p={rate}% dump via Jac walkers")
@@ -638,7 +528,7 @@ def _ensure_churn_dump(
                 f"p={rate} verification saw only {post_count} messages; expected at least "
                 f"{base_message_count + added_messages}"
             )
-        adapter.mongodump_to_app(dump_name)
+        adapter.dump_to_app(dump_name)
         print(f"    wrote {adapter.dump_description(dump_name)}")
     else:
         print(f"  reusing p={rate}% dump: {adapter.dump_description(dump_name)}")
@@ -688,7 +578,7 @@ def _mutate_channel(
             access_log=str(paths.logs_dir / f"mutate_p{rate:02d}_access.csv"),
         )
     )
-    adapter.flush_redis()
+    adapter.clear_runtime_cache()
     proc = None
     new_message_ids: list[str] = []
     try:
@@ -727,11 +617,10 @@ def _mutate_channel(
 
 
 def _restart_storage_stack(adapter, *, wait_sec: float) -> None:
-    print("    restarting full Mongo/Redis stack after mutation")
+    print("    restarting full Postgres stack after mutation")
     adapter.compose_down()
     adapter.compose_up()
     time.sleep(wait_sec)
-    adapter.flush_redis()
 
 
 def _verify_channel_after_restart(
@@ -748,7 +637,7 @@ def _verify_channel_after_restart(
             access_log=str(paths.logs_dir / f"verify_p{rate:02d}_access.csv"),
         )
     )
-    adapter.flush_redis()
+    adapter.clear_runtime_cache()
     proc = None
     try:
         proc = adapter.start_server(paths.logs_dir / f"verify_p{rate:02d}.log")
@@ -797,10 +686,6 @@ def _measure_policy_trial(
     elif policy == "coaccess":
         model_file = stale.coaccess_file
         plan_ids = _model_plan_ids(model_file, spec.target_id, args.limit)
-    elif policy in ("selep", "selep-adapted"):
-        runtime_policy = "selep-adapted"
-        model_file = stale.selep_file
-        plan_ids = _model_plan_ids(model_file, spec.target_id, args.limit) if model_file is not None else []
     elif policy == "ttg":
         ttg_plan_file = paths.logs_dir / f"ttg_plan_p{dump.rate:02d}_trial{trial}.csv"
         ttg_plan_file.unlink(missing_ok=True)
@@ -833,10 +718,9 @@ def _measure_policy_trial(
             oracle_file=str(oracle_file) if oracle_file is not None else "",
             markov_file=str(model_file) if model_file is not None and runtime_policy == "markov" else "",
             coaccess_file=str(model_file) if model_file is not None and runtime_policy == "coaccess" else "",
-            selep_file=str(model_file) if model_file is not None and runtime_policy == "selep-adapted" else "",
         )
     )
-    adapter.flush_redis()
+    adapter.clear_runtime_cache()
     old_ttg_dump = adapter.options.env.get("JAC_PREFETCH_DUMP")
     if ttg_plan_file is not None:
         adapter.options.env["JAC_PREFETCH_DUMP"] = str(ttg_plan_file)
@@ -844,7 +728,7 @@ def _measure_policy_trial(
         adapter.options.env.pop("JAC_PREFETCH_DUMP", None)
 
     proc = None
-    mongo_before = adapter.mongo_query_count() if adapter.options.count_mongo else ""
+    db_before = adapter.db_query_count() if adapter.options.count_db else ""
     try:
         proc = adapter.start_server(log_path, profile_dir=profile_dir, profile_csv=profile_csv)
         token = adapter.login()
@@ -860,19 +744,19 @@ def _measure_policy_trial(
             adapter.options.env["JAC_PREFETCH_DUMP"] = old_ttg_dump
 
     _assert_profiles(profile_dir, profile_csv)
-    mongo_after = adapter.mongo_query_count() if adapter.options.count_mongo else ""
+    db_after = adapter.db_query_count() if adapter.options.count_db else ""
     if policy == "ttg" and ttg_plan_file is not None:
         plan_ids = _read_ttg_plan_dump(ttg_plan_file)
     actual_ids = oracle.extract_uuid_order(access_log)
     quality = _quality(actual_ids, plan_ids)
     tiers = metrics.tier_counts(access_log)
     profile = metrics.profile_breakdown(profile_csv)
-    mongo_q = ""
-    if mongo_before and mongo_after:
+    db_q = ""
+    if db_before and db_after:
         try:
-            mongo_q = str(int(mongo_after) - int(mongo_before))
+            db_q = str(int(db_after) - int(db_before))
         except ValueError:
-            mongo_q = ""
+            db_q = ""
 
     empirical_ceiling = _pct(len(set(stale.actual_ids) & set(dump.actual_ids)), len(set(dump.actual_ids)))
     analytic_ceiling = 100.0 / (1.0 + (dump.rate / 100.0))
@@ -901,7 +785,7 @@ def _measure_policy_trial(
         "l2": tiers.get("l2", ""),
         "l3": tiers.get("l3", ""),
         "miss": tiers.get("miss", ""),
-        "mongo_q": mongo_q,
+        "db_q": db_q,
         "base_dump": args.base_dump,
         "churn_dump": dump.dump_name,
         "oracle_file": str(oracle_file) if oracle_file is not None else "",
@@ -919,7 +803,7 @@ def _record_access_trace(
     access_log: Path,
 ) -> dict[str, Any]:
     editor.patch(_config_values("none", 0, access_log=str(access_log)))
-    adapter.flush_redis()
+    adapter.clear_runtime_cache()
     proc = None
     try:
         proc = adapter.start_server(log_path)
@@ -997,7 +881,6 @@ def _config_values(
     oracle_file: str = "",
     markov_file: str = "",
     coaccess_file: str = "",
-    selep_file: str = "",
 ) -> dict[str, object]:
     effective = "none" if policy == "none" or limit <= 0 else policy
     return {
@@ -1008,7 +891,6 @@ def _config_values(
         "prefetch_oracle_file": oracle_file,
         "prefetch_markov_file": markov_file,
         "prefetch_coaccess_file": coaccess_file,
-        "prefetch_selep_file": selep_file,
     }
 
 
@@ -1102,7 +984,7 @@ def _assert_p0_sanity(
     *,
     requested_policies: set[str],
 ) -> None:
-    required = {"oracle", "history", "markov", "coaccess", "selep", "selep-adapted"} & requested_policies
+    required = {"oracle", "history", "markov", "coaccess"} & requested_policies
     if not required:
         return
     by_policy = {str(row["policy"]): row for row in rows if int(row["trial"]) == 1}
@@ -1119,11 +1001,6 @@ def _assert_p0_sanity(
             "p=0 same-spawn sanity failed; expected oracle-level coverage, got "
             + ", ".join(failures)
         )
-
-
-def _requests_selep_policy(policies: list[str]) -> bool:
-    return any(policy in ("selep", "selep-adapted") for policy in policies)
-
 
 def _write_header(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)

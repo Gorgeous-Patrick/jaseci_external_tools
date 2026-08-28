@@ -10,8 +10,8 @@ from lib.prefetch_exp.models import CaseState, RequestSpec
 class LittleX5Adapter(BenchmarkAdapter):
     default_user = "sim_user_56"
     default_password = "password"
-    credential_source = "backup.dump seeded sim_user benchmark target"
-    default_dump = "backup.dump"
+    credential_source = "backup.pgdump seeded sim_user benchmark target"
+    default_dump = "backup.pgdump"
 
     def server_command(self) -> list[str]:
         cmd = [self.options.jac_bin, "start", "server.jac"]
@@ -19,14 +19,14 @@ class LittleX5Adapter(BenchmarkAdapter):
             cmd.extend(["--profile", self.profile_name])
         return cmd
 
-    def restore_dump_if_present(self, dump_name: str = "jac_db.dump") -> None:
+    def restore_dump_if_present(self, dump_name: str = "jac_db.pgdump") -> None:
         configured = self._configured_dump()
         self.options.env["LITTLEX_DUMP"] = configured
         if not self.dump_exists(configured):
             raise FileNotFoundError(
                 "Configured LittleX dump does not exist: "
                 f"{self.dump_description(configured)}. Set LITTLEX_DUMP to a valid dump; "
-                "the LittleX sweep will not silently fall back to jac_db.dump."
+                "the LittleX sweep will not silently fall back to backup.pgdump."
             )
         print(
             "=== LittleX restoring configured dump: "

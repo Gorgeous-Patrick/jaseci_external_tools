@@ -1,7 +1,7 @@
 name: littlex5
 description: |
   littleX social feed benchmark.  Runs the load_feed walker against a
-  seeded MongoDB + Redis pair from backup.dump (~5000 simulated users,
+  seeded Postgres dump from backup.pgdump (~5000 simulated users,
   2.26M anchors, 250K follow edges).
 
 app_dir: ../../littlex5
@@ -22,9 +22,8 @@ parameters:
     default: "oracle ttg markov1-pooled coaccess-pooled none"
     help: >
       Space-separated policies to run. Supported: none, ttg, oracle,
-      markov, markov1-pooled, coaccess, coaccess-pooled, selep-adapted,
-      selep-adapted-pooled. Oracle, Markov, co-access, and SeLeP default
-      to auto-record/train then replay.
+      markov, markov1-pooled, coaccess, coaccess-pooled. Oracle,
+      Markov, and co-access default to auto-record/train then replay.
 
   - name: SWEEP_ORACLE_MODE
     label: Oracle mode
@@ -108,16 +107,16 @@ parameters:
   - name: LITTLEX_DUMP
     label: LittleX dump
     kind: str
-    default: "backup.dump"
+    default: "backup.pgdump"
     help: >
-      MongoDB archive restored before each case. The default backup.dump is
-      the large LittleX seed; use jac_db.dump only for the small smoke dataset.
+      Postgres dump restored before each case. The default backup.pgdump is
+      the large LittleX seed.
 
   - name: TEST_USER
     label: Benchmark user
     kind: str
     default: "sim_user_56"
-    help: Matches backup.dump's selected seeded LittleX user.
+    help: Matches backup.pgdump's selected seeded LittleX user.
 
   - name: TEST_PASSWORD
     label: Benchmark password
