@@ -53,6 +53,16 @@ class SweepOptions:
     coaccess_train_ns: list[int]
     coaccess_pool_seed: int
     coaccess_cluster_threshold: float
+    selep_mode: str
+    selep_dir: Path
+    selep_train_ns: list[int]
+    selep_pool_seed: int
+    selep_look_back: int
+    selep_epochs: int
+    selep_batch_size: int
+    selep_repo: Path | None
+    selep_source_commit: str
+    selep_allow_self_label: bool
     count_mongo: bool
     env: dict[str, str]
 
@@ -93,6 +103,29 @@ class SweepOptions:
                 or "42"
             ),
             coaccess_cluster_threshold=float(env.get("SWEEP_COACCESS_CLUSTER_THRESHOLD") or "0.05"),
+            selep_mode=(env.get("SWEEP_SELEP_MODE") or "auto").strip().lower(),
+            selep_dir=_env_path(env, "SWEEP_SELEP_DIR", app_dir / "selep_models", app_dir),
+            selep_train_ns=_parse_int_list(
+                env.get("SWEEP_SELEP_TRAIN_NS")
+                or env.get("SWEEP_COACCESS_TRAIN_NS")
+                or env.get("SWEEP_MARKOV_TRAIN_NS"),
+                [5],
+            ),
+            selep_pool_seed=int(
+                env.get("SWEEP_SELEP_POOL_SEED")
+                or env.get("SWEEP_COACCESS_POOL_SEED")
+                or env.get("SWEEP_MARKOV_POOL_SEED")
+                or "42"
+            ),
+            selep_look_back=int(env.get("SWEEP_SELEP_LOOK_BACK") or "4"),
+            selep_epochs=int(env.get("SWEEP_SELEP_EPOCHS") or "25"),
+            selep_batch_size=int(env.get("SWEEP_SELEP_BATCH_SIZE") or "16"),
+            selep_repo=_optional_env_path(env, "SWEEP_SELEP_REPO"),
+            selep_source_commit=(
+                env.get("SWEEP_SELEP_SOURCE_COMMIT")
+                or "0b896c4ff6bb3ec04b8a9a1d4454061cfbfb062d"
+            ),
+            selep_allow_self_label=_env_bool(env.get("SWEEP_SELEP_ALLOW_SELF_LABEL")),
             count_mongo=bool(env.get("JAC_COUNT_MONGO")),
             env=env,
         )
@@ -154,6 +187,17 @@ def _env_path(env: dict[str, str], name: str, default: Path, base_dir: Path) -> 
         return default
     path = Path(raw).expanduser()
     return path if path.is_absolute() else base_dir / path
+
+
+def _optional_env_path(env: dict[str, str], name: str) -> Path | None:
+    raw = env.get(name)
+    if not raw:
+        return None
+    return Path(raw).expanduser()
+
+
+def _env_bool(raw: str | None) -> bool:
+    return str(raw or "").strip().lower() in {"1", "true", "yes", "on"}
 
 
 def _sibling_python(jac_bin: str) -> str:

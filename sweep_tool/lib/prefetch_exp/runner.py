@@ -7,7 +7,7 @@ import random
 import re
 from pathlib import Path
 
-from lib.prefetch_exp import coaccess, markov, metrics, oracle, process
+from lib.prefetch_exp import coaccess, markov, metrics, oracle, process, selep_adapted
 from lib.prefetch_exp.adapters import make_adapter
 from lib.prefetch_exp.config_edit import RunConfigEditor
 from lib.prefetch_exp.models import CaseState, RequestSpec, SweepOptions, TrialResult
@@ -23,9 +23,15 @@ SUPPORTED_POLICIES = {
     "markov1-pooled",
     "coaccess",
     "coaccess-pooled",
+    "selep",
+    "selep-adapted",
+    "selep-adapted-pooled",
+    "selep-pooled",
 }
 MARKOV_POOLED_PREFIX = "markov1-pooled"
 COACCESS_POOLED_PREFIX = "coaccess-pooled"
+SELEP_POOLED_PREFIX = "selep-adapted-pooled"
+SELEP_POOLED_ALIAS_PREFIX = "selep-pooled"
 ACCESS_LOG_RECORDS_ALL_TIERS = True
 
 
@@ -50,6 +56,11 @@ def run_sweep(options: SweepOptions) -> None:
         f"threshold={options.coaccess_cluster_threshold:g}"
     )
     print(
+        "selep   : "
+        f"mode={options.selep_mode} dir={options.selep_dir} "
+        f"look_back={options.selep_look_back} epochs={options.selep_epochs}"
+    )
+    print(
         "pooled  : "
         f"train_ns={' '.join(str(x) for x in options.markov_train_ns)} "
         f"trials={options.trials} seed={options.markov_pool_seed}"
@@ -58,6 +69,11 @@ def run_sweep(options: SweepOptions) -> None:
         "co-pool : "
         f"train_ns={' '.join(str(x) for x in options.coaccess_train_ns)} "
         f"trials={options.trials} seed={options.coaccess_pool_seed}"
+    )
+    print(
+        "se-pool : "
+        f"train_ns={' '.join(str(x) for x in options.selep_train_ns)} "
+        f"trials={options.trials} seed={options.selep_pool_seed}"
     )
     print("")
 
@@ -77,6 +93,10 @@ def run_sweep(options: SweepOptions) -> None:
             if _is_coaccess_pooled_policy(policy):
                 for train_n in _coaccess_pooled_train_ns(policy, options):
                     _run_coaccess_pooled(adapter, editor, policy, train_n, options, results_path)
+                continue
+            if _is_selep_pooled_policy(policy):
+                for train_n in _selep_pooled_train_ns(policy, options):
+                    _run_selep_pooled(adapter, editor, policy, train_n, options, results_path)
                 continue
             if policy == "history":
                 print(
@@ -442,6 +462,212 @@ def _run_coaccess_pooled(
         print(f"    accuracy: {_rate_summary(results, 'accuracy')}")
 
 
+def _run_selep_pooled(
+    adapter,
+    editor: RunConfigEditor,
+    policy: str,
+    train_n: int,
+    options: SweepOptions,
+    results_path: Path,
+) -> None:
+    if options.selep_mode != "auto":
+        raise ValueError("selep-adapted-pooled requires SWEEP_SELEP_MODE=auto")
+    if train_n <= 0:
+        raise ValueError(f"pooled SeLeP-adapted train N must be positive, got {train_n}")
+    if options.trials <= 0:
+        raise ValueError(f"pooled SeLeP-adapted trial count must be positive, got {options.trials}")
+
+    limits = _limits_for_policy("selep-adapted", options.limits)
+    label = f"{SELEP_POOLED_PREFIX}-N{train_n}"
+    setup_limit = max(limits) if limits else 0
+
+    print("")
+    print("========================================")
+    print(f"Case: policy={label} pooled_train={train_n} trials={options.trials}")
+    print("========================================")
+
+    editor.patch(_config_values("none", 0, access_log=""))
+    state = adapter.prepare_case(label, setup_limit)
+    if state.request is None:
+        raise RuntimeError(f"{adapter.name} did not prepare a request")
+
+    trial_spec = _require_request(state)
+    trial_id = _request_id(trial_spec)
+    pool = [
+        spec
+        for spec in _unique_spawn_pool(adapter.spawn_pool(state))
+        if _request_id(spec) != trial_id
+    ]
+    required = train_n
+    if len(pool) < required:
+        raise RuntimeError(
+            f"{adapter.name} exposes {len(pool)} pooled spawn request(s), "
+            f"but {SELEP_POOLED_PREFIX}-N{train_n} needs N={required} training request(s) "
+            f"after excluding measured request {trial_id}. "
+            "Expose more seeded spawn targets for this adapter or lower "
+            "SWEEP_SELEP_TRAIN_NS."
+        )
+
+    rng = random.Random(options.selep_pool_seed)
+    sample = list(pool)
+    rng.shuffle(sample)
+    train_specs = sample[:train_n]
+    train_ids = [_request_id(spec) for spec in train_specs]
+    metadata = {
+        "policy": label,
+        "runtime_policy": "selep-adapted",
+        "app": adapter.name,
+        "seed": options.selep_pool_seed,
+        "train_n": train_n,
+        "trial_count": options.trials,
+        "trial_request_id": trial_id,
+        "pool_size": len(pool),
+        "limits": limits,
+        "training_request_ids": train_ids,
+        "trial_request_ids": [trial_id],
+        "cluster_threshold": options.coaccess_cluster_threshold,
+        "look_back": options.selep_look_back,
+        "epochs": options.selep_epochs,
+        "batch_size": options.selep_batch_size,
+        "selep_source_commit": options.selep_source_commit,
+        "access_log_records_all_tiers": ACCESS_LOG_RECORDS_ALL_TIERS,
+        "training_skips_cold_start_protocol": ACCESS_LOG_RECORDS_ALL_TIERS,
+    }
+    metadata_path = selep_adapted.pooled_metadata_path(
+        options.selep_dir,
+        adapter.name,
+        state.request.walker,
+        label,
+        options.selep_pool_seed,
+    )
+    metadata_path = _app_path(adapter, metadata_path)
+    selep_adapted.write_pooled_metadata(metadata_path, metadata)
+    print(
+        "    pooled split: "
+        f"seed={options.selep_pool_seed} pool={len(pool)} "
+        f"trial_request={trial_id} metadata={metadata_path}"
+    )
+
+    training_logs: list[Path] = []
+    for idx, spec in enumerate(train_specs, start=1):
+        access_log = _collect_selep_training_trace(adapter, editor, state, spec, label, idx)
+        training_logs.append(access_log)
+        print(
+            f"    train {idx}/{train_n}: request={_request_id(spec)} "
+            f"first_touch={len(coaccess.extract_first_touch_sequence(access_log))}"
+        )
+
+    model_paths: dict[int, Path] = {}
+    for limit in limits:
+        model_path = selep_adapted.pooled_selep_model_path(
+            options.selep_dir,
+            adapter.name,
+            state.request.walker,
+            label,
+            limit,
+            options.selep_pool_seed,
+        )
+        model_paths[limit] = _app_path(adapter, model_path)
+
+    try:
+        models = selep_adapted.write_pooled_selep_models_from_access_logs(
+            training_logs,
+            model_paths,
+            app_name=adapter.name,
+            walker=state.request.walker,
+            label=label,
+            seed=options.selep_pool_seed,
+            training_request_ids=train_ids,
+            trial_request_ids=[trial_id],
+            trial_count=options.trials,
+            plan_start_ids=[trial_spec.target_id],
+            cluster_threshold=options.coaccess_cluster_threshold,
+            look_back=options.selep_look_back,
+            epochs=options.selep_epochs,
+            batch_size=options.selep_batch_size,
+            selep_repo=options.selep_repo,
+            source_commit=options.selep_source_commit,
+        )
+    except Exception as exc:
+        print(f"    SeLeP-adapted pipeline failed; measuring empty plan: {exc}")
+        models = {
+            limit: selep_adapted.write_empty_selep_model(
+                model_path,
+                app_name=adapter.name,
+                walker=state.request.walker,
+                label=label,
+                limit=limit,
+                seed=options.selep_pool_seed,
+                training_request_ids=train_ids,
+                trial_request_ids=[trial_id],
+                trial_count=options.trials,
+                plan_start_ids=[trial_spec.target_id],
+                reason=f"pipeline_failure:{type(exc).__name__}:{exc}",
+                cluster_threshold=options.coaccess_cluster_threshold,
+                look_back=options.selep_look_back,
+                epochs=options.selep_epochs,
+                batch_size=options.selep_batch_size,
+                source_commit=options.selep_source_commit,
+            )
+            for limit, model_path in model_paths.items()
+        }
+    first_model = next(iter(models.values()), {})
+    model_train_ids = set(_model_training_ids(first_model))
+    leak = [rid for rid in [trial_id] if rid in model_train_ids]
+    if leak:
+        raise RuntimeError(
+            "pooled SeLeP-adapted leakage guard failed; measured request ID(s) "
+            f"present in model training metadata: {', '.join(leak)}"
+        )
+    print(
+        f"    pooled model: trained={first_model.get('metadata', {}).get('trained', False)} "
+        f"samples={first_model.get('metadata', {}).get('train_samples', 0)} "
+        f"partitions={first_model.get('num_partitions', 0)} "
+        f"files={len(model_paths)}"
+    )
+
+    for limit in limits:
+        print("")
+        print("----------------------------------------")
+        print(f"Trial case: policy={label} prefetch_limit={limit}")
+        print("----------------------------------------")
+        model_path = model_paths[limit]
+        model = models.get(limit, {})
+        print(
+            f"    model: partitions={model.get('num_partitions', 0)} "
+            f"plan={model.get('plan_len', 0)} file={model_path}"
+        )
+
+        results: list[TrialResult] = []
+        for trial in range(1, options.trials + 1):
+            result = _run_trial(
+                adapter,
+                editor,
+                state,
+                "selep-adapted",
+                limit,
+                trial,
+                options,
+                spec_override=trial_spec,
+                result_policy=label,
+                effective_policy_override="selep-adapted",
+                model_file_override=model_path,
+                request_id=trial_id,
+                train_n=train_n,
+                trial_count=options.trials,
+                pool_seed=options.selep_pool_seed,
+            )
+            metrics.append_result(results_path, result.__dict__)
+            results.append(result)
+            print(
+                f"  Trial {trial}: request={result.request_id} limit={limit} "
+                f"{result.e2e_ms:.3f}ms coverage={result.coverage or '?'} "
+                f"accuracy={result.accuracy or '?'} L1={result.l1 or '?'} L3={result.l3 or '?'}"
+            )
+        print(f"    coverage: {_rate_summary(results, 'coverage')}")
+        print(f"    accuracy: {_rate_summary(results, 'accuracy')}")
+
+
 def _collect_markov_training_trace(
     adapter,
     editor: RunConfigEditor,
@@ -511,6 +737,42 @@ def _collect_coaccess_training_trace(
     return record_access_log
 
 
+def _collect_selep_training_trace(
+    adapter,
+    editor: RunConfigEditor,
+    state: CaseState,
+    spec: RequestSpec,
+    label: str,
+    train_idx: int,
+) -> Path:
+    logs_dir = adapter.app_dir / adapter.options.manifest.logs_dir
+    safe_walker = _safe(spec.walker)
+    safe_label = _safe(label)
+    safe_request = _safe(_request_id(spec))[:80]
+    record_log = logs_dir / f"selep_pooled_train_{safe_walker}_{safe_label}_{train_idx}_{safe_request}.log"
+    record_access_log = logs_dir / f"selep_pooled_train_access_{safe_walker}_{safe_label}_{train_idx}_{safe_request}.csv"
+    editor.patch(
+        _config_values(
+            "none",
+            0,
+            access_log=str(record_access_log),
+            oracle_file="",
+            markov_file="",
+            coaccess_file="",
+            selep_file="",
+        )
+    )
+    proc = None
+    try:
+        proc = adapter.start_server(record_log)
+        resp = adapter.post(spec.path, spec.body, token=spec.token or state.token)
+        adapter.validate_response(spec, resp.json())
+    finally:
+        process.stop_process(proc)
+        adapter.stop_stale_servers()
+    return record_access_log
+
+
 def _run_trial(
     adapter,
     editor: RunConfigEditor,
@@ -544,6 +806,9 @@ def _run_trial(
     elif policy == "coaccess":
         model_file = _coaccess_for_trial(adapter, editor, state, spec, limit, trial, options)
         effective_policy = "coaccess"
+    elif policy in ("selep", "selep-adapted"):
+        model_file = _selep_for_trial(adapter, editor, state, spec, limit, trial, options)
+        effective_policy = "selep-adapted"
     else:
         effective_policy = policy
 
@@ -557,6 +822,7 @@ def _run_trial(
             oracle_file=str(oracle_file) if oracle_file is not None else "",
             markov_file=str(model_file) if model_file is not None and effective_policy == "markov" else "",
             coaccess_file=str(model_file) if model_file is not None and effective_policy == "coaccess" else "",
+            selep_file=str(model_file) if model_file is not None and effective_policy in ("selep", "selep-adapted") else "",
         )
     )
     adapter.flush_redis()
@@ -578,6 +844,8 @@ def _run_trial(
     profile = metrics.profile_breakdown(profile_csv)
     if model_file and effective_policy == "coaccess":
         quality = coaccess.plan_quality(model_file, spec.target_id, access_log, limit)
+    elif model_file and effective_policy in ("selep", "selep-adapted"):
+        quality = selep_adapted.plan_quality(model_file, spec.target_id, access_log, limit)
     elif model_file:
         quality = markov.plan_quality(model_file, spec.target_id, access_log, limit)
     else:
@@ -812,6 +1080,127 @@ def _coaccess_for_trial(
     return output_path
 
 
+def _selep_for_trial(
+    adapter,
+    editor: RunConfigEditor,
+    state: CaseState,
+    spec: RequestSpec,
+    limit: int,
+    trial: int,
+    options: SweepOptions,
+) -> Path:
+    explicit = options.env.get("SWEEP_SELEP_FILE") or options.env.get("JAC_PREFETCH_SELEP_FILE")
+    if options.selep_mode == "file":
+        path = Path(explicit) if explicit else selep_adapted.selep_model_path(
+            options.selep_dir, adapter.name, spec.walker, spec.target_id, limit, trial
+        )
+        path = path if path.is_absolute() else adapter.app_dir / path
+        if not path.exists():
+            raise FileNotFoundError(f"SeLeP-adapted model file does not exist: {path}")
+        return path
+    if options.selep_mode != "auto":
+        raise ValueError(f"unsupported SWEEP_SELEP_MODE={options.selep_mode!r}")
+
+    output_path = Path(explicit) if explicit else selep_adapted.selep_model_path(
+        options.selep_dir, adapter.name, spec.walker, spec.target_id, limit, trial
+    )
+    output_path = output_path if output_path.is_absolute() else adapter.app_dir / output_path
+
+    if not options.selep_allow_self_label:
+        model = selep_adapted.write_empty_selep_model(
+            output_path,
+            app_name=adapter.name,
+            walker=spec.walker,
+            label="selep-adapted",
+            limit=limit,
+            seed=0,
+            training_request_ids=[],
+            trial_request_ids=[_request_id(spec)],
+            trial_count=1,
+            plan_start_ids=[spec.target_id],
+            reason="cold_start_insufficient_preceding_history",
+            cluster_threshold=options.coaccess_cluster_threshold,
+            look_back=options.selep_look_back,
+            epochs=options.selep_epochs,
+            batch_size=options.selep_batch_size,
+            source_commit=options.selep_source_commit,
+        )
+        print(
+            "    SeLeP-adapted cold start: wrote empty plan "
+            f"reason={model.get('metadata', {}).get('failure_reason', '')} "
+            f"to {output_path}"
+        )
+        return output_path
+
+    logs_dir = adapter.app_dir / adapter.options.manifest.logs_dir
+    safe_walker = _safe(spec.walker)
+    record_log = logs_dir / f"selep_train_{safe_walker}_limit{limit}_trial{trial}.log"
+    record_access_log = logs_dir / f"selep_train_access_{safe_walker}_limit{limit}_trial{trial}.csv"
+    editor.patch(
+        _config_values(
+            "none",
+            0,
+            access_log=str(record_access_log),
+            oracle_file="",
+            markov_file="",
+            coaccess_file="",
+            selep_file="",
+        )
+    )
+    adapter.flush_redis()
+    proc = None
+    try:
+        proc = adapter.start_server(record_log)
+        resp = adapter.post(spec.path, spec.body, token=spec.token or state.token)
+        adapter.validate_response(spec, resp.json())
+    finally:
+        process.stop_process(proc)
+        adapter.stop_stale_servers()
+    try:
+        model = selep_adapted.write_selep_model_from_access_log(
+            record_access_log,
+            output_path,
+            app_name=adapter.name,
+            walker=spec.walker,
+            target_id=spec.target_id,
+            start_id=spec.target_id,
+            limit=limit,
+            cluster_threshold=options.coaccess_cluster_threshold,
+            request_id=_request_id(spec),
+            source_commit=options.selep_source_commit,
+            self_labeled=True,
+        )
+    except Exception as exc:
+        print(f"    SeLeP-adapted pipeline failed; measuring empty plan: {exc}")
+        model = selep_adapted.write_empty_selep_model(
+            output_path,
+            app_name=adapter.name,
+            walker=spec.walker,
+            label="selep-adapted",
+            limit=limit,
+            seed=0,
+            training_request_ids=[],
+            trial_request_ids=[_request_id(spec)],
+            trial_count=1,
+            plan_start_ids=[spec.target_id],
+            reason=f"pipeline_failure:{type(exc).__name__}:{exc}",
+            cluster_threshold=options.coaccess_cluster_threshold,
+            look_back=options.selep_look_back,
+            epochs=options.selep_epochs,
+            batch_size=options.selep_batch_size,
+            source_commit=options.selep_source_commit,
+        )
+    print(
+        "    SeLeP-adapted train: wrote "
+        f"{len(model.get('fallback_order', []))} distinct UUID(s), "
+        f"partitions={model.get('num_partitions', 0)} "
+        f"plan={model.get('plan_len', 0)} "
+        f"to {output_path}"
+    )
+    adapter.flush_redis()
+    return output_path
+
+
 def _trial_paths(adapter, spec: RequestSpec, policy: str, limit: int, trial: int):
     logs_dir = adapter.app_dir / adapter.options.manifest.logs_dir
     profiles_dir = adapter.app_dir / adapter.options.manifest.profiles_dir
@@ -846,6 +1235,7 @@ def _config_values(
     oracle_file: str = "",
     markov_file: str = "",
     coaccess_file: str = "",
+    selep_file: str = "",
 ) -> dict[str, object]:
     effective = "none" if policy == "none" or limit <= 0 else policy
     return {
@@ -856,6 +1246,7 @@ def _config_values(
         "prefetch_oracle_file": oracle_file,
         "prefetch_markov_file": markov_file,
         "prefetch_coaccess_file": coaccess_file,
+        "prefetch_selep_file": selep_file,
     }
 
 
@@ -875,6 +1266,7 @@ def _is_supported_policy(policy: str) -> bool:
         policy in SUPPORTED_POLICIES
         or _is_markov_pooled_policy(policy)
         or _is_coaccess_pooled_policy(policy)
+        or _is_selep_pooled_policy(policy)
     )
 
 
@@ -884,6 +1276,14 @@ def _is_markov_pooled_policy(policy: str) -> bool:
 
 def _is_coaccess_pooled_policy(policy: str) -> bool:
     return policy == COACCESS_POOLED_PREFIX or re.fullmatch(rf"{COACCESS_POOLED_PREFIX}-n\d+", policy) is not None
+
+
+def _is_selep_pooled_policy(policy: str) -> bool:
+    return (
+        policy in (SELEP_POOLED_PREFIX, SELEP_POOLED_ALIAS_PREFIX)
+        or re.fullmatch(rf"{SELEP_POOLED_PREFIX}-n\d+", policy) is not None
+        or re.fullmatch(rf"{SELEP_POOLED_ALIAS_PREFIX}-n\d+", policy) is not None
+    )
 
 
 def _pooled_train_ns(policy: str, options: SweepOptions) -> list[int]:
@@ -898,6 +1298,14 @@ def _coaccess_pooled_train_ns(policy: str, options: SweepOptions) -> list[int]:
     if match:
         return [int(match.group(1))]
     return list(options.coaccess_train_ns)
+
+
+def _selep_pooled_train_ns(policy: str, options: SweepOptions) -> list[int]:
+    for prefix in (SELEP_POOLED_PREFIX, SELEP_POOLED_ALIAS_PREFIX):
+        match = re.fullmatch(rf"{prefix}-n(\d+)", policy)
+        if match:
+            return [int(match.group(1))]
+    return list(options.selep_train_ns)
 
 
 def _unique_spawn_pool(pool: list[RequestSpec]) -> list[RequestSpec]:
