@@ -57,6 +57,8 @@ streamlit run app.py
 - **Raw data**: the results CSV as a table, downloadable.
 - **Churn**: runs the Jacord same-spawn churn experiment and plots
   coverage and L1 hit rate across churn rates.
+- **SeLeP**: launches the original SeLeP SQL/block-level baseline directly.
+  This tab is separate from Jac UUID prefetch policies.
 
 ## Python prefetch policy runner
 
@@ -130,6 +132,33 @@ To regenerate paper-ready churn coverage and hit-rate PDFs:
 
 ```bash
 python tools/plot_jacord_churn.py --csv ../../../jacord/churn_results.csv
+```
+
+## Direct SeLeP baseline
+
+The SeLeP tab and `tools/run_selep_direct.py` run the original SeLeP
+pipeline from `/home/patrickli/Space/jaseci_env/SeLeP`.  It consumes SQL
+workload text files and Postgres block/partition metadata, then writes
+SeLeP's own pickle outputs under `SeLeP/Results/`.  It is not a Jac
+UUID-plan prefetcher and is not valid inside `SWEEP_POLICIES`.
+
+Before launch, the tool checks for the original SeLeP inputs:
+
+- `Data/<db>_tableLookUp.txt` and `Data/pcaExclude.txt`
+- train workload: `<db>_all_train<suffix>WB<block>WP<partition>.txt`
+- test workloads: `<db>_test1_1gen...txt`, `<db>_test1_2...txt`, etc.
+- in test-only mode, `SavedFiles/Models/<model>.json` and `<model>.h5`
+
+CLI check:
+
+```bash
+python tools/run_selep_direct.py --check --mode train-test
+```
+
+CLI run:
+
+```bash
+python tools/run_selep_direct.py --mode train-test
 ```
 
 ## Two-machine DB mode

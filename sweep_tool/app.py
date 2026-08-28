@@ -1,11 +1,12 @@
 """Streamlit entry point for the sweep tool.
 
-Four tabs, all backed by the app's live output directory on disk:
+Five tabs, all backed by the app's live output directory on disk:
 
   1. Run — kick off a sweep for a chosen app.  Fire-and-forget subprocess.
   2. Analyze — read the app's current CSV + logs, render interactive charts.
   3. Raw data — the CSV as a downloadable dataframe.
   4. Churn — run/analyze the Jacord same-spawn churn experiment.
+  5. SeLeP — launch the original SQL/block-level SeLeP baseline.
 
 Archiving isn't the tool's job; commit interesting runs to git.
 """
@@ -18,6 +19,7 @@ import streamlit as st
 
 from lib import manifest as mf
 from lib import parsers, charts, sweep_runner
+from lib import selep_direct
 
 APP_ROOT = Path(__file__).resolve().parent
 MANIFEST_DIR = APP_ROOT / "manifests"
@@ -42,7 +44,9 @@ if not manifests:
 manifest_by_name = {m.name: m for m in manifests}
 
 
-tab_run, tab_analyze, tab_raw, tab_churn = st.tabs(["Run", "Analyze", "Raw data", "Churn"])
+tab_run, tab_analyze, tab_raw, tab_churn, tab_selep = st.tabs(
+    ["Run", "Analyze", "Raw data", "Churn", "SeLeP"]
+)
 
 
 # ---------------------------------------------------------------------------
@@ -437,3 +441,188 @@ with tab_churn:
                 file_name=churn_csv.name,
                 mime="text/csv",
             )
+
+
+# ---------------------------------------------------------------------------
+# TAB 5 — Direct SeLeP SQL/block baseline
+# ---------------------------------------------------------------------------
+with tab_selep:
+    st.header("Direct SeLeP")
+    st.caption(
+        "Runs the original SeLeP SQL/block-level pipeline directly. "
+        "This is separate from Jac UUID prefetch sweeps."
+    )
+
+    running, live_pid = selep_direct.is_running()
+    col_status, col_kill = st.columns([3, 1])
+    with col_status:
+        if running:
+            st.warning(f"Direct SeLeP is running (pid={live_pid}).")
+        else:
+            st.info("No direct SeLeP run is currently running.")
+    with col_kill:
+        if running and st.button("Stop SeLeP", type="secondary", key="selep_kill"):
+            msg = selep_direct.kill()
+            st.success(msg)
+            st.rerun()
+
+    st.subheader("Configuration")
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        repo = Path(
+            st.text_input(
+                "SeLeP repo",
+                value=str(selep_direct.DEFAULT_SELEP_REPO),
+                key="selep_repo",
+            )
+        ).expanduser()
+        python = Path(
+            st.text_input(
+                "SeLeP python",
+                value=str(repo / ".venv" / "bin" / "python"),
+                key="selep_python",
+            )
+        ).expanduser()
+        mode = st.selectbox(
+            "Mode",
+            ["train-test", "test"],
+            index=0,
+            key="selep_mode",
+        )
+        config_suffix = st.text_input("Config suffix", value="", key="selep_config_suffix")
+    with c2:
+        db_name = st.text_input("DB name", value="sdss_1", key="selep_db_name")
+        db_user = st.text_input("DB user", value="user", key="selep_db_user")
+        db_password = st.text_input(
+            "DB password",
+            value="pass",
+            type="password",
+            key="selep_db_password",
+        )
+        db_host = st.text_input("DB host", value="127.0.0.1", key="selep_db_host")
+        db_port = st.text_input("DB port", value="5432", key="selep_db_port")
+    with c3:
+        model_name = st.text_input("Model name", value="binary_cross_entropy2", key="selep_model")
+        result_name = st.text_input("Result name", value="binary_lstm2", key="selep_result")
+        prefetching_k = st.number_input("Prefetching k", value=42, min_value=1, step=1)
+        cache_size = st.number_input("Cache size", value=66000, min_value=0, step=1000)
+
+    c4, c5, c6 = st.columns(3)
+    with c4:
+        max_partition_size = st.number_input(
+            "Max partition size",
+            value=128,
+            min_value=1,
+            step=1,
+        )
+        logical_block_size = st.number_input(
+            "Logical block size",
+            value=8,
+            min_value=1,
+            step=1,
+        )
+        look_back = st.number_input("Look back", value=4, min_value=1, step=1)
+    with c5:
+        test_repeat = st.number_input("Test repeat", value=1, min_value=1, step=1)
+        total_repeat = st.number_input("Total repeat", value=1, min_value=1, step=1)
+        measure_time = st.checkbox("Measure DB time", value=False, key="selep_measure_time")
+    with c6:
+        optimize = st.checkbox("Optimize predictions", value=False, key="selep_optimize")
+        read_table_manager = st.checkbox(
+            "Read table manager",
+            value=False,
+            key="selep_read_table_manager",
+        )
+        read_partition_manager = st.checkbox(
+            "Read partition manager",
+            value=False,
+            key="selep_read_partition_manager",
+        )
+        read_affinity_matrix = st.checkbox(
+            "Read affinity matrix",
+            value=False,
+            key="selep_read_affinity_matrix",
+        )
+        save_to_file = st.checkbox("Save results", value=True, key="selep_save_to_file")
+
+    selep_config = selep_direct.SelepDirectConfig(
+        repo=repo.resolve(),
+        python=python.resolve(),
+        mode=mode,
+        db_name=db_name,
+        db_user=db_user,
+        db_password=db_password,
+        db_host=db_host,
+        db_port=db_port,
+        model_name=model_name,
+        result_name=result_name,
+        config_suffix=config_suffix,
+        test_repeat=int(test_repeat),
+        total_repeat=int(total_repeat),
+        cache_size=int(cache_size),
+        prefetching_k=int(prefetching_k),
+        max_partition_size=int(max_partition_size),
+        logical_block_size=int(logical_block_size),
+        look_back=int(look_back),
+        measure_time=measure_time,
+        optimize=optimize,
+        read_table_manager=read_table_manager,
+        read_partition_manager=read_partition_manager,
+        read_affinity_matrix=read_affinity_matrix,
+        save_to_file=save_to_file,
+    )
+    problems = selep_direct.validate(selep_config)
+
+    st.subheader("Prerequisite check")
+    if problems:
+        st.error("Direct SeLeP is not ready.")
+        for problem in problems:
+            st.write(f"- {problem}")
+    else:
+        st.success("Direct SeLeP inputs are present.")
+        with st.expander("Expected workload files", expanded=False):
+            st.code(
+                "\n".join(str(p) for p in selep_direct.expected_workload_files(selep_config)),
+                language="text",
+            )
+
+    c_run, c_check = st.columns([1, 1])
+    with c_run:
+        run_clicked = st.button(
+            "Run direct SeLeP",
+            type="primary",
+            disabled=running or bool(problems),
+            key="selep_run",
+        )
+    with c_check:
+        if st.button("Refresh SeLeP", key="selep_refresh"):
+            st.rerun()
+
+    if run_clicked:
+        try:
+            info = selep_direct.kickoff(selep_config)
+        except RuntimeError as exc:
+            st.error(str(exc))
+        else:
+            safe_env = dict(info.env_overrides)
+            safe_env["SELEP_DB_PASSWORD"] = "********"
+            st.success(f"Started direct SeLeP (pid={info.pid}). Watch `{info.stdout_log}`.")
+            with st.expander("Env vars passed to SeLeP", expanded=False):
+                st.code("\n".join(f"{k}={v}" for k, v in sorted(safe_env.items())))
+            st.rerun()
+
+    st.divider()
+    st.subheader("SeLeP output")
+    st.caption(f"tail of `{selep_direct.LOG_PATH}`")
+    if selep_direct.LOG_PATH.exists():
+        text = selep_direct.LOG_PATH.read_text()
+        max_bytes = 15_000
+        if len(text) > max_bytes:
+            text = "(truncated head)\n" + text[-max_bytes:]
+        st.code(text or "(empty)", language="text")
+    else:
+        st.info(f"No direct SeLeP output at `{selep_direct.LOG_PATH}` yet.")
+
+    if selep_direct.METADATA_PATH.exists():
+        with st.expander("Last SeLeP metadata", expanded=False):
+            st.code(selep_direct.METADATA_PATH.read_text(), language="json")

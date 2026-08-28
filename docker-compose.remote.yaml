@@ -3,6 +3,11 @@
 # This compose file does not need the source checkout. It pulls the GHCR image,
 # serves the Streamlit app on port 8501, and keeps generated app outputs in
 # Docker named volumes initialized from the packaged image contents.
+#
+# Jac comes from the pulled image's compiled /usr/local/bin/jac. To update Jac
+# on a remote machine, build and push a fresh image from the intended jaseci
+# checkout, then `docker compose pull` and recreate this service. Verify with:
+#   docker compose -f docker-compose.remote.yaml exec sweep jac-info
 
 name: jac-prefetch-experiment
 
@@ -20,7 +25,7 @@ services:
       SWEEP_DB_MODE: "${SWEEP_DB_MODE:-remote_ssh}"
       SWEEP_DB_HOST: "${SWEEP_DB_HOST:-clarity2}"
       SWEEP_DB_REMOTE_APP_ROOT: "${SWEEP_DB_REMOTE_APP_ROOT:-/home/baichuan/jaseci_remote_apps}"
-      SWEEP_DB_SSH_OPTIONS: "${SWEEP_DB_SSH_OPTIONS:--F /root/.ssh/config}"
+      SWEEP_DB_SSH_OPTIONS: "${SWEEP_DB_SSH_OPTIONS:--F /root/.ssh/config -o UserKnownHostsFile=/tmp/known_hosts -o StrictHostKeyChecking=accept-new}"
     volumes:
       - ${HOME}/.ssh:/root/.ssh:ro
       - jacord_app:/workspace/jacord

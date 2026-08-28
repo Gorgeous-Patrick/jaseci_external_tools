@@ -1,5 +1,9 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1.7
 ARG PYTHON_STANDALONE_URL=https://github.com/astral-sh/python-build-standalone/releases/download/20260814/cpython-3.14.7%2B20260814-x86_64-unknown-linux-gnu-freethreaded%2Bpgo%2Blto-full.tar.zst
+ARG JASECI_COMMIT=unknown
+ARG JASECI_SOURCE_LABEL=/home/patrickli/Space/jaseci
+ARG ZIG_VERSION=0.16.0
+ARG ZIG_TARBALL_URL=https://ziglang.org/download/0.16.0/zig-x86_64-linux-0.16.0.tar.xz
 
 FROM debian:bookworm-slim AS python-runtime
 ARG PYTHON_STANDALONE_URL
@@ -16,22 +20,62 @@ RUN apt-get update \
     && mv /tmp/python/install/* /opt/python/ \
     && rm -rf /tmp/python /tmp/python.tar.zst
 
-FROM debian:bookworm-slim
+FROM debian:trixie-slim AS jac-builder
+ARG ZIG_TARBALL_URL
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        git \
+        xz-utils \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -fL "$ZIG_TARBALL_URL" -o /tmp/zig.tar.xz \
+    && mkdir -p /opt/zig \
+    && tar -xJf /tmp/zig.tar.xz -C /opt/zig --strip-components=1 \
+    && ln -s /opt/zig/zig /usr/local/bin/zig \
+    && zig version \
+    && rm -f /tmp/zig.tar.xz
+
+WORKDIR /src/jaseci
+COPY --from=jaseci_src . /src/jaseci
+
+WORKDIR /src/jaseci/jac
+RUN --mount=type=cache,target=/root/.cache/zig \
+    --mount=type=cache,target=/src/jaseci/jac/.pbs-build \
+    --mount=type=cache,target=/src/jaseci/jac/.llvm-build \
+    --mount=type=cache,target=/src/jaseci/jac/.bun-build \
+    --mount=type=cache,target=/src/jaseci/jac/.payload-layers \
+    --mount=type=cache,target=/src/jaseci/jac/.precompiled-build \
+    zig build fetch-llvm \
+    && \
+    zig build
+
+RUN ./zig-out/bin/jac --version
+
+FROM debian:trixie-slim
+ARG JASECI_COMMIT
+ARG JASECI_SOURCE_LABEL
 
 LABEL org.opencontainers.image.source="https://github.com/Gorgeous-Patrick/jaseci_external_tools" \
       org.opencontainers.image.title="jaseci_external_tools experiment runner" \
-      org.opencontainers.image.description="Containerized Jac prefetch sweep experiments with Streamlit UI"
+      org.opencontainers.image.description="Containerized Jac prefetch sweep experiments with Streamlit UI" \
+      org.opencontainers.image.jaseci.revision="${JASECI_COMMIT}" \
+      org.opencontainers.image.jaseci.source="${JASECI_SOURCE_LABEL}"
 
 COPY --from=python-runtime /opt/python/ /usr/local/
+COPY --from=jac-builder /src/jaseci/jac/zig-out/bin/jac /usr/local/bin/jac
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PYTHON_GIL=0 \
     PIP_NO_CACHE_DIR=1 \
     JASECI_ENV_ROOT=/workspace \
+    JASECI_SOURCE_LABEL=${JASECI_SOURCE_LABEL} \
+    JASECI_COMMIT=${JASECI_COMMIT} \
     JAC_BIN=/usr/local/bin/jac \
-    PYTHONPATH=/workspace/jaseci/jac-scale
+    XDG_CACHE_HOME=/opt/jac/cache \
+    JAC_CACHE_HOME=/opt/jac/state
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -63,8 +107,6 @@ RUN printf '%s\n' \
 
 WORKDIR /workspace
 
-COPY jaseci/jac /workspace/jaseci/jac
-COPY jaseci/jac-scale /workspace/jaseci/jac-scale
 COPY jaseci_external_tools/sweep_tool /workspace/jaseci_external_tools/sweep_tool
 COPY jaseci_external_tools/tools /workspace/jaseci_external_tools/tools
 COPY jaseci_external_tools/linked_list /workspace/jaseci_external_tools/linked_list
@@ -73,60 +115,55 @@ COPY jacord /workspace/jacord
 COPY jdrive /workspace/jdrive
 COPY jsearch /workspace/jsearch
 
-RUN rm -rf /workspace/jaseci/jac-scale/jac_scale.egg-info \
-    && python -m pip install --upgrade pip setuptools wheel \
-    && python -m pip install \
-        "llvmlite==0.47.0" \
-        "bcrypt==5.0.0" \
-    && python -m pip install -e /workspace/jaseci/jac \
+RUN python -m pip install --upgrade pip setuptools wheel \
     && python -m pip install \
         -r /workspace/jaseci_external_tools/sweep_tool/requirements.txt \
-        "rich>=13.0.0" \
-        "python-dotenv>=1.2.1,<2.0.0" \
-        "fastapi>=0.121.3,<0.122.0" \
-        "uvicorn[standard]>=0.38.0,<0.39.0" \
-        "pyjwt>=2.10.1,<2.11.0" \
-        "fastapi-sso>=0.21.0,<1.0.0" \
-        "python-multipart>=0.0.21,<1.0.0" \
-        "aiohttp>=3.9.0,<4.0.0" \
-        "sqlalchemy>=2.0.0,<3.0.0" \
-        "email-validator>=2.3.0,<3.0.0" \
-        "pymongo>=4.15.4,<5.0.0" \
-        "redis>=7.1.0,<8.0.0" \
-        "prometheus-client>=0.21.0,<1.0.0" \
-        "apscheduler>=3.11.2,<4.0.0" \
-        "kubernetes>=34.1.0,<35.0.0" \
-        "docker>=7.1.0,<8.0.0" \
         matplotlib \
         requests \
-    && jac install -e /workspace/jaseci/jac-scale --no-deps --quiet \
-    && python -m pip install -e /workspace/jaseci/jac --no-deps --force-reinstall \
     && rm -rf /root/.cache/jac
 
+RUN chmod 0755 /usr/local/bin/jac \
+    && mkdir -p /opt/jac/cache /opt/jac/state \
+    && jac --version \
+    && mkdir /tmp/seed \
+    && printf '[project]\nname = "seed"\nversion = "0.0.1"\nentry-point = "main.jac"\n\n[dependencies]\nsetuptools = ">=75"\n\n[serve]\nbase_route_app = "app"\n\n[scale.monitoring]\nenabled = true\n\n[scale.kubernetes]\nnamespace = "seed"\n' > /tmp/seed/jac.toml \
+    && printf 'with entry {}\n' > /tmp/seed/main.jac \
+    && (cd /tmp/seed && jac install) \
+    && rt_lib=$(ls -d /opt/jac/cache/jac/rt/*/python/lib/python3.*) \
+    && mkdir -p "$rt_lib/site-packages" \
+    && cp -a /tmp/seed/.jac/venv/lib/python3.*/site-packages/. "$rt_lib/site-packages/" \
+    && ls "$rt_lib/site-packages" | grep -q dotenv \
+    && ls "$rt_lib/site-packages" | grep -q prometheus_client \
+    && ls "$rt_lib/site-packages" | grep -q requests \
+    && rm -rf /tmp/seed \
+    && chmod -R a+rX /opt/jac/cache \
+    && chmod 1777 /opt/jac/cache/jac /opt/jac/state
+
 RUN python - <<'PY'
-import importlib.metadata as metadata
 import sys
 import sysconfig
-from pathlib import Path
-
-import jaclang
-import jac_scale
 
 assert sysconfig.get_config_var("Py_GIL_DISABLED") == 1, sys.version
 if hasattr(sys, "_is_gil_enabled"):
-    assert not sys._is_gil_enabled(), "free-threaded Python is running with the GIL enabled"
-assert metadata.version("jaclang") == "0.16.1"
-assert Path(jaclang.__file__).resolve().is_relative_to("/workspace/jaseci/jac"), jaclang.__file__
-
-jac_entry_points = {
-    entry_point.name: entry_point.value
-    for entry_point in metadata.entry_points(group="jac")
-}
-assert jac_entry_points.get("scale") == "jac_scale.plugin:JacCmd", jac_entry_points
-assert jac_entry_points.get("scale_plugin_config") == (
-    "jac_scale.plugin_config:JacScalePluginConfig"
-), jac_entry_points
+    assert not sys._is_gil_enabled(), "free-threaded sweep Python is running with the GIL enabled"
 PY
+
+RUN printf '%s\n' \
+        '#!/usr/bin/env bash' \
+        'set -euo pipefail' \
+        'echo "JASECI_COMMIT=${JASECI_COMMIT:-unknown}"' \
+        'echo "JASECI_SOURCE_LABEL=${JASECI_SOURCE_LABEL:-unknown}"' \
+        'echo "JAC_BIN=${JAC_BIN:-/usr/local/bin/jac}"' \
+        '"${JAC_BIN:-/usr/local/bin/jac}" --version || true' \
+        'python - <<'"'"'PY'"'"'' \
+        'import sys' \
+        'import sysconfig' \
+        'print("sweep_python=" + sys.version.replace("\n", " "))' \
+        'print("sweep_Py_GIL_DISABLED=" + str(sysconfig.get_config_var("Py_GIL_DISABLED")))' \
+        'print("sweep_gil_enabled=" + str(sys._is_gil_enabled() if hasattr(sys, "_is_gil_enabled") else "unknown"))' \
+        'PY' \
+        > /usr/local/bin/jac-info \
+    && chmod +x /usr/local/bin/jac-info
 
 COPY jaseci_external_tools/docker/entrypoint.sh /usr/local/bin/experiment
 COPY jaseci_external_tools/docker/run_all_sweeps.py /usr/local/bin/run-all-sweeps

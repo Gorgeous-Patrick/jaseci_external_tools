@@ -11,6 +11,7 @@ experiment container commands:
   sweep <app> [args...]     Run one app manifest in the foreground
   run-all [app ...]         Run all/default app manifests sequentially
   check-remote-db [app...]  Validate remote DB setup from inside the container
+  jac-info                  Print packaged Jac source/version details
   bash | sh | <command>     Run a shell or arbitrary command
 
 Examples:
@@ -52,6 +53,9 @@ case "$cmd" in
   check-remote-db)
     cd /workspace/jaseci_external_tools
     exec python tools/check_remote_db.py "$@"
+    ;;
+  jac-info)
+    exec jac-info "$@"
     ;;
   help|--help|-h)
     usage

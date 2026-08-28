@@ -3,6 +3,11 @@ services:
     build:
       context: ..
       dockerfile: jaseci_external_tools/Dockerfile.experiment
+      additional_contexts:
+        jaseci_src: ${JASECI_SRC:-/home/patrickli/Space/jaseci}
+      args:
+        JASECI_COMMIT: ${JASECI_COMMIT:-local}
+        JASECI_SOURCE_LABEL: ${JASECI_SRC:-/home/patrickli/Space/jaseci}
     image: jac-prefetch-experiment:latest
     ports:
       - "8501:8501"
@@ -12,7 +17,7 @@ services:
       SWEEP_DB_MODE: ${SWEEP_DB_MODE:-remote_ssh}
       SWEEP_DB_HOST: ${SWEEP_DB_HOST:-clarity2}
       SWEEP_DB_REMOTE_APP_ROOT: ${SWEEP_DB_REMOTE_APP_ROOT:-/home/baichuan/jaseci_remote_apps}
-      SWEEP_DB_SSH_OPTIONS: "${SWEEP_DB_SSH_OPTIONS:--F /root/.ssh/config}"
+      SWEEP_DB_SSH_OPTIONS: "${SWEEP_DB_SSH_OPTIONS:--F /root/.ssh/config -o UserKnownHostsFile=/tmp/known_hosts -o StrictHostKeyChecking=accept-new}"
     volumes:
       - ../jacord:/workspace/jacord
       - ../jdrive:/workspace/jdrive

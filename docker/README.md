@@ -1,15 +1,23 @@
 # Experiment Runner Container
 
-This image packages the Jac runtime, `jac_scale`, the sweep tool, and the
+This image compiles and packages the Jac binary, the sweep tool, and the
 benchmark app code so the prefetch experiments can move to a stable machine.
 
-Build from the `jaseci_env` root:
+Build from the `jaseci_env` root, using the intended Jac checkout as an
+additional build context:
 
 ```bash
-docker build \
-  -f jaseci_external_tools/Dockerfile.experiment \
-  -t jac-prefetch-experiment:free-threaded \
-  .
+JASECI_SRC=/home/patrickli/Space/jaseci \
+IMAGE=jac-prefetch-experiment:free-threaded \
+jaseci_external_tools/docker/build_experiment_image.sh
+```
+
+Build and push the GHCR image:
+
+```bash
+JASECI_SRC=/home/patrickli/Space/jaseci \
+IMAGE=ghcr.io/gorgeous-patrick/jaseci_external_tools:free-threaded \
+jaseci_external_tools/docker/build_experiment_image.sh --push
 ```
 
 Run the Streamlit UI:
@@ -83,11 +91,12 @@ Then open `http://localhost:8501`.
 To verify the remote container is using free-threaded Python:
 
 ```bash
-docker compose exec sweep python -c \
-  'import sys, sysconfig; print(sys.version); print(sysconfig.get_config_var("Py_GIL_DISABLED")); print(sys._is_gil_enabled())'
+docker compose exec sweep jac-info
 ```
 
-The second line should be `1`; the third line should be `False`.
+`JASECI_SOURCE_LABEL` should point at the Jac checkout used for the build.
+The sweep Python lines should show `sweep_Py_GIL_DISABLED=1` and
+`sweep_gil_enabled=False`.
 
 Export remote results:
 

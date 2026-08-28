@@ -90,7 +90,7 @@ class BenchmarkAdapter(ABC):
             raise RuntimeError(f"{self.name}/{spec.walker} returned an empty response")
 
     def server_command(self) -> list[str]:
-        cmd = [self.options.jac_bin, "run", "--serve"]
+        cmd = [self.options.jac_bin, "start"]
         if self.profile_name:
             cmd.extend(["--profile", self.profile_name])
         cmd.append(self.entry_point())
