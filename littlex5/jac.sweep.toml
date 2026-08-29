@@ -1,0 +1,18 @@
+[project]
+name = "little-x-sweep"
+entry-point = "server.jac"
+
+[run]
+access_log = ""
+topology_index = true
+prefetching = "ttg"
+prefetch_limit = 0
+cross_root_resolve = true
+async_prefetch = "thread"
+prefetch_workers = 4
+
+[serve]
+profile = true
+
+[scale.database]
+url = "postgresql://jac:jac@localhost:5432/jac_db"

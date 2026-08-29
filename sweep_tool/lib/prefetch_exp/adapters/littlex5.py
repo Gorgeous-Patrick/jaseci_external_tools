@@ -2,23 +2,59 @@
 
 from __future__ import annotations
 
+import shutil
+from pathlib import Path
+
 from lib.prefetch_exp import process
 from lib.prefetch_exp.adapters.base import BenchmarkAdapter
 from lib.prefetch_exp.models import CaseState, RequestSpec
 
 
 class LittleX5Adapter(BenchmarkAdapter):
+    config_name = "jac.sweep.toml"
     default_user = "sim_user_56"
     default_password = "password"
     credential_source = "backup.pgdump seeded sim_user benchmark target"
     default_dump = "backup.pgdump"
 
     def server_command(self) -> list[str]:
-        cmd = [self.options.jac_bin, "run", "--serve", "--no-client"]
-        if self.profile_name:
-            cmd.extend(["--profile", self.profile_name])
-        cmd.append("server.jac")
-        return cmd
+        return [self.options.jac_bin, "run", "--serve", "--no-client", "server.jac"]
+
+    def start_server(
+        self,
+        log_path: Path,
+        profile_dir: Path | None = None,
+        profile_csv: Path | None = None,
+    ):
+        stage_dir = self._stage_backend_project()
+        proc = process.start_server(
+            self.server_command(),
+            stage_dir,
+            self.server_env(profile_dir=profile_dir, profile_csv=profile_csv),
+            log_path,
+        )
+        try:
+            process.wait_ready(self.base_url)
+            self._assert_tiered_memory_connected(log_path)
+        except Exception:
+            process.stop_process(proc)
+            raise
+        return proc
+
+    def _stage_backend_project(self) -> Path:
+        stage_dir = Path(
+            self.options.env.get("LITTLEX_SWEEP_STAGE_DIR")
+            or "/tmp/jaseci_littlex5_sweep"
+        )
+        stage_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(self.app_dir / "server.jac", stage_dir / "server.jac")
+        shutil.copy2(self.config_path, stage_dir / "jac.toml")
+        for stale in ("jac.local.toml", "jac.sweep.toml"):
+            try:
+                (stage_dir / stale).unlink()
+            except FileNotFoundError:
+                pass
+        return stage_dir
 
     def restore_dump_if_present(self, dump_name: str = "jac_db.pgdump") -> None:
         configured = self._configured_dump()
