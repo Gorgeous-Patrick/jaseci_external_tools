@@ -14,7 +14,7 @@ class LittleX5Adapter(BenchmarkAdapter):
     default_dump = "backup.pgdump"
 
     def server_command(self) -> list[str]:
-        cmd = [self.options.jac_bin, "run", "--serve"]
+        cmd = [self.options.jac_bin, "run", "--serve", "--no-client"]
         if self.profile_name:
             cmd.extend(["--profile", self.profile_name])
         cmd.append("server.jac")
