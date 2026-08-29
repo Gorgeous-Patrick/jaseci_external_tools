@@ -18,6 +18,9 @@ class JDriveAdapter(BenchmarkAdapter):
     default_password = "password"
     credential_source = "seed_sweep_db.py / sweep_seed.json"
 
+    def entry_point(self) -> str:
+        return "server.jac"
+
     def prepare_sweep(self) -> None:
         self._assert_seed_credentials_match_env()
         if (

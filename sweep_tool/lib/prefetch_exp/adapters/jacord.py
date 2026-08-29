@@ -22,6 +22,9 @@ class JacordAdapter(BenchmarkAdapter):
         self._selected_channel_messages = -1
         self._restored_dump = ""
 
+    def entry_point(self) -> str:
+        return "server.jac"
+
     def restore_dump_if_present(self, dump_name: str = "jac_db.pgdump") -> None:
         configured = self._configured_dump()
         self.options.env["JACORD_DUMP"] = configured
