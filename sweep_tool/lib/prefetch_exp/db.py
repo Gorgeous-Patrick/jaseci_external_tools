@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import shlex
 import subprocess
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -123,6 +124,7 @@ class LocalDockerDbManager(DbManager):
             stdout=subprocess.PIPE,
         )
         if result.returncode == 0:
+            self._wait_postgres_ready()
             return
         output = result.stdout or ""
         if "Conflict. The container name" in output:
@@ -133,6 +135,7 @@ class LocalDockerDbManager(DbManager):
                 check=False,
             )
             process.run(["docker", "compose", "up", "-d"], self.app_dir)
+            self._wait_postgres_ready()
             return
         print(output)
         result.check_returncode()
@@ -261,6 +264,34 @@ class LocalDockerDbManager(DbManager):
             self.app_dir,
         )
 
+    def _wait_postgres_ready(self, timeout_sec: float = 60.0) -> None:
+        deadline = time.time() + timeout_sec
+        last_output = ""
+        while time.time() < deadline:
+            result = process.run(
+                [
+                    "docker",
+                    "exec",
+                    *self._pg_env(),
+                    self.postgres_container,
+                    "pg_isready",
+                    "-U",
+                    self.postgres_user,
+                    "-d",
+                    self.postgres_db,
+                ],
+                self.app_dir,
+                check=False,
+                stdout=subprocess.PIPE,
+            )
+            last_output = result.stdout or ""
+            if result.returncode == 0:
+                return
+            time.sleep(1.0)
+        raise TimeoutError(
+            f"Postgres did not become ready in container {self.postgres_container}: {last_output.strip()}"
+        )
+
 
 class RemoteSshDockerDbManager(DbManager):
     mode = "remote_ssh"
@@ -278,6 +309,7 @@ class RemoteSshDockerDbManager(DbManager):
     def compose_up(self) -> None:
         result = self._ssh(self._cd("docker compose up -d"), check=False, stdout=subprocess.PIPE)
         if result.returncode == 0:
+            self._wait_postgres_ready()
             return
         output = result.stdout or ""
         if "Conflict. The container name" in output:
@@ -287,6 +319,7 @@ class RemoteSshDockerDbManager(DbManager):
                 check=False,
             )
             self._ssh(self._cd("docker compose up -d"))
+            self._wait_postgres_ready()
             return
         print(output)
         result.check_returncode()
@@ -379,6 +412,26 @@ class RemoteSshDockerDbManager(DbManager):
 
     def _pg_exec_args(self) -> str:
         return f"-e PGPASSWORD={shlex.quote(self.postgres_password)}"
+
+    def _wait_postgres_ready(self, timeout_sec: float = 60.0) -> None:
+        deadline = time.time() + timeout_sec
+        last_output = ""
+        command = (
+            f"docker exec {self._pg_exec_args()} "
+            f"{shlex.quote(self.postgres_container)} pg_isready "
+            f"-U {shlex.quote(self.postgres_user)} "
+            f"-d {shlex.quote(self.postgres_db)}"
+        )
+        while time.time() < deadline:
+            result = self._ssh(self._cd(command), check=False, stdout=subprocess.PIPE)
+            last_output = result.stdout or ""
+            if result.returncode == 0:
+                return
+            time.sleep(1.0)
+        raise TimeoutError(
+            f"remote Postgres did not become ready in container {self.postgres_container}: "
+            f"{last_output.strip()}"
+        )
 
     def _cd(self, command: str) -> str:
         return f"cd {shlex.quote(self.remote_app_dir)} && {command}"

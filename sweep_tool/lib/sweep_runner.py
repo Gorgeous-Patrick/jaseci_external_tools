@@ -155,14 +155,15 @@ def kill(manifest: Manifest, timeout_sec: float = 5.0) -> str:
     else:
         outcome = "SIGTERM (graceful)"
 
-    # Belt-and-suspenders: sweep_prefetch_limit.sh spawns `jac start`
+    # Belt-and-suspenders: sweep_prefetch_limit.sh spawns Jac servers
     # backgrounded; those should be inside the killed pgid already, but
     # older Bash setups sometimes disown.  Best-effort sweep.
-    subprocess.run(
-        ["pkill", "-9", "-f", "jac start"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
+    for pattern in ("jac run --serve", "jac start"):
+        subprocess.run(
+            ["pkill", "-9", "-f", pattern],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
 
     pf.unlink(missing_ok=True)
     return f"stopped pid={pid} via {outcome}"
@@ -209,11 +210,12 @@ def kill_jacord_churn(manifest: Manifest, timeout_sec: float = 5.0) -> str:
     else:
         outcome = "SIGTERM (graceful)"
 
-    subprocess.run(
-        ["pkill", "-9", "-f", "jac start"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
+    for pattern in ("jac run --serve", "jac start"):
+        subprocess.run(
+            ["pkill", "-9", "-f", pattern],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
     pf.unlink(missing_ok=True)
     return f"stopped Jacord churn pid={pid} via {outcome}"
 
@@ -390,11 +392,12 @@ def kill_run_all(timeout_sec: float = 5.0) -> str:
     else:
         outcome = "SIGTERM (graceful)"
 
-    subprocess.run(
-        ["pkill", "-9", "-f", "jac start"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
+    for pattern in ("jac run --serve", "jac start"):
+        subprocess.run(
+            ["pkill", "-9", "-f", pattern],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
     pf.unlink(missing_ok=True)
     return f"stopped shepherd pid={pid} via {outcome}"
 

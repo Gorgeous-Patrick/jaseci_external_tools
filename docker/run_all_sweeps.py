@@ -17,8 +17,9 @@ def main(argv: list[str]) -> int:
     from lib import manifest as mf
     from lib.prefetch_exp import db as db_config
 
-    manifests = {m.name: m for m in mf.discover(SWEEP_TOOL_DIR / "manifests")}
-    selected = argv or sorted(manifests)
+    discovered = mf.discover(SWEEP_TOOL_DIR / "manifests")
+    manifests = {m.name: m for m in discovered}
+    selected = argv or [name for name in mf.DEFAULT_APP_ORDER if name in manifests]
     missing = [name for name in selected if name not in manifests]
     if missing:
         print(f"unknown manifest(s): {', '.join(missing)}", file=sys.stderr)

@@ -66,7 +66,7 @@ docker run --rm -it \
   -e SWEEP_DB_HOST=clarity2 \
   -e SWEEP_DB_REMOTE_APP_ROOT=/home/baichuan/jaseci_remote_apps \
   -e SWEEP_DB_SSH_OPTIONS="-F /root/.ssh/config" \
-  jac-prefetch-experiment:free-threaded run-all jacord jdrive jsearch linked_list littlex5
+  jac-prefetch-experiment:free-threaded run-all linked_list jacord littlex5 jdrive
 ```
 
 Run the published image on a remote machine:

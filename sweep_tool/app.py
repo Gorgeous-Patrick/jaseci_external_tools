@@ -42,6 +42,9 @@ if not manifests:
     st.error(f"No manifests found in {MANIFEST_DIR}. Add one and rerun.")
     st.stop()
 manifest_by_name = {m.name: m for m in manifests}
+default_run_all_manifests = [
+    manifest_by_name[name] for name in mf.DEFAULT_APP_ORDER if name in manifest_by_name
+]
 
 
 tab_run, tab_analyze, tab_raw, tab_churn, tab_selep = st.tabs(
@@ -71,10 +74,10 @@ with tab_run:
     if "/" in jac_bin and not Path(jac_bin).exists():
         st.warning(f"JAC_BIN path does not exist: `{jac_bin}`")
 
-    # ---- Run all (shepherd over every manifest, sequential) ----
+    # ---- Run all (shepherd over the default benchmark manifests, sequential) ----
     st.subheader("Run all sweeps")
     st.caption(
-        "Kicks off every manifest's sweep sequentially with each app's "
+        "Kicks off the default benchmark sweeps sequentially with each app's "
         "default parameters. Presets use the same default-parameter path. "
         "Some apps share Postgres container "
         "names, so parallel isn't safe."
@@ -93,10 +96,10 @@ with tab_run:
             st.rerun()
     with ra_launch:
         if not all_running and st.button("Run all", type="primary", key="run_all_go"):
-            info = sweep_runner.kickoff_all(manifests, jac_bin=jac_bin)
+            info = sweep_runner.kickoff_all(default_run_all_manifests, jac_bin=jac_bin)
             st.success(
                 f"Launched shepherd (pid={info.pid}) over "
-                f"{len(manifests)} manifest(s).  Watch progress in "
+                f"{len(default_run_all_manifests)} manifest(s).  Watch progress in "
                 f"`{info.stdout_log}` or the Analyze tab per app."
             )
             st.rerun()

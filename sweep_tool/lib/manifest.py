@@ -14,6 +14,9 @@ from typing import Any
 import yaml
 
 
+DEFAULT_APP_ORDER = ("linked_list", "jacord", "littlex5", "jdrive")
+
+
 @dataclass
 class Parameter:
     name: str
@@ -84,7 +87,8 @@ def load(path: Path) -> Manifest:
 
 
 def discover(manifest_dir: Path) -> list[Manifest]:
+    order = {name: i for i, name in enumerate(DEFAULT_APP_ORDER)}
     return sorted(
         (load(p) for p in manifest_dir.glob("*.yaml")),
-        key=lambda m: m.name,
+        key=lambda m: (order.get(m.name, len(order)), m.name),
     )

@@ -17,7 +17,7 @@ experiment container commands:
 Examples:
   experiment streamlit
   experiment sweep jacord
-  experiment run-all jacord jdrive jsearch linked_list littlex5
+  experiment run-all linked_list jacord littlex5 jdrive
 EOF
 }
 
