@@ -99,6 +99,15 @@ parameters:
     default: 30
     help: Number of repeated measured SearchIndex requests per prefetch limit.
 
+  - name: JAC_QUERY_CACHE
+    label: Query result cache
+    kind: enum
+    default: "1"
+    choices: ["1", "0"]
+    help: >
+      Runtime graph-query result memoization. Keep enabled for stock Jac
+      performance; set to 0 only for cache-ablation runs.
+
   - name: SWEEP_RESEED
     label: Reseed
     kind: enum
