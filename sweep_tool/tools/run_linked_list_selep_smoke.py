@@ -14,6 +14,7 @@ import csv
 import hashlib
 import json
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -41,6 +42,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--look-back", type=int, default=4)
     parser.add_argument("--top-k", type=int, default=4)
     parser.add_argument("--partitions", type=int, default=64)
+    parser.add_argument("--block-source", choices=["hash", "pg-buffercache"], default="hash")
+    parser.add_argument("--max-block-selects", type=int, default=16)
+    parser.add_argument("--sql-contains", default="")
+    parser.add_argument("--ssh-target", default="clarity2")
+    parser.add_argument("--ssh-option", action="append", default=["-F", "/home/patrickli/.ssh/config"])
+    parser.add_argument("--postgres-container", default="postgres")
+    parser.add_argument("--postgres-user", default="jac")
+    parser.add_argument("--postgres-db", default="jac_db")
+    parser.add_argument("--partition-size", type=int, default=8)
     parser.add_argument("--skip-collect", action="store_true")
     return parser.parse_args()
 
@@ -139,6 +149,215 @@ def load_trace(trace_path: Path) -> list[dict[str, Any]]:
     return records
 
 
+def collect_pg_buffercache_blocks(args: argparse.Namespace, records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    selects = [record for record in records if is_select_record(record)]
+    if args.sql_contains:
+        needle = args.sql_contains.lower()
+        selects = [
+            record
+            for record in selects
+            if needle in compact_sql(record.get("sql") or "").lower()
+        ]
+    if args.max_block_selects > 0:
+        selects = selects[: args.max_block_selects]
+    if not selects:
+        raise RuntimeError("no successful SELECT records available for pg-buffercache collection")
+    remote_psql(args, "CREATE EXTENSION IF NOT EXISTS pg_buffercache;")
+    enriched: list[dict[str, Any]] = []
+    empty = 0
+    for idx, record in enumerate(selects, start=1):
+        restart_remote_postgres(args)
+        sql = render_sql(record.get("sql") or "", record.get("params") or {})
+        blocks = psql_query_blocks(args, sql)
+        if not blocks:
+            empty += 1
+            continue
+        item = dict(record)
+        item["_result_blocks"] = blocks
+        enriched.append(item)
+        print(f"block replay {idx}/{len(selects)}: blocks={len(blocks)} sql={compact_sql(sql)[:90]}")
+    if not enriched:
+        raise RuntimeError("pg-buffercache replay produced no block-bearing records")
+    print(
+        "block replay summary: "
+        f"selected={len(selects)} block_bearing={len(enriched)} empty={empty}"
+        f" filter={args.sql_contains or '<none>'}"
+    )
+    return enriched
+
+
+def is_select_record(record: dict[str, Any]) -> bool:
+    if record.get("status") != "ok":
+        return False
+    sql = compact_sql(record.get("sql") or "")
+    return sql.upper().startswith("SELECT ")
+
+
+def compact_sql(sql: str) -> str:
+    return " ".join(str(sql).split())
+
+
+def restart_remote_postgres(args: argparse.Namespace) -> None:
+    remote(args, ["docker", "restart", args.postgres_container])
+    deadline = time.time() + 30.0
+    while time.time() < deadline:
+        proc = remote(
+            args,
+            [
+                "docker",
+                "exec",
+                args.postgres_container,
+                "pg_isready",
+                "-U",
+                args.postgres_user,
+                "-d",
+                args.postgres_db,
+            ],
+            check=False,
+            capture=True,
+        )
+        if proc.returncode == 0:
+            return
+        time.sleep(0.5)
+    raise RuntimeError(f"remote Postgres did not become ready after restart: {args.postgres_container}")
+
+
+def psql_query_blocks(args: argparse.Namespace, sql: str) -> list[str]:
+    block_sql = """
+\\o /dev/null
+{query};
+\\o
+SELECT DISTINCT c.relname || '_' || b.relblocknumber
+FROM pg_buffercache b
+JOIN pg_database d ON b.reldatabase = d.oid
+JOIN pg_class c ON b.relfilenode = pg_relation_filenode(c.oid)
+WHERE d.datname = current_database()
+  AND b.relblocknumber IS NOT NULL
+  AND c.relkind IN ('r', 'i', 't')
+  AND c.relname NOT LIKE 'pg_%'
+  AND c.relname NOT LIKE 'sql_%'
+ORDER BY 1;
+""".format(query=sql.rstrip().rstrip(";"))
+    proc = remote_psql(args, block_sql, capture=True)
+    return [line.strip() for line in proc.stdout.splitlines() if line.strip()]
+
+
+def remote_psql(args: argparse.Namespace, sql: str, capture: bool = False) -> subprocess.CompletedProcess[str]:
+    return remote(
+        args,
+        [
+            "docker",
+            "exec",
+            "-i",
+            args.postgres_container,
+            "psql",
+            "-qAtX",
+            "-v",
+            "ON_ERROR_STOP=1",
+            "-U",
+            args.postgres_user,
+            "-d",
+            args.postgres_db,
+        ],
+        input_text=sql,
+        capture=capture,
+    )
+
+
+def remote(
+    args: argparse.Namespace,
+    command: list[str],
+    *,
+    input_text: str | None = None,
+    capture: bool = False,
+    check: bool = True,
+) -> subprocess.CompletedProcess[str]:
+    ssh_cmd = ["ssh", *args.ssh_option, args.ssh_target, *command]
+    proc = subprocess.run(
+        ssh_cmd,
+        input=input_text,
+        text=True,
+        stdout=subprocess.PIPE if capture else None,
+        stderr=subprocess.PIPE if capture else None,
+        check=False,
+    )
+    if check and proc.returncode != 0:
+        rendered = " ".join(shlex.quote(part) for part in ssh_cmd)
+        stderr = (proc.stderr or "").strip()
+        raise RuntimeError(f"remote command failed: {rendered}\n{stderr}")
+    return proc
+
+
+def render_sql(sql: str, params: dict[str, Any]) -> str:
+    out: list[str] = []
+    i = 0
+    n = len(sql)
+    in_squote = False
+    in_dquote = False
+    while i < n:
+        ch = sql[i]
+        if in_squote:
+            out.append(ch)
+            if ch == "'":
+                if i + 1 < n and sql[i + 1] == "'":
+                    out.append("'")
+                    i += 1
+                else:
+                    in_squote = False
+            i += 1
+            continue
+        if in_dquote:
+            out.append(ch)
+            if ch == '"':
+                in_dquote = False
+            i += 1
+            continue
+        if ch == "'":
+            in_squote = True
+            out.append(ch)
+            i += 1
+            continue
+        if ch == '"':
+            in_dquote = True
+            out.append(ch)
+            i += 1
+            continue
+        if ch == ":":
+            if i + 1 < n and sql[i + 1] == ":":
+                out.append("::")
+                i += 2
+                continue
+            j = i + 1
+            name = ""
+            while j < n and (sql[j].isalnum() or sql[j] == "_"):
+                name += sql[j]
+                j += 1
+            if name and name in params:
+                out.append(sql_literal(params[name]))
+                i = j
+                continue
+        out.append(ch)
+        i += 1
+    return "".join(out)
+
+
+def sql_literal(value: Any) -> str:
+    if value is None:
+        return "NULL"
+    if isinstance(value, bool):
+        return "TRUE" if value else "FALSE"
+    if isinstance(value, (int, float)):
+        return str(value)
+    if isinstance(value, list):
+        items = []
+        for item in value:
+            escaped = str(item).replace("\\", "\\\\").replace('"', '\\"')
+            items.append(f'"{escaped}"')
+        return "'" + "{" + ",".join(items) + "}" + "'"
+    text = str(value).replace("'", "''")
+    return f"'{text}'"
+
+
 def stable_partition(record: dict[str, Any], partition_count: int) -> str:
     sql = " ".join(str(record.get("sql") or "").split())
     params = json.dumps(record.get("params") or {}, sort_keys=True)
@@ -159,8 +378,25 @@ def block_id(record: dict[str, Any], partition: str) -> str:
     return f"{relation}_{partition}_{digest[:8]}"
 
 
-def write_workload(records: list[dict[str, Any]], workload_path: Path, partition_count: int) -> list[str]:
-    partitions: list[str] = []
+def assign_block_partitions(records: list[dict[str, Any]], partition_size: int) -> dict[str, str]:
+    if partition_size <= 0:
+        raise ValueError(f"partition_size must be positive, got {partition_size}")
+    mapping: dict[str, str] = {}
+    for record in records:
+        for block in record.get("_result_blocks") or []:
+            if block not in mapping:
+                mapping[block] = f"p{len(mapping) // partition_size}"
+    return mapping
+
+
+def write_workload(
+    records: list[dict[str, Any]],
+    workload_path: Path,
+    partition_count: int,
+    partition_size: int,
+) -> list[list[str]]:
+    partition_events: list[list[str]] = []
+    block_partitions = assign_block_partitions(records, partition_size)
     with workload_path.open("w", newline="") as fh:
         writer = csv.DictWriter(
             fh,
@@ -175,50 +411,62 @@ def write_workload(records: list[dict[str, Any]], workload_path: Path, partition
         )
         writer.writeheader()
         for idx, record in enumerate(records):
-            partition = stable_partition(record, partition_count)
-            partitions.append(partition)
+            result_blocks = record.get("_result_blocks") or []
+            if result_blocks:
+                event_partitions = sorted({block_partitions[block] for block in result_blocks})
+                result_block_text = "[" + ", ".join(result_blocks) + "]"
+            else:
+                partition = stable_partition(record, partition_count)
+                event_partitions = [partition]
+                result_block_text = f"[{block_id(record, partition)}]"
+            partition_events.append(event_partitions)
             writer.writerow(
                 {
                     "theTime": str(record.get("ts_ns") or ""),
                     "ClientIP": str(record.get("thread_id") or "linked_list"),
                     "row": str(record.get("row_count") or 0),
                     "statement": record.get("sql") or "",
-                    "resultBlock": f"[{block_id(record, partition)}]",
-                    "resultPartitions": f"[{partition}]",
+                    "resultBlock": result_block_text,
+                    "resultPartitions": "[" + ", ".join(event_partitions) + "]",
                 }
             )
-    return partitions
+    return partition_events
 
 
-def train_frequency_model(partitions: list[str], look_back: int, top_k: int) -> dict[str, Any]:
-    if len(partitions) <= look_back:
+def train_frequency_model(partition_events: list[list[str]], look_back: int, top_k: int) -> dict[str, Any]:
+    if len(partition_events) <= look_back:
         raise RuntimeError(
-            f"need more than look_back={look_back} SQL events, got {len(partitions)}"
+            f"need more than look_back={look_back} SQL events, got {len(partition_events)}"
         )
     counts: dict[str, Counter[str]] = defaultdict(Counter)
     total = 0
     hits = 0
-    for idx in range(look_back, len(partitions)):
-        context = tuple(partitions[idx - look_back : idx])
-        target = partitions[idx]
+    for idx in range(look_back, len(partition_events)):
+        context = tuple(
+            ";".join(parts) for parts in partition_events[idx - look_back : idx]
+        )
+        targets = partition_events[idx]
         key = "|".join(context)
         prediction = [part for part, _count in counts[key].most_common(top_k)]
-        if target in prediction:
+        if any(target in prediction for target in targets):
             hits += 1
-        counts[key][target] += 1
+        for target in targets:
+            counts[key][target] += 1
         total += 1
 
     model_contexts = {
         key: [{"partition": part, "count": count} for part, count in counter.most_common()]
         for key, counter in sorted(counts.items())
     }
-    global_counts = Counter(partitions)
+    global_counts: Counter[str] = Counter()
+    for parts in partition_events:
+        global_counts.update(parts)
     return {
         "model_type": "next_partition_frequency_smoke",
         "source": "linked_list JAC_SELEP_TRACE",
         "look_back": look_back,
         "top_k": top_k,
-        "events": len(partitions),
+        "events": len(partition_events),
         "examples": total,
         "contexts": len(model_contexts),
         "online_train_hit_rate": hits / total if total else 0.0,
@@ -235,6 +483,8 @@ def write_summary(out_dir: Path, trace_path: Path, workload_path: Path, model_pa
         "trace": str(trace_path),
         "workload": str(workload_path),
         "model": str(model_path),
+        "raw_trace_events": model.get("raw_trace_events", model["events"]),
+        "training_events": model["events"],
         "events": model["events"],
         "examples": model["examples"],
         "contexts": model["contexts"],
@@ -256,15 +506,24 @@ def main() -> int:
 
     if not args.skip_collect:
         run_collect(args, out_dir)
-    records = load_trace(trace_path)
-    partitions = write_workload(records, workload_path, args.partitions)
-    model = train_frequency_model(partitions, args.look_back, args.top_k)
+    raw_records = load_trace(trace_path)
+    records = raw_records
+    if args.block_source == "pg-buffercache":
+        records = collect_pg_buffercache_blocks(args, records)
+    partition_events = write_workload(records, workload_path, args.partitions, args.partition_size)
+    model = train_frequency_model(partition_events, args.look_back, args.top_k)
+    model["raw_trace_events"] = len(raw_records)
+    model["training_events"] = len(records)
+    model["block_source"] = args.block_source
+    model["sql_contains"] = args.sql_contains
+    model["partition_size"] = args.partition_size
+    model["max_block_selects"] = args.max_block_selects
     model_path.write_text(json.dumps(model, indent=2, sort_keys=True))
     write_summary(out_dir, trace_path, workload_path, model_path, model)
 
     print("=== LinkedList SeLeP smoke complete ===")
-    print(f"trace    : {trace_path} ({len(records)} SQL records)")
-    print(f"workload : {workload_path}")
+    print(f"trace    : {trace_path} ({len(raw_records)} successful SQL records)")
+    print(f"workload : {workload_path} ({len(records)} training records)")
     print(f"model    : {model_path}")
     print(
         "train    : "
