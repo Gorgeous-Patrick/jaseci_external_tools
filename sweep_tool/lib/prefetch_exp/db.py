@@ -244,22 +244,44 @@ class LocalDockerDbManager(DbManager):
                 ],
                 self.app_dir,
             )
-            return
+        else:
+            process.run(
+                [
+                    "docker",
+                    "exec",
+                    *self._pg_env(),
+                    self.postgres_container,
+                    "pg_restore",
+                    "-U",
+                    self.postgres_user,
+                    "-d",
+                    self.postgres_db,
+                    "--clean",
+                    "--if-exists",
+                    "--no-owner",
+                    container_path,
+                ],
+                self.app_dir,
+            )
+        self._analyze_database()
+
+    def _analyze_database(self) -> None:
+        print("Analyzing Postgres planner stats after restore")
         process.run(
             [
                 "docker",
                 "exec",
                 *self._pg_env(),
                 self.postgres_container,
-                "pg_restore",
+                "psql",
                 "-U",
                 self.postgres_user,
                 "-d",
                 self.postgres_db,
-                "--clean",
-                "--if-exists",
-                "--no-owner",
-                container_path,
+                "-v",
+                "ON_ERROR_STOP=1",
+                "-c",
+                "ANALYZE",
             ],
             self.app_dir,
         )
@@ -343,6 +365,7 @@ class RemoteSshDockerDbManager(DbManager):
                 f"--clean --if-exists --no-owner < {shlex.quote(dump_name)}"
             )
         self._ssh(self._cd(command))
+        self._analyze_database()
 
     def dump_exists(self, dump_name: str) -> bool:
         result = self._ssh(self._cd(f"test -e {shlex.quote(dump_name)}"), check=False)
@@ -412,6 +435,18 @@ class RemoteSshDockerDbManager(DbManager):
 
     def _pg_exec_args(self) -> str:
         return f"-e PGPASSWORD={shlex.quote(self.postgres_password)}"
+
+    def _analyze_database(self) -> None:
+        print("Analyzing remote Postgres planner stats after restore")
+        command = (
+            f"docker exec {self._pg_exec_args()} "
+            f"{shlex.quote(self.postgres_container)} psql "
+            f"-U {shlex.quote(self.postgres_user)} "
+            f"-d {shlex.quote(self.postgres_db)} "
+            f"-v ON_ERROR_STOP=1 "
+            f"-c {shlex.quote('ANALYZE')}"
+        )
+        self._ssh(self._cd(command))
 
     def _wait_postgres_ready(self, timeout_sec: float = 60.0) -> None:
         deadline = time.time() + timeout_sec
