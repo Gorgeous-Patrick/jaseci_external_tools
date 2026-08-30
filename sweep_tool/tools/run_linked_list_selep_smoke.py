@@ -41,6 +41,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--trials", type=int, default=1)
     parser.add_argument("--look-back", type=int, default=4)
     parser.add_argument("--top-k", type=int, default=4)
+    parser.add_argument("--test-fraction", type=float, default=0.30)
     parser.add_argument("--partitions", type=int, default=64)
     parser.add_argument("--block-source", choices=["hash", "pg-buffercache"], default="hash")
     parser.add_argument("--max-block-selects", type=int, default=16)
@@ -433,46 +434,103 @@ def write_workload(
     return partition_events
 
 
-def train_frequency_model(partition_events: list[list[str]], look_back: int, top_k: int) -> dict[str, Any]:
+def context_key(partition_events: list[list[str]], start: int, look_back: int) -> str:
+    return "|".join(
+        ";".join(parts) for parts in partition_events[start : start + look_back]
+    )
+
+
+def top_predictions(
+    counts: dict[str, Counter[str]],
+    key: str,
+    global_counts: Counter[str],
+    top_k: int,
+) -> list[str]:
+    if key in counts:
+        return [part for part, _count in counts[key].most_common(top_k)]
+    return [part for part, _count in global_counts.most_common(top_k)]
+
+
+def train_frequency_model(
+    partition_events: list[list[str]],
+    look_back: int,
+    top_k: int,
+    test_fraction: float,
+) -> dict[str, Any]:
     if len(partition_events) <= look_back:
         raise RuntimeError(
             f"need more than look_back={look_back} SQL events, got {len(partition_events)}"
         )
     counts: dict[str, Counter[str]] = defaultdict(Counter)
-    total = 0
-    hits = 0
-    for idx in range(look_back, len(partition_events)):
-        context = tuple(
-            ";".join(parts) for parts in partition_events[idx - look_back : idx]
-        )
+    total_examples = len(partition_events) - look_back
+    if not 0.0 <= test_fraction < 1.0:
+        raise ValueError(f"test_fraction must be in [0, 1), got {test_fraction}")
+    test_examples = int(round(total_examples * test_fraction))
+    if total_examples > 1:
+        test_examples = max(1, min(test_examples, total_examples - 1))
+    split_idx = len(partition_events) - test_examples
+
+    global_counts: Counter[str] = Counter()
+    for parts in partition_events[:split_idx]:
+        global_counts.update(parts)
+
+    train_total = 0
+    train_hits = 0
+    for idx in range(look_back, split_idx):
+        key = context_key(partition_events, idx - look_back, look_back)
         targets = partition_events[idx]
-        key = "|".join(context)
-        prediction = [part for part, _count in counts[key].most_common(top_k)]
+        prediction = top_predictions(counts, key, global_counts, top_k)
         if any(target in prediction for target in targets):
-            hits += 1
+            train_hits += 1
         for target in targets:
             counts[key][target] += 1
-        total += 1
+        train_total += 1
+
+    test_total = 0
+    test_event_hits = 0
+    test_partition_covered = 0
+    test_partition_total = 0
+    for idx in range(split_idx, len(partition_events)):
+        key = context_key(partition_events, idx - look_back, look_back)
+        targets = partition_events[idx]
+        prediction = top_predictions(counts, key, global_counts, top_k)
+        target_set = set(targets)
+        covered = target_set.intersection(prediction)
+        if covered:
+            test_event_hits += 1
+        test_partition_covered += len(covered)
+        test_partition_total += len(target_set)
+        test_total += 1
 
     model_contexts = {
         key: [{"partition": part, "count": count} for part, count in counter.most_common()]
         for key, counter in sorted(counts.items())
     }
-    global_counts: Counter[str] = Counter()
+    all_counts: Counter[str] = Counter()
     for parts in partition_events:
-        global_counts.update(parts)
+        all_counts.update(parts)
     return {
         "model_type": "next_partition_frequency_smoke",
         "source": "linked_list JAC_SELEP_TRACE",
         "look_back": look_back,
         "top_k": top_k,
+        "test_fraction": test_fraction,
+        "split_idx": split_idx,
         "events": len(partition_events),
-        "examples": total,
+        "examples": total_examples,
+        "train_examples": train_total,
+        "test_examples": test_total,
         "contexts": len(model_contexts),
-        "online_train_hit_rate": hits / total if total else 0.0,
+        "online_train_hit_rate": train_hits / train_total if train_total else 0.0,
+        "test_event_hit_rate": test_event_hits / test_total if test_total else 0.0,
+        "test_partition_coverage": (
+            test_partition_covered / test_partition_total
+            if test_partition_total
+            else 0.0
+        ),
         "global_top": [
             {"partition": part, "count": count}
-            for part, count in global_counts.most_common(top_k)
+            for part, count in all_counts.most_common(top_k)
         ],
         "context_model": model_contexts,
     }
@@ -487,8 +545,12 @@ def write_summary(out_dir: Path, trace_path: Path, workload_path: Path, model_pa
         "training_events": model["events"],
         "events": model["events"],
         "examples": model["examples"],
+        "train_examples": model["train_examples"],
+        "test_examples": model["test_examples"],
         "contexts": model["contexts"],
         "online_train_hit_rate": model["online_train_hit_rate"],
+        "test_event_hit_rate": model["test_event_hit_rate"],
+        "test_partition_coverage": model["test_partition_coverage"],
     }
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True))
 
@@ -511,7 +573,12 @@ def main() -> int:
     if args.block_source == "pg-buffercache":
         records = collect_pg_buffercache_blocks(args, records)
     partition_events = write_workload(records, workload_path, args.partitions, args.partition_size)
-    model = train_frequency_model(partition_events, args.look_back, args.top_k)
+    model = train_frequency_model(
+        partition_events,
+        args.look_back,
+        args.top_k,
+        args.test_fraction,
+    )
     model["raw_trace_events"] = len(raw_records)
     model["training_events"] = len(records)
     model["block_source"] = args.block_source
@@ -527,8 +594,14 @@ def main() -> int:
     print(f"model    : {model_path}")
     print(
         "train    : "
-        f"examples={model['examples']} contexts={model['contexts']} "
+        f"examples={model['train_examples']} contexts={model['contexts']} "
         f"online_hit={model['online_train_hit_rate']:.3f}"
+    )
+    print(
+        "test     : "
+        f"examples={model['test_examples']} "
+        f"event_hit={model['test_event_hit_rate']:.3f} "
+        f"partition_coverage={model['test_partition_coverage']:.3f}"
     )
     return 0
 
