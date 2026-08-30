@@ -22,6 +22,18 @@ COMPOSE_FILES = ("docker-compose.yaml", "docker-compose.yml", "compose.yaml", "c
 
 DEFAULT_POSTGRES_URI = "postgresql://jac:jac@localhost:5432/jac_db"
 
+POSTGRES_POST_RESTORE_SQL = """
+CREATE INDEX IF NOT EXISTS idx_anchors_edge_src_type_order
+    ON anchors (src, arch_type, seq, id)
+    INCLUDE (dst, undirected)
+    WHERE kind = 'EdgeAnchor' AND src IS NOT NULL AND dst IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_anchors_edge_dst_type_order
+    ON anchors (dst, arch_type, seq, id)
+    INCLUDE (src, undirected)
+    WHERE kind = 'EdgeAnchor' AND src IS NOT NULL AND dst IS NOT NULL;
+ANALYZE;
+""".strip()
+
 
 @dataclass(frozen=True)
 class DbSettings:
@@ -263,10 +275,10 @@ class LocalDockerDbManager(DbManager):
                 ],
                 self.app_dir,
             )
-        self._analyze_database()
+        self._optimize_database()
 
-    def _analyze_database(self) -> None:
-        print("Analyzing Postgres planner stats after restore")
+    def _optimize_database(self) -> None:
+        print("Creating TTG Postgres indexes and analyzing planner stats after restore")
         process.run(
             [
                 "docker",
@@ -281,7 +293,7 @@ class LocalDockerDbManager(DbManager):
                 "-v",
                 "ON_ERROR_STOP=1",
                 "-c",
-                "ANALYZE",
+                POSTGRES_POST_RESTORE_SQL,
             ],
             self.app_dir,
         )
@@ -365,7 +377,7 @@ class RemoteSshDockerDbManager(DbManager):
                 f"--clean --if-exists --no-owner < {shlex.quote(dump_name)}"
             )
         self._ssh(self._cd(command))
-        self._analyze_database()
+        self._optimize_database()
 
     def dump_exists(self, dump_name: str) -> bool:
         result = self._ssh(self._cd(f"test -e {shlex.quote(dump_name)}"), check=False)
@@ -436,15 +448,15 @@ class RemoteSshDockerDbManager(DbManager):
     def _pg_exec_args(self) -> str:
         return f"-e PGPASSWORD={shlex.quote(self.postgres_password)}"
 
-    def _analyze_database(self) -> None:
-        print("Analyzing remote Postgres planner stats after restore")
+    def _optimize_database(self) -> None:
+        print("Creating remote TTG Postgres indexes and analyzing planner stats after restore")
         command = (
             f"docker exec {self._pg_exec_args()} "
             f"{shlex.quote(self.postgres_container)} psql "
             f"-U {shlex.quote(self.postgres_user)} "
             f"-d {shlex.quote(self.postgres_db)} "
             f"-v ON_ERROR_STOP=1 "
-            f"-c {shlex.quote('ANALYZE')}"
+            f"-c {shlex.quote(POSTGRES_POST_RESTORE_SQL)}"
         )
         self._ssh(self._cd(command))
 
