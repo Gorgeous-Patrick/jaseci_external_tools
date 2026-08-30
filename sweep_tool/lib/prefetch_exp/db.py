@@ -103,6 +103,9 @@ class DbManager:
     def dump_to_app(self, dump_name: str = "jac_db.pgdump") -> None:
         raise NotImplementedError
 
+    def optimize_database(self) -> None:
+        raise NotImplementedError
+
     def ensure_app_dir(self, rel_dir: str) -> None:
         raise NotImplementedError
 
@@ -275,10 +278,10 @@ class LocalDockerDbManager(DbManager):
                 ],
                 self.app_dir,
             )
-        self._optimize_database()
+        self.optimize_database()
 
-    def _optimize_database(self) -> None:
-        print("Creating TTG Postgres indexes and analyzing planner stats after restore")
+    def optimize_database(self) -> None:
+        print("Creating TTG Postgres indexes and analyzing planner stats")
         process.run(
             [
                 "docker",
@@ -377,7 +380,7 @@ class RemoteSshDockerDbManager(DbManager):
                 f"--clean --if-exists --no-owner < {shlex.quote(dump_name)}"
             )
         self._ssh(self._cd(command))
-        self._optimize_database()
+        self.optimize_database()
 
     def dump_exists(self, dump_name: str) -> bool:
         result = self._ssh(self._cd(f"test -e {shlex.quote(dump_name)}"), check=False)
@@ -448,8 +451,8 @@ class RemoteSshDockerDbManager(DbManager):
     def _pg_exec_args(self) -> str:
         return f"-e PGPASSWORD={shlex.quote(self.postgres_password)}"
 
-    def _optimize_database(self) -> None:
-        print("Creating remote TTG Postgres indexes and analyzing planner stats after restore")
+    def optimize_database(self) -> None:
+        print("Creating remote TTG Postgres indexes and analyzing planner stats")
         command = (
             f"docker exec {self._pg_exec_args()} "
             f"{shlex.quote(self.postgres_container)} psql "

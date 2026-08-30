@@ -187,6 +187,9 @@ class BenchmarkAdapter(ABC):
     def dump_to_app(self, dump_name: str = "jac_db.pgdump") -> None:
         self.db_manager.dump_to_app(dump_name)
 
+    def optimize_database(self) -> None:
+        self.db_manager.optimize_database()
+
     def db_query_count(self) -> str:
         return self.db_manager.db_query_count()
 

@@ -44,6 +44,7 @@ class LinkedListAdapter(BenchmarkAdapter):
                 raise RuntimeError("LinkedList setup_graph returned no nodes")
             first_node = str(nodes[0])
             print(f"LinkedList setup_graph created {len(nodes)} node(s)")
+            self.optimize_database()
             time.sleep(5)
         finally:
             process.stop_process(proc)

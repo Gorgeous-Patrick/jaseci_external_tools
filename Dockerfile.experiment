@@ -115,6 +115,18 @@ COPY jacord /workspace/jacord
 COPY jdrive /workspace/jdrive
 COPY jsearch /workspace/jsearch
 
+RUN ! grep -R --line-number --include='*.jac' --include='*.toml' \
+        --include='*.yaml' --include='*.yml' --include='*.sh' \
+        --include='*.py' \
+        'JAC_TTG_SQL_FANOUT' \
+        /workspace/jaseci_external_tools/sweep_tool \
+        /workspace/jaseci_external_tools/tools \
+        /workspace/jaseci_external_tools/linked_list \
+        /workspace/jaseci_external_tools/littlex5 \
+        /workspace/jacord \
+        /workspace/jdrive \
+        /workspace/jsearch
+
 RUN python -m pip install --upgrade pip setuptools wheel \
     && python -m pip install \
         -r /workspace/jaseci_external_tools/sweep_tool/requirements.txt \
