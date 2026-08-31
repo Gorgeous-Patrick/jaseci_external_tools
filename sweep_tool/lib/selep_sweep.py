@@ -66,7 +66,7 @@ class SelepSweepConfig:
     partitions: int = 64
     block_source: str = "pg-buffercache"
     max_block_selects: int = 20
-    sql_contains: str = "anchors"
+    sql_contains: str = ""
     ssh_target: str = "clarity2"
     ssh_options: str = DEFAULT_SSH_OPTIONS
     postgres_container: str = "postgres"

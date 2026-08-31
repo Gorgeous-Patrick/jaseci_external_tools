@@ -48,6 +48,16 @@ def main() -> int:
     train.add_argument("--block-source", choices=["pg-buffercache", "hash"], default="pg-buffercache")
     train.add_argument("--max-block-selects", type=int, default=256)
     train.add_argument("--sql-contains", default="")
+    train.add_argument(
+        "--relation-allowlist",
+        default="anchors,graph_types",
+        help="Comma-separated relation names to keep from pg_buffercache; empty keeps all.",
+    )
+    train.add_argument(
+        "--relation-kinds",
+        default="r",
+        help="Comma-separated pg_class relkind values to keep; default r excludes indexes.",
+    )
     add_db_args(train)
 
     serve = sub.add_parser("serve", help="tail a Jac SQL trace and issue pg_prewarm calls")
@@ -121,6 +131,8 @@ def train_command(args: argparse.Namespace) -> int:
             "partition_size": args.partition_size,
             "sql_contains": args.sql_contains,
             "max_block_selects": args.max_block_selects,
+            "relation_allowlist": sorted(parse_csv_set(args.relation_allowlist)),
+            "relation_kinds": sorted(parse_csv_set(args.relation_kinds)),
             "partition_blocks": {
                 part: sorted(blocks, key=block_sort_key)
                 for part, blocks in partition_blocks.items()
@@ -166,6 +178,7 @@ def serve_command(args: argparse.Namespace) -> int:
         "predicted_partitions": 0,
         "prewarm_calls": 0,
         "blocks_requested": 0,
+        "blocks_skipped": 0,
         "prewarm_ms": 0.0,
         "errors": [],
     }
@@ -359,7 +372,9 @@ def handle_trace_line(
     stats["blocks_requested"] += len(blocks)
     started = time.perf_counter()
     try:
-        stats["prewarm_calls"] += prewarm_blocks(conn, blocks)
+        calls, skipped = prewarm_blocks(conn, blocks)
+        stats["prewarm_calls"] += calls
+        stats["blocks_skipped"] += skipped
     except Exception as exc:  # keep the measured Jac request alive
         errors = stats.setdefault("errors", [])
         if len(errors) < 20:
@@ -368,17 +383,48 @@ def handle_trace_line(
         stats["prewarm_ms"] += (time.perf_counter() - started) * 1000.0
 
 
-def prewarm_blocks(conn: Any, blocks: list[str]) -> int:
+def prewarm_blocks(conn: Any, blocks: list[str]) -> tuple[int, int]:
     ranges = coalesce_blocks(blocks)
     if not ranges:
-        return 0
+        return 0, 0
+    limits = relation_block_limits(conn, [relation for relation, _start, _end in ranges])
+    calls = 0
+    skipped = 0
     with conn.cursor() as cur:
         for relation, start, end in ranges:
+            max_block = limits.get(relation)
+            if max_block is None or max_block < 0:
+                skipped += end - start + 1
+                continue
+            clipped_end = min(end, max_block)
+            if start > clipped_end:
+                skipped += end - start + 1
+                continue
             cur.execute(
                 "SELECT pg_prewarm(%s::regclass, first_block => %s, last_block => %s)",
-                (relation, start, end),
+                (relation, start, clipped_end),
             )
-    return len(ranges)
+            calls += 1
+            skipped += max(0, end - clipped_end)
+    return calls, skipped
+
+
+def relation_block_limits(conn: Any, relations: list[str]) -> dict[str, int]:
+    names = sorted({relation for relation in relations if relation})
+    if not names:
+        return {}
+    out: dict[str, int] = {}
+    with conn.cursor() as cur:
+        for relation in names:
+            try:
+                cur.execute("SELECT pg_relation_size(%s::regclass)", (relation,))
+                row = cur.fetchone()
+            except Exception:
+                out[relation] = -1
+                continue
+            size = int(row[0] or 0) if row else 0
+            out[relation] = (size + 8191) // 8192 - 1
+    return out
 
 
 def coalesce_blocks(blocks: list[str]) -> list[tuple[str, int, int]]:
@@ -461,12 +507,14 @@ def collect_pg_buffercache_blocks(
     records: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     db_psql(args, "CREATE EXTENSION IF NOT EXISTS pg_buffercache;")
+    relation_allowlist = parse_csv_set(args.relation_allowlist)
+    relation_kinds = parse_csv_set(args.relation_kinds)
     enriched: list[dict[str, Any]] = []
     empty = 0
     for idx, record in enumerate(records, start=1):
         restart_postgres(args)
         sql = render_sql(record.get("sql") or "", record.get("params") or {})
-        blocks = query_result_blocks(args, sql)
+        blocks = query_result_blocks(args, sql, relation_allowlist, relation_kinds)
         if not blocks:
             empty += 1
             continue
@@ -505,8 +553,21 @@ def attach_hash_blocks(records: list[dict[str, Any]], partition_count: int) -> l
     return out
 
 
-def query_result_blocks(args: argparse.Namespace, sql: str) -> list[str]:
+def query_result_blocks(
+    args: argparse.Namespace,
+    sql: str,
+    relation_allowlist: set[str],
+    relation_kinds: set[str],
+) -> list[str]:
     replay = sql.rstrip().rstrip(";")
+    relation_filter = ""
+    kind_filter = ""
+    if relation_allowlist:
+        relations = ", ".join(sql_quote(name) for name in sorted(relation_allowlist))
+        relation_filter = f"  AND c.relname IN ({relations})\n"
+    if relation_kinds:
+        kinds = ", ".join(sql_quote(kind) for kind in sorted(relation_kinds))
+        kind_filter = f"  AND c.relkind IN ({kinds})\n"
     block_sql = f"""
 \\o /dev/null
 {replay};
@@ -517,7 +578,7 @@ JOIN pg_database d ON b.reldatabase = d.oid
 JOIN pg_class c ON b.relfilenode = pg_relation_filenode(c.oid)
 WHERE d.datname = current_database()
   AND b.relblocknumber IS NOT NULL
-  AND c.relkind IN ('r', 'i', 't')
+{kind_filter}{relation_filter}
   AND c.relname NOT LIKE 'pg_%'
   AND c.relname NOT LIKE 'sql_%'
 ORDER BY 1;
@@ -969,6 +1030,14 @@ def relation_name(record: dict[str, Any]) -> str:
             if raw not in {"unnest", "select"}:
                 return raw.replace(".", "_")
     return "anchors"
+
+
+def parse_csv_set(raw: str) -> set[str]:
+    return {item.strip() for item in str(raw or "").split(",") if item.strip()}
+
+
+def sql_quote(value: str) -> str:
+    return "'" + str(value).replace("'", "''") + "'"
 
 
 def compact_sql(sql: str) -> str:

@@ -649,6 +649,7 @@ def _run_selep_trial(
         selep_matched_events=str(stats.get("matched_events", "")),
         selep_predictions=str(stats.get("predictions", "")),
         selep_blocks=str(stats.get("blocks_requested", "")),
+        selep_blocks_skipped=str(stats.get("blocks_skipped", "")),
         selep_prewarm_calls=str(stats.get("prewarm_calls", "")),
         selep_prewarm_ms=str(stats.get("prewarm_ms", "")),
         selep_errors=error_text,

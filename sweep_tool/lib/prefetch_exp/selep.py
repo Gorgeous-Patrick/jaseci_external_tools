@@ -52,7 +52,8 @@ def describe(options: SweepOptions) -> str:
         f"mode={env_value(options, 'SELEP_MODEL_KIND', 'lstm')} "
         f"top_k={selep_top_k(options)} "
         f"look_back={env_int(options, 'SELEP_LOOK_BACK', 4)} "
-        f"blocks={env_value(options, 'SELEP_BLOCK_SOURCE', 'pg-buffercache')}"
+        f"blocks={env_value(options, 'SELEP_BLOCK_SOURCE', 'pg-buffercache')} "
+        f"relations={env_value(options, 'SELEP_RELATION_ALLOWLIST', 'anchors,graph_types')}"
     )
 
 
@@ -94,7 +95,7 @@ def model_config(
         top_k=selep_top_k(options),
         block_limit=env_int(options, "SELEP_BLOCK_LIMIT", limit),
         max_block_selects=env_int(options, "SELEP_MAX_BLOCK_SELECTS", 256),
-        sql_contains=env_value(options, "SELEP_SQL_CONTAINS", "anchors"),
+        sql_contains=env_value(options, "SELEP_SQL_CONTAINS", ""),
     )
 
 
@@ -168,6 +169,10 @@ def run_training_script(adapter: Any, cfg: SelepModelConfig, options: SweepOptio
         str(cfg.max_block_selects),
         "--sql-contains",
         cfg.sql_contains,
+        "--relation-allowlist",
+        env_value(options, "SELEP_RELATION_ALLOWLIST", "anchors,graph_types"),
+        "--relation-kinds",
+        env_value(options, "SELEP_RELATION_KINDS", "r"),
         "--db-mode",
         adapter.db_manager.settings.mode,
         "--postgres-container",

@@ -137,6 +137,23 @@ parameters:
       pg-buffercache replays training queries to discover PostgreSQL blocks;
       hash is only for plumbing smoke tests.
 
+  - name: SELEP_RELATION_ALLOWLIST
+    label: SeLeP relations
+    kind: str
+    default: "anchors,graph_types"
+    help: >
+      Comma-separated PostgreSQL relations retained from the replayed request
+      block trace. The default keeps Jac data/topology tables and excludes
+      auth/catalog noise.
+
+  - name: SELEP_RELATION_KINDS
+    label: SeLeP relation kinds
+    kind: str
+    default: "r"
+    help: >
+      Comma-separated pg_class relkind values retained from pg_buffercache.
+      The default keeps heap tables and excludes indexes.
+
   - name: SELEP_MAX_BLOCK_SELECTS
     label: SeLeP max SELECTs
     kind: int

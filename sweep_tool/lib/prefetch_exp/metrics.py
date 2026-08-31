@@ -40,6 +40,7 @@ RESULT_COLUMNS = [
     "selep_matched_events",
     "selep_predictions",
     "selep_blocks",
+    "selep_blocks_skipped",
     "selep_prewarm_calls",
     "selep_prewarm_ms",
     "selep_errors",

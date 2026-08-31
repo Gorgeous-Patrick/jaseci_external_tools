@@ -544,7 +544,7 @@ with tab_selep:
             min_value=1,
             step=1,
         )
-        sql_contains = st.text_input("SQL filter", value="anchors", key="selep_sql_filter")
+        sql_contains = st.text_input("SQL filter", value="", key="selep_sql_filter")
     with c5:
         partition_size = st.number_input(
             "Blocks per partition",
