@@ -25,7 +25,7 @@ parameters:
     default: "none ttg oracle markov1-pooled coaccess-pooled"
     help: >
       Space-separated policies to run. Supported: none, ttg, oracle,
-      markov, markov1-pooled, coaccess, coaccess-pooled, history,
+      markov, markov1-pooled, coaccess, coaccess-pooled, selep, history,
       manual. Oracle, Markov, and co-access default to auto-record/train
       then replay.
 
@@ -107,6 +107,43 @@ parameters:
     kind: str
     default: "0.05"
     help: Greedy transaction-clustering Jaccard threshold.
+
+  - name: SELEP_MODEL_KIND
+    label: SeLeP model
+    kind: enum
+    default: "lstm"
+    choices: ["lstm", "frequency"]
+    help: >
+      SeLeP sidecar model. lstm trains the original SeLeP binary LSTM in
+      the Python 3.11 sidecar environment; frequency is a plumbing-only
+      fallback for fast debugging.
+
+  - name: SELEP_TOP_K
+    label: SeLeP partitions
+    kind: int
+    default: 42
+    help: Number of partitions predicted per SQL event.
+
+  - name: SELEP_BLOCK_SOURCE
+    label: SeLeP blocks
+    kind: enum
+    default: "pg-buffercache"
+    choices: ["pg-buffercache", "hash"]
+    help: >
+      pg-buffercache replays training queries to discover PostgreSQL blocks;
+      hash is only for plumbing smoke tests.
+
+  - name: SELEP_MAX_BLOCK_SELECTS
+    label: SeLeP max SELECTs
+    kind: int
+    default: 256
+    help: Maximum successful SELECT events replayed while building block partitions.
+
+  - name: SELEP_LSTM_EPOCHS
+    label: SeLeP epochs
+    kind: int
+    default: 5
+    help: LSTM training epochs for the SeLeP sidecar model.
 
   - name: TEST_USER
     label: Benchmark user

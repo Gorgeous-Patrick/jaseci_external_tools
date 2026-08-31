@@ -128,6 +128,13 @@ class TrialResult:
     db_q: str = ""
     oracle_file: str = ""
     model_file: str = ""
+    selep_events: str = ""
+    selep_matched_events: str = ""
+    selep_predictions: str = ""
+    selep_blocks: str = ""
+    selep_prewarm_calls: str = ""
+    selep_prewarm_ms: str = ""
+    selep_errors: str = ""
 
 
 def _split_words(raw: str) -> list[str]:

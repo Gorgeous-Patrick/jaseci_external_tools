@@ -20,6 +20,21 @@ RUN apt-get update \
     && mv /tmp/python/install/* /opt/python/ \
     && rm -rf /tmp/python /tmp/python.tar.zst
 
+FROM python:3.11-slim-bookworm AS selep-python
+
+ENV PIP_NO_CACHE_DIR=1
+
+RUN python -m venv /opt/selep-venv \
+    && /opt/selep-venv/bin/python -m pip install --upgrade pip setuptools wheel \
+    && /opt/selep-venv/bin/python -m pip install \
+        tensorflow-cpu==2.13.0 \
+        keras==2.13.1 \
+        numpy==1.24.3 \
+        pandas==2.0.3 \
+        "psycopg[binary]==3.1.18" \
+        scikit-learn==1.3.0 \
+        tqdm==4.66.1
+
 FROM debian:trixie-slim AS jac-builder
 ARG ZIG_TARBALL_URL
 
@@ -65,6 +80,14 @@ LABEL org.opencontainers.image.source="https://github.com/Gorgeous-Patrick/jasec
 
 COPY --from=python-runtime /opt/python/ /usr/local/
 COPY --from=jac-builder /src/jaseci/jac/zig-out/bin/jac /usr/local/bin/jac
+COPY --from=selep-python /usr/local/bin/python3.11 /usr/local/bin/python3.11
+COPY --from=selep-python /usr/local/lib/libpython3.11.so.1.0 /usr/local/lib/libpython3.11.so.1.0
+COPY --from=selep-python /usr/local/lib/python3.11 /usr/local/lib/python3.11
+COPY --from=selep-python /opt/selep-venv /opt/selep-venv
+
+RUN ln -sf /usr/local/bin/python3.11 /opt/selep-venv/bin/python3.11 \
+    && ln -sf /opt/selep-venv/bin/python3.11 /opt/selep-venv/bin/python3 \
+    && ln -sf /opt/selep-venv/bin/python3.11 /opt/selep-venv/bin/python
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -74,6 +97,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     JASECI_SOURCE_LABEL=${JASECI_SOURCE_LABEL} \
     JASECI_COMMIT=${JASECI_COMMIT} \
     JAC_BIN=/usr/local/bin/jac \
+    SELEP_REPO=/workspace/SeLeP \
+    SELEP_PYTHON=/opt/selep-venv/bin/python \
     XDG_CACHE_HOME=/opt/jac/cache \
     JAC_CACHE_HOME=/opt/jac/state
 
@@ -114,6 +139,11 @@ COPY jaseci_external_tools/littlex5 /workspace/jaseci_external_tools/littlex5
 COPY jacord /workspace/jacord
 COPY jdrive /workspace/jdrive
 COPY jsearch /workspace/jsearch
+COPY SeLeP/Backend /workspace/SeLeP/Backend
+COPY SeLeP/Configuration /workspace/SeLeP/Configuration
+COPY SeLeP/Utils /workspace/SeLeP/Utils
+COPY SeLeP/Data /workspace/SeLeP/Data
+COPY SeLeP/*.py SeLeP/README.md SeLeP/requirements.txt /workspace/SeLeP/
 
 RUN ! grep -R --line-number --include='*.jac' --include='*.toml' \
         --include='*.yaml' --include='*.yml' --include='*.sh' \
@@ -133,6 +163,26 @@ RUN python -m pip install --upgrade pip setuptools wheel \
         matplotlib \
         requests \
     && rm -rf /root/.cache/jac
+
+RUN /opt/selep-venv/bin/python - <<'PY'
+import sys
+sys.path.insert(0, "/workspace/SeLeP")
+import keras
+import numpy
+import pandas
+import psycopg
+import sklearn
+import tensorflow as tf
+from Backend.Models.LSTM import create_binary_lstm_model
+
+model = create_binary_lstm_model(2, 2, 2, 2)
+assert model.input_shape == (None, 2, 4), model.input_shape
+assert model.output_shape == (None, 2), model.output_shape
+print("selep_python=" + sys.version.replace("\n", " "))
+print("tensorflow=" + tf.__version__)
+print("keras=" + keras.__version__)
+print("psycopg=" + psycopg.__version__)
+PY
 
 RUN chmod 0755 /usr/local/bin/jac \
     && mkdir -p /opt/jac/cache /opt/jac/state \
@@ -173,6 +223,18 @@ RUN printf '%s\n' \
         'print("sweep_python=" + sys.version.replace("\n", " "))' \
         'print("sweep_Py_GIL_DISABLED=" + str(sysconfig.get_config_var("Py_GIL_DISABLED")))' \
         'print("sweep_gil_enabled=" + str(sys._is_gil_enabled() if hasattr(sys, "_is_gil_enabled") else "unknown"))' \
+        'PY' \
+        'echo "SELEP_REPO=${SELEP_REPO:-/workspace/SeLeP}"' \
+        'echo "SELEP_PYTHON=${SELEP_PYTHON:-/opt/selep-venv/bin/python}"' \
+        '"${SELEP_PYTHON:-/opt/selep-venv/bin/python}" - <<'"'"'PY'"'"'' \
+        'import sys' \
+        'import tensorflow as tf' \
+        'import keras' \
+        'import psycopg' \
+        'print("selep_python=" + sys.version.replace("\n", " "))' \
+        'print("selep_tensorflow=" + tf.__version__)' \
+        'print("selep_keras=" + keras.__version__)' \
+        'print("selep_psycopg=" + psycopg.__version__)' \
         'PY' \
         > /usr/local/bin/jac-info \
     && chmod +x /usr/local/bin/jac-info

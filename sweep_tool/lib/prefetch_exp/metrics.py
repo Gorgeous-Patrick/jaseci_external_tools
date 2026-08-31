@@ -36,6 +36,13 @@ RESULT_COLUMNS = [
     "db_q",
     "oracle_file",
     "model_file",
+    "selep_events",
+    "selep_matched_events",
+    "selep_predictions",
+    "selep_blocks",
+    "selep_prewarm_calls",
+    "selep_prewarm_ms",
+    "selep_errors",
 ]
 
 

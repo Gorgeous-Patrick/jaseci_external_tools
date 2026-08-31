@@ -109,7 +109,12 @@ class BenchmarkAdapter(ABC):
                     return str(entry)
         return "main.jac"
 
-    def server_env(self, profile_dir: Path | None = None, profile_csv: Path | None = None) -> dict[str, str]:
+    def server_env(
+        self,
+        profile_dir: Path | None = None,
+        profile_csv: Path | None = None,
+        extra_env: dict[str, str] | None = None,
+    ) -> dict[str, str]:
         env = {
             **self.options.env,
             "JAC_BIN": self.options.jac_bin,
@@ -121,13 +126,21 @@ class BenchmarkAdapter(ABC):
             env["JAC_PROFILE_DIR"] = str(profile_dir)
         if profile_csv is not None:
             env["JAC_PROFILE_CSV"] = str(profile_csv)
+        if extra_env:
+            env.update({key: str(value) for key, value in extra_env.items()})
         return env
 
-    def start_server(self, log_path: Path, profile_dir: Path | None = None, profile_csv: Path | None = None):
+    def start_server(
+        self,
+        log_path: Path,
+        profile_dir: Path | None = None,
+        profile_csv: Path | None = None,
+        extra_env: dict[str, str] | None = None,
+    ):
         proc = process.start_server(
             self.server_command(),
             self.app_dir,
-            self.server_env(profile_dir=profile_dir, profile_csv=profile_csv),
+            self.server_env(profile_dir=profile_dir, profile_csv=profile_csv, extra_env=extra_env),
             log_path,
         )
         try:

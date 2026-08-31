@@ -1,10 +1,9 @@
 """Collect a LinkedList SQL trace and train a small SeLeP-shaped model.
 
-This is a smoke-test pipeline for the SeLeP integration work.  It does not
-train the original SeLeP ED-LSTM; that still needs the SeLeP TensorFlow
-environment.  The goal here is to prove that Jac can emit replayable SQL
-events and that those events can be converted into a partition-sequence
-training artifact.
+This is a smoke-test pipeline for the SeLeP integration work.  The default
+frequency model is intentionally lightweight.  The optional LSTM model reuses
+SeLeP's TensorFlow/Keras LSTM implementation against the generated
+partition-sequence workload.
 """
 
 from __future__ import annotations
@@ -42,18 +41,28 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--look-back", type=int, default=4)
     parser.add_argument("--top-k", type=int, default=4)
     parser.add_argument("--test-fraction", type=float, default=0.30)
+    parser.add_argument("--model-kind", choices=["frequency", "lstm"], default="frequency")
+    parser.add_argument("--selep-root", default="/home/patrickli/Space/jaseci_env/SeLeP")
+    parser.add_argument("--lstm-epochs", type=int, default=8)
+    parser.add_argument("--lstm-batch-size", type=int, default=8)
+    parser.add_argument("--lstm-validation-fraction", type=float, default=0.10)
+    parser.add_argument("--lstm-seed", type=int, default=42)
     parser.add_argument("--partitions", type=int, default=64)
     parser.add_argument("--block-source", choices=["hash", "pg-buffercache"], default="hash")
     parser.add_argument("--max-block-selects", type=int, default=16)
     parser.add_argument("--sql-contains", default="")
     parser.add_argument("--ssh-target", default="clarity2")
-    parser.add_argument("--ssh-option", action="append", default=["-F", "/home/patrickli/.ssh/config"])
+    parser.add_argument("--ssh-option", action="append", default=None)
     parser.add_argument("--postgres-container", default="postgres")
     parser.add_argument("--postgres-user", default="jac")
     parser.add_argument("--postgres-db", default="jac_db")
     parser.add_argument("--partition-size", type=int, default=8)
     parser.add_argument("--skip-collect", action="store_true")
-    return parser.parse_args()
+    parser.add_argument("--skip-workload-rebuild", action="store_true")
+    args = parser.parse_args()
+    if args.ssh_option is None:
+        args.ssh_option = ["-F", "/home/patrickli/.ssh/config"]
+    return args
 
 
 def reset_output_dir(out_dir: Path) -> None:
@@ -84,7 +93,8 @@ def run_collect(args: argparse.Namespace, out_dir: Path) -> None:
             "JAC_COUNT_DB": "0",
             "JAC_QUERY_CACHE": "1",
             "PYTHONUNBUFFERED": "1",
-            "SWEEP_DB_SSH_OPTIONS": env.get("SWEEP_DB_SSH_OPTIONS", "-F /home/patrickli/.ssh/config"),
+            "SWEEP_DB_HOST": args.ssh_target,
+            "SWEEP_DB_SSH_OPTIONS": " ".join(shlex.quote(part) for part in args.ssh_option),
         }
     )
     cmd = [
@@ -434,6 +444,27 @@ def write_workload(
     return partition_events
 
 
+def read_workload_partitions(workload_path: Path) -> list[list[str]]:
+    if not workload_path.exists():
+        raise RuntimeError(f"workload does not exist: {workload_path}")
+    partition_events: list[list[str]] = []
+    with workload_path.open(newline="") as fh:
+        reader = csv.DictReader(fh)
+        if "resultPartitions" not in (reader.fieldnames or []):
+            raise RuntimeError(f"workload is missing resultPartitions column: {workload_path}")
+        for row in reader:
+            parts = [
+                part.strip()
+                for part in str(row.get("resultPartitions") or "").strip("[]").split(",")
+                if part.strip()
+            ]
+            if parts:
+                partition_events.append(parts)
+    if not partition_events:
+        raise RuntimeError(f"workload has no partition events: {workload_path}")
+    return partition_events
+
+
 def context_key(partition_events: list[list[str]], start: int, look_back: int) -> str:
     return "|".join(
         ";".join(parts) for parts in partition_events[start : start + look_back]
@@ -536,6 +567,196 @@ def train_frequency_model(
     }
 
 
+def partition_sort_key(partition: str) -> tuple[int, str]:
+    if partition.startswith("p") and partition[1:].isdigit():
+        return (int(partition[1:]), partition)
+    return (sys.maxsize, partition)
+
+
+def matrix_dims(num_partitions: int) -> tuple[int, int]:
+    if num_partitions <= 0:
+        raise ValueError(f"num_partitions must be positive, got {num_partitions}")
+    rows = max(2, int(num_partitions ** 0.5))
+    cols = max(2, (num_partitions + rows - 1) // rows)
+    while rows * cols < num_partitions:
+        cols += 1
+    return rows, cols
+
+
+def supervised_split(total_examples: int, test_fraction: float) -> tuple[int, int]:
+    if total_examples <= 0:
+        raise RuntimeError("need at least one supervised example")
+    if not 0.0 <= test_fraction < 1.0:
+        raise ValueError(f"test_fraction must be in [0, 1), got {test_fraction}")
+    test_examples = int(round(total_examples * test_fraction))
+    if total_examples > 1:
+        test_examples = max(1, min(test_examples, total_examples - 1))
+    else:
+        test_examples = 0
+    split_idx = total_examples - test_examples
+    return split_idx, test_examples
+
+
+def train_lstm_model(
+    partition_events: list[list[str]],
+    look_back: int,
+    top_k: int,
+    test_fraction: float,
+    args: argparse.Namespace,
+    out_dir: Path,
+) -> dict[str, Any]:
+    if len(partition_events) <= look_back:
+        raise RuntimeError(
+            f"need more than look_back={look_back} SQL events, got {len(partition_events)}"
+        )
+
+    os.environ.setdefault("CUDA_VISIBLE_DEVICES", "-1")
+    os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "1")
+    os.environ.setdefault("OMP_NUM_THREADS", "2")
+    os.environ.setdefault("TF_NUM_INTRAOP_THREADS", "2")
+    os.environ.setdefault("TF_NUM_INTEROP_THREADS", "1")
+
+    selep_root = Path(args.selep_root).expanduser().resolve()
+    if not (selep_root / "Backend" / "Models" / "LSTM.py").exists():
+        raise RuntimeError(f"SeLeP LSTM.py not found under {selep_root}")
+    sys.path.insert(0, str(selep_root))
+
+    import numpy as np
+    import tensorflow as tf
+    from tensorflow import keras
+    from Backend.Models.LSTM import create_binary_lstm_model
+
+    tf.random.set_seed(args.lstm_seed)
+    np.random.seed(args.lstm_seed)
+
+    vocab = sorted({part for event in partition_events for part in event}, key=partition_sort_key)
+    part_to_idx = {part: idx for idx, part in enumerate(vocab)}
+    rows, cols = matrix_dims(len(vocab))
+    data_shape = rows * cols
+
+    vectors = np.zeros((len(partition_events), data_shape), dtype=np.float32)
+    outputs = np.zeros((len(partition_events), len(vocab)), dtype=np.float32)
+    for event_idx, parts in enumerate(partition_events):
+        for part in parts:
+            idx = part_to_idx[part]
+            vectors[event_idx, idx] = 1.0
+            outputs[event_idx, idx] = 1.0
+
+    data_x: list[Any] = []
+    data_y: list[Any] = []
+    for idx in range(look_back, len(partition_events)):
+        data_x.append(vectors[idx - look_back : idx])
+        data_y.append(outputs[idx])
+    x = np.asarray(data_x, dtype=np.float32)
+    y = np.asarray(data_y, dtype=np.float32)
+
+    split_examples, test_examples = supervised_split(len(x), test_fraction)
+    x_train, y_train = x[:split_examples], y[:split_examples]
+    x_test, y_test = x[split_examples:], y[split_examples:]
+
+    val_count = int(round(len(x_train) * args.lstm_validation_fraction))
+    if len(x_train) > 1:
+        val_count = max(1, min(val_count, len(x_train) - 1))
+    else:
+        val_count = 0
+    if val_count:
+        train_inputs = x_train[:-val_count]
+        train_targets = y_train[:-val_count]
+        validation_data = (x_train[-val_count:], y_train[-val_count:])
+    else:
+        train_inputs = x_train
+        train_targets = y_train
+        validation_data = None
+
+    model = create_binary_lstm_model(len(vocab), look_back, rows, cols)
+    model.compile(
+        loss=keras.losses.BinaryCrossentropy(from_logits=False),
+        optimizer=keras.optimizers.Adam(),
+        metrics=[keras.metrics.MeanAbsoluteError(), "accuracy"],
+    )
+    callbacks = []
+    if validation_data is not None:
+        callbacks.append(keras.callbacks.EarlyStopping(monitor="val_loss", patience=3, restore_best_weights=True))
+
+    started = time.time()
+    history = model.fit(
+        train_inputs,
+        train_targets,
+        epochs=args.lstm_epochs,
+        batch_size=args.lstm_batch_size,
+        validation_data=validation_data,
+        callbacks=callbacks,
+        verbose=1,
+        shuffle=False,
+    )
+    train_seconds = time.time() - started
+
+    train_pred = model.predict(x_train, verbose=0)
+    test_pred = model.predict(x_test, verbose=0) if len(x_test) else np.zeros((0, len(vocab)))
+
+    train_eval = evaluate_lstm_predictions(train_pred, y_train, vocab, top_k)
+    test_eval = evaluate_lstm_predictions(test_pred, y_test, vocab, top_k)
+
+    keras_json_path = out_dir / "model_lstm_architecture.json"
+    weights_path = out_dir / "model_lstm.weights.h5"
+    keras_json_path.write_text(model.to_json())
+    model.save_weights(str(weights_path))
+
+    return {
+        "model_type": "selep_binary_lstm",
+        "source": "linked_list JAC_SELEP_TRACE",
+        "selep_root": str(selep_root),
+        "look_back": look_back,
+        "top_k": top_k,
+        "test_fraction": test_fraction,
+        "events": len(partition_events),
+        "examples": len(x),
+        "train_examples": len(x_train),
+        "test_examples": test_examples,
+        "contexts": 0,
+        "partitions": len(vocab),
+        "rows": rows,
+        "cols": cols,
+        "lstm_epochs_requested": args.lstm_epochs,
+        "lstm_epochs_ran": len(history.history.get("loss", [])),
+        "lstm_batch_size": args.lstm_batch_size,
+        "lstm_validation_examples": val_count,
+        "lstm_train_seconds": train_seconds,
+        "online_train_hit_rate": train_eval["event_hit_rate"],
+        "test_event_hit_rate": test_eval["event_hit_rate"],
+        "test_partition_coverage": test_eval["partition_coverage"],
+        "train_partition_coverage": train_eval["partition_coverage"],
+        "vocab": vocab,
+        "history": {key: [float(value) for value in values] for key, values in history.history.items()},
+        "keras_model_json": str(keras_json_path),
+        "keras_weights": str(weights_path),
+    }
+
+
+def evaluate_lstm_predictions(predictions: Any, targets: Any, vocab: list[str], top_k: int) -> dict[str, float]:
+    if len(targets) == 0:
+        return {"event_hit_rate": 0.0, "partition_coverage": 0.0}
+    import numpy as np
+
+    event_hits = 0
+    covered_total = 0
+    target_total = 0
+    k = max(1, min(top_k, len(vocab)))
+    for pred, target in zip(predictions, targets, strict=True):
+        top_indices = np.argsort(pred)[-k:]
+        predicted = set(int(idx) for idx in top_indices)
+        wanted = {int(idx) for idx in np.flatnonzero(target > 0.0)}
+        covered = predicted.intersection(wanted)
+        if covered:
+            event_hits += 1
+        covered_total += len(covered)
+        target_total += len(wanted)
+    return {
+        "event_hit_rate": event_hits / len(targets),
+        "partition_coverage": covered_total / target_total if target_total else 0.0,
+    }
+
+
 def write_summary(out_dir: Path, trace_path: Path, workload_path: Path, model_path: Path, model: dict[str, Any]) -> None:
     summary = {
         "trace": str(trace_path),
@@ -551,6 +772,7 @@ def write_summary(out_dir: Path, trace_path: Path, workload_path: Path, model_pa
         "online_train_hit_rate": model["online_train_hit_rate"],
         "test_event_hit_rate": model["test_event_hit_rate"],
         "test_partition_coverage": model["test_partition_coverage"],
+        "model_type": model["model_type"],
     }
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True))
 
@@ -566,21 +788,39 @@ def main() -> int:
     workload_path = out_dir / "workload.csv"
     model_path = out_dir / "model.json"
 
+    if args.skip_workload_rebuild and not args.skip_collect:
+        raise RuntimeError("--skip-workload-rebuild requires --skip-collect")
+
     if not args.skip_collect:
         run_collect(args, out_dir)
-    raw_records = load_trace(trace_path)
-    records = raw_records
-    if args.block_source == "pg-buffercache":
-        records = collect_pg_buffercache_blocks(args, records)
-    partition_events = write_workload(records, workload_path, args.partitions, args.partition_size)
-    model = train_frequency_model(
-        partition_events,
-        args.look_back,
-        args.top_k,
-        args.test_fraction,
-    )
+    if args.skip_workload_rebuild:
+        raw_records = load_trace(trace_path) if trace_path.exists() else []
+        records = []
+        partition_events = read_workload_partitions(workload_path)
+    else:
+        raw_records = load_trace(trace_path)
+        records = raw_records
+        if args.block_source == "pg-buffercache":
+            records = collect_pg_buffercache_blocks(args, records)
+        partition_events = write_workload(records, workload_path, args.partitions, args.partition_size)
+    if args.model_kind == "lstm":
+        model = train_lstm_model(
+            partition_events,
+            args.look_back,
+            args.top_k,
+            args.test_fraction,
+            args,
+            out_dir,
+        )
+    else:
+        model = train_frequency_model(
+            partition_events,
+            args.look_back,
+            args.top_k,
+            args.test_fraction,
+        )
     model["raw_trace_events"] = len(raw_records)
-    model["training_events"] = len(records)
+    model["training_events"] = len(records) if records else len(partition_events)
     model["block_source"] = args.block_source
     model["sql_contains"] = args.sql_contains
     model["partition_size"] = args.partition_size
@@ -590,7 +830,7 @@ def main() -> int:
 
     print("=== LinkedList SeLeP smoke complete ===")
     print(f"trace    : {trace_path} ({len(raw_records)} successful SQL records)")
-    print(f"workload : {workload_path} ({len(records)} training records)")
+    print(f"workload : {workload_path} ({len(records) if records else len(partition_events)} training records)")
     print(f"model    : {model_path}")
     print(
         "train    : "

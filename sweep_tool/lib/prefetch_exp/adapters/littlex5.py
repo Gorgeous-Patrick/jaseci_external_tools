@@ -25,12 +25,13 @@ class LittleX5Adapter(BenchmarkAdapter):
         log_path: Path,
         profile_dir: Path | None = None,
         profile_csv: Path | None = None,
+        extra_env: dict[str, str] | None = None,
     ):
         stage_dir = self._stage_backend_project()
         proc = process.start_server(
             self.server_command(),
             stage_dir,
-            self.server_env(profile_dir=profile_dir, profile_csv=profile_csv),
+            self.server_env(profile_dir=profile_dir, profile_csv=profile_csv, extra_env=extra_env),
             log_path,
         )
         try:

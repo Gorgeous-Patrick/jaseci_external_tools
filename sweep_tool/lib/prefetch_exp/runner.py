@@ -7,7 +7,7 @@ import random
 import re
 from pathlib import Path
 
-from lib.prefetch_exp import coaccess, markov, metrics, oracle, process
+from lib.prefetch_exp import coaccess, markov, metrics, oracle, process, selep
 from lib.prefetch_exp.adapters import make_adapter
 from lib.prefetch_exp.config_edit import RunConfigEditor
 from lib.prefetch_exp.models import CaseState, RequestSpec, SweepOptions, TrialResult
@@ -20,6 +20,7 @@ SUPPORTED_POLICIES = {
     "markov",
     "history",
     "manual",
+    "selep",
     "markov1-pooled",
     "coaccess",
     "coaccess-pooled",
@@ -59,6 +60,7 @@ def run_sweep(options: SweepOptions) -> None:
         f"train_ns={' '.join(str(x) for x in options.coaccess_train_ns)} "
         f"trials={options.trials} seed={options.coaccess_pool_seed}"
     )
+    print(f"selep   : {selep.describe(options)}")
     print("")
 
     adapter.clean_outputs()
@@ -84,6 +86,9 @@ def run_sweep(options: SweepOptions) -> None:
                     "runner records the structural baseline but does not warm "
                     "history across server restarts."
                 )
+            if policy == "selep":
+                _run_selep_policy(adapter, editor, options, results_path)
+                continue
             for limit in _limits_for_policy(policy, options.limits):
                 print("")
                 print("========================================")
@@ -509,6 +514,145 @@ def _collect_coaccess_training_trace(
         process.stop_process(proc)
         adapter.stop_stale_servers()
     return record_access_log
+
+
+def _run_selep_policy(
+    adapter,
+    editor: RunConfigEditor,
+    options: SweepOptions,
+    results_path: Path,
+) -> None:
+    for limit in _limits_for_policy("selep", options.limits):
+        print("")
+        print("========================================")
+        print(f"Case: policy=selep prefetch_limit={limit}")
+        print("========================================")
+        editor.patch(_config_values("none", 0, access_log=""))
+        state = adapter.prepare_case("selep", limit)
+        spec = _require_request(state)
+        cfg = selep.collect_and_train(adapter, editor, state, spec, limit, options, _config_values)
+        print(
+            "    selep train: "
+            f"model={cfg.model_path} workload={cfg.workload_path} "
+            f"kind={cfg.model_kind} top_k={cfg.top_k} block_limit={cfg.block_limit}"
+        )
+
+        editor.patch(_config_values("none", 0, access_log=""))
+        state = adapter.prepare_case("selep", limit)
+        if state.request is None:
+            raise RuntimeError(f"{adapter.name} did not prepare a request")
+
+        for trial in range(1, options.trials + 1):
+            result = _run_selep_trial(
+                adapter,
+                editor,
+                state,
+                cfg,
+                limit,
+                trial,
+                options,
+                trial_count=options.trials,
+            )
+            metrics.append_result(results_path, result.__dict__)
+            print(
+                f"  Trial {trial}: policy=selep limit={limit} "
+                f"{result.e2e_ms:.3f}ms L1={result.l1 or '?'} "
+                f"L3={result.l3 or '?'} prewarm={result.selep_prewarm_calls or '?'}"
+            )
+
+
+def _run_selep_trial(
+    adapter,
+    editor: RunConfigEditor,
+    state: CaseState,
+    cfg: selep.SelepModelConfig,
+    limit: int,
+    trial: int,
+    options: SweepOptions,
+    *,
+    trial_count: int | None = None,
+) -> TrialResult:
+    spec = _require_request(state)
+    log_path, access_log, profile_dir, profile_csv = _trial_paths(adapter, spec, "selep", limit, trial)
+    sidecar_paths = selep.trial_paths(adapter, spec, limit, trial)
+    editor.patch(
+        _config_values(
+            "none",
+            0,
+            access_log=str(access_log),
+            oracle_file="",
+            markov_file="",
+            coaccess_file="",
+        )
+    )
+    adapter.clear_runtime_cache()
+
+    proc = None
+    db_before = _db_query_count(adapter) if options.count_db else ""
+    try:
+        with selep.start_sidecar(adapter, cfg, sidecar_paths, options):
+            proc = adapter.start_server(
+                log_path,
+                profile_dir=profile_dir,
+                profile_csv=profile_csv,
+                extra_env={"JAC_SELEP_TRACE": str(sidecar_paths.trace_path)},
+            )
+            resp = adapter.post(spec.path, spec.body, token=spec.token or state.token)
+            payload = resp.json()
+            adapter.validate_response(spec, payload)
+    finally:
+        process.stop_process(proc)
+        adapter.stop_stale_servers()
+
+    _assert_trial_profiles(profile_dir, profile_csv)
+    db_after = _db_query_count(adapter) if options.count_db else ""
+    counts = metrics.tier_counts(access_log)
+    profile = metrics.profile_breakdown(profile_csv)
+    stats = selep.load_stats(sidecar_paths.sidecar_stats)
+    db_q = ""
+    if db_before != "" and db_after != "":
+        try:
+            db_q = str(int(db_after) - int(db_before))
+        except ValueError:
+            db_q = ""
+
+    errors = stats.get("errors") or []
+    if isinstance(errors, list):
+        error_text = str(len(errors))
+        if errors and not selep.env_bool(options, "SELEP_ALLOW_PREWARM_ERRORS"):
+            raise RuntimeError(
+                "SeLeP sidecar reported pg_prewarm error(s); "
+                f"see {sidecar_paths.sidecar_stats} and {sidecar_paths.sidecar_log}"
+            )
+    else:
+        error_text = ""
+    return TrialResult(
+        policy="selep",
+        walker=spec.walker,
+        prefetch_limit=limit,
+        trial=trial,
+        e2e_ms=resp.elapsed_ms,
+        request_id=_request_id(spec),
+        trial_count=str(trial_count) if trial_count is not None else "",
+        topo_idx_ms=profile.get("topo_idx_ms", ""),
+        ttg_ms=profile.get("ttg_ms", ""),
+        prefetch_ms=profile.get("prefetch_ms", ""),
+        walker_ms=profile.get("walker_ms", ""),
+        l1_hit_rate=counts.get("l1_hit_rate", ""),
+        l1=counts.get("l1", ""),
+        l2=counts.get("l2", ""),
+        l3=counts.get("l3", ""),
+        miss=counts.get("miss", ""),
+        db_q=db_q,
+        model_file=str(cfg.model_path),
+        selep_events=str(stats.get("events_seen", "")),
+        selep_matched_events=str(stats.get("matched_events", "")),
+        selep_predictions=str(stats.get("predictions", "")),
+        selep_blocks=str(stats.get("blocks_requested", "")),
+        selep_prewarm_calls=str(stats.get("prewarm_calls", "")),
+        selep_prewarm_ms=str(stats.get("prewarm_ms", "")),
+        selep_errors=error_text,
+    )
 
 
 def _run_trial(

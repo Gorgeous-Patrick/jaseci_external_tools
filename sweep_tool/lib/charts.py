@@ -25,17 +25,19 @@ POLICY_COLOR = {
     "coaccess-pooled": "#bcbd22",
     "history": "#ff7f0e",
     "manual": "#17becf",
+    "selep": "#636efa",
 }
 POLICY_ORDER = {
-    "oracle": 0,
-    "none": 1,
-    "ttg": 2,
-    "markov": 3,
-    "markov1-pooled": 4,
-    "coaccess": 5,
-    "coaccess-pooled": 6,
-    "history": 7,
-    "manual": 8,
+    "none": 0,
+    "ttg": 1,
+    "oracle": 2,
+    "selep": 3,
+    "markov": 4,
+    "markov1-pooled": 5,
+    "coaccess": 6,
+    "coaccess-pooled": 7,
+    "history": 8,
+    "manual": 9,
 }
 
 JACORD_TTG_HIDDEN_ROOT_PREFETCH = 200

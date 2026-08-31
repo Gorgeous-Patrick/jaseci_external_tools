@@ -57,8 +57,9 @@ streamlit run app.py
 - **Raw data**: the results CSV as a table, downloadable.
 - **Churn**: runs the Jacord same-spawn churn experiment and plots
   coverage and L1 hit rate across churn rates.
-- **SeLeP**: launches the original SeLeP SQL/block-level baseline directly.
-  This tab is separate from Jac UUID prefetch policies.
+- **SeLeP**: runs the LinkedList SQL trace/block-partition/LSTM smoke
+  experiment using SeLeP's TensorFlow model code.  This tab is separate from
+  Jac UUID prefetch policies.
 
 ## Python prefetch policy runner
 
@@ -74,7 +75,7 @@ Useful knobs:
 
 - `SWEEP_POLICIES="none ttg oracle"` — space-separated policy list. Supported
   values include `none`, `ttg`, `oracle`, `markov`, `markov1-pooled`,
-  `coaccess`, `coaccess-pooled`, `history`, and `manual`.
+  `coaccess`, `coaccess-pooled`, `selep`, `history`, and `manual`.
 - `SWEEP_PREFETCH_LIMITS="500 1000 2000"` — positive limits for predictive
   policies; `none` runs once at limit 0.
 - `SWEEP_ORACLE_MODE=auto` — run a non-counted `prefetching="none"` request,
@@ -90,9 +91,20 @@ Useful knobs:
 - `SWEEP_COACCESS_MODE=auto` — run no-prefetch training requests, cluster
   each request's first-touch UUID set with the standalone co-access policy,
   then replay with `prefetching="coaccess"`.
+- `SWEEP_POLICIES="selep"` — runs Jac with normal demand loading and enables a
+  SeLeP sidecar. The sidecar tails `JAC_SELEP_TRACE`, predicts PostgreSQL
+  block partitions from prior SQL history, and asynchronously issues
+  `pg_prewarm`. This is a storage-layer policy; it does not produce or replay
+  Jac UUID prefetch plans.
+- `SELEP_MODEL_KIND=lstm` — trains SeLeP's binary LSTM in the sidecar Python
+  environment. Use `frequency` only for fast plumbing smoke tests.
+- `SELEP_TOP_K=42` — number of predicted partitions per SQL event.
+- `SELEP_MAX_BLOCK_SELECTS=256` — maximum training SELECT statements replayed
+  through `pg_buffercache` to map SQL events to PostgreSQL blocks.
 
 The result CSV keeps the old timing/tier columns and adds `policy` and
-`oracle_file` / `model_file`.
+`oracle_file` / `model_file`. For `selep`, `model_file` points at the
+sidecar model and the `selep_*` columns report sidecar activity.
 
 ## Jacord churn experiment
 
@@ -134,31 +146,52 @@ To regenerate paper-ready churn coverage and hit-rate PDFs:
 python tools/plot_jacord_churn.py --csv ../../../jacord/churn_results.csv
 ```
 
-## Direct SeLeP baseline
+## LinkedList SeLeP LSTM smoke
 
-The SeLeP tab and `tools/run_selep_direct.py` run the original SeLeP
-pipeline from `/home/patrickli/Space/jaseci_env/SeLeP`.  It consumes SQL
-workload text files and Postgres block/partition metadata, then writes
-SeLeP's own pickle outputs under `SeLeP/Results/`.  It is not a Jac
-UUID-plan prefetcher and is not valid inside `SWEEP_POLICIES`.
+The SeLeP tab runs `tools/run_linked_list_selep_smoke.py` through
+`lib/selep_sweep.py`.  The fresh mode deletes the previous output directory,
+runs a no-prefetch LinkedList trace with `JAC_SELEP_TRACE`, replays selected
+Postgres `SELECT`s against remote `clarity2`, maps touched blocks from
+`pg_buffercache` into partitions, then trains/tests SeLeP's binary LSTM model
+on the generated `resultPartitions` sequence.
 
-Before launch, the tool checks for the original SeLeP inputs:
+The normal Python sweep runner also accepts `selep` as a policy. The smoke tab
+is still useful for checking only the trace/block/LSTM plumbing without
+running a full benchmark policy sweep.
 
-- `Data/<db>_tableLookUp.txt` and `Data/pcaExclude.txt`
-- train workload: `<db>_all_train<suffix>WB<block>WP<partition>.txt`
-- test workloads: `<db>_test1_1gen...txt`, `<db>_test1_2...txt`, etc.
-- in test-only mode, `SavedFiles/Models/<model>.json` and `<model>.h5`
+Default local paths:
 
-CLI check:
-
-```bash
-python tools/run_selep_direct.py --check --mode train-test
+```text
+Local SeLeP repo   : /home/patrickli/Space/jaseci_env/SeLeP
+Local SeLeP python : /home/patrickli/Space/jaseci_env/SeLeP/.venv-lstm/bin/python
+Image SeLeP repo   : /workspace/SeLeP
+Image SeLeP python : /opt/selep-venv/bin/python
+Output             : linked_list/selep_smoke/
 ```
 
-CLI run:
+CLI equivalent for a fresh LinkedList block/LSTM smoke:
 
 ```bash
-python tools/run_selep_direct.py --mode train-test
+/home/patrickli/Space/jaseci_env/SeLeP/.venv-lstm/bin/python \
+  tools/run_linked_list_selep_smoke.py \
+  --jac-bin /home/patrickli/Space/jaseci/jac/zig-out/bin/jac \
+  --python /home/patrickli/Space/jaseci_env/jaseci_external_tools/.venv/bin/python \
+  --model-kind lstm \
+  --look-back 2 \
+  --top-k 4 \
+  --block-source pg-buffercache \
+  --sql-contains anchors \
+  --max-block-selects 20
+```
+
+To retrain/test only from an existing workload without touching the remote DB:
+
+```bash
+/home/patrickli/Space/jaseci_env/SeLeP/.venv-lstm/bin/python \
+  tools/run_linked_list_selep_smoke.py \
+  --skip-collect \
+  --skip-workload-rebuild \
+  --model-kind lstm
 ```
 
 ## Two-machine DB mode

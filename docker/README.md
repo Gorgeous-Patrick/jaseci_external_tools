@@ -96,7 +96,15 @@ docker compose exec sweep jac-info
 
 `JASECI_SOURCE_LABEL` should point at the Jac checkout used for the build.
 The sweep Python lines should show `sweep_Py_GIL_DISABLED=1` and
-`sweep_gil_enabled=False`.
+`sweep_gil_enabled=False`.  The same command also verifies the packaged
+SeLeP LSTM runtime:
+
+```text
+SELEP_REPO=/workspace/SeLeP
+SELEP_PYTHON=/opt/selep-venv/bin/python
+selep_tensorflow=2.13.0
+selep_keras=2.13.1
+```
 
 Export remote results:
 

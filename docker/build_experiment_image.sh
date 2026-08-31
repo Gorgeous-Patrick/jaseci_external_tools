@@ -14,8 +14,10 @@ if [ -n "$(git -C "$JASECI_SRC" status --porcelain --untracked-files=no)" ]; the
 fi
 
 tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/jaseci-docker-src.XXXXXX")"
+ctxdir="$(mktemp -d "${TMPDIR:-/tmp}/jaseci-experiment-context.XXXXXX")"
 cleanup() {
   rm -rf "$tmpdir"
+  rm -rf "$ctxdir"
 }
 trap cleanup EXIT
 
@@ -40,6 +42,62 @@ tar -C "$JASECI_SRC" \
   --exclude='jac/jaclang/compiler/passes/native/llvm/libjacllvm.so' \
   -cf - . | tar -C "$tmpdir" -xf -
 
+tar -C "$CONTEXT_ROOT" \
+  --exclude='.git' \
+  --exclude='.codex' \
+  --exclude='**/.git' \
+  --exclude='**/.git/**' \
+  --exclude='**/.venv' \
+  --exclude='**/.venv/**' \
+  --exclude='**/.venv-lstm' \
+  --exclude='**/.venv-lstm/**' \
+  --exclude='**/.jac' \
+  --exclude='**/.jac/**' \
+  --exclude='**/__pycache__' \
+  --exclude='**/__pycache__/**' \
+  --exclude='**/*.pyc' \
+  --exclude='**/data' \
+  --exclude='**/data/**' \
+  --exclude='**/logs' \
+  --exclude='**/logs/**' \
+  --exclude='**/profiles' \
+  --exclude='**/profiles/**' \
+  --exclude='**/profiles_newbin' \
+  --exclude='**/churn_dumps' \
+  --exclude='**/churn_logs' \
+  --exclude='**/churn_profiles' \
+  --exclude='**/churn_models' \
+  --exclude='**/sweep_runs' \
+  --exclude='**/oracle_plans' \
+  --exclude='**/markov_models' \
+  --exclude='**/coaccess_models' \
+  --exclude='**/node_modules' \
+  --exclude='**/*.prof' \
+  --exclude='**/*.log' \
+  -cf - \
+  jaseci_external_tools/sweep_tool \
+  jaseci_external_tools/tools \
+  jaseci_external_tools/linked_list \
+  jaseci_external_tools/littlex5 \
+  jaseci_external_tools/Dockerfile.experiment \
+  jaseci_external_tools/Dockerfile.experiment.dockerignore \
+  jaseci_external_tools/docker \
+  jaseci_external_tools/docker-compose.experiment.yaml \
+  jacord \
+  jdrive \
+  jsearch \
+  SeLeP/Backend \
+  SeLeP/Configuration \
+  SeLeP/Utils \
+  SeLeP/Data \
+  SeLeP/bid_getter.py \
+  SeLeP/main.py \
+  SeLeP/partitioning_main.py \
+  SeLeP/selep_main.py \
+  SeLeP/README.md \
+  SeLeP/requirements.txt \
+  | tar -C "$ctxdir" -xf -
+
 extra_args=("$@")
 has_output=0
 for arg in "${extra_args[@]}"; do
@@ -55,14 +113,15 @@ fi
 
 echo "Building $IMAGE"
 echo "  external tools context: $CONTEXT_ROOT"
+echo "  clean build context:    $ctxdir"
 echo "  jaseci source:          $JASECI_SRC"
 echo "  jaseci commit label:    $JASECI_COMMIT"
 
 docker buildx build \
-  -f "$EXTERNAL_TOOLS_DIR/Dockerfile.experiment" \
+  -f "$ctxdir/jaseci_external_tools/Dockerfile.experiment" \
   --build-context "jaseci_src=$tmpdir" \
   --build-arg "JASECI_COMMIT=$JASECI_COMMIT" \
   --build-arg "JASECI_SOURCE_LABEL=$JASECI_SRC" \
   -t "$IMAGE" \
   "${extra_args[@]}" \
-  "$CONTEXT_ROOT"
+  "$ctxdir"

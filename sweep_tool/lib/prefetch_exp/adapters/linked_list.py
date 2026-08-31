@@ -16,8 +16,8 @@ class LinkedListAdapter(BenchmarkAdapter):
     default_password = "password"
     credential_source = "quick_run.sh live setup user"
 
-    def server_env(self, profile_dir=None, profile_csv=None) -> dict[str, str]:
-        env = super().server_env(profile_dir=profile_dir, profile_csv=profile_csv)
+    def server_env(self, profile_dir=None, profile_csv=None, extra_env=None) -> dict[str, str]:
+        env = super().server_env(profile_dir=profile_dir, profile_csv=profile_csv, extra_env=extra_env)
         env["JAC_LIST_SIZE"] = str(self.options.env.get("JAC_LIST_SIZE") or "1000")
         return env
 
