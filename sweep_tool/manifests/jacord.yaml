@@ -26,7 +26,7 @@ parameters:
   - name: SWEEP_POLICIES
     label: Prefetch policies
     kind: str
-    default: "none ttg oracle markov1-pooled coaccess-pooled selep"
+    default: "none ttg oracle markov1-pooled coaccess-pooled"
     help: >
       Space-separated policies to run. Supported: none, ttg, oracle,
       markov, markov1-pooled, coaccess, coaccess-pooled, selep, history,
@@ -111,6 +111,30 @@ parameters:
     kind: str
     default: "0.05"
     help: Greedy transaction-clustering Jaccard threshold.
+
+  - name: SWEEP_RANDOM_N
+    label: Random paired N
+    kind: int
+    default: 20
+    help: Number of measured stream requests used by random-paired sweeps.
+
+  - name: SWEEP_RANDOM_TRAIN_K
+    label: Random paired train K
+    kind: int
+    default: 5
+    help: Number of sampled requests used to train stream predictors such as SeLeP.
+
+  - name: SWEEP_RANDOM_SEED
+    label: Random paired seed
+    kind: int
+    default: 42
+    help: Seed used to shuffle the seeded spawn pool for random-paired sweeps.
+
+  - name: SWEEP_RANDOM_POLICIES
+    label: Random paired policies
+    kind: str
+    default: "none ttg"
+    help: Stream-safe runtime policies compared when SWEEP_POLICIES=random-paired.
 
   - name: SELEP_MODEL_KIND
     label: SeLeP model

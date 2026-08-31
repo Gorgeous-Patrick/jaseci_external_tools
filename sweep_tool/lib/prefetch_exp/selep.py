@@ -86,14 +86,14 @@ def model_config(
     return SelepModelConfig(
         model_path=model_dir / "model.json",
         workload_path=model_dir / "workload.csv",
-        train_trace_path=logs_dir / f"selep_train_trace_{safe_walker}_limit{limit}.jsonl",
-        train_access_log=logs_dir / f"selep_train_access_{safe_walker}_limit{limit}.csv",
-        train_log_path=logs_dir / f"selep_train_{safe_walker}_limit{limit}.log",
+        train_trace_path=logs_dir / f"selep_train_trace_{safe_walker}_{safe_request}_limit{limit}.jsonl",
+        train_access_log=logs_dir / f"selep_train_access_{safe_walker}_{safe_request}_limit{limit}.csv",
+        train_log_path=logs_dir / f"selep_train_{safe_walker}_{safe_request}_limit{limit}.log",
         model_kind=env_value(options, "SELEP_MODEL_KIND", "lstm").lower(),
         block_source=env_value(options, "SELEP_BLOCK_SOURCE", "pg-buffercache").lower(),
         look_back=env_int(options, "SELEP_LOOK_BACK", 4),
         top_k=selep_top_k(options),
-        block_limit=env_int(options, "SELEP_BLOCK_LIMIT", limit),
+        block_limit=env_int(options, "SELEP_BLOCK_LIMIT", selep_top_k(options)),
         max_block_selects=env_int(options, "SELEP_MAX_BLOCK_SELECTS", 256),
         sql_contains=env_value(options, "SELEP_SQL_CONTAINS", ""),
     )
@@ -214,10 +214,17 @@ def run_training_script(adapter: Any, cfg: SelepModelConfig, options: SweepOptio
         raise RuntimeError(f"SeLeP training did not write model: {cfg.model_path}")
 
 
-def trial_paths(adapter: Any, spec: RequestSpec, limit: int, trial: int) -> SelepTrialPaths:
+def trial_paths(
+    adapter: Any,
+    spec: RequestSpec,
+    limit: int,
+    trial: int,
+    suffix: str = "",
+) -> SelepTrialPaths:
     logs_dir = adapter.app_dir / adapter.options.manifest.logs_dir
     safe_walker = safe(spec.walker)
-    suffix = f"{safe_walker}_policyselep_limit{limit}_trial{trial}"
+    extra = f"_{safe(suffix)}" if suffix else ""
+    suffix = f"{safe_walker}_policyselep_limit{limit}_trial{trial}{extra}"
     return SelepTrialPaths(
         trace_path=logs_dir / f"selep_live_trace_{suffix}.jsonl",
         sidecar_log=logs_dir / f"selep_sidecar_{suffix}.log",

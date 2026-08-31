@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import random
 import re
+import time
 from pathlib import Path
 
 from lib.prefetch_exp import coaccess, markov, metrics, oracle, process, selep
@@ -24,6 +25,7 @@ SUPPORTED_POLICIES = {
     "markov1-pooled",
     "coaccess",
     "coaccess-pooled",
+    "random-paired",
 }
 MARKOV_POOLED_PREFIX = "markov1-pooled"
 COACCESS_POOLED_PREFIX = "coaccess-pooled"
@@ -60,6 +62,12 @@ def run_sweep(options: SweepOptions) -> None:
         f"train_ns={' '.join(str(x) for x in options.coaccess_train_ns)} "
         f"trials={options.trials} seed={options.coaccess_pool_seed}"
     )
+    print(
+        "random : "
+        f"n={options.random_n} train_k={options.random_train_k} "
+        f"seed={options.random_seed} "
+        f"policies={' '.join(options.random_policies)}"
+    )
     print(f"selep   : {selep.describe(options)}")
     print("")
 
@@ -72,6 +80,9 @@ def run_sweep(options: SweepOptions) -> None:
     editor = RunConfigEditor(adapter.config_path)
     try:
         for policy in options.policies:
+            if policy == "random-paired":
+                _run_random_paired(adapter, editor, options, results_path)
+                continue
             if _is_markov_pooled_policy(policy):
                 for train_n in _pooled_train_ns(policy, options):
                     _run_markov_pooled(adapter, editor, policy, train_n, options, results_path)
@@ -447,6 +458,421 @@ def _run_coaccess_pooled(
         print(f"    accuracy: {_rate_summary(results, 'accuracy')}")
 
 
+def _run_random_paired(
+    adapter,
+    editor: RunConfigEditor,
+    options: SweepOptions,
+    results_path: Path,
+) -> None:
+    if options.random_n <= 0:
+        raise ValueError(f"SWEEP_RANDOM_N must be positive, got {options.random_n}")
+    if options.random_train_k < 0:
+        raise ValueError(
+            f"SWEEP_RANDOM_TRAIN_K must be non-negative, got {options.random_train_k}"
+        )
+    unknown = [p for p in options.random_policies if not _is_random_runtime_policy(p)]
+    if unknown:
+        raise ValueError(
+            "SWEEP_RANDOM_POLICIES supports stream-safe runtime policies only; "
+            f"unknown/unsupported: {', '.join(unknown)}"
+        )
+
+    setup_policy = next((p for p in options.random_policies if p != "none"), "none")
+    setup_limit = max(options.limits) if options.limits else 0
+    print("")
+    print("========================================")
+    print(
+        "Case: policy=random-paired "
+        f"n={options.random_n} train_k={options.random_train_k} "
+        f"seed={options.random_seed} "
+        f"policies={' '.join(options.random_policies)}"
+    )
+    print("========================================")
+
+    editor.patch(_config_values("none", 0, access_log=""))
+    state = adapter.prepare_case(setup_policy, setup_limit)
+    pool = _unique_spawn_pool(adapter.spawn_pool(state))
+    min_pool = max(options.random_n, options.random_train_k)
+    if len(pool) < min_pool:
+        raise RuntimeError(
+            f"{adapter.name} exposes {len(pool)} pooled spawn request(s), "
+            f"but random-paired needs at least {min_pool} for "
+            f"N={options.random_n}, K={options.random_train_k}. "
+            "Expose more seeded spawn targets or lower SWEEP_RANDOM_N/"
+            "SWEEP_RANDOM_TRAIN_K."
+        )
+    sample_indices = list(range(len(pool)))
+    random.Random(options.random_seed).shuffle(sample_indices)
+    if len(sample_indices) >= options.random_train_k + options.random_n:
+        train_indices = sample_indices[: options.random_train_k]
+        measured_indices = sample_indices[
+            options.random_train_k : options.random_train_k + options.random_n
+        ]
+        split_mode = "disjoint"
+    else:
+        train_indices = sample_indices[: options.random_train_k]
+        measured_indices = sample_indices[: options.random_n]
+        split_mode = "overlap"
+    train_specs = _select_specs_by_indices(pool, train_indices, "training")
+    measured_specs = _select_specs_by_indices(pool, measured_indices, "measured")
+    train_ids = [_request_id(spec) for spec in train_specs]
+    measured_ids = [_request_id(spec) for spec in measured_specs]
+    effective_trials = 1
+    metadata = {
+        "mode": "random-paired",
+        "app": adapter.name,
+        "seed": options.random_seed,
+        "n": options.random_n,
+        "train_k": options.random_train_k,
+        "split_mode": split_mode,
+        "requested_trials": options.trials,
+        "effective_trials": effective_trials,
+        "policies": list(options.random_policies),
+        "limits": list(options.limits),
+        "policy_limits": {
+            policy: _random_limits_for_policy(policy, options.limits)
+            for policy in options.random_policies
+        },
+        "pool_size": len(pool),
+        "train_indices": train_indices,
+        "measured_indices": measured_indices,
+        "train_ids": train_ids,
+        "measured_ids": measured_ids,
+        "summaries": [],
+    }
+    metadata_path = (
+        adapter.app_dir
+        / options.manifest.logs_dir
+        / (
+            f"random_paired_seed{options.random_seed}_n{options.random_n}"
+            f"_k{options.random_train_k}_metadata.json"
+        )
+    )
+    metadata_path.parent.mkdir(parents=True, exist_ok=True)
+    metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n")
+    print(
+        f"    random split: seed={options.random_seed} pool={len(pool)} "
+        f"train={len(train_specs)} measured={len(measured_specs)} "
+        f"mode={split_mode} metadata={metadata_path}"
+    )
+    if options.trials != effective_trials:
+        print(
+            "    random-paired ignores Trials; each selected request runs "
+            "once in a continuous stream per policy/limit."
+        )
+
+    for policy in options.random_policies:
+        for limit in _random_limits_for_policy(policy, options.limits):
+            print("")
+            print("----------------------------------------")
+            print(
+                f"Stream: policy={policy} limit={limit} "
+                f"measured={len(measured_specs)}"
+            )
+            print("----------------------------------------")
+            cfg = None
+            train_ms = ""
+            if policy == "selep":
+                if not train_indices:
+                    raise RuntimeError("random-paired selep requires SWEEP_RANDOM_TRAIN_K > 0")
+                editor.patch(_config_values("none", 0, access_log=""))
+                train_state = adapter.prepare_case("selep", limit)
+                train_pool = _unique_spawn_pool(adapter.spawn_pool(train_state))
+                train_specs = _select_specs_by_indices(
+                    train_pool, train_indices, "training"
+                )
+                cfg, train_ms = _collect_and_train_selep_stream(
+                    adapter,
+                    editor,
+                    train_state,
+                    train_specs,
+                    limit,
+                    options,
+                )
+
+            editor.patch(_config_values("none", 0, access_log=""))
+            stream_state = adapter.prepare_case(policy, limit)
+            stream_pool = _unique_spawn_pool(adapter.spawn_pool(stream_state))
+            measured_specs = _select_specs_by_indices(
+                stream_pool, measured_indices, "measured"
+            )
+            results, summary = _run_random_stream_trial(
+                adapter,
+                editor,
+                stream_state,
+                policy,
+                limit,
+                measured_specs,
+                options,
+                cfg=cfg,
+                train_ms=train_ms,
+            )
+            for result in results:
+                metrics.append_result(results_path, result.__dict__)
+            summary["train_indices"] = train_indices
+            summary["measured_indices"] = measured_indices
+            summary["measured_ids"] = [_request_id(spec) for spec in measured_specs]
+            metadata["summaries"].append(summary)
+            metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n")
+            print(
+                f"  Stream done: policy={policy} limit={limit} "
+                f"sum_e2e={summary['sum_request_e2e_ms']:.3f}ms "
+                f"wall={summary['stream_wall_ms']:.3f}ms"
+            )
+
+
+def _collect_and_train_selep_stream(
+    adapter,
+    editor: RunConfigEditor,
+    state: CaseState,
+    specs: list[RequestSpec],
+    limit: int,
+    options: SweepOptions,
+) -> tuple[selep.SelepModelConfig, str]:
+    first = specs[0]
+    label_spec = RequestSpec(
+        walker=first.walker,
+        path=first.path,
+        body=first.body,
+        request_id=(
+            f"random-paired-seed{options.random_seed}"
+            f"-trainK{len(specs)}-limit{limit}"
+        ),
+    )
+    cfg = selep.model_config(adapter, label_spec, limit, options)
+    cfg.train_trace_path.unlink(missing_ok=True)
+    cfg.train_access_log.unlink(missing_ok=True)
+    editor.patch(
+        _config_values(
+            "none",
+            0,
+            access_log=str(cfg.train_access_log),
+            oracle_file="",
+            markov_file="",
+            coaccess_file="",
+        )
+    )
+    adapter.clear_runtime_cache()
+    proc = None
+    start = time.perf_counter()
+    try:
+        proc = adapter.start_server(
+            cfg.train_log_path,
+            extra_env={"JAC_SELEP_TRACE": str(cfg.train_trace_path)},
+        )
+        for spec in specs:
+            resp = adapter.post(spec.path, spec.body, token=spec.token or state.token)
+            payload = _response_payload_or_raise(resp, spec)
+            adapter.validate_response(spec, payload)
+    finally:
+        process.stop_process(proc)
+        adapter.stop_stale_servers()
+    if not cfg.train_trace_path.exists() or cfg.train_trace_path.stat().st_size == 0:
+        raise RuntimeError(f"SeLeP training produced no SQL trace: {cfg.train_trace_path}")
+    selep.run_training_script(adapter, cfg, options)
+    train_ms = (time.perf_counter() - start) * 1000
+    print(
+        "    selep stream train: "
+        f"k={len(specs)} model={cfg.model_path} train_ms={train_ms:.3f}"
+    )
+    return cfg, f"{train_ms:.3f}"
+
+
+def _run_random_stream_trial(
+    adapter,
+    editor: RunConfigEditor,
+    state: CaseState,
+    policy: str,
+    limit: int,
+    specs: list[RequestSpec],
+    options: SweepOptions,
+    *,
+    cfg: selep.SelepModelConfig | None = None,
+    train_ms: str = "",
+) -> tuple[list[TrialResult], dict[str, object]]:
+    if not specs:
+        raise RuntimeError("random-paired stream has no measured requests")
+    first = specs[0]
+    stream_spec = RequestSpec(
+        walker=first.walker,
+        path=first.path,
+        body=first.body,
+        request_id=(
+            f"random-paired-seed{options.random_seed}"
+            f"-policy{policy}-limit{limit}-n{len(specs)}"
+        ),
+    )
+    log_path, access_log, profile_dir, profile_csv = _trial_paths(
+        adapter,
+        stream_spec,
+        policy,
+        limit,
+        1,
+        suffix=f"stream_seed{options.random_seed}_n{len(specs)}",
+    )
+    if policy == "selep":
+        if cfg is None:
+            raise RuntimeError("random-paired selep stream requires a trained cfg")
+        sidecar_paths = selep.trial_paths(
+            adapter,
+            stream_spec,
+            limit,
+            1,
+            suffix=f"stream_seed{options.random_seed}_n{len(specs)}",
+        )
+        editor.patch(
+            _config_values(
+                "none",
+                0,
+                access_log=str(access_log),
+                oracle_file="",
+                markov_file="",
+                coaccess_file="",
+            )
+        )
+    else:
+        sidecar_paths = None
+        editor.patch(
+            _config_values(
+                policy,
+                limit,
+                access_log=str(access_log),
+                oracle_file="",
+                markov_file="",
+                coaccess_file="",
+            )
+        )
+
+    adapter.clear_runtime_cache()
+    proc = None
+    db_before = _db_query_count(adapter) if options.count_db else ""
+    request_results: list[TrialResult] = []
+    stream_start = time.perf_counter()
+    try:
+        if policy == "selep":
+            assert cfg is not None and sidecar_paths is not None
+            with selep.start_sidecar(adapter, cfg, sidecar_paths, options):
+                proc = adapter.start_server(
+                    log_path,
+                    profile_dir=profile_dir,
+                    profile_csv=profile_csv,
+                    extra_env={"JAC_SELEP_TRACE": str(sidecar_paths.trace_path)},
+                )
+                request_results = _post_stream_requests(
+                    adapter, state, policy, limit, specs, options, cfg
+                )
+        else:
+            proc = adapter.start_server(
+                log_path,
+                profile_dir=profile_dir,
+                profile_csv=profile_csv,
+            )
+            request_results = _post_stream_requests(
+                adapter, state, policy, limit, specs, options, cfg
+            )
+    finally:
+        process.stop_process(proc)
+        adapter.stop_stale_servers()
+    stream_wall_ms = (time.perf_counter() - stream_start) * 1000
+
+    db_after = _db_query_count(adapter) if options.count_db else ""
+    db_q = ""
+    if db_before != "" and db_after != "":
+        try:
+            db_q = str(int(db_after) - int(db_before))
+        except ValueError:
+            db_q = ""
+    counts = metrics.tier_counts(access_log)
+    stats = selep.load_stats(sidecar_paths.sidecar_stats) if sidecar_paths else {}
+    errors = stats.get("errors") or []
+    error_text = str(len(errors)) if isinstance(errors, list) else ""
+    if (
+        policy == "selep"
+        and isinstance(errors, list)
+        and errors
+        and not selep.env_bool(options, "SELEP_ALLOW_PREWARM_ERRORS")
+    ):
+        raise RuntimeError(
+            "SeLeP sidecar reported pg_prewarm error(s); "
+            f"see {sidecar_paths.sidecar_stats} and {sidecar_paths.sidecar_log}"
+        )
+
+    summary: dict[str, object] = {
+        "policy": policy,
+        "prefetch_limit": limit,
+        "measured_n": len(specs),
+        "train_k": options.random_train_k if policy == "selep" else 0,
+        "train_ms": train_ms,
+        "sum_request_e2e_ms": sum(result.e2e_ms for result in request_results),
+        "stream_wall_ms": stream_wall_ms,
+        "db_q": db_q,
+        "access_log": str(access_log),
+        "server_log": str(log_path),
+        "profile_csv": str(profile_csv),
+        "l1_hit_rate": counts.get("l1_hit_rate", ""),
+        "l1": counts.get("l1", ""),
+        "l2": counts.get("l2", ""),
+        "l3": counts.get("l3", ""),
+        "miss": counts.get("miss", ""),
+        "model_file": str(cfg.model_path) if cfg is not None else "",
+        "selep_events": str(stats.get("events_seen", "")),
+        "selep_matched_events": str(stats.get("matched_events", "")),
+        "selep_predictions": str(stats.get("predictions", "")),
+        "selep_blocks": str(stats.get("blocks_requested", "")),
+        "selep_blocks_skipped": str(stats.get("blocks_skipped", "")),
+        "selep_prewarm_calls": str(stats.get("prewarm_calls", "")),
+        "selep_prewarm_ms": str(stats.get("prewarm_ms", "")),
+        "selep_errors": error_text,
+    }
+    summary_path = (
+        adapter.app_dir
+        / options.manifest.logs_dir
+        / (
+            f"random_paired_stream_policy{_safe(policy)}_limit{limit}"
+            f"_seed{options.random_seed}_n{len(specs)}_summary.json"
+        )
+    )
+    summary["summary_path"] = str(summary_path)
+    summary_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
+    return request_results, summary
+
+
+def _post_stream_requests(
+    adapter,
+    state: CaseState,
+    policy: str,
+    limit: int,
+    specs: list[RequestSpec],
+    options: SweepOptions,
+    cfg: selep.SelepModelConfig | None,
+) -> list[TrialResult]:
+    results: list[TrialResult] = []
+    for request_order, spec in enumerate(specs, start=1):
+        resp = adapter.post(spec.path, spec.body, token=spec.token or state.token)
+        payload = _response_payload_or_raise(resp, spec)
+        adapter.validate_response(spec, payload)
+        results.append(
+            TrialResult(
+                policy=policy,
+                walker=spec.walker,
+                prefetch_limit=limit,
+                trial=request_order,
+                e2e_ms=resp.elapsed_ms,
+                request_id=_request_id(spec),
+                request_order=str(request_order),
+                train_n=str(options.random_train_k if policy == "selep" else 0),
+                trial_count=str(len(specs)),
+                pool_seed=str(options.random_seed),
+                model_file=str(cfg.model_path) if cfg is not None else "",
+            )
+        )
+        print(
+            f"  Request {request_order}/{len(specs)}: policy={policy} "
+            f"limit={limit} {resp.elapsed_ms:.3f}ms"
+        )
+    return results
+
+
 def _collect_markov_training_trace(
     adapter,
     editor: RunConfigEditor,
@@ -474,7 +900,8 @@ def _collect_markov_training_trace(
     try:
         proc = adapter.start_server(record_log)
         resp = adapter.post(spec.path, spec.body, token=spec.token or state.token)
-        adapter.validate_response(spec, resp.json())
+        payload = _response_payload_or_raise(resp, spec)
+        adapter.validate_response(spec, payload)
     finally:
         process.stop_process(proc)
         adapter.stop_stale_servers()
@@ -509,7 +936,8 @@ def _collect_coaccess_training_trace(
     try:
         proc = adapter.start_server(record_log)
         resp = adapter.post(spec.path, spec.body, token=spec.token or state.token)
-        adapter.validate_response(spec, resp.json())
+        payload = _response_payload_or_raise(resp, spec)
+        adapter.validate_response(spec, payload)
     finally:
         process.stop_process(proc)
         adapter.stop_stale_servers()
@@ -571,10 +999,16 @@ def _run_selep_trial(
     options: SweepOptions,
     *,
     trial_count: int | None = None,
+    spec_override: RequestSpec | None = None,
+    request_id: str = "",
+    request_order: int | None = None,
+    path_suffix: str = "",
 ) -> TrialResult:
-    spec = _require_request(state)
-    log_path, access_log, profile_dir, profile_csv = _trial_paths(adapter, spec, "selep", limit, trial)
-    sidecar_paths = selep.trial_paths(adapter, spec, limit, trial)
+    spec = spec_override or _require_request(state)
+    log_path, access_log, profile_dir, profile_csv = _trial_paths(
+        adapter, spec, "selep", limit, trial, suffix=path_suffix
+    )
+    sidecar_paths = selep.trial_paths(adapter, spec, limit, trial, suffix=path_suffix)
     editor.patch(
         _config_values(
             "none",
@@ -632,7 +1066,8 @@ def _run_selep_trial(
         prefetch_limit=limit,
         trial=trial,
         e2e_ms=resp.elapsed_ms,
-        request_id=_request_id(spec),
+        request_id=request_id or _request_id(spec),
+        request_order=str(request_order) if request_order is not None else "",
         trial_count=str(trial_count) if trial_count is not None else "",
         topo_idx_ms=profile.get("topo_idx_ms", ""),
         ttg_ms=profile.get("ttg_ms", ""),
@@ -670,9 +1105,11 @@ def _run_trial(
     effective_policy_override: str = "",
     model_file_override: Path | None = None,
     request_id: str = "",
+    request_order: int | None = None,
     train_n: int | None = None,
     trial_count: int | None = None,
     pool_seed: int | None = None,
+    path_suffix: str = "",
 ) -> TrialResult:
     spec = spec_override or _require_request(state)
     oracle_file: Path | None = None
@@ -693,7 +1130,9 @@ def _run_trial(
         effective_policy = policy
 
     output_policy = result_policy or policy
-    log_path, access_log, profile_dir, profile_csv = _trial_paths(adapter, spec, output_policy, limit, trial)
+    log_path, access_log, profile_dir, profile_csv = _trial_paths(
+        adapter, spec, output_policy, limit, trial, suffix=path_suffix
+    )
     editor.patch(
         _config_values(
             effective_policy,
@@ -741,6 +1180,7 @@ def _run_trial(
         trial=trial,
         e2e_ms=resp.elapsed_ms,
         request_id=request_id or _request_id(spec),
+        request_order=str(request_order) if request_order is not None else "",
         train_n=str(train_n) if train_n is not None else "",
         trial_count=str(trial_count) if trial_count is not None else "",
         pool_seed=str(pool_seed) if pool_seed is not None else "",
@@ -957,14 +1397,28 @@ def _coaccess_for_trial(
     return output_path
 
 
-def _trial_paths(adapter, spec: RequestSpec, policy: str, limit: int, trial: int):
+def _trial_paths(
+    adapter,
+    spec: RequestSpec,
+    policy: str,
+    limit: int,
+    trial: int,
+    suffix: str = "",
+):
     logs_dir = adapter.app_dir / adapter.options.manifest.logs_dir
     profiles_dir = adapter.app_dir / adapter.options.manifest.profiles_dir
     safe_walker = _safe(spec.walker)
     safe_policy = _safe(policy)
-    log_path = logs_dir / f"jac_server_{safe_walker}_policy{safe_policy}_limit{limit}_trial{trial}.log"
-    access_log = logs_dir / f"access_log_{safe_walker}_policy{safe_policy}_limit{limit}_trial{trial}.csv"
-    profile_dir = profiles_dir / f"policy_{safe_policy}" / f"limit_{limit}" / safe_walker / f"trial_{trial}"
+    safe_suffix = f"_{_safe(suffix)}" if suffix else ""
+    log_path = logs_dir / f"jac_server_{safe_walker}_policy{safe_policy}_limit{limit}_trial{trial}{safe_suffix}.log"
+    access_log = logs_dir / f"access_log_{safe_walker}_policy{safe_policy}_limit{limit}_trial{trial}{safe_suffix}.csv"
+    profile_dir = (
+        profiles_dir
+        / f"policy_{safe_policy}"
+        / f"limit_{limit}"
+        / safe_walker
+        / f"trial_{trial}{safe_suffix}"
+    )
     profile_csv = profile_dir / "profile.csv"
     return log_path, access_log, profile_dir, profile_csv
 
@@ -1011,6 +1465,12 @@ def _limits_for_policy(policy: str, limits: list[int]) -> list[int]:
     return positive or [0]
 
 
+def _random_limits_for_policy(policy: str, limits: list[int]) -> list[int]:
+    if policy in {"none", "selep"}:
+        return [0]
+    return _limits_for_policy(policy, limits)
+
+
 def _app_path(adapter, path: Path) -> Path:
     return path if path.is_absolute() else adapter.app_dir / path
 
@@ -1021,6 +1481,16 @@ def _is_supported_policy(policy: str) -> bool:
         or _is_markov_pooled_policy(policy)
         or _is_coaccess_pooled_policy(policy)
     )
+
+
+def _is_random_runtime_policy(policy: str) -> bool:
+    return policy in {
+        "none",
+        "ttg",
+        "history",
+        "manual",
+        "selep",
+    }
 
 
 def _is_markov_pooled_policy(policy: str) -> bool:

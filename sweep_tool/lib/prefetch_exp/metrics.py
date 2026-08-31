@@ -14,6 +14,7 @@ RESULT_COLUMNS = [
     "trial",
     "e2e_ms",
     "request_id",
+    "request_order",
     "train_n",
     "trial_count",
     "pool_seed",

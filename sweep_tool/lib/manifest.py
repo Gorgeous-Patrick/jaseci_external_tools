@@ -51,6 +51,13 @@ class Manifest:
                 env[p.name] = " ".join(str(x) for x in v)
             else:
                 env[p.name] = str(v)
+        for key, value in values.items():
+            if key in env:
+                continue
+            if isinstance(value, (list, tuple)):
+                env[key] = " ".join(str(x) for x in value)
+            else:
+                env[key] = str(value)
         return env
 
 

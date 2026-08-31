@@ -1,12 +1,13 @@
 """Streamlit entry point for the sweep tool.
 
-Five tabs, all backed by the app's live output directory on disk:
+Six tabs, all backed by the app's live output directory on disk:
 
   1. Run — kick off a sweep for a chosen app.  Fire-and-forget subprocess.
-  2. Analyze — read the app's current CSV + logs, render interactive charts.
-  3. Raw data — the CSV as a downloadable dataframe.
-  4. Churn — run/analyze the Jacord same-spawn churn experiment.
-  5. SeLeP — run the LinkedList SQL/block LSTM smoke experiment.
+  2. Random paired — compare policies on the same random request set.
+  3. Analyze — read the app's current CSV + logs, render interactive charts.
+  4. Raw data — the CSV as a downloadable dataframe.
+  5. Churn — run/analyze the Jacord same-spawn churn experiment.
+  6. SeLeP — run the LinkedList SQL/block LSTM smoke experiment.
 
 Archiving isn't the tool's job; commit interesting runs to git.
 """
@@ -49,8 +50,45 @@ default_run_all_manifests = [
 ]
 
 
-tab_run, tab_analyze, tab_raw, tab_churn, tab_selep = st.tabs(
-    ["Run", "Analyze", "Raw data", "Churn", "SeLeP"]
+def _parse_int_list(text: str) -> list[int]:
+    return [int(x) for x in text.split() if x.strip()]
+
+
+def _random_paired_values(
+    n: int,
+    train_k: int,
+    seed: int,
+    policies: str,
+    limits: list[int] | None,
+) -> dict:
+    values = {
+        "SWEEP_POLICIES": "random-paired",
+        "SWEEP_RANDOM_N": n,
+        "SWEEP_RANDOM_TRAIN_K": train_k,
+        "SWEEP_RANDOM_SEED": seed,
+        "SWEEP_RANDOM_POLICIES": policies,
+        "SWEEP_MARKOV_POOL_SIZE": n + train_k,
+    }
+    if limits is not None:
+        values["SWEEP_PREFETCH_LIMITS"] = limits
+    return values
+
+
+def _manifest_param_default(manifest: mf.Manifest, name: str, fallback: object = "") -> object:
+    for param in manifest.parameters:
+        if param.name == name:
+            return param.default
+    return fallback
+
+
+def _format_int_list(value: object) -> str:
+    if isinstance(value, (list, tuple)):
+        return " ".join(str(x) for x in value)
+    return str(value or "")
+
+
+tab_run, tab_random, tab_analyze, tab_raw, tab_churn, tab_selep = st.tabs(
+    ["Run", "Random paired", "Analyze", "Raw data", "Churn", "SeLeP"]
 )
 
 
@@ -222,7 +260,172 @@ with tab_run:
 
 
 # ---------------------------------------------------------------------------
-# TAB 2 — Analyze
+# TAB 2 — Random paired sweep
+# ---------------------------------------------------------------------------
+with tab_random:
+    st.header("Random paired")
+    st.caption(
+        "Trains predictors on K sampled requests, then runs the same N-request "
+        "stream across policies without resetting DB state between requests. "
+        "Trials is ignored in this mode."
+    )
+
+    random_jac_bin = st.text_input(
+        "jac binary (JAC_BIN)",
+        value=sweep_runner.DEFAULT_JAC_BIN,
+        key="random_jac_bin",
+    ).strip()
+    random_jac_bin = str(Path(random_jac_bin).expanduser()) if random_jac_bin else "jac"
+    if "/" in random_jac_bin and not Path(random_jac_bin).exists():
+        st.warning(f"JAC_BIN path does not exist: `{random_jac_bin}`")
+
+    random_app_options = [m.name for m in default_run_all_manifests]
+    selected_random_apps = st.multiselect(
+        "Apps",
+        random_app_options,
+        default=random_app_options,
+        key="random_apps",
+    )
+
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        random_n = st.number_input(
+            "Measured N",
+            value=20,
+            min_value=1,
+            step=1,
+            key="random_n",
+        )
+    with c2:
+        random_train_k = st.number_input(
+            "Train K",
+            value=5,
+            min_value=0,
+            step=1,
+            key="random_train_k",
+        )
+    with c3:
+        random_seed = st.number_input(
+            "Random paired seed",
+            value=42,
+            step=1,
+            key="random_seed",
+        )
+    with c4:
+        random_policies = st.text_input(
+            "Random paired policies",
+            value="none ttg",
+            help="Supported in stream mode: none, ttg, selep, history, manual.",
+            key="random_policies",
+        )
+    st.caption(
+        "TTG limits are app-specific. Defaults below come from each app's manifest. "
+        "SeLeP can still be selected explicitly and runs once with SELEP_TOP_K/SELEP_BLOCK_LIMIT."
+    )
+    random_limits_by_name: dict[str, str] = {}
+    for name in selected_random_apps:
+        m_for_limits = manifest_by_name.get(name)
+        if m_for_limits is None:
+            continue
+        default_limits = _format_int_list(
+            _manifest_param_default(m_for_limits, "SWEEP_PREFETCH_LIMITS", "")
+        )
+        random_limits_by_name[name] = st.text_input(
+            f"{name} TTG limits",
+            value=default_limits,
+            key=f"random_limits_{name}",
+        )
+
+    random_running, random_pid = sweep_runner.is_run_all_running()
+    rr_status, rr_kill, rr_launch = st.columns([3, 1, 1])
+    with rr_status:
+        if random_running:
+            st.warning(f"Run-all is in progress (shepherd pid={random_pid}).")
+        else:
+            st.info("No run-all sweep is currently in progress.")
+    with rr_kill:
+        if random_running and st.button("Stop all", type="secondary", key="random_kill"):
+            msg = sweep_runner.kill_run_all()
+            st.success(msg)
+            st.rerun()
+    with rr_launch:
+        if not random_running and st.button("Run all", type="primary", key="random_run_all"):
+            random_manifests = [
+                manifest_by_name[name]
+                for name in selected_random_apps
+                if name in manifest_by_name
+            ]
+            if not random_manifests:
+                st.error("Select at least one app.")
+                st.stop()
+            form_values_by_name = {}
+            for manifest in random_manifests:
+                raw_limits = random_limits_by_name.get(manifest.name, "").strip()
+                try:
+                    limits = _parse_int_list(raw_limits) if raw_limits else None
+                except ValueError as e:
+                    st.error(
+                        f"{manifest.name} TTG limits must be space-separated integers: {e}"
+                    )
+                    st.stop()
+                form_values_by_name[manifest.name] = _random_paired_values(
+                    int(random_n),
+                    int(random_train_k),
+                    int(random_seed),
+                    random_policies,
+                    limits,
+                )
+            info = sweep_runner.kickoff_all(
+                random_manifests,
+                form_values_by_name=form_values_by_name,
+                jac_bin=random_jac_bin,
+            )
+            st.success(
+                f"Launched random-paired run-all (pid={info.pid}) over "
+                f"{len(random_manifests)} app(s). Watch `{info.stdout_log}`."
+            )
+            st.rerun()
+
+    if sweep_runner.run_all_log_path().exists():
+        with st.expander("Tail of run_all.log", expanded=False):
+            text = sweep_runner.run_all_log_path().read_text()
+            max_bytes = 15_000
+            if len(text) > max_bytes:
+                text = "…(truncated head)…\n" + text[-max_bytes:]
+            st.code(text or "(empty)", language="text")
+
+    summary_rows = []
+    for name in selected_random_apps:
+        m = manifest_by_name.get(name)
+        if m is None:
+            continue
+        logs_dir = m.app_dir / m.logs_dir
+        for path in sorted(logs_dir.glob("random_paired_stream_*_summary.json"))[-20:]:
+            try:
+                row = json.loads(path.read_text())
+            except Exception:
+                continue
+            summary_rows.append(
+                {
+                    "app": name,
+                    "policy": row.get("policy", ""),
+                    "limit": row.get("prefetch_limit", ""),
+                    "N": row.get("measured_n", ""),
+                    "K": row.get("train_k", ""),
+                    "sum_e2e_ms": row.get("sum_request_e2e_ms", ""),
+                    "stream_wall_ms": row.get("stream_wall_ms", ""),
+                    "train_ms": row.get("train_ms", ""),
+                    "l1_hit_rate": row.get("l1_hit_rate", ""),
+                    "summary": row.get("summary_path", str(path)),
+                }
+            )
+    if summary_rows:
+        st.subheader("Recent stream summaries")
+        st.dataframe(summary_rows, use_container_width=True, hide_index=True)
+
+
+# ---------------------------------------------------------------------------
+# TAB 3 — Analyze
 # ---------------------------------------------------------------------------
 with tab_analyze:
     st.header("Analyze")
@@ -286,7 +489,7 @@ with tab_analyze:
 
 
 # ---------------------------------------------------------------------------
-# TAB 3 — Sweep data
+# TAB 4 — Sweep data
 # ---------------------------------------------------------------------------
 with tab_raw:
     st.header("Sweep data")
@@ -318,7 +521,7 @@ with tab_raw:
 
 
 # ---------------------------------------------------------------------------
-# TAB 4 — Jacord churn experiment
+# TAB 5 — Jacord churn experiment
 # ---------------------------------------------------------------------------
 with tab_churn:
     st.header("Jacord churn")
@@ -449,7 +652,7 @@ with tab_churn:
 
 
 # ---------------------------------------------------------------------------
-# TAB 5 — LinkedList SeLeP SQL/block LSTM smoke
+# TAB 6 — LinkedList SeLeP SQL/block LSTM smoke
 # ---------------------------------------------------------------------------
 with tab_selep:
     st.header("LinkedList SeLeP LSTM")

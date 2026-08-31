@@ -53,6 +53,10 @@ class SweepOptions:
     coaccess_train_ns: list[int]
     coaccess_pool_seed: int
     coaccess_cluster_threshold: float
+    random_n: int
+    random_train_k: int
+    random_seed: int
+    random_policies: list[str]
     count_db: bool
     env: dict[str, str]
 
@@ -93,6 +97,10 @@ class SweepOptions:
                 or "42"
             ),
             coaccess_cluster_threshold=float(env.get("SWEEP_COACCESS_CLUSTER_THRESHOLD") or "0.05"),
+            random_n=int(env.get("SWEEP_RANDOM_N") or "20"),
+            random_train_k=int(env.get("SWEEP_RANDOM_TRAIN_K") or "5"),
+            random_seed=int(env.get("SWEEP_RANDOM_SEED") or "42"),
+            random_policies=_split_words(env.get("SWEEP_RANDOM_POLICIES") or "none ttg"),
             count_db=_env_bool(env.get("JAC_COUNT_DB") or env.get("JAC_COUNT_MONGO")),
             env=env,
         )
@@ -106,6 +114,7 @@ class TrialResult:
     trial: int
     e2e_ms: float
     request_id: str = ""
+    request_order: str = ""
     train_n: str = ""
     trial_count: str = ""
     pool_seed: str = ""
