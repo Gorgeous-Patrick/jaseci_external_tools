@@ -17,12 +17,17 @@ class JDriveAdapter(BenchmarkAdapter):
     default_user = "sweep_user"
     default_password = "password"
     credential_source = "seed_sweep_db.py / sweep_seed.json"
+    default_dump = "jac_db_50users_same_shape.pgdump"
+    default_seed_file = "sweep_seed_50users_same_shape.json"
 
     def dump_name(self) -> str:
-        return self.options.env.get("JDRIVE_DUMP", "jac_db.pgdump").strip() or "jac_db.pgdump"
+        return self.options.env.get("JDRIVE_DUMP", self.default_dump).strip() or self.default_dump
 
     def seed_file(self) -> str:
-        return self.options.env.get("JDRIVE_SEED_FILE", "sweep_seed.json").strip() or "sweep_seed.json"
+        return (
+            self.options.env.get("JDRIVE_SEED_FILE", self.default_seed_file).strip()
+            or self.default_seed_file
+        )
 
     def entry_point(self) -> str:
         return "server.jac"
