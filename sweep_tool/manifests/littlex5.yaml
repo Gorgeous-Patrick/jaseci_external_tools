@@ -128,6 +128,21 @@ parameters:
     default: "none ttg"
     help: Stream-safe runtime policies compared when SWEEP_POLICIES=random-paired.
 
+  - name: WALKER
+    label: Walker
+    kind: enum
+    default: "load_feed"
+    choices: ["load_feed", "load_feed_stepwise"]
+    help: >
+      LittleX walker under test. load_feed_stepwise keeps the same feed
+      shape but enters followed Profile nodes before visiting their posts.
+
+  - name: LITTLEX_USER_POOL_SIZE
+    label: User pool size
+    kind: int
+    default: 20
+    help: Number of sim_user_* accounts exposed for pooled/random-paired runs.
+
   - name: SELEP_MODEL_KIND
     label: SeLeP model
     kind: enum

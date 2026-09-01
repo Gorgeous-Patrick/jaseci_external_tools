@@ -114,10 +114,18 @@ class LittleX5Adapter(BenchmarkAdapter):
         raw = self.options.env.get("LITTLEX_USER_POOL", "").strip()
         if raw:
             return [item.strip() for item in raw.replace(",", " ").split() if item.strip()]
-        desired = int(
-            self.options.env.get("SWEEP_MARKOV_POOL_SIZE")
-            or str(max(max(self.options.markov_train_ns), max(self.options.coaccess_train_ns)) + 1)
+        required = max(
+            max(self.options.markov_train_ns) + 1,
+            max(self.options.coaccess_train_ns) + 1,
+            self.options.random_n,
+            self.options.random_train_k,
         )
+        configured = int(
+            self.options.env.get("LITTLEX_USER_POOL_SIZE")
+            or self.options.env.get("SWEEP_MARKOV_POOL_SIZE")
+            or "0"
+        )
+        desired = max(configured, required)
         prefix = self.options.env.get("LITTLEX_USER_POOL_PREFIX") or "sim_user_"
         start = int(self.options.env.get("LITTLEX_USER_POOL_START") or "0")
         return [f"{prefix}{idx}" for idx in range(start, start + desired)]

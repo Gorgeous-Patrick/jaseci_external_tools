@@ -269,6 +269,56 @@ walker load_feed {
     }
 }
 
+walker load_feed_stepwise {
+    has search_query: str = "",
+        root_profile_id: str = "",
+        seen_profiles: dict[str, bool] = {},
+        seen_tweets: dict[str, bool] = {},
+        feed: list[TweetView] = [],
+        reports: list[list[TweetView]] = [];
+
+    can run with Root entry {
+        visit [-->[?:Profile]];
+    }
+
+    can collect with Profile entry {
+        pid = jid(here);
+        if pid in self.seen_profiles {
+            return;
+        }
+        self.seen_profiles[pid] = True;
+
+        visit [->:Post:->[?:Tweet]];
+        if not self.root_profile_id {
+            self.root_profile_id = pid;
+            visit [->:Follow:->[?:Profile]];
+        }
+    }
+
+    can gather with Tweet entry {
+        tid = jid(here);
+        if tid in self.seen_tweets {
+            return;
+        }
+        self.seen_tweets[tid] = True;
+        self.feed.append(here.to_view());
+    }
+
+    can deliver with Root exit {
+        result = self.feed;
+        if self.search_query {
+            q = self.search_query.lower().strip();
+            result = [
+                t
+                for t in result
+                if q in t.content.lower()
+            ];
+        }
+        result.sort(key=lambda (t: TweetView) { t.created_at; }, reverse=True);
+        report result;
+    }
+}
+
 walker get_channels {
     has seen: dict[str, bool] = {},
         results: list[ChannelView] = [],
