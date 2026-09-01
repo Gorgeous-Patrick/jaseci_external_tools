@@ -32,6 +32,9 @@ class JDriveAdapter(BenchmarkAdapter):
     def entry_point(self) -> str:
         return "server.jac"
 
+    def restore_dump_if_present(self, dump_name: str = "jac_db.pgdump") -> None:
+        super().restore_dump_if_present(self.dump_name())
+
     def prepare_sweep(self) -> None:
         self._assert_seed_credentials_match_env()
         if (
