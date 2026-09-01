@@ -127,7 +127,8 @@ def collect_training_trace(
             extra_env={"JAC_SELEP_TRACE": str(cfg.train_trace_path)},
         )
         resp = adapter.post(spec.path, spec.body, token=spec.token or state.token)
-        adapter.validate_response(spec, resp.json())
+        payload = _response_payload_or_raise(resp, spec)
+        adapter.validate_response(spec, payload)
     finally:
         process.stop_process(proc)
         adapter.stop_stale_servers()
@@ -385,6 +386,19 @@ def request_id(spec: RequestSpec) -> str:
     if spec.target_id:
         return str(spec.target_id)
     return f"{spec.walker}:{spec.path}:{json.dumps(spec.body, sort_keys=True)}"
+
+
+def _response_payload_or_raise(resp: process.HttpResponse, spec: RequestSpec) -> object:
+    body = resp.body.decode("utf-8", errors="replace")[:500]
+    context = f"{spec.walker} request {request_id(spec)}"
+    if resp.status >= 400:
+        raise RuntimeError(f"{context} failed: HTTP {resp.status} {body}")
+    try:
+        return resp.json()
+    except Exception as exc:
+        raise RuntimeError(
+            f"{context} returned non-JSON HTTP {resp.status}: {body}"
+        ) from exc
 
 
 def safe(raw: str) -> str:

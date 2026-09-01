@@ -142,6 +142,7 @@ class TrialResult:
     selep_predictions: str = ""
     selep_blocks: str = ""
     selep_blocks_skipped: str = ""
+    selep_blocks_already_warmed: str = ""
     selep_prewarm_calls: str = ""
     selep_prewarm_ms: str = ""
     selep_errors: str = ""

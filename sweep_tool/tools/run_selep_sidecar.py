@@ -179,6 +179,7 @@ def serve_command(args: argparse.Namespace) -> int:
         "prewarm_calls": 0,
         "blocks_requested": 0,
         "blocks_skipped": 0,
+        "blocks_already_warmed": 0,
         "prewarm_ms": 0.0,
         "errors": [],
     }
@@ -326,6 +327,8 @@ def tail_trace(
 ) -> None:
     global STOP
     offset = 0
+    relation_size_cache: dict[str, int] = {}
+    warmed_blocks: set[str] = set()
     while not trace_path.exists() and not STOP:
         time.sleep(args.poll_sec)
     while not STOP:
@@ -339,7 +342,15 @@ def tail_trace(
                         time.sleep(args.poll_sec)
                         continue
                     offset = fh.tell()
-                    handle_trace_line(line, predictor, conn, args, stats)
+                    handle_trace_line(
+                        line,
+                        predictor,
+                        conn,
+                        args,
+                        stats,
+                        relation_size_cache,
+                        warmed_blocks,
+                    )
         except FileNotFoundError:
             time.sleep(args.poll_sec)
 
@@ -350,6 +361,8 @@ def handle_trace_line(
     conn: Any,
     args: argparse.Namespace,
     stats: dict[str, Any],
+    relation_size_cache: dict[str, int],
+    warmed_blocks: set[str],
 ) -> None:
     try:
         record = json.loads(line)
@@ -369,12 +382,19 @@ def handle_trace_line(
     blocks = predictor.blocks_for(predicted, args.block_limit)
     if not blocks:
         return
-    stats["blocks_requested"] += len(blocks)
+    fresh_blocks = [block for block in blocks if block not in warmed_blocks]
+    already_warmed = len(blocks) - len(fresh_blocks)
+    if already_warmed:
+        stats["blocks_already_warmed"] += already_warmed
+    if not fresh_blocks:
+        return
+    stats["blocks_requested"] += len(fresh_blocks)
     started = time.perf_counter()
     try:
-        calls, skipped = prewarm_blocks(conn, blocks)
+        calls, skipped = prewarm_blocks(conn, fresh_blocks, relation_size_cache)
         stats["prewarm_calls"] += calls
         stats["blocks_skipped"] += skipped
+        warmed_blocks.update(fresh_blocks)
     except Exception as exc:  # keep the measured Jac request alive
         errors = stats.setdefault("errors", [])
         if len(errors) < 20:
@@ -383,11 +403,19 @@ def handle_trace_line(
         stats["prewarm_ms"] += (time.perf_counter() - started) * 1000.0
 
 
-def prewarm_blocks(conn: Any, blocks: list[str]) -> tuple[int, int]:
+def prewarm_blocks(
+    conn: Any,
+    blocks: list[str],
+    relation_size_cache: dict[str, int],
+) -> tuple[int, int]:
     ranges = coalesce_blocks(blocks)
     if not ranges:
         return 0, 0
-    limits = relation_block_limits(conn, [relation for relation, _start, _end in ranges])
+    limits = relation_block_limits(
+        conn,
+        [relation for relation, _start, _end in ranges],
+        relation_size_cache,
+    )
     calls = 0
     skipped = 0
     with conn.cursor() as cur:
@@ -409,21 +437,30 @@ def prewarm_blocks(conn: Any, blocks: list[str]) -> tuple[int, int]:
     return calls, skipped
 
 
-def relation_block_limits(conn: Any, relations: list[str]) -> dict[str, int]:
+def relation_block_limits(
+    conn: Any,
+    relations: list[str],
+    cache: dict[str, int],
+) -> dict[str, int]:
     names = sorted({relation for relation in relations if relation})
     if not names:
         return {}
     out: dict[str, int] = {}
     with conn.cursor() as cur:
         for relation in names:
+            if relation in cache:
+                out[relation] = cache[relation]
+                continue
             try:
                 cur.execute("SELECT pg_relation_size(%s::regclass)", (relation,))
                 row = cur.fetchone()
             except Exception:
-                out[relation] = -1
+                cache[relation] = -1
+                out[relation] = cache[relation]
                 continue
             size = int(row[0] or 0) if row else 0
-            out[relation] = (size + 8191) // 8192 - 1
+            cache[relation] = (size + 8191) // 8192 - 1
+            out[relation] = cache[relation]
     return out
 
 

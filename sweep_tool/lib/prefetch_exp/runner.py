@@ -802,6 +802,7 @@ def _run_random_stream_trial(
         "prefetch_limit": limit,
         "measured_n": len(specs),
         "train_k": options.random_train_k if policy == "selep" else 0,
+        "measured_ids": [_request_id(spec) for spec in specs],
         "train_ms": train_ms,
         "sum_request_e2e_ms": sum(result.e2e_ms for result in request_results),
         "stream_wall_ms": stream_wall_ms,
@@ -820,6 +821,7 @@ def _run_random_stream_trial(
         "selep_predictions": str(stats.get("predictions", "")),
         "selep_blocks": str(stats.get("blocks_requested", "")),
         "selep_blocks_skipped": str(stats.get("blocks_skipped", "")),
+        "selep_blocks_already_warmed": str(stats.get("blocks_already_warmed", "")),
         "selep_prewarm_calls": str(stats.get("prewarm_calls", "")),
         "selep_prewarm_ms": str(stats.get("prewarm_ms", "")),
         "selep_errors": error_text,
@@ -1032,7 +1034,7 @@ def _run_selep_trial(
                 extra_env={"JAC_SELEP_TRACE": str(sidecar_paths.trace_path)},
             )
             resp = adapter.post(spec.path, spec.body, token=spec.token or state.token)
-            payload = resp.json()
+            payload = _response_payload_or_raise(resp, spec)
             adapter.validate_response(spec, payload)
     finally:
         process.stop_process(proc)
@@ -1085,6 +1087,7 @@ def _run_selep_trial(
         selep_predictions=str(stats.get("predictions", "")),
         selep_blocks=str(stats.get("blocks_requested", "")),
         selep_blocks_skipped=str(stats.get("blocks_skipped", "")),
+        selep_blocks_already_warmed=str(stats.get("blocks_already_warmed", "")),
         selep_prewarm_calls=str(stats.get("prewarm_calls", "")),
         selep_prewarm_ms=str(stats.get("prewarm_ms", "")),
         selep_errors=error_text,
@@ -1150,7 +1153,7 @@ def _run_trial(
     try:
         proc = adapter.start_server(log_path, profile_dir=profile_dir, profile_csv=profile_csv)
         resp = adapter.post(spec.path, spec.body, token=spec.token or state.token)
-        payload = resp.json()
+        payload = _response_payload_or_raise(resp, spec)
         adapter.validate_response(spec, payload)
     finally:
         process.stop_process(proc)
@@ -1250,7 +1253,8 @@ def _oracle_for_trial(
     try:
         proc = adapter.start_server(record_log)
         resp = adapter.post(spec.path, spec.body, token=spec.token or state.token)
-        adapter.validate_response(spec, resp.json())
+        payload = _response_payload_or_raise(resp, spec)
+        adapter.validate_response(spec, payload)
     finally:
         process.stop_process(proc)
         adapter.stop_stale_servers()
@@ -1304,7 +1308,8 @@ def _markov_for_trial(
     try:
         proc = adapter.start_server(record_log)
         resp = adapter.post(spec.path, spec.body, token=spec.token or state.token)
-        adapter.validate_response(spec, resp.json())
+        payload = _response_payload_or_raise(resp, spec)
+        adapter.validate_response(spec, payload)
     finally:
         process.stop_process(proc)
         adapter.stop_stale_servers()
@@ -1372,7 +1377,8 @@ def _coaccess_for_trial(
     try:
         proc = adapter.start_server(record_log)
         resp = adapter.post(spec.path, spec.body, token=spec.token or state.token)
-        adapter.validate_response(spec, resp.json())
+        payload = _response_payload_or_raise(resp, spec)
+        adapter.validate_response(spec, payload)
     finally:
         process.stop_process(proc)
         adapter.stop_stale_servers()
@@ -1529,6 +1535,37 @@ def _unique_spawn_pool(pool: list[RequestSpec]) -> list[RequestSpec]:
         seen.add(request_id)
         out.append(spec)
     return out
+
+
+def _select_specs_by_indices(
+    pool: list[RequestSpec],
+    indices: list[int],
+    label: str,
+) -> list[RequestSpec]:
+    if not indices:
+        return []
+    max_index = max(indices)
+    if max_index >= len(pool):
+        raise RuntimeError(
+            f"{label} split needs pool index {max_index}, "
+            f"but this reset exposed only {len(pool)} request(s). "
+            "The seeded spawn pool is not stable across resets."
+        )
+    return [pool[index] for index in indices]
+
+
+def _response_payload_or_raise(resp, spec: RequestSpec) -> object:
+    body = resp.body.decode("utf-8", errors="replace")[:500]
+    request_id = _request_id(spec)
+    context = f"{spec.walker} request {request_id}"
+    if resp.status >= 400:
+        raise RuntimeError(f"{context} failed: HTTP {resp.status} {body}")
+    try:
+        return resp.json()
+    except Exception as exc:
+        raise RuntimeError(
+            f"{context} returned non-JSON HTTP {resp.status}: {body}"
+        ) from exc
 
 
 def _request_id(spec: RequestSpec) -> str:

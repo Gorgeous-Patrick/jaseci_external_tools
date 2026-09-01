@@ -97,6 +97,22 @@ class JacordAdapter(BenchmarkAdapter):
             reports = self._reports_or_raise(resp, "Jacord ListChannelIds")
             ids = [str(x) for x in (reports[0] if reports else [])]
             specs: list[RequestSpec] = []
+            pick_mode = (
+                self.options.env.get("JACORD_CHANNEL_PICK") or "first"
+            ).strip().lower()
+            if pick_mode == "first":
+                for channel_id in ids[:desired]:
+                    specs.append(
+                        RequestSpec(
+                            walker=walker,
+                            path=f"/walker/{walker}/{channel_id}",
+                            body={},
+                            target_id=channel_id,
+                            request_id=channel_id,
+                        )
+                    )
+                return specs or super().spawn_pool(state)
+
             for channel_id in ids:
                 if len(specs) >= desired:
                     break

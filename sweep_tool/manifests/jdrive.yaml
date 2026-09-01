@@ -198,6 +198,24 @@ parameters:
     default: "password"
     help: Matches seed_sweep_db.py's default password.
 
+  - name: JDRIVE_DUMP
+    label: JDrive dump
+    kind: str
+    default: "jac_db.pgdump"
+    help: >
+      Postgres dump restored for each JDrive case. Set to
+      jac_db_50users_same_shape.pgdump to use the larger 50-root seed
+      without replacing the default dump.
+
+  - name: JDRIVE_SEED_FILE
+    label: JDrive seed file
+    kind: str
+    default: "sweep_seed.json"
+    help: >
+      Seed metadata file read by the JDrive adapter for root_id and
+      training_roots. Set to sweep_seed_50users_same_shape.json with the
+      larger dump.
+
   - name: SWEEP_PREFETCH_LIMITS
     label: Prefetch limits
     kind: int_list

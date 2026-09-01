@@ -69,6 +69,16 @@ def _random_paired_values(
         "SWEEP_RANDOM_POLICIES": policies,
         "SWEEP_MARKOV_POOL_SIZE": n + train_k,
     }
+    if "selep" in {part.strip().lower() for part in policies.split()}:
+        values.update(
+            {
+                "SELEP_MODEL_KIND": "frequency",
+                "SELEP_TOP_K": 8,
+                "SELEP_BLOCK_LIMIT": 8,
+                "SELEP_MAX_BLOCK_SELECTS": 32,
+                "SELEP_LSTM_EPOCHS": 1,
+            }
+        )
     if limits is not None:
         values["SWEEP_PREFETCH_LIMITS"] = limits
     return values
@@ -320,7 +330,8 @@ with tab_random:
         )
     st.caption(
         "TTG limits are app-specific. Defaults below come from each app's manifest. "
-        "SeLeP can still be selected explicitly and runs once with SELEP_TOP_K/SELEP_BLOCK_LIMIT."
+        "SeLeP can still be selected explicitly; random-paired uses a lightweight "
+        "frequency model with top_k=8 by default."
     )
     random_limits_by_name: dict[str, str] = {}
     for name in selected_random_apps:

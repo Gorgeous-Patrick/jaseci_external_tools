@@ -18,6 +18,12 @@ class JDriveAdapter(BenchmarkAdapter):
     default_password = "password"
     credential_source = "seed_sweep_db.py / sweep_seed.json"
 
+    def dump_name(self) -> str:
+        return self.options.env.get("JDRIVE_DUMP", "jac_db.pgdump").strip() or "jac_db.pgdump"
+
+    def seed_file(self) -> str:
+        return self.options.env.get("JDRIVE_SEED_FILE", "sweep_seed.json").strip() or "sweep_seed.json"
+
     def entry_point(self) -> str:
         return "server.jac"
 
@@ -25,8 +31,8 @@ class JDriveAdapter(BenchmarkAdapter):
         self._assert_seed_credentials_match_env()
         if (
             self.options.env.get("SWEEP_RESEED") == "1"
-            or not self.dump_exists("jac_db.pgdump")
-            or not (self.app_dir / "sweep_seed.json").exists()
+            or not self.dump_exists(self.dump_name())
+            or not (self.app_dir / self.seed_file()).exists()
             or self._seed_training_root_count() < self._required_training_roots()
         ):
             self._prepare_seed_dump()
@@ -36,14 +42,14 @@ class JDriveAdapter(BenchmarkAdapter):
         if explicit:
             return explicit
         try:
-            seeded = self.json_file("sweep_seed.json").get("username")
+            seeded = self.json_file(self.seed_file()).get("username")
         except FileNotFoundError:
             seeded = ""
         return str(seeded or self.default_user)
 
     def prepare_request(self, policy: str, limit: int) -> CaseState:
         token = self.setup_token(f"jac_server_prepare_{policy}_limit{limit}.log")
-        seed = self.json_file("sweep_seed.json")
+        seed = self.json_file(self.seed_file())
         root_id = str(seed["root_id"])
         walker = self.options.env.get("WALKER") or "VisibleFolderTree"
         return CaseState(
@@ -61,7 +67,7 @@ class JDriveAdapter(BenchmarkAdapter):
     def spawn_pool(self, state: CaseState) -> list[RequestSpec]:
         if state.request is None:
             return []
-        seed = state.extra.get("seed") or self.json_file("sweep_seed.json")
+        seed = state.extra.get("seed") or self.json_file(self.seed_file())
         walker = self.options.env.get("WALKER") or "VisibleFolderTree"
         roots = [str(seed["root_id"])]
         for item in seed.get("training_roots") or []:
@@ -86,7 +92,7 @@ class JDriveAdapter(BenchmarkAdapter):
         entries = reports[0].get("entries") or []
 
         try:
-            seed = self.json_file("sweep_seed.json")
+            seed = self.json_file(self.seed_file())
         except FileNotFoundError:
             return
 
@@ -134,20 +140,21 @@ class JDriveAdapter(BenchmarkAdapter):
             process.stop_process(proc)
             self.stop_stale_servers()
 
-        self.dump_to_app("jac_db.pgdump")
-        print(f"=== Seed dump ready: {self.dump_description('jac_db.pgdump')} ===")
+        dump_name = self.dump_name()
+        self.dump_to_app(dump_name)
+        print(f"=== Seed dump ready: {self.dump_description(dump_name)} ===")
 
     def _assert_seed_credentials_match_env(self) -> None:
         explicit = self.options.env.get("TEST_USER")
         if not explicit or self.options.env.get("SWEEP_RESEED") == "1":
             return
         try:
-            seeded = self.json_file("sweep_seed.json").get("username")
+            seeded = self.json_file(self.seed_file()).get("username")
         except FileNotFoundError:
             return
         if seeded and seeded != explicit:
             raise RuntimeError(
-                f"TEST_USER={explicit!r} does not match sweep_seed.json username={seeded!r}; "
+                f"TEST_USER={explicit!r} does not match {self.seed_file()} username={seeded!r}; "
                 "set SWEEP_RESEED=1 to rebuild the dump for a different seeded user."
             )
 
@@ -171,7 +178,7 @@ class JDriveAdapter(BenchmarkAdapter):
 
     def _seed_training_root_count(self) -> int:
         try:
-            seed = self.json_file("sweep_seed.json")
+            seed = self.json_file(self.seed_file())
         except FileNotFoundError:
             return 0
         return len(seed.get("training_roots") or [])
