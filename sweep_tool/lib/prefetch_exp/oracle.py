@@ -43,17 +43,18 @@ def extract_uuid_order(access_log: Path) -> list[str]:
         for row in reader:
             if row.get("tier") == "MISS":
                 continue
-            raw = (row.get("id") or "").strip()
-            if not raw:
-                continue
-            try:
-                uid = str(UUID(raw))
-            except ValueError:
-                continue
-            if uid in seen:
-                continue
-            seen.add(uid)
-            out.append(uid)
+            for key in ("id", "root"):
+                raw = (row.get(key) or "").strip()
+                if not raw:
+                    continue
+                try:
+                    uid = str(UUID(raw))
+                except ValueError:
+                    continue
+                if uid in seen:
+                    continue
+                seen.add(uid)
+                out.append(uid)
     return out
 
 

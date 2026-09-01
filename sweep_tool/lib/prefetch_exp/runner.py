@@ -1452,7 +1452,7 @@ def _config_values(
     markov_file: str = "",
     coaccess_file: str = "",
 ) -> dict[str, object]:
-    effective = "none" if policy == "none" or limit <= 0 else policy
+    effective = "none" if policy == "none" or (limit <= 0 and policy != "oracle") else policy
     return {
         "access_log": access_log,
         "topology_index": True,
@@ -1465,7 +1465,7 @@ def _config_values(
 
 
 def _limits_for_policy(policy: str, limits: list[int]) -> list[int]:
-    if policy == "none":
+    if policy in {"none", "oracle"}:
         return [0]
     positive = [x for x in limits if x > 0]
     return positive or [0]
