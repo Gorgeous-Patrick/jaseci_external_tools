@@ -30,6 +30,10 @@ def markov_model_path(
     )
 
 
+def markov_topology_file_path(model_file: Path) -> Path:
+    return model_file.with_name(model_file.name + ".topology.json")
+
+
 def pooled_markov_model_path(
     markov_dir: Path,
     app_name: str,

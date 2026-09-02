@@ -38,6 +38,7 @@ RESULT_COLUMNS = [
     "oracle_file",
     "oracle_topology_file",
     "model_file",
+    "model_topology_file",
     "selep_events",
     "selep_matched_events",
     "selep_predictions",

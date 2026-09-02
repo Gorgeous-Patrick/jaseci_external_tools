@@ -138,6 +138,7 @@ class TrialResult:
     oracle_file: str = ""
     oracle_topology_file: str = ""
     model_file: str = ""
+    model_topology_file: str = ""
     selep_events: str = ""
     selep_matched_events: str = ""
     selep_predictions: str = ""

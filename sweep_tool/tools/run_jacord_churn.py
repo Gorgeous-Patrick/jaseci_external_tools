@@ -72,6 +72,7 @@ CHURN_COLUMNS = [
     "oracle_file",
     "oracle_topology_file",
     "model_file",
+    "model_topology_file",
     "ttg_plan_file",
 ]
 
@@ -102,7 +103,9 @@ class StalePlans:
     oracle_file: Path
     oracle_topology_file: Path
     markov_file: Path
+    markov_topology_file: Path
     coaccess_file: Path
+    coaccess_topology_file: Path
     actual_ids: list[str]
     message_ids: list[str]
     message_count: int
@@ -164,7 +167,9 @@ def main() -> int:
         print(f"history file: {stale.oracle_file}")
         print(f"history topo: {stale.oracle_topology_file}")
         print(f"markov file : {stale.markov_file}")
+        print(f"markov topo : {stale.markov_topology_file}")
         print(f"coaccess    : {stale.coaccess_file}")
+        print(f"coaccess topo: {stale.coaccess_topology_file}")
 
         print("")
         print("=== Generating/reusing deterministic churn dumps ===")
@@ -459,7 +464,9 @@ def _build_stale_plans(
     stale_oracle = paths.models_dir / "history_pre_churn.uuids"
     stale_topology = oracle.oracle_topology_file_path(stale_oracle)
     stale_markov = paths.models_dir / "markov_pre_churn.json"
+    stale_markov_topology = markov.markov_topology_file_path(stale_markov)
     stale_coaccess = paths.models_dir / "coaccess_pre_churn.json"
+    stale_coaccess_topology = coaccess.coaccess_topology_file_path(stale_coaccess)
     record = _record_access_trace(
         adapter,
         editor,
@@ -488,12 +495,36 @@ def _build_stale_plans(
         limit=limit,
         cluster_threshold=adapter.options.coaccess_cluster_threshold,
     )
+    _record_model_topology(
+        adapter,
+        editor,
+        spec,
+        policy="markov",
+        limit=limit,
+        model_file=stale_markov,
+        topology_file=stale_markov_topology,
+        log_path=paths.logs_dir / "markov_topology_pre_churn.log",
+        access_log=paths.logs_dir / "markov_topology_pre_churn_access.csv",
+    )
+    _record_model_topology(
+        adapter,
+        editor,
+        spec,
+        policy="coaccess",
+        limit=limit,
+        model_file=stale_coaccess,
+        topology_file=stale_coaccess_topology,
+        log_path=paths.logs_dir / "coaccess_topology_pre_churn.log",
+        access_log=paths.logs_dir / "coaccess_topology_pre_churn_access.csv",
+    )
     return StalePlans(
         access_log=record["access_log"],
         oracle_file=stale_oracle,
         oracle_topology_file=stale_topology,
         markov_file=stale_markov,
+        markov_topology_file=stale_markov_topology,
         coaccess_file=stale_coaccess,
+        coaccess_topology_file=stale_coaccess_topology,
         actual_ids=ids,
         message_ids=record["message_ids"],
         message_count=record["message_count"],
@@ -668,6 +699,7 @@ def _measure_policy_trial(
     oracle_file: Path | None = None
     oracle_topology_file: Path | None = None
     model_file: Path | None = None
+    model_topology_file: Path | None = None
     ttg_plan_file: Path | None = None
     runtime_policy = policy
     plan_ids: list[str] = []
@@ -696,9 +728,11 @@ def _measure_policy_trial(
         plan_ids = _read_uuid_lines(stale.oracle_file)
     elif policy == "markov":
         model_file = stale.markov_file
+        model_topology_file = stale.markov_topology_file
         plan_ids = _model_plan_ids(model_file, spec.target_id, args.limit)
     elif policy == "coaccess":
         model_file = stale.coaccess_file
+        model_topology_file = stale.coaccess_topology_file
         plan_ids = _model_plan_ids(model_file, spec.target_id, args.limit)
     elif policy == "ttg":
         ttg_plan_file = paths.logs_dir / f"ttg_plan_p{dump.rate:02d}_trial{trial}.csv"
@@ -734,7 +768,17 @@ def _measure_policy_trial(
                 str(oracle_topology_file) if oracle_topology_file is not None else ""
             ),
             markov_file=str(model_file) if model_file is not None and runtime_policy == "markov" else "",
+            markov_topology_file=(
+                str(model_topology_file)
+                if model_topology_file is not None and runtime_policy == "markov"
+                else ""
+            ),
             coaccess_file=str(model_file) if model_file is not None and runtime_policy == "coaccess" else "",
+            coaccess_topology_file=(
+                str(model_topology_file)
+                if model_topology_file is not None and runtime_policy == "coaccess"
+                else ""
+            ),
         )
     )
     adapter.clear_runtime_cache()
@@ -810,6 +854,9 @@ def _measure_policy_trial(
             str(oracle_topology_file) if oracle_topology_file is not None else ""
         ),
         "model_file": str(model_file) if model_file is not None else "",
+        "model_topology_file": (
+            str(model_topology_file) if model_topology_file is not None else ""
+        ),
         "ttg_plan_file": str(ttg_plan_file) if ttg_plan_file is not None else "",
     }
 
@@ -856,6 +903,56 @@ def _record_access_trace(
         "message_ids": _message_ids(reports),
         "message_count": len(reports),
     }
+
+
+def _record_model_topology(
+    adapter,
+    editor: RunConfigEditor,
+    spec: RequestSpec,
+    *,
+    policy: str,
+    limit: int,
+    model_file: Path,
+    topology_file: Path,
+    log_path: Path,
+    access_log: Path,
+) -> None:
+    config_kwargs = {
+        "access_log": str(access_log),
+        "oracle_file": "",
+        "oracle_topology_file": "",
+        "oracle_record_topology_file": "",
+        "markov_file": "",
+        "markov_topology_file": "",
+        "markov_record_topology_file": "",
+        "coaccess_file": "",
+        "coaccess_topology_file": "",
+        "coaccess_record_topology_file": "",
+    }
+    if policy == "markov":
+        config_kwargs["markov_file"] = str(model_file)
+        config_kwargs["markov_record_topology_file"] = str(topology_file)
+    elif policy == "coaccess":
+        config_kwargs["coaccess_file"] = str(model_file)
+        config_kwargs["coaccess_record_topology_file"] = str(topology_file)
+    else:
+        raise ValueError(f"unsupported model topology policy={policy!r}")
+    editor.patch(_config_values(policy, limit, **config_kwargs))
+    adapter.clear_runtime_cache()
+    proc = None
+    try:
+        proc = adapter.start_server(log_path)
+        token = adapter.login()
+        resp = adapter.post(spec.path, spec.body, token=token)
+        payload = resp.json()
+        adapter.validate_response(spec, payload)
+    finally:
+        process.stop_process(proc)
+        adapter.stop_stale_servers()
+    if not topology_file.exists():
+        raise RuntimeError(
+            f"{policy} topology record did not produce snapshot: {topology_file}"
+        )
 
 
 def _restore_named_dump(adapter, dump_name: str) -> None:
@@ -916,7 +1013,11 @@ def _config_values(
     oracle_topology_file: str = "",
     oracle_record_topology_file: str = "",
     markov_file: str = "",
+    markov_topology_file: str = "",
+    markov_record_topology_file: str = "",
     coaccess_file: str = "",
+    coaccess_topology_file: str = "",
+    coaccess_record_topology_file: str = "",
 ) -> dict[str, object]:
     effective = "none" if policy == "none" or limit <= 0 else policy
     return {
@@ -928,7 +1029,11 @@ def _config_values(
         "prefetch_oracle_topology_file": oracle_topology_file,
         "prefetch_oracle_record_topology_file": oracle_record_topology_file,
         "prefetch_markov_file": markov_file,
+        "prefetch_markov_topology_file": markov_topology_file,
+        "prefetch_markov_record_topology_file": markov_record_topology_file,
         "prefetch_coaccess_file": coaccess_file,
+        "prefetch_coaccess_topology_file": coaccess_topology_file,
+        "prefetch_coaccess_record_topology_file": coaccess_record_topology_file,
     }
 
 

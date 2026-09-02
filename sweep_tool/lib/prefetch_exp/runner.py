@@ -268,6 +268,19 @@ def _run_markov_pooled(
 
         results: list[TrialResult] = []
         for trial in range(1, options.trials + 1):
+            model_topology_path = _trial_model_topology_file(model_path, trial_spec, trial)
+            _record_model_topology(
+                adapter,
+                editor,
+                state,
+                trial_spec,
+                "markov",
+                limit,
+                model_path,
+                model_topology_path,
+                trial,
+                suffix=label,
+            )
             result = _run_trial(
                 adapter,
                 editor,
@@ -280,6 +293,7 @@ def _run_markov_pooled(
                 result_policy=label,
                 effective_policy_override="markov",
                 model_file_override=model_path,
+                model_topology_file_override=model_topology_path,
                 request_id=trial_id,
                 train_n=train_n,
                 trial_count=options.trials,
@@ -430,6 +444,19 @@ def _run_coaccess_pooled(
 
         results: list[TrialResult] = []
         for trial in range(1, options.trials + 1):
+            model_topology_path = _trial_model_topology_file(model_path, trial_spec, trial)
+            _record_model_topology(
+                adapter,
+                editor,
+                state,
+                trial_spec,
+                "coaccess",
+                limit,
+                model_path,
+                model_topology_path,
+                trial,
+                suffix=label,
+            )
             result = _run_trial(
                 adapter,
                 editor,
@@ -442,6 +469,7 @@ def _run_coaccess_pooled(
                 result_policy=label,
                 effective_policy_override="coaccess",
                 model_file_override=model_path,
+                model_topology_file_override=model_topology_path,
                 request_id=trial_id,
                 train_n=train_n,
                 trial_count=options.trials,
@@ -1107,6 +1135,7 @@ def _run_trial(
     result_policy: str = "",
     effective_policy_override: str = "",
     model_file_override: Path | None = None,
+    model_topology_file_override: Path | None = None,
     request_id: str = "",
     request_order: int | None = None,
     train_n: int | None = None,
@@ -1118,19 +1147,31 @@ def _run_trial(
     oracle_file: Path | None = None
     oracle_topology_file: Path | None = None
     model_file: Path | None = None
+    model_topology_file: Path | None = None
     if model_file_override is not None:
         model_file = model_file_override
         effective_policy = effective_policy_override or "markov"
+        model_topology_file = model_topology_file_override or _default_model_topology_file(
+            effective_policy, model_file
+        )
+        if model_topology_file is not None and not model_topology_file.exists():
+            raise FileNotFoundError(
+                f"{effective_policy} topology snapshot does not exist: {model_topology_file}"
+            )
     elif policy == "oracle":
         oracle_file, oracle_topology_file = _oracle_for_trial(
             adapter, editor, state, spec, limit, trial, options
         )
         effective_policy = "oracle"
     elif policy == "markov":
-        model_file = _markov_for_trial(adapter, editor, state, spec, limit, trial, options)
+        model_file, model_topology_file = _markov_for_trial(
+            adapter, editor, state, spec, limit, trial, options
+        )
         effective_policy = "markov"
     elif policy == "coaccess":
-        model_file = _coaccess_for_trial(adapter, editor, state, spec, limit, trial, options)
+        model_file, model_topology_file = _coaccess_for_trial(
+            adapter, editor, state, spec, limit, trial, options
+        )
         effective_policy = "coaccess"
     else:
         effective_policy = policy
@@ -1149,7 +1190,17 @@ def _run_trial(
                 str(oracle_topology_file) if oracle_topology_file is not None else ""
             ),
             markov_file=str(model_file) if model_file is not None and effective_policy == "markov" else "",
+            markov_topology_file=(
+                str(model_topology_file)
+                if model_topology_file is not None and effective_policy == "markov"
+                else ""
+            ),
             coaccess_file=str(model_file) if model_file is not None and effective_policy == "coaccess" else "",
+            coaccess_topology_file=(
+                str(model_topology_file)
+                if model_topology_file is not None and effective_policy == "coaccess"
+                else ""
+            ),
         )
     )
     adapter.clear_runtime_cache()
@@ -1215,6 +1266,9 @@ def _run_trial(
             str(oracle_topology_file) if oracle_topology_file is not None else ""
         ),
         model_file=str(model_file) if model_file is not None else "",
+        model_topology_file=(
+            str(model_topology_file) if model_topology_file is not None else ""
+        ),
     )
 
 
@@ -1305,8 +1359,12 @@ def _markov_for_trial(
     limit: int,
     trial: int,
     options: SweepOptions,
-) -> Path:
+) -> tuple[Path, Path]:
     explicit = options.env.get("SWEEP_MARKOV_FILE") or options.env.get("JAC_PREFETCH_MARKOV_FILE")
+    explicit_topology = (
+        options.env.get("SWEEP_MARKOV_TOPOLOGY_FILE")
+        or options.env.get("JAC_PREFETCH_MARKOV_TOPOLOGY_FILE")
+    )
     if options.markov_mode == "file":
         path = Path(explicit) if explicit else markov.markov_model_path(
             options.markov_dir, adapter.name, spec.walker, spec.target_id, limit, trial
@@ -1314,7 +1372,16 @@ def _markov_for_trial(
         path = path if path.is_absolute() else adapter.app_dir / path
         if not path.exists():
             raise FileNotFoundError(f"markov model file does not exist: {path}")
-        return path
+        topology_path = (
+            Path(explicit_topology)
+            if explicit_topology else markov.markov_topology_file_path(path)
+        )
+        topology_path = topology_path if topology_path.is_absolute() else adapter.app_dir / topology_path
+        if not topology_path.exists():
+            raise FileNotFoundError(
+                f"markov topology snapshot does not exist: {topology_path}"
+            )
+        return path, topology_path
     if options.markov_mode != "auto":
         raise ValueError(f"unsupported SWEEP_MARKOV_MODE={options.markov_mode!r}")
 
@@ -1322,6 +1389,11 @@ def _markov_for_trial(
         options.markov_dir, adapter.name, spec.walker, spec.target_id, limit, trial
     )
     output_path = output_path if output_path.is_absolute() else adapter.app_dir / output_path
+    topology_path = (
+        Path(explicit_topology)
+        if explicit_topology else markov.markov_topology_file_path(output_path)
+    )
+    topology_path = topology_path if topology_path.is_absolute() else adapter.app_dir / topology_path
 
     logs_dir = adapter.app_dir / adapter.options.manifest.logs_dir
     safe_walker = _safe(spec.walker)
@@ -1334,6 +1406,9 @@ def _markov_for_trial(
             access_log=str(record_access_log),
             oracle_file="",
             markov_file="",
+            markov_topology_file="",
+            markov_record_topology_file="",
+            coaccess_file="",
         )
     )
     adapter.clear_runtime_cache()
@@ -1361,8 +1436,20 @@ def _markov_for_trial(
         f"plan={len(model.get('plans', {}).get(model.get('start_id', ''), {}).get('plan', []))} "
         f"to {output_path}"
     )
+    _record_model_topology(
+        adapter,
+        editor,
+        state,
+        spec,
+        "markov",
+        limit,
+        output_path,
+        topology_path,
+        trial,
+        suffix="single",
+    )
     adapter.clear_runtime_cache()
-    return output_path
+    return output_path, topology_path
 
 
 def _coaccess_for_trial(
@@ -1373,8 +1460,12 @@ def _coaccess_for_trial(
     limit: int,
     trial: int,
     options: SweepOptions,
-) -> Path:
+) -> tuple[Path, Path]:
     explicit = options.env.get("SWEEP_COACCESS_FILE") or options.env.get("JAC_PREFETCH_COACCESS_FILE")
+    explicit_topology = (
+        options.env.get("SWEEP_COACCESS_TOPOLOGY_FILE")
+        or options.env.get("JAC_PREFETCH_COACCESS_TOPOLOGY_FILE")
+    )
     if options.coaccess_mode == "file":
         path = Path(explicit) if explicit else coaccess.coaccess_model_path(
             options.coaccess_dir, adapter.name, spec.walker, spec.target_id, limit, trial
@@ -1382,7 +1473,16 @@ def _coaccess_for_trial(
         path = path if path.is_absolute() else adapter.app_dir / path
         if not path.exists():
             raise FileNotFoundError(f"co-access model file does not exist: {path}")
-        return path
+        topology_path = (
+            Path(explicit_topology)
+            if explicit_topology else coaccess.coaccess_topology_file_path(path)
+        )
+        topology_path = topology_path if topology_path.is_absolute() else adapter.app_dir / topology_path
+        if not topology_path.exists():
+            raise FileNotFoundError(
+                f"co-access topology snapshot does not exist: {topology_path}"
+            )
+        return path, topology_path
     if options.coaccess_mode != "auto":
         raise ValueError(f"unsupported SWEEP_COACCESS_MODE={options.coaccess_mode!r}")
 
@@ -1390,6 +1490,11 @@ def _coaccess_for_trial(
         options.coaccess_dir, adapter.name, spec.walker, spec.target_id, limit, trial
     )
     output_path = output_path if output_path.is_absolute() else adapter.app_dir / output_path
+    topology_path = (
+        Path(explicit_topology)
+        if explicit_topology else coaccess.coaccess_topology_file_path(output_path)
+    )
+    topology_path = topology_path if topology_path.is_absolute() else adapter.app_dir / topology_path
 
     logs_dir = adapter.app_dir / adapter.options.manifest.logs_dir
     safe_walker = _safe(spec.walker)
@@ -1403,6 +1508,8 @@ def _coaccess_for_trial(
             oracle_file="",
             markov_file="",
             coaccess_file="",
+            coaccess_topology_file="",
+            coaccess_record_topology_file="",
         )
     )
     adapter.clear_runtime_cache()
@@ -1432,8 +1539,98 @@ def _coaccess_for_trial(
         f"plan={model.get('plan_len', 0)} "
         f"to {output_path}"
     )
+    _record_model_topology(
+        adapter,
+        editor,
+        state,
+        spec,
+        "coaccess",
+        limit,
+        output_path,
+        topology_path,
+        trial,
+        suffix="single",
+    )
     adapter.clear_runtime_cache()
-    return output_path
+    return output_path, topology_path
+
+
+def _record_model_topology(
+    adapter,
+    editor: RunConfigEditor,
+    state: CaseState,
+    spec: RequestSpec,
+    policy: str,
+    limit: int,
+    model_file: Path,
+    topology_file: Path,
+    trial: int,
+    *,
+    suffix: str = "",
+) -> None:
+    logs_dir = adapter.app_dir / adapter.options.manifest.logs_dir
+    safe_walker = _safe(spec.walker)
+    safe_policy = _safe(policy)
+    safe_suffix = f"_{_safe(suffix)}" if suffix else ""
+    record_log = (
+        logs_dir
+        / f"{safe_policy}_topology_record_{safe_walker}_limit{limit}_trial{trial}{safe_suffix}.log"
+    )
+    record_access_log = (
+        logs_dir
+        / f"{safe_policy}_topology_record_access_{safe_walker}_limit{limit}_trial{trial}{safe_suffix}.csv"
+    )
+    config_kwargs: dict[str, str] = {
+        "access_log": str(record_access_log),
+        "oracle_file": "",
+        "oracle_topology_file": "",
+        "oracle_record_topology_file": "",
+        "markov_file": "",
+        "markov_topology_file": "",
+        "markov_record_topology_file": "",
+        "coaccess_file": "",
+        "coaccess_topology_file": "",
+        "coaccess_record_topology_file": "",
+    }
+    if policy == "markov":
+        config_kwargs["markov_file"] = str(model_file)
+        config_kwargs["markov_record_topology_file"] = str(topology_file)
+    elif policy == "coaccess":
+        config_kwargs["coaccess_file"] = str(model_file)
+        config_kwargs["coaccess_record_topology_file"] = str(topology_file)
+    else:
+        raise ValueError(f"unsupported model topology policy={policy!r}")
+
+    editor.patch(_config_values(policy, limit, **config_kwargs))
+    adapter.clear_runtime_cache()
+    proc = None
+    try:
+        proc = adapter.start_server(record_log)
+        resp = adapter.post(spec.path, spec.body, token=spec.token or state.token)
+        payload = _response_payload_or_raise(resp, spec)
+        adapter.validate_response(spec, payload)
+    finally:
+        process.stop_process(proc)
+        adapter.stop_stale_servers()
+    if not topology_file.exists():
+        raise RuntimeError(
+            f"{policy} topology record did not produce snapshot: {topology_file}"
+        )
+    print(f"    {policy} topology: wrote snapshot to {topology_file}")
+
+
+def _default_model_topology_file(policy: str, model_file: Path) -> Path | None:
+    if policy == "markov":
+        return markov.markov_topology_file_path(model_file)
+    if policy == "coaccess":
+        return coaccess.coaccess_topology_file_path(model_file)
+    return None
+
+
+def _trial_model_topology_file(model_file: Path, spec: RequestSpec, trial: int) -> Path:
+    safe_request = _safe(_request_id(spec))[:80]
+    suffix = f"{safe_request}_trial{trial}.topology.json"
+    return model_file.with_name(f"{model_file.name}.{suffix}")
 
 
 def _trial_paths(
@@ -1485,7 +1682,11 @@ def _config_values(
     oracle_topology_file: str = "",
     oracle_record_topology_file: str = "",
     markov_file: str = "",
+    markov_topology_file: str = "",
+    markov_record_topology_file: str = "",
     coaccess_file: str = "",
+    coaccess_topology_file: str = "",
+    coaccess_record_topology_file: str = "",
 ) -> dict[str, object]:
     effective = "none" if policy == "none" or (limit <= 0 and policy != "oracle") else policy
     return {
@@ -1497,7 +1698,11 @@ def _config_values(
         "prefetch_oracle_topology_file": oracle_topology_file,
         "prefetch_oracle_record_topology_file": oracle_record_topology_file,
         "prefetch_markov_file": markov_file,
+        "prefetch_markov_topology_file": markov_topology_file,
+        "prefetch_markov_record_topology_file": markov_record_topology_file,
         "prefetch_coaccess_file": coaccess_file,
+        "prefetch_coaccess_topology_file": coaccess_topology_file,
+        "prefetch_coaccess_record_topology_file": coaccess_record_topology_file,
     }
 
 
