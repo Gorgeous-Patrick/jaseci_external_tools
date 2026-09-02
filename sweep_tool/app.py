@@ -324,14 +324,14 @@ with tab_random:
     with c4:
         random_policies = st.text_input(
             "Random paired policies",
-            value="none ttg",
+            value="none ttg selep",
             help="Supported in stream mode: none, ttg, selep, history, manual.",
             key="random_policies",
         )
     st.caption(
         "TTG limits are app-specific. Defaults below come from each app's manifest. "
-        "SeLeP can still be selected explicitly; random-paired uses a lightweight "
-        "frequency model with top_k=8 by default."
+        "Random-paired includes SeLeP by default with a lightweight frequency "
+        "model and top_k=8."
     )
     random_limits_by_name: dict[str, str] = {}
     for name in selected_random_apps:
