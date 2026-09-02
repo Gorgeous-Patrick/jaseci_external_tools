@@ -1116,12 +1116,15 @@ def _run_trial(
 ) -> TrialResult:
     spec = spec_override or _require_request(state)
     oracle_file: Path | None = None
+    oracle_topology_file: Path | None = None
     model_file: Path | None = None
     if model_file_override is not None:
         model_file = model_file_override
         effective_policy = effective_policy_override or "markov"
     elif policy == "oracle":
-        oracle_file = _oracle_for_trial(adapter, editor, state, spec, limit, trial, options)
+        oracle_file, oracle_topology_file = _oracle_for_trial(
+            adapter, editor, state, spec, limit, trial, options
+        )
         effective_policy = "oracle"
     elif policy == "markov":
         model_file = _markov_for_trial(adapter, editor, state, spec, limit, trial, options)
@@ -1142,6 +1145,9 @@ def _run_trial(
             limit,
             access_log=str(access_log),
             oracle_file=str(oracle_file) if oracle_file is not None else "",
+            oracle_topology_file=(
+                str(oracle_topology_file) if oracle_topology_file is not None else ""
+            ),
             markov_file=str(model_file) if model_file is not None and effective_policy == "markov" else "",
             coaccess_file=str(model_file) if model_file is not None and effective_policy == "coaccess" else "",
         )
@@ -1205,6 +1211,9 @@ def _run_trial(
         miss=counts.get("miss", ""),
         db_q=db_q,
         oracle_file=str(oracle_file) if oracle_file is not None else "",
+        oracle_topology_file=(
+            str(oracle_topology_file) if oracle_topology_file is not None else ""
+        ),
         model_file=str(model_file) if model_file is not None else "",
     )
 
@@ -1217,8 +1226,12 @@ def _oracle_for_trial(
     limit: int,
     trial: int,
     options: SweepOptions,
-) -> Path:
+) -> tuple[Path, Path]:
     explicit = options.env.get("SWEEP_ORACLE_FILE") or options.env.get("JAC_PREFETCH_ORACLE_FILE")
+    explicit_topology = (
+        options.env.get("SWEEP_ORACLE_TOPOLOGY_FILE")
+        or options.env.get("JAC_PREFETCH_ORACLE_TOPOLOGY_FILE")
+    )
     if options.oracle_mode == "file":
         path = Path(explicit) if explicit else oracle.oracle_file_path(
             options.oracle_dir, adapter.name, spec.walker, spec.target_id, limit, trial
@@ -1226,7 +1239,16 @@ def _oracle_for_trial(
         path = path if path.is_absolute() else adapter.app_dir / path
         if not path.exists():
             raise FileNotFoundError(f"oracle file does not exist: {path}")
-        return path
+        topology_path = (
+            Path(explicit_topology)
+            if explicit_topology else oracle.oracle_topology_file_path(path)
+        )
+        topology_path = (
+            topology_path if topology_path.is_absolute() else adapter.app_dir / topology_path
+        )
+        if not topology_path.exists():
+            raise FileNotFoundError(f"oracle topology snapshot does not exist: {topology_path}")
+        return path, topology_path
     if options.oracle_mode != "auto":
         raise ValueError(f"unsupported SWEEP_ORACLE_MODE={options.oracle_mode!r}")
 
@@ -1234,6 +1256,11 @@ def _oracle_for_trial(
         options.oracle_dir, adapter.name, spec.walker, spec.target_id, limit, trial
     )
     output_path = output_path if output_path.is_absolute() else adapter.app_dir / output_path
+    topology_path = (
+        Path(explicit_topology)
+        if explicit_topology else oracle.oracle_topology_file_path(output_path)
+    )
+    topology_path = topology_path if topology_path.is_absolute() else adapter.app_dir / topology_path
 
     logs_dir = adapter.app_dir / adapter.options.manifest.logs_dir
     safe_walker = _safe(spec.walker)
@@ -1245,7 +1272,10 @@ def _oracle_for_trial(
             0,
             access_log=str(record_access_log),
             oracle_file="",
+            oracle_topology_file="",
+            oracle_record_topology_file=str(topology_path),
             markov_file="",
+            coaccess_file="",
         )
     )
     adapter.clear_runtime_cache()
@@ -1260,8 +1290,11 @@ def _oracle_for_trial(
         adapter.stop_stale_servers()
     ids = oracle.write_oracle_from_access_log(record_access_log, output_path)
     print(f"    oracle record: wrote {len(ids)} UUID(s) to {output_path}")
+    if not topology_path.exists():
+        raise RuntimeError(f"oracle record did not produce topology snapshot: {topology_path}")
+    print(f"    oracle record: wrote topology snapshot to {topology_path}")
     adapter.clear_runtime_cache()
-    return output_path
+    return output_path, topology_path
 
 
 def _markov_for_trial(
@@ -1449,6 +1482,8 @@ def _config_values(
     limit: int,
     access_log: str,
     oracle_file: str = "",
+    oracle_topology_file: str = "",
+    oracle_record_topology_file: str = "",
     markov_file: str = "",
     coaccess_file: str = "",
 ) -> dict[str, object]:
@@ -1459,6 +1494,8 @@ def _config_values(
         "prefetching": effective,
         "prefetch_limit": int(limit),
         "prefetch_oracle_file": oracle_file,
+        "prefetch_oracle_topology_file": oracle_topology_file,
+        "prefetch_oracle_record_topology_file": oracle_record_topology_file,
         "prefetch_markov_file": markov_file,
         "prefetch_coaccess_file": coaccess_file,
     }

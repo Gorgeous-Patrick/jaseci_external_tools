@@ -36,6 +36,7 @@ RESULT_COLUMNS = [
     "miss",
     "db_q",
     "oracle_file",
+    "oracle_topology_file",
     "model_file",
     "selep_events",
     "selep_matched_events",

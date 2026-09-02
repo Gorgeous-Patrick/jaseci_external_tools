@@ -24,6 +24,10 @@ def oracle_file_path(
     )
 
 
+def oracle_topology_file_path(oracle_file: Path) -> Path:
+    return oracle_file.with_name(oracle_file.name + ".topology.json")
+
+
 def write_oracle_from_access_log(access_log: Path, output_path: Path) -> list[str]:
     ids = extract_uuid_order(access_log)
     output_path.parent.mkdir(parents=True, exist_ok=True)

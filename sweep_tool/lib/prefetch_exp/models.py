@@ -136,6 +136,7 @@ class TrialResult:
     miss: str = ""
     db_q: str = ""
     oracle_file: str = ""
+    oracle_topology_file: str = ""
     model_file: str = ""
     selep_events: str = ""
     selep_matched_events: str = ""

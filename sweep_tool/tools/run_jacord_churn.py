@@ -70,6 +70,7 @@ CHURN_COLUMNS = [
     "base_dump",
     "churn_dump",
     "oracle_file",
+    "oracle_topology_file",
     "model_file",
     "ttg_plan_file",
 ]
@@ -99,6 +100,7 @@ class ChurnDump:
 class StalePlans:
     access_log: Path
     oracle_file: Path
+    oracle_topology_file: Path
     markov_file: Path
     coaccess_file: Path
     actual_ids: list[str]
@@ -160,6 +162,7 @@ def main() -> int:
             f"actual_ids={len(stale.actual_ids)}"
         )
         print(f"history file: {stale.oracle_file}")
+        print(f"history topo: {stale.oracle_topology_file}")
         print(f"markov file : {stale.markov_file}")
         print(f"coaccess    : {stale.coaccess_file}")
 
@@ -453,16 +456,18 @@ def _build_stale_plans(
     args: argparse.Namespace,
 ) -> StalePlans:
     limit = args.limit
+    stale_oracle = paths.models_dir / "history_pre_churn.uuids"
+    stale_topology = oracle.oracle_topology_file_path(stale_oracle)
+    stale_markov = paths.models_dir / "markov_pre_churn.json"
+    stale_coaccess = paths.models_dir / "coaccess_pre_churn.json"
     record = _record_access_trace(
         adapter,
         editor,
         spec,
         log_path=paths.logs_dir / "pre_churn_train.log",
         access_log=paths.logs_dir / "pre_churn_train_access.csv",
+        oracle_topology_file=stale_topology,
     )
-    stale_oracle = paths.models_dir / "history_pre_churn.uuids"
-    stale_markov = paths.models_dir / "markov_pre_churn.json"
-    stale_coaccess = paths.models_dir / "coaccess_pre_churn.json"
     ids = oracle.write_oracle_from_access_log(record["access_log"], stale_oracle)
     markov.write_markov_model_from_access_log(
         record["access_log"],
@@ -486,6 +491,7 @@ def _build_stale_plans(
     return StalePlans(
         access_log=record["access_log"],
         oracle_file=stale_oracle,
+        oracle_topology_file=stale_topology,
         markov_file=stale_markov,
         coaccess_file=stale_coaccess,
         actual_ids=ids,
@@ -660,6 +666,7 @@ def _measure_policy_trial(
     trial: int,
 ) -> dict[str, Any]:
     oracle_file: Path | None = None
+    oracle_topology_file: Path | None = None
     model_file: Path | None = None
     ttg_plan_file: Path | None = None
     runtime_policy = policy
@@ -667,18 +674,25 @@ def _measure_policy_trial(
 
     if policy == "oracle":
         oracle_file = paths.models_dir / "oracle" / f"p{dump.rate:02d}_trial{trial}.uuids"
+        oracle_topology_file = oracle.oracle_topology_file_path(oracle_file)
         record = _record_access_trace(
             adapter,
             editor,
             spec,
             log_path=paths.logs_dir / f"oracle_record_p{dump.rate:02d}_trial{trial}.log",
             access_log=paths.logs_dir / f"oracle_record_p{dump.rate:02d}_trial{trial}_access.csv",
+            oracle_topology_file=oracle_topology_file,
         )
         plan_ids = oracle.write_oracle_from_access_log(record["access_log"], oracle_file)
+        if not oracle_topology_file.exists():
+            raise RuntimeError(
+                f"oracle record did not produce topology snapshot: {oracle_topology_file}"
+            )
         _restore_named_dump(adapter, dump.dump_name)
     elif policy == "history":
         runtime_policy = "oracle"
         oracle_file = stale.oracle_file
+        oracle_topology_file = stale.oracle_topology_file
         plan_ids = _read_uuid_lines(stale.oracle_file)
     elif policy == "markov":
         model_file = stale.markov_file
@@ -716,6 +730,9 @@ def _measure_policy_trial(
             args.limit,
             access_log=str(access_log),
             oracle_file=str(oracle_file) if oracle_file is not None else "",
+            oracle_topology_file=(
+                str(oracle_topology_file) if oracle_topology_file is not None else ""
+            ),
             markov_file=str(model_file) if model_file is not None and runtime_policy == "markov" else "",
             coaccess_file=str(model_file) if model_file is not None and runtime_policy == "coaccess" else "",
         )
@@ -789,6 +806,9 @@ def _measure_policy_trial(
         "base_dump": args.base_dump,
         "churn_dump": dump.dump_name,
         "oracle_file": str(oracle_file) if oracle_file is not None else "",
+        "oracle_topology_file": (
+            str(oracle_topology_file) if oracle_topology_file is not None else ""
+        ),
         "model_file": str(model_file) if model_file is not None else "",
         "ttg_plan_file": str(ttg_plan_file) if ttg_plan_file is not None else "",
     }
@@ -801,8 +821,18 @@ def _record_access_trace(
     *,
     log_path: Path,
     access_log: Path,
+    oracle_topology_file: Path | None = None,
 ) -> dict[str, Any]:
-    editor.patch(_config_values("none", 0, access_log=str(access_log)))
+    editor.patch(
+        _config_values(
+            "none",
+            0,
+            access_log=str(access_log),
+            oracle_record_topology_file=(
+                str(oracle_topology_file) if oracle_topology_file is not None else ""
+            ),
+        )
+    )
     adapter.clear_runtime_cache()
     proc = None
     try:
@@ -815,6 +845,10 @@ def _record_access_trace(
     finally:
         process.stop_process(proc)
         adapter.stop_stale_servers()
+    if oracle_topology_file is not None and not oracle_topology_file.exists():
+        raise RuntimeError(
+            f"oracle record did not produce topology snapshot: {oracle_topology_file}"
+        )
     actual_ids = oracle.extract_uuid_order(access_log)
     return {
         "access_log": access_log,
@@ -879,6 +913,8 @@ def _config_values(
     limit: int,
     access_log: str,
     oracle_file: str = "",
+    oracle_topology_file: str = "",
+    oracle_record_topology_file: str = "",
     markov_file: str = "",
     coaccess_file: str = "",
 ) -> dict[str, object]:
@@ -889,6 +925,8 @@ def _config_values(
         "prefetching": effective,
         "prefetch_limit": int(limit),
         "prefetch_oracle_file": oracle_file,
+        "prefetch_oracle_topology_file": oracle_topology_file,
+        "prefetch_oracle_record_topology_file": oracle_record_topology_file,
         "prefetch_markov_file": markov_file,
         "prefetch_coaccess_file": coaccess_file,
     }
