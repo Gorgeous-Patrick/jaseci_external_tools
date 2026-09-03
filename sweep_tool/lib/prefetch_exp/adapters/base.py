@@ -5,11 +5,13 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import subprocess
 import time
 import tomllib
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 from lib.prefetch_exp import process
 from lib.prefetch_exp.db import make_db_manager
@@ -90,11 +92,34 @@ class BenchmarkAdapter(ABC):
             raise RuntimeError(f"{self.name}/{spec.walker} returned an empty response")
 
     def server_command(self) -> list[str]:
-        cmd = [self.options.jac_bin, "run", "--serve", "--no-client"]
+        if self._supports_jac_start():
+            cmd = [self.options.jac_bin, "start", "--no_client"]
+        else:
+            cmd = [self.options.jac_bin, "run", "--serve", "--no-client"]
+        port = self.server_port()
+        if port is not None:
+            cmd.extend(["--port", str(port)])
         if self.profile_name:
             cmd.extend(["--profile", self.profile_name])
         cmd.append(self.entry_point())
         return cmd
+
+    def _supports_jac_start(self) -> bool:
+        try:
+            result = subprocess.run(
+                [self.options.jac_bin, "start", "--help"],
+                cwd=str(self.app_dir),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False,
+            )
+        except OSError:
+            return False
+        return result.returncode == 0
+
+    def server_port(self) -> int | None:
+        parsed = urlsplit(self.base_url if "://" in self.base_url else f"http://{self.base_url}")
+        return parsed.port
 
     def entry_point(self) -> str:
         for path in (self.config_path, self.app_dir / "jac.toml"):

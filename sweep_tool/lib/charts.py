@@ -17,6 +17,7 @@ TIERS = ["L1", "L2", "L3", "MISS"]
 TIER_COLOR = {"L1": "#2ca02c", "L2": "#e6b800", "L3": "#ff7f0e", "MISS": "#d62728"}
 POLICY_COLOR = {
     "oracle": "#2ca02c",
+    "capre": "#d62728",
     "ttg": "#1f77b4",
     "none": "#7f7f7f",
     "markov": "#9467bd",
@@ -29,15 +30,16 @@ POLICY_COLOR = {
 }
 POLICY_ORDER = {
     "none": 0,
-    "ttg": 1,
-    "oracle": 2,
-    "selep": 3,
-    "markov": 4,
-    "markov1-pooled": 5,
-    "coaccess": 6,
-    "coaccess-pooled": 7,
-    "history": 8,
-    "manual": 9,
+    "capre": 1,
+    "ttg": 2,
+    "oracle": 3,
+    "selep": 4,
+    "markov": 5,
+    "markov1-pooled": 6,
+    "coaccess": 7,
+    "coaccess-pooled": 8,
+    "history": 9,
+    "manual": 10,
 }
 
 JACORD_TTG_HIDDEN_ROOT_PREFETCH = 200

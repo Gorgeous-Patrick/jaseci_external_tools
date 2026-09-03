@@ -18,6 +18,7 @@ SUPPORTED_POLICIES = {
     "none",
     "ttg",
     "oracle",
+    "capre",
     "markov",
     "history",
     "manual",
@@ -1180,6 +1181,12 @@ def _run_trial(
     log_path, access_log, profile_dir, profile_csv = _trial_paths(
         adapter, spec, output_policy, limit, trial, suffix=path_suffix
     )
+    call_spec = spec
+    capre_response_file: Path | None = None
+    if policy == "capre":
+        call_spec, capre_response_file = _linked_list_capre_trial_spec(
+            adapter, spec, access_log, profile_dir, profile_csv, limit, trial, options
+        )
     editor.patch(
         _config_values(
             effective_policy,
@@ -1209,29 +1216,43 @@ def _run_trial(
     db_before = _db_query_count(adapter) if options.count_db else ""
     try:
         proc = adapter.start_server(log_path, profile_dir=profile_dir, profile_csv=profile_csv)
-        resp = adapter.post(spec.path, spec.body, token=spec.token or state.token)
-        payload = _response_payload_or_raise(resp, spec)
-        adapter.validate_response(spec, payload)
+        resp = adapter.post(
+            call_spec.path,
+            call_spec.body,
+            token=call_spec.token or state.token,
+        )
+        payload = _response_payload_or_raise(resp, call_spec)
+        if capre_response_file is not None:
+            capre_response_file.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+        adapter.validate_response(call_spec, payload)
     finally:
         process.stop_process(proc)
         adapter.stop_stale_servers()
 
     _assert_trial_profiles(profile_dir, profile_csv)
     db_after = _db_query_count(adapter) if options.count_db else ""
-    counts = metrics.tier_counts(access_log)
-    profile = metrics.profile_breakdown(profile_csv)
-    if model_file and effective_policy == "coaccess":
-        quality = coaccess.plan_quality(model_file, spec.target_id, access_log, limit)
-    elif model_file:
-        quality = markov.plan_quality(model_file, spec.target_id, access_log, limit)
+    capre_metrics = _linked_list_capre_metrics(payload) if policy == "capre" else {}
+    if capre_metrics:
+        counts = _linked_list_capre_counts(capre_metrics)
+        profile = metrics.profile_breakdown(profile_csv)
+        quality = _linked_list_capre_quality(capre_metrics)
     else:
-        quality = {}
+        counts = metrics.tier_counts(access_log)
+        profile = metrics.profile_breakdown(profile_csv)
+        if model_file and effective_policy == "coaccess":
+            quality = coaccess.plan_quality(model_file, spec.target_id, access_log, limit)
+        elif model_file:
+            quality = markov.plan_quality(model_file, spec.target_id, access_log, limit)
+        else:
+            quality = {}
     db_q = ""
     if db_before != "" and db_after != "":
         try:
             db_q = str(int(db_after) - int(db_before))
         except ValueError:
             db_q = ""
+    if capre_metrics:
+        db_q = str(capre_metrics.get("query_count", ""))
 
     return TrialResult(
         policy=output_policy,
@@ -1253,8 +1274,14 @@ def _run_trial(
         undercoverage_ids=quality.get("undercoverage_ids", ""),
         topo_idx_ms=profile.get("topo_idx_ms", ""),
         ttg_ms=profile.get("ttg_ms", ""),
-        prefetch_ms=profile.get("prefetch_ms", ""),
-        walker_ms=profile.get("walker_ms", ""),
+        prefetch_ms=(
+            str(capre_metrics.get("prefetch_ms", ""))
+            if capre_metrics else profile.get("prefetch_ms", "")
+        ),
+        walker_ms=(
+            str(capre_metrics.get("cpu_ms", ""))
+            if capre_metrics else profile.get("walker_ms", "")
+        ),
         l1_hit_rate=counts.get("l1_hit_rate", ""),
         l1=counts.get("l1", ""),
         l2=counts.get("l2", ""),
@@ -1270,6 +1297,104 @@ def _run_trial(
             str(model_topology_file) if model_topology_file is not None else ""
         ),
     )
+
+
+def _linked_list_capre_trial_spec(
+    adapter,
+    spec: RequestSpec,
+    access_log: Path,
+    profile_dir: Path,
+    profile_csv: Path,
+    limit: int,
+    trial: int,
+    options: SweepOptions,
+) -> tuple[RequestSpec, Path]:
+    if adapter.name != "linked_list":
+        raise ValueError("capre baseline is currently implemented only for linked_list")
+    plans_dir = adapter.app_dir / "capre_plans"
+    safe_walker = _safe(spec.walker)
+    safe_request = _safe(_request_id(spec))[:80]
+    actual_file = plans_dir / f"actual_{safe_walker}_{safe_request}_trial{trial}.uuids"
+    prefetch_file = plans_dir / f"prefetch_{safe_walker}_{safe_request}_trial{trial}.uuids"
+    response_file = (
+        adapter.app_dir
+        / adapter.options.manifest.logs_dir
+        / f"http_response_{safe_walker}_policycapre_limit{limit}_trial{trial}.json"
+    )
+    return (
+        RequestSpec(
+            walker=spec.walker,
+            path="/function/oop_traverse",
+            body={
+                "start_id": spec.target_id,
+                "prefetch_limit": 0,
+                "visit_limit": int(options.env.get("JAC_VISIT_LIMIT") or "10000"),
+                "policy": "capre",
+                "postgres_uri": adapter.postgres_uri,
+                "access_log": str(access_log),
+                "actual_file": str(actual_file),
+                "prefetch_file": str(prefetch_file),
+                "profile_dir": str(profile_dir),
+                "profile_csv": str(profile_csv),
+                "include_metrics": True,
+            },
+            target_id=spec.target_id,
+            request_id=_request_id(spec),
+            token=spec.token,
+        ),
+        response_file,
+    )
+
+
+def _linked_list_capre_metrics(payload: object) -> dict[str, object]:
+    if not isinstance(payload, dict) or not payload.get("ok"):
+        raise RuntimeError(f"capre returned failed payload: {payload!r}")
+    data = payload.get("data")
+    result = data.get("result") if isinstance(data, dict) else None
+    capre_metrics = result.get("metrics") if isinstance(result, dict) else None
+    reports = result.get("reports") if isinstance(result, dict) else None
+    if not isinstance(capre_metrics, dict) or not isinstance(reports, list):
+        raise RuntimeError(f"capre returned malformed payload: {payload!r}")
+    if int(capre_metrics.get("visited", -1)) != len(reports):
+        raise RuntimeError(
+            "capre visited mismatch: "
+            f"metrics={capre_metrics.get('visited')} reports={len(reports)}"
+        )
+    return capre_metrics
+
+
+def _linked_list_capre_quality(capre_metrics: dict[str, object]) -> dict[str, str]:
+    return {
+        "coverage": str(capre_metrics.get("coverage", "")),
+        "accuracy": str(capre_metrics.get("accuracy", "")),
+        "actual_ids": str(capre_metrics.get("actual_ids", "")),
+        "plan_ids": str(capre_metrics.get("prefetched_ids", "")),
+        "covered_ids": str(capre_metrics.get("covered_ids", "")),
+        "overfetch_ids": str(capre_metrics.get("overfetch_ids", "")),
+        "undercoverage_ids": str(capre_metrics.get("undercoverage_ids", "")),
+    }
+
+
+def _linked_list_capre_counts(capre_metrics: dict[str, object]) -> dict[str, str]:
+    l1 = str(capre_metrics.get("l1", ""))
+    l3 = str(capre_metrics.get("l3", ""))
+    return {
+        "l1_hit_rate": _hit_rate(l1, l3),
+        "l1": l1,
+        "l2": "0",
+        "l3": l3,
+        "miss": "0",
+    }
+
+
+def _hit_rate(l1: str, l3: str) -> str:
+    try:
+        l1_count = int(l1)
+        l3_count = int(l3)
+    except ValueError:
+        return ""
+    total = l1_count + l3_count
+    return f"{(l1_count * 100.0 / total) if total else 0.0:.1f}"
 
 
 def _oracle_for_trial(
@@ -1707,7 +1832,7 @@ def _config_values(
 
 
 def _limits_for_policy(policy: str, limits: list[int]) -> list[int]:
-    if policy in {"none", "oracle"}:
+    if policy in {"none", "oracle", "capre"}:
         return [0]
     positive = [x for x in limits if x > 0]
     return positive or [0]

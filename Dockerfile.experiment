@@ -188,7 +188,7 @@ RUN chmod 0755 /usr/local/bin/jac \
     && mkdir -p /opt/jac/cache /opt/jac/state \
     && jac --version \
     && mkdir /tmp/seed \
-    && printf '[project]\nname = "seed"\nversion = "0.0.1"\nentry-point = "main.jac"\n\n[dependencies]\nsetuptools = ">=75"\n\n[serve]\nbase_route_app = "app"\n\n[scale.monitoring]\nenabled = true\n\n[scale.kubernetes]\nnamespace = "seed"\n' > /tmp/seed/jac.toml \
+    && printf '[project]\nname = "seed"\nversion = "0.0.1"\nentry-point = "main.jac"\n\n[dependencies]\nsetuptools = ">=75"\n"psycopg[binary]" = ">=3.2.0"\n\n[serve]\nbase_route_app = "app"\n\n[scale.monitoring]\nenabled = true\n\n[scale.kubernetes]\nnamespace = "seed"\n' > /tmp/seed/jac.toml \
     && printf 'with entry {}\n' > /tmp/seed/main.jac \
     && (cd /tmp/seed && jac install) \
     && rt_lib=$(ls -d /opt/jac/cache/jac/rt/*/python/lib/python3.*) \
@@ -196,6 +196,7 @@ RUN chmod 0755 /usr/local/bin/jac \
     && cp -a /tmp/seed/.jac/venv/lib/python3.*/site-packages/. "$rt_lib/site-packages/" \
     && ls "$rt_lib/site-packages" | grep -q dotenv \
     && ls "$rt_lib/site-packages" | grep -q prometheus_client \
+    && ls "$rt_lib/site-packages" | grep -q psycopg \
     && ls "$rt_lib/site-packages" | grep -q requests \
     && rm -rf /tmp/seed \
     && chmod -R a+rX /opt/jac/cache \
