@@ -223,27 +223,35 @@ def _write_oop_profile(
     );
 }
 
-def oop_traverse(
-    start_id: str,
-    policy: str = "none",
-    postgres_uri: str = "",
-    access_log: str = "",
-    actual_file: str = "",
-    prefetch_file: str = "",
-    profile_dir: str = "",
-    profile_csv: str = "",
-    include_metrics: bool = False
-) -> any {
-    del postgres_uri;
-    normalized_policy = policy.strip().lower();
-    if normalized_policy not in ["none", "dbridge_like"] {
-        raise ValueError(f"unsupported LinkedList OOP policy: {policy}");
-    }
+def oop_traverse() -> any {
+    start_id = os.environ.get("JAC_DBRIDGE_LIKE_START_ID", "").strip();
     if not start_id {
-        raise ValueError("LinkedList OOP traversal requires start_id");
+        raise ValueError("JAC_DBRIDGE_LIKE_START_ID is required");
+    }
+
+    access_log = os.environ.get("JAC_DBRIDGE_LIKE_ACCESS_LOG", "").strip();
+    cfg = get_config();
+    if not access_log and cfg is not None {
+        access_log = str(cast(any, cfg).run.access_log or "");
+    }
+    actual_file = os.environ.get("JAC_DBRIDGE_LIKE_ACTUAL_FILE", "").strip();
+    prefetch_file = os.environ.get("JAC_DBRIDGE_LIKE_PREFETCH_FILE", "").strip();
+    profile_dir = (
+        os.environ.get("JAC_DBRIDGE_LIKE_PROFILE_DIR", "").strip()
+        or os.environ.get("JAC_PROFILE_DIR", "").strip()
+    );
+    profile_csv = (
+        os.environ.get("JAC_DBRIDGE_LIKE_PROFILE_CSV", "").strip()
+        or os.environ.get("JAC_PROFILE_CSV", "").strip()
+    );
+
+    if not actual_file {
+        raise ValueError("JAC_DBRIDGE_LIKE_ACTUAL_FILE is required");
+    }
+    if not prefetch_file {
+        raise ValueError("JAC_DBRIDGE_LIKE_PREFETCH_FILE is required");
     }
     if access_log {
-        cfg = get_config();
         if cfg is not None {
             cast(any, cfg).run.access_log = access_log;
             _access_log_reset_for_tests();
@@ -266,7 +274,7 @@ def oop_traverse(
     prefetched_order: list[str] = [];
     prefetched_seen: set[str] = set();
     next_cache: dict[str, str] = {};
-    dbridge_like_next_item: (Item | None) = None;
+    next_item: (Item | None) = None;
     db_ms: float = 0.0;
     materialize_ms: float = 0.0;
     prefetch_wait_ms: float = 0.0;
@@ -279,9 +287,9 @@ def oop_traverse(
             break;
         }
         current: (Item | None) = None;
-        if dbridge_like_next_item is not None and _jac_id(dbridge_like_next_item) == current_id {
-            current = dbridge_like_next_item;
-            dbridge_like_next_item = None;
+        if next_item is not None and _jac_id(next_item) == current_id {
+            current = next_item;
+            next_item = None;
         } else {
             current = cast((Item | None), Jac.get_object(current_id));
         }
@@ -292,7 +300,7 @@ def oop_traverse(
         current_id = _jac_id(current);
         actual_order.append(current_id);
         dbridge_like_future: any = None;
-        if normalized_policy == "dbridge_like" and (len(reports) + 1) < max_visits {
+        if (len(reports) + 1) < max_visits {
             dbridge_like_future = _submit_dbridge_like_prefetch(current_id, next_cache);
         }
 
@@ -300,39 +308,25 @@ def oop_traverse(
         reports.append(value);
 
         if len(reports) < max_visits {
-            next_id = "";
-            if normalized_policy == "dbridge_like" {
-                wait_start = time.perf_counter();
-                prefetch_result = dbridge_like_future.result();
-                prefetch_wait_ms += (time.perf_counter() - wait_start) * 1000.0;
-                next_id = str(prefetch_result["next_id"]);
-                db_ms += float(prefetch_result["db_ms"]);
-                materialize_ms += float(prefetch_result["materialize_ms"]);
-                prefetch_ms += float(prefetch_result["elapsed_ms"]);
-                if bool(prefetch_result["queried"]) {
-                    query_count += 1;
-                }
-                if next_id {
-                    dbridge_like_next_item = cast((Item | None), prefetch_result["item"]);
-                }
-            } else {
-                edge_start = time.perf_counter();
-                was_cached = current_id in next_cache;
-                next_id = _next_item_id(current_id, next_cache);
-                edge_elapsed = (time.perf_counter() - edge_start) * 1000.0;
-                if not was_cached {
-                    query_count += 1;
-                }
-                db_ms += edge_elapsed;
+            wait_start = time.perf_counter();
+            prefetch_result = dbridge_like_future.result();
+            prefetch_wait_ms += (time.perf_counter() - wait_start) * 1000.0;
+            next_id = str(prefetch_result["next_id"]);
+            db_ms += float(prefetch_result["db_ms"]);
+            materialize_ms += float(prefetch_result["materialize_ms"]);
+            prefetch_ms += float(prefetch_result["elapsed_ms"]);
+            if bool(prefetch_result["queried"]) {
+                query_count += 1;
+            }
+            if next_id {
+                next_item = cast((Item | None), prefetch_result["item"]);
             }
             if not next_id {
                 break;
             }
-            if normalized_policy == "dbridge_like" {
-                if next_id not in prefetched_seen {
-                    prefetched_seen.add(next_id);
-                    prefetched_order.append(next_id);
-                }
+            if next_id not in prefetched_seen {
+                prefetched_seen.add(next_id);
+                prefetched_order.append(next_id);
             }
             current_id = next_id;
         }
@@ -353,7 +347,7 @@ def oop_traverse(
     _write_oop_profile(
         profile_dir,
         profile_csv,
-        normalized_policy,
+        "dbridge_like",
         profiler,
         e2e_ms,
         prefetch_ms,
@@ -363,7 +357,7 @@ def oop_traverse(
     );
 
     metrics = {
-        "policy": normalized_policy,
+        "policy": "dbridge_like",
         "prefetch_limit": 0,
         "trial": 0,
         "start_id": start_id,
@@ -395,11 +389,8 @@ def oop_traverse(
         "prefetch_file": prefetch_file,
         "error": ""
     };
-    if include_metrics {
-        return {
-            "reports": reports,
-            "metrics": metrics
-        };
-    }
-    return reports;
+    return {
+        "reports": reports,
+        "metrics": metrics
+    };
 }

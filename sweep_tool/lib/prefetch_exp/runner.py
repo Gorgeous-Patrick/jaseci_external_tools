@@ -1183,8 +1183,9 @@ def _run_trial(
     )
     call_spec = spec
     dbridge_like_response_file: Path | None = None
+    trial_env: dict[str, str] | None = None
     if policy == "dbridge_like":
-        call_spec, dbridge_like_response_file = _linked_list_dbridge_like_trial_spec(
+        call_spec, dbridge_like_response_file, trial_env = _linked_list_dbridge_like_trial_spec(
             adapter, spec, access_log, profile_dir, profile_csv, limit, trial, options
         )
     editor.patch(
@@ -1215,7 +1216,12 @@ def _run_trial(
     proc = None
     db_before = _db_query_count(adapter) if options.count_db else ""
     try:
-        proc = adapter.start_server(log_path, profile_dir=profile_dir, profile_csv=profile_csv)
+        proc = adapter.start_server(
+            log_path,
+            profile_dir=profile_dir,
+            profile_csv=profile_csv,
+            extra_env=trial_env,
+        )
         resp = adapter.post(
             call_spec.path,
             call_spec.body,
@@ -1316,7 +1322,7 @@ def _linked_list_dbridge_like_trial_spec(
     limit: int,
     trial: int,
     options: SweepOptions,
-) -> tuple[RequestSpec, Path]:
+) -> tuple[RequestSpec, Path, dict[str, str]]:
     if adapter.name != "linked_list":
         raise ValueError("dbridge_like baseline is currently implemented only for linked_list")
     plans_dir = adapter.app_dir / "dbridge_like_plans"
@@ -1329,26 +1335,25 @@ def _linked_list_dbridge_like_trial_spec(
         / adapter.options.manifest.logs_dir
         / f"http_response_{safe_walker}_policydbridge_like_limit{limit}_trial{trial}.json"
     )
+    trial_env = {
+        "JAC_DBRIDGE_LIKE_START_ID": str(spec.target_id),
+        "JAC_DBRIDGE_LIKE_ACCESS_LOG": str(access_log),
+        "JAC_DBRIDGE_LIKE_ACTUAL_FILE": str(actual_file),
+        "JAC_DBRIDGE_LIKE_PREFETCH_FILE": str(prefetch_file),
+        "JAC_DBRIDGE_LIKE_PROFILE_DIR": str(profile_dir),
+        "JAC_DBRIDGE_LIKE_PROFILE_CSV": str(profile_csv),
+    }
     return (
         RequestSpec(
             walker=spec.walker,
             path="/function/oop_traverse",
-            body={
-                "start_id": spec.target_id,
-                "policy": "dbridge_like",
-                "postgres_uri": adapter.postgres_uri,
-                "access_log": str(access_log),
-                "actual_file": str(actual_file),
-                "prefetch_file": str(prefetch_file),
-                "profile_dir": str(profile_dir),
-                "profile_csv": str(profile_csv),
-                "include_metrics": True,
-            },
+            body={},
             target_id=spec.target_id,
             request_id=_request_id(spec),
             token=spec.token,
         ),
         response_file,
+        trial_env,
     )
 
 

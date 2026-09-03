@@ -42,7 +42,6 @@ RESULT_COLUMNS = [
 ]
 
 SUPPORTED_POLICIES = {
-    "none": "none",
     "dbridge_like": "dbridge_like",
 }
 

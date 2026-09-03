@@ -33,7 +33,7 @@ from lib.prefetch_exp.db import load_db_settings  # noqa: E402
 
 
 DEFAULT_MANIFEST = SWEEP_TOOL_ROOT / "manifests" / "linked_list.yaml"
-DEFAULT_POLICIES = ["none", "dbridge_like"]
+DEFAULT_POLICIES = ["dbridge_like"]
 BASELINE_LIMIT = 0
 
 
@@ -44,11 +44,6 @@ def main() -> int:
     parser.add_argument("--start-id", default="")
     parser.add_argument("--base-url", default=os.environ.get("BASE_URL", "localhost:8000"))
     parser.add_argument("--jac-bin", default=os.environ.get("JAC_BIN", "jac"))
-    parser.add_argument(
-        "--reuse-server",
-        action="store_true",
-        help="Use an already-running Jac server at --base-url instead of starting one.",
-    )
     parser.add_argument("--username", default=os.environ.get("TEST_USER", "oop_sweep"))
     parser.add_argument("--password", default=os.environ.get("TEST_PASSWORD", "password"))
     parser.add_argument(
@@ -98,7 +93,6 @@ def main() -> int:
         "transport": "http",
         "base_url": args.base_url,
         "jac_bin": args.jac_bin,
-        "reuse_server": args.reuse_server,
         "policies": policies,
         "prefetch_limits": [BASELINE_LIMIT],
         "trials": args.trials,
@@ -149,56 +143,55 @@ def _run_http_cases(
     proc = None
     profiles_dir = out_dir / "profiles"
     profiles_dir.mkdir(parents=True, exist_ok=True)
-    try:
-        if not args.reuse_server:
-            server_log = logs_dir / "jac_server_oop_http.log"
-            proc = process.start_server(
-                _server_command(args),
-                APP_DIR,
-                {
-                    "JAC_BIN": args.jac_bin,
-                    "JAC_DB_URL": postgres_uri,
-                    "POSTGRES_URL": postgres_uri,
-                    "DATABASE_URL": postgres_uri,
-                    "JAC_PROFILE_DIR": str(profiles_dir),
-                },
-                server_log,
+    for policy in policies:
+        if policy != "dbridge_like":
+            raise ValueError(f"unsupported OOP LinkedList baseline: {policy}")
+        limit = BASELINE_LIMIT
+        print("========================================")
+        print(f"Case: baseline={policy}")
+        print("========================================")
+        for trial in range(1, args.trials + 1):
+            access_log = logs_dir / f"access_log_Traverse_policy{_safe(policy)}_limit{limit}_trial{trial}.csv"
+            actual_file = plans_dir / f"actual_policy{_safe(policy)}_limit{limit}_trial{trial}.uuids"
+            prefetch_file = plans_dir / f"prefetch_policy{_safe(policy)}_limit{limit}_trial{trial}.uuids"
+            profile_dir = (
+                profiles_dir
+                / f"policy_{_safe(policy)}"
+                / f"limit_{limit}"
+                / "Traverse"
+                / f"trial_{trial}"
             )
-            process.wait_ready(args.base_url)
-        process.register_user(args.base_url, args.username, args.password)
-        token = process.login(args.base_url, args.username, args.password)
-
-        for policy in policies:
-            limit = BASELINE_LIMIT
-            print("========================================")
-            print(f"Case: baseline={policy}")
-            print("========================================")
-            for trial in range(1, args.trials + 1):
-                access_log = logs_dir / f"access_log_Traverse_policy{_safe(policy)}_limit{limit}_trial{trial}.csv"
-                actual_file = plans_dir / f"actual_policy{_safe(policy)}_limit{limit}_trial{trial}.uuids"
-                prefetch_file = plans_dir / f"prefetch_policy{_safe(policy)}_limit{limit}_trial{trial}.uuids"
-                profile_dir = (
-                    profiles_dir
-                    / f"policy_{_safe(policy)}"
-                    / f"limit_{limit}"
-                    / "Traverse"
-                    / f"trial_{trial}"
+            profile_csv = profile_dir / "profile.csv"
+            response_file = logs_dir / f"http_response_policy{_safe(policy)}_limit{limit}_trial{trial}.json"
+            server_log = logs_dir / f"jac_server_oop_http_policy{_safe(policy)}_trial{trial}.log"
+            proc = None
+            try:
+                proc = process.start_server(
+                    _server_command(args),
+                    APP_DIR,
+                    {
+                        "JAC_BIN": args.jac_bin,
+                        "JAC_DB_URL": postgres_uri,
+                        "POSTGRES_URL": postgres_uri,
+                        "DATABASE_URL": postgres_uri,
+                        "JAC_PROFILE_DIR": str(profile_dir),
+                        "JAC_PROFILE_CSV": str(profile_csv),
+                        "JAC_DBRIDGE_LIKE_START_ID": start_id,
+                        "JAC_DBRIDGE_LIKE_ACCESS_LOG": str(access_log),
+                        "JAC_DBRIDGE_LIKE_ACTUAL_FILE": str(actual_file),
+                        "JAC_DBRIDGE_LIKE_PREFETCH_FILE": str(prefetch_file),
+                        "JAC_DBRIDGE_LIKE_PROFILE_DIR": str(profile_dir),
+                        "JAC_DBRIDGE_LIKE_PROFILE_CSV": str(profile_csv),
+                    },
+                    server_log,
                 )
-                response_file = logs_dir / f"http_response_policy{_safe(policy)}_limit{limit}_trial{trial}.json"
+                process.wait_ready(args.base_url)
+                process.register_user(args.base_url, args.username, args.password)
+                token = process.login(args.base_url, args.username, args.password)
                 resp = process.post_json(
                     args.base_url,
                     "/function/oop_traverse",
-                    {
-                        "start_id": start_id,
-                        "policy": policy,
-                        "postgres_uri": postgres_uri,
-                        "access_log": str(access_log),
-                        "actual_file": str(actual_file),
-                        "prefetch_file": str(prefetch_file),
-                        "profile_dir": str(profile_dir),
-                        "profile_csv": str(profile_dir / "profile.csv"),
-                        "include_metrics": True,
-                    },
+                    {},
                     token=token,
                 )
                 payload = resp.json()
@@ -220,9 +213,8 @@ def _run_http_cases(
                     f"coverage={_row_float(row, 'coverage'):.3f} "
                     f"accuracy={_row_float(row, 'accuracy'):.3f}"
                 )
-    finally:
-        if proc is not None:
-            process.stop_process(proc)
+            finally:
+                process.stop_process(proc)
 
 
 def _postgres_uri_from_local_config() -> str:
