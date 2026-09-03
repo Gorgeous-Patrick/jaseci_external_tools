@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import random
 import re
+import shutil
 import time
 from pathlib import Path
 
@@ -739,7 +740,30 @@ def _run_random_stream_trial(
         1,
         suffix=f"stream_seed{options.random_seed}_n{len(specs)}",
     )
-    if policy == "selep":
+    dbridge_like_stream_paths: dict[str, Path] | None = None
+    if policy == "dbridge_like":
+        sidecar_paths = None
+        dbridge_like_stream_paths = _dbridge_like_stream_paths(
+            adapter,
+            stream_spec,
+            access_log,
+            profile_dir,
+            profile_csv,
+            limit,
+            options,
+            len(specs),
+        )
+        editor.patch(
+            _config_values(
+                policy,
+                limit,
+                access_log=str(access_log),
+                oracle_file="",
+                markov_file="",
+                coaccess_file="",
+            )
+        )
+    elif policy == "selep":
         if cfg is None:
             raise RuntimeError("random-paired selep stream requires a trained cfg")
         sidecar_paths = selep.trial_paths(
@@ -795,9 +819,21 @@ def _run_random_stream_trial(
                 log_path,
                 profile_dir=profile_dir,
                 profile_csv=profile_csv,
+                extra_env=(
+                    _dbridge_like_env_from_paths(dbridge_like_stream_paths)
+                    if dbridge_like_stream_paths is not None
+                    else None
+                ),
             )
             request_results = _post_stream_requests(
-                adapter, state, policy, limit, specs, options, cfg
+                adapter,
+                state,
+                policy,
+                limit,
+                specs,
+                options,
+                cfg,
+                dbridge_like_stream_paths=dbridge_like_stream_paths,
             )
     finally:
         process.stop_process(proc)
@@ -812,6 +848,9 @@ def _run_random_stream_trial(
         except ValueError:
             db_q = ""
     counts = metrics.tier_counts(access_log)
+    if policy == "dbridge_like":
+        counts = _aggregate_trial_counts(request_results)
+        db_q = _sum_trial_int_field(request_results, "db_q")
     stats = selep.load_stats(sidecar_paths.sidecar_stats) if sidecar_paths else {}
     errors = stats.get("errors") or []
     error_text = str(len(errors)) if isinstance(errors, list) else ""
@@ -876,12 +915,44 @@ def _post_stream_requests(
     specs: list[RequestSpec],
     options: SweepOptions,
     cfg: selep.SelepModelConfig | None,
+    *,
+    dbridge_like_stream_paths: dict[str, Path] | None = None,
 ) -> list[TrialResult]:
     results: list[TrialResult] = []
     for request_order, spec in enumerate(specs, start=1):
-        resp = adapter.post(spec.path, spec.body, token=spec.token or state.token)
-        payload = _response_payload_or_raise(resp, spec)
-        adapter.validate_response(spec, payload)
+        call_spec = spec
+        dbridge_like_metrics: dict[str, object] = {}
+        quality: dict[str, str] = {}
+        counts: dict[str, str] = {}
+        if policy == "dbridge_like":
+            call_spec = RequestSpec(
+                walker=spec.walker,
+                path=_dbridge_like_endpoint(adapter.name, spec),
+                body=dict(spec.body or {}),
+                target_id=spec.target_id,
+                request_id=_request_id(spec),
+                token=spec.token,
+            )
+        resp = adapter.post(call_spec.path, call_spec.body, token=call_spec.token or state.token)
+        payload = _response_payload_or_raise(resp, call_spec)
+        if policy == "dbridge_like":
+            result = _dbridge_like_result(payload)
+            adapter.validate_response(spec, {"data": {"reports": result["reports"]}})
+            dbridge_like_metrics = _dbridge_like_metrics(payload)
+            quality = _dbridge_like_quality(dbridge_like_metrics)
+            counts = _dbridge_like_counts(dbridge_like_metrics)
+            _snapshot_dbridge_like_stream_artifacts(
+                adapter,
+                spec,
+                payload,
+                dbridge_like_stream_paths,
+                limit,
+                request_order,
+                len(specs),
+                options,
+            )
+        else:
+            adapter.validate_response(spec, payload)
         results.append(
             TrialResult(
                 policy=policy,
@@ -894,6 +965,23 @@ def _post_stream_requests(
                 train_n=str(options.random_train_k if policy == "selep" else 0),
                 trial_count=str(len(specs)),
                 pool_seed=str(options.random_seed),
+                coverage=quality.get("coverage", ""),
+                accuracy=quality.get("accuracy", ""),
+                actual_ids=quality.get("actual_ids", ""),
+                plan_ids=quality.get("plan_ids", ""),
+                covered_ids=quality.get("covered_ids", ""),
+                overfetch_ids=quality.get("overfetch_ids", ""),
+                undercoverage_ids=quality.get("undercoverage_ids", ""),
+                prefetch_ms=str(dbridge_like_metrics.get("prefetch_ms", "")),
+                materialize_ms=str(dbridge_like_metrics.get("materialize_ms", "")),
+                prefetch_wait_ms=str(dbridge_like_metrics.get("prefetch_wait_ms", "")),
+                walker_ms=str(dbridge_like_metrics.get("cpu_ms", "")),
+                l1_hit_rate=counts.get("l1_hit_rate", ""),
+                l1=counts.get("l1", ""),
+                l2=counts.get("l2", ""),
+                l3=counts.get("l3", ""),
+                miss=counts.get("miss", ""),
+                db_q=str(dbridge_like_metrics.get("query_count", "")),
                 model_file=str(cfg.model_path) if cfg is not None else "",
             )
         )
@@ -902,6 +990,109 @@ def _post_stream_requests(
             f"limit={limit} {resp.elapsed_ms:.3f}ms"
         )
     return results
+
+
+def _dbridge_like_stream_paths(
+    adapter,
+    spec: RequestSpec,
+    access_log: Path,
+    profile_dir: Path,
+    profile_csv: Path,
+    limit: int,
+    options: SweepOptions,
+    stream_n: int,
+) -> dict[str, Path]:
+    plans_dir = adapter.app_dir / "dbridge_like_plans"
+    safe_walker = _safe(spec.walker)
+    safe_request = _safe(_request_id(spec))[:80]
+    suffix = f"stream_seed{options.random_seed}_n{stream_n}"
+    return {
+        "access_log": access_log,
+        "actual_file": plans_dir / f"actual_{safe_walker}_{safe_request}_limit{limit}_{suffix}.uuids",
+        "prefetch_file": plans_dir / f"prefetch_{safe_walker}_{safe_request}_limit{limit}_{suffix}.uuids",
+        "profile_dir": profile_dir,
+        "profile_csv": profile_csv,
+    }
+
+
+def _dbridge_like_env_from_paths(paths: dict[str, Path] | None) -> dict[str, str]:
+    if paths is None:
+        return {}
+    return {
+        "JAC_DBRIDGE_LIKE_ACCESS_LOG": str(paths["access_log"]),
+        "JAC_DBRIDGE_LIKE_ACTUAL_FILE": str(paths["actual_file"]),
+        "JAC_DBRIDGE_LIKE_PREFETCH_FILE": str(paths["prefetch_file"]),
+        "JAC_DBRIDGE_LIKE_PROFILE_DIR": str(paths["profile_dir"]),
+        "JAC_DBRIDGE_LIKE_PROFILE_CSV": str(paths["profile_csv"]),
+    }
+
+
+def _snapshot_dbridge_like_stream_artifacts(
+    adapter,
+    spec: RequestSpec,
+    payload: object,
+    stream_paths: dict[str, Path] | None,
+    limit: int,
+    request_order: int,
+    stream_n: int,
+    options: SweepOptions,
+) -> None:
+    if stream_paths is None:
+        raise RuntimeError("dbridge_like random stream missing artifact paths")
+    logs_dir = adapter.app_dir / adapter.options.manifest.logs_dir
+    plans_dir = adapter.app_dir / "dbridge_like_plans"
+    safe_walker = _safe(spec.walker)
+    safe_request = _safe(_request_id(spec))[:80]
+    suffix = f"stream_seed{options.random_seed}_n{stream_n}_request{request_order}_{safe_request}"
+
+    response_file = logs_dir / (
+        f"http_response_{safe_walker}_policydbridge_like_limit{limit}_{suffix}.json"
+    )
+    response_file.parent.mkdir(parents=True, exist_ok=True)
+    response_file.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+
+    _copy_optional_file(
+        stream_paths["access_log"],
+        logs_dir / f"access_log_{safe_walker}_policydbridge_like_limit{limit}_{suffix}.csv",
+    )
+
+    plans_dir.mkdir(parents=True, exist_ok=True)
+    _copy_required_file(
+        stream_paths["actual_file"],
+        plans_dir / f"actual_{safe_walker}_{safe_request}_limit{limit}_{suffix}.uuids",
+    )
+    _copy_required_file(
+        stream_paths["prefetch_file"],
+        plans_dir / f"prefetch_{safe_walker}_{safe_request}_limit{limit}_{suffix}.uuids",
+    )
+
+    profile_snapshot_dir = (
+        stream_paths["profile_dir"] / f"request_{request_order}_{safe_request}"
+    )
+    profile_snapshot_dir.mkdir(parents=True, exist_ok=True)
+    _copy_required_file(stream_paths["profile_csv"], profile_snapshot_dir / "profile.csv")
+    _copy_required_file(
+        stream_paths["profile_dir"] / "jac_server.prof",
+        profile_snapshot_dir / "jac_server.prof",
+    )
+    _copy_required_file(
+        stream_paths["profile_dir"] / "jac_server.txt",
+        profile_snapshot_dir / "jac_server.txt",
+    )
+
+
+def _copy_required_file(src: Path, dst: Path) -> None:
+    if not src.exists():
+        raise RuntimeError(f"expected artifact missing: {src}")
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(src, dst)
+
+
+def _copy_optional_file(src: Path, dst: Path) -> None:
+    if not src.exists():
+        return
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(src, dst)
 
 
 def _collect_markov_training_trace(
@@ -1889,6 +2080,7 @@ def _is_supported_policy(policy: str) -> bool:
 def _is_random_runtime_policy(policy: str) -> bool:
     return policy in {
         "none",
+        "dbridge_like",
         "ttg",
         "history",
         "manual",
@@ -1997,6 +2189,35 @@ def _rate_summary(results: list[TrialResult], attr: str) -> str:
         return "n/a"
     mean = sum(vals) / len(vals)
     return f"mean={mean:.1f} range={min(vals):.1f}..{max(vals):.1f}"
+
+
+def _aggregate_trial_counts(results: list[TrialResult]) -> dict[str, str]:
+    l1 = _sum_trial_int_field(results, "l1")
+    l2 = _sum_trial_int_field(results, "l2")
+    l3 = _sum_trial_int_field(results, "l3")
+    miss = _sum_trial_int_field(results, "miss")
+    return {
+        "l1_hit_rate": _hit_rate(l1, l3),
+        "l1": l1,
+        "l2": l2,
+        "l3": l3,
+        "miss": miss,
+    }
+
+
+def _sum_trial_int_field(results: list[TrialResult], attr: str) -> str:
+    total = 0
+    seen = False
+    for result in results:
+        raw = getattr(result, attr, "")
+        if raw == "":
+            continue
+        try:
+            total += int(raw)
+        except ValueError:
+            return ""
+        seen = True
+    return str(total) if seen else ""
 
 
 def _db_query_count(adapter) -> str:

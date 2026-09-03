@@ -17,6 +17,7 @@ import from concurrent.futures { ThreadPoolExecutor }
 import from http { HTTPMethod }
 import from pathlib { Path }
 import from typing { cast }
+import from uuid { UUID }
 import from jaclang { JacRuntimeInterface as Jac }
 import from jaclang.project.config { get_config }
 import from jaclang.runtime.archetype { AccessLevel }
@@ -589,7 +590,7 @@ def _dbridge_like_store() -> any {
 }
 
 def _dbridge_like_jac_id(value: any) -> str {
-    return str(cast(any, value).__jac__.id);
+    return jid(value);
 }
 
 def _dbridge_like_remember(order: list[str], seen: set[str], uid: str) -> None {
@@ -664,6 +665,49 @@ def _dbridge_like_write_profile(
     );
 }
 
+def _dbridge_like_batch_get(ids: list[str]) -> dict[str, any] {
+    if not ids {
+        return {};
+    }
+    ctx = Jac.get_context();
+    mem = ctx.mem;
+    if mem is None {
+        raise RuntimeError("dbridge_like requires an active Jac memory session");
+    }
+    uuid_ids: list[UUID] = [];
+    seen: set[str] = set();
+    for uid in ids {
+        if uid and uid not in seen {
+            seen.add(uid);
+            uuid_ids.append(UUID(uid));
+        }
+    }
+    anchors = mem.batch_get(uuid_ids);
+    out: dict[str, any] = {};
+    for uid in ids {
+        if uid {
+            anchor = anchors.get(UUID(uid));
+            if anchor is not None and cast(any, anchor).archetype is not None {
+                out[uid] = cast(any, anchor).archetype;
+            }
+        }
+    }
+    return out;
+}
+
+def _dbridge_like_batch_tweets(ids: list[str], context: str) -> dict[str, Tweet] {
+    materialized = _dbridge_like_batch_get(ids);
+    tweets: dict[str, Tweet] = {};
+    for uid in ids {
+        tweet = cast((Tweet | None), materialized.get(uid));
+        if tweet is None {
+            raise ValueError(f"Tweet not found during dbridge_like {context}: {uid}");
+        }
+        tweets[uid] = tweet;
+    }
+    return tweets;
+}
+
 def _dbridge_like_empty_feed_result(
     root_id: str,
     e2e_ms: float,
@@ -730,42 +774,52 @@ def _dbridge_like_root_profile_id(root_id: str) -> str {
     return str(rows[0][0]) if rows else "";
 }
 
-def _dbridge_like_own_tweet_ids(profile_id: str) -> list[str] {
+def _dbridge_like_feed_tweet_ids(profile_id: str) -> list[str] {
     rows = _dbridge_like_store().rows(
         """
-        SELECT e.dst::text
-        FROM anchors e
-        JOIN anchors dst ON dst.id = e.dst
-        WHERE e.kind = 'EdgeAnchor'
-          AND e.src = CAST(:src AS uuid)
-          AND e.arch_type = 'Post'
-          AND dst.kind = 'NodeAnchor'
-          AND dst.arch_type = 'Tweet'
-        ORDER BY e.seq NULLS LAST, e.id
-        """,
-        {"src": profile_id}
-    );
-    return [str(r[0]) for r in rows];
-}
-
-def _dbridge_like_followed_tweet_ids(profile_id: str) -> list[str] {
-    rows = _dbridge_like_store().rows(
-        """
-        SELECT post.dst::text
-        FROM anchors follow
-        JOIN anchors followed ON followed.id = follow.dst
-        JOIN anchors post ON post.src = follow.dst
-        JOIN anchors tweet ON tweet.id = post.dst
-        WHERE follow.kind = 'EdgeAnchor'
-          AND follow.src = CAST(:src AS uuid)
-          AND follow.arch_type = 'Follow'
-          AND followed.kind = 'NodeAnchor'
-          AND followed.arch_type = 'Profile'
-          AND post.kind = 'EdgeAnchor'
-          AND post.arch_type = 'Post'
-          AND tweet.kind = 'NodeAnchor'
-          AND tweet.arch_type = 'Tweet'
-        ORDER BY follow.seq NULLS LAST, follow.id, post.seq NULLS LAST, post.id
+        SELECT tweet_id
+        FROM (
+            SELECT
+                0 AS path_rank,
+                NULL::bigint AS follow_seq,
+                NULL::uuid AS follow_id,
+                e.seq AS post_seq,
+                e.id AS post_id,
+                e.dst::text AS tweet_id
+            FROM anchors e
+            JOIN anchors dst ON dst.id = e.dst
+            WHERE e.kind = 'EdgeAnchor'
+              AND e.src = CAST(:src AS uuid)
+              AND e.arch_type = 'Post'
+              AND dst.kind = 'NodeAnchor'
+              AND dst.arch_type = 'Tweet'
+            UNION ALL
+            SELECT
+                1 AS path_rank,
+                follow.seq AS follow_seq,
+                follow.id AS follow_id,
+                post.seq AS post_seq,
+                post.id AS post_id,
+                post.dst::text AS tweet_id
+            FROM anchors follow
+            JOIN anchors followed ON followed.id = follow.dst
+            JOIN anchors post ON post.src = follow.dst
+            JOIN anchors tweet ON tweet.id = post.dst
+            WHERE follow.kind = 'EdgeAnchor'
+              AND follow.src = CAST(:src AS uuid)
+              AND follow.arch_type = 'Follow'
+              AND followed.kind = 'NodeAnchor'
+              AND followed.arch_type = 'Profile'
+              AND post.kind = 'EdgeAnchor'
+              AND post.arch_type = 'Post'
+              AND tweet.kind = 'NodeAnchor'
+              AND tweet.arch_type = 'Tweet'
+        ) feed_refs
+        ORDER BY path_rank,
+                 follow_seq NULLS LAST,
+                 follow_id NULLS LAST,
+                 post_seq NULLS LAST,
+                 post_id
         """,
         {"src": profile_id}
     );
@@ -775,28 +829,20 @@ def _dbridge_like_followed_tweet_ids(profile_id: str) -> list[str] {
 def _dbridge_like_prefetch_feed_tweets(profile_id: str) -> dict[str, any] {
     started = time.perf_counter();
     db_start = time.perf_counter();
-    tweet_ids = _dbridge_like_own_tweet_ids(profile_id);
-    tweet_ids += _dbridge_like_followed_tweet_ids(profile_id);
+    tweet_ids = _dbridge_like_feed_tweet_ids(profile_id);
     db_ms = (time.perf_counter() - db_start) * 1000.0;
 
     materialize_start = time.perf_counter();
-    tweets: list[Tweet] = [];
-    for tweet_id in tweet_ids {
-        tweet = cast((Tweet | None), Jac.get_object(tweet_id));
-        if tweet is None {
-            raise ValueError(f"Tweet not found during dbridge_like prefetch: {tweet_id}");
-        }
-        tweets.append(tweet);
-    }
+    tweets_by_id = _dbridge_like_batch_tweets(tweet_ids, "prefetch");
     materialize_ms = (time.perf_counter() - materialize_start) * 1000.0;
 
     return {
         "tweet_ids": tweet_ids,
-        "tweets": tweets,
+        "tweets_by_id": tweets_by_id,
         "db_ms": db_ms,
         "materialize_ms": materialize_ms,
         "elapsed_ms": (time.perf_counter() - started) * 1000.0,
-        "query_count": 2
+        "query_count": 1
     };
 }
 
@@ -876,7 +922,7 @@ def dbridge_like_load_feed(search_query: str = "") -> dict[str, any] {
     }
 
     materialize_start = time.perf_counter();
-    profile = cast((Profile | None), Jac.get_object(profile_id));
+    profile = cast((Profile | None), _dbridge_like_batch_get([profile_id]).get(profile_id));
     materialize_ms += (time.perf_counter() - materialize_start) * 1000.0;
     if profile is None {
         raise ValueError(f"Profile not found during dbridge_like traversal: {profile_id}");
@@ -894,10 +940,9 @@ def dbridge_like_load_feed(search_query: str = "") -> dict[str, any] {
     query_count += int(feed_prefetch["query_count"]);
 
     tweet_ids = cast(list[str], feed_prefetch["tweet_ids"]);
-    tweets = cast(list[Tweet], feed_prefetch["tweets"]);
-    for idx in range(len(tweet_ids)) {
-        tweet_id = tweet_ids[idx];
-        tweet = tweets[idx];
+    tweets_by_id = cast(dict[str, Tweet], feed_prefetch["tweets_by_id"]);
+    for tweet_id in tweet_ids {
+        tweet = tweets_by_id[tweet_id];
         _dbridge_like_remember(prefetched_order, prefetched_seen, tweet_id);
         _dbridge_like_remember(actual_order, actual_seen, tweet_id);
         feed.append(

@@ -100,7 +100,9 @@ class SweepOptions:
             random_n=int(env.get("SWEEP_RANDOM_N") or "20"),
             random_train_k=int(env.get("SWEEP_RANDOM_TRAIN_K") or "5"),
             random_seed=int(env.get("SWEEP_RANDOM_SEED") or "42"),
-            random_policies=_split_words(env.get("SWEEP_RANDOM_POLICIES") or "none ttg selep"),
+            random_policies=_split_words(
+                env.get("SWEEP_RANDOM_POLICIES") or "none dbridge_like ttg selep"
+            ),
             count_db=_env_bool(env.get("JAC_COUNT_DB") or env.get("JAC_COUNT_MONGO")),
             env=env,
         )

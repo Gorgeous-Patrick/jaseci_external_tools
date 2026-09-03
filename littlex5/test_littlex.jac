@@ -8,8 +8,6 @@ Run with:  jac test test_littlex.jac
 """
 
 import os;
-import pytest;
-import from typing { Any }
 import from tempfile { mkdtemp }
 import from jaclang.runtimelib.testing { JacTestClient }
 
@@ -27,7 +25,7 @@ def login_as(client: JacTestClient, username: str, password: str) {
 }
 
 """Return the walker's report list from a response."""
-def reports_of(response: Any) -> list {
+def reports_of(response: any) -> list {
     data = response.data;
     if data and "reports" in data {
         return data["reports"];
@@ -36,9 +34,20 @@ def reports_of(response: Any) -> list {
 }
 
 """Return the first reported value (or None if the walker reported nothing)."""
-def first_report(response: Any) -> Any {
+def first_report(response: any) -> any {
     reports = reports_of(response);
     return reports[0] if reports else None;
+}
+
+def tweet_rows(tweets: list) -> list {
+    return [
+        {
+            "content": t["content"],
+            "author_username": t["author_username"],
+            "is_mine": t["is_mine"]
+        }
+        for t in tweets
+    ];
 }
 
 # -- Auth --
@@ -233,6 +242,45 @@ test "feed includes tweets from followed users" {
     contents = {t["content"] for t in feed};
     assert "alice's update" in contents;
     assert "bob's update" in contents;
+
+    client.close();
+}
+
+test "dbridge_like load_feed matches walker feed" {
+    client = make_client();
+    client.register_user("alice", "secret123");
+    client.register_user("bob", "secret123");
+
+    client.login("bob", "secret123");
+    bob_profile = first_report(
+        client.post("/walker/setup_profile", json={"username": "bob"})
+    );
+    client.post("/walker/create_tweet", json={"content": "bob's update"});
+
+    client.login("alice", "secret123");
+    client.post("/walker/setup_profile", json={"username": "alice"});
+    client.post("/walker/create_tweet", json={"content": "alice's update"});
+    client.post("/walker/follow_user", json={"target_id": bob_profile["id"]});
+
+    tmp = mkdtemp();
+    os.environ["JAC_DBRIDGE_LIKE_ACTUAL_FILE"] = os.path.join(tmp, "actual.uuids");
+    os.environ["JAC_DBRIDGE_LIKE_PREFETCH_FILE"] = os.path.join(tmp, "prefetch.uuids");
+    os.environ["JAC_DBRIDGE_LIKE_PROFILE_DIR"] = os.path.join(tmp, "profile");
+    os.environ["JAC_DBRIDGE_LIKE_PROFILE_CSV"] = os.path.join(tmp, "profile", "profile.csv");
+
+    actual_response = client.post("/dbridge_like/load_feed", json={});
+    assert actual_response.ok;
+    actual = actual_response.data;
+    expected = first_report(client.post("/walker/load_feed", json={}));
+    actual_feed = actual["reports"][0];
+    metrics = actual["metrics"];
+
+    assert tweet_rows(actual_feed) == tweet_rows(expected);
+    assert len(actual_feed) == 2;
+    assert int(metrics["visited"]) == 2;
+    assert int(metrics["query_count"]) == 2;
+    assert int(metrics["overfetch_ids"]) == 0;
+    assert int(metrics["undercoverage_ids"]) == 1;
 
     client.close();
 }
