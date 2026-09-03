@@ -19,13 +19,14 @@ parameters:
   - name: SWEEP_POLICIES
     label: Prefetch policies
     kind: str
-    default: "none capre ttg oracle markov1-pooled coaccess-pooled"
+    default: "none dbridge_like ttg oracle markov1-pooled coaccess-pooled"
     help: >
-      Space-separated policies to run. Supported: none, capre, ttg, oracle,
+      Space-separated policies to run. Supported: none, dbridge_like, ttg, oracle,
       markov, markov1-pooled, coaccess, coaccess-pooled, selep, history,
-      manual. CAPRe is a LinkedList OOP baseline that resolves Next by explicit
-      edge SQL and does not consume prefetch limits. Oracle, Markov, and
-      co-access default to auto-record/train then replay.
+      manual. dbridge_like is a LinkedList OOP baseline that resolves Next by
+      explicit edge SQL and schedules a one-step-ahead background materialization
+      helper. It does not consume prefetch limits. Oracle, Markov, and co-access
+      default to auto-record/train then replay.
 
   - name: SWEEP_ORACLE_MODE
     label: Oracle mode

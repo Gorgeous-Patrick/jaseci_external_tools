@@ -18,7 +18,7 @@ SUPPORTED_POLICIES = {
     "none",
     "ttg",
     "oracle",
-    "capre",
+    "dbridge_like",
     "markov",
     "history",
     "manual",
@@ -1182,9 +1182,9 @@ def _run_trial(
         adapter, spec, output_policy, limit, trial, suffix=path_suffix
     )
     call_spec = spec
-    capre_response_file: Path | None = None
-    if policy == "capre":
-        call_spec, capre_response_file = _linked_list_capre_trial_spec(
+    dbridge_like_response_file: Path | None = None
+    if policy == "dbridge_like":
+        call_spec, dbridge_like_response_file = _linked_list_dbridge_like_trial_spec(
             adapter, spec, access_log, profile_dir, profile_csv, limit, trial, options
         )
     editor.patch(
@@ -1222,8 +1222,8 @@ def _run_trial(
             token=call_spec.token or state.token,
         )
         payload = _response_payload_or_raise(resp, call_spec)
-        if capre_response_file is not None:
-            capre_response_file.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+        if dbridge_like_response_file is not None:
+            dbridge_like_response_file.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
         adapter.validate_response(call_spec, payload)
     finally:
         process.stop_process(proc)
@@ -1231,11 +1231,11 @@ def _run_trial(
 
     _assert_trial_profiles(profile_dir, profile_csv)
     db_after = _db_query_count(adapter) if options.count_db else ""
-    capre_metrics = _linked_list_capre_metrics(payload) if policy == "capre" else {}
-    if capre_metrics:
-        counts = _linked_list_capre_counts(capre_metrics)
+    dbridge_like_metrics = _linked_list_dbridge_like_metrics(payload) if policy == "dbridge_like" else {}
+    if dbridge_like_metrics:
+        counts = _linked_list_dbridge_like_counts(dbridge_like_metrics)
         profile = metrics.profile_breakdown(profile_csv)
-        quality = _linked_list_capre_quality(capre_metrics)
+        quality = _linked_list_dbridge_like_quality(dbridge_like_metrics)
     else:
         counts = metrics.tier_counts(access_log)
         profile = metrics.profile_breakdown(profile_csv)
@@ -1251,8 +1251,8 @@ def _run_trial(
             db_q = str(int(db_after) - int(db_before))
         except ValueError:
             db_q = ""
-    if capre_metrics:
-        db_q = str(capre_metrics.get("query_count", ""))
+    if dbridge_like_metrics:
+        db_q = str(dbridge_like_metrics.get("query_count", ""))
 
     return TrialResult(
         policy=output_policy,
@@ -1275,12 +1275,20 @@ def _run_trial(
         topo_idx_ms=profile.get("topo_idx_ms", ""),
         ttg_ms=profile.get("ttg_ms", ""),
         prefetch_ms=(
-            str(capre_metrics.get("prefetch_ms", ""))
-            if capre_metrics else profile.get("prefetch_ms", "")
+            str(dbridge_like_metrics.get("prefetch_ms", ""))
+            if dbridge_like_metrics else profile.get("prefetch_ms", "")
+        ),
+        materialize_ms=(
+            str(dbridge_like_metrics.get("materialize_ms", ""))
+            if dbridge_like_metrics else profile.get("materialize_ms", "")
+        ),
+        prefetch_wait_ms=(
+            str(dbridge_like_metrics.get("prefetch_wait_ms", ""))
+            if dbridge_like_metrics else profile.get("prefetch_wait_ms", "")
         ),
         walker_ms=(
-            str(capre_metrics.get("cpu_ms", ""))
-            if capre_metrics else profile.get("walker_ms", "")
+            str(dbridge_like_metrics.get("cpu_ms", ""))
+            if dbridge_like_metrics else profile.get("walker_ms", "")
         ),
         l1_hit_rate=counts.get("l1_hit_rate", ""),
         l1=counts.get("l1", ""),
@@ -1299,7 +1307,7 @@ def _run_trial(
     )
 
 
-def _linked_list_capre_trial_spec(
+def _linked_list_dbridge_like_trial_spec(
     adapter,
     spec: RequestSpec,
     access_log: Path,
@@ -1310,8 +1318,8 @@ def _linked_list_capre_trial_spec(
     options: SweepOptions,
 ) -> tuple[RequestSpec, Path]:
     if adapter.name != "linked_list":
-        raise ValueError("capre baseline is currently implemented only for linked_list")
-    plans_dir = adapter.app_dir / "capre_plans"
+        raise ValueError("dbridge_like baseline is currently implemented only for linked_list")
+    plans_dir = adapter.app_dir / "dbridge_like_plans"
     safe_walker = _safe(spec.walker)
     safe_request = _safe(_request_id(spec))[:80]
     actual_file = plans_dir / f"actual_{safe_walker}_{safe_request}_trial{trial}.uuids"
@@ -1319,7 +1327,7 @@ def _linked_list_capre_trial_spec(
     response_file = (
         adapter.app_dir
         / adapter.options.manifest.logs_dir
-        / f"http_response_{safe_walker}_policycapre_limit{limit}_trial{trial}.json"
+        / f"http_response_{safe_walker}_policydbridge_like_limit{limit}_trial{trial}.json"
     )
     return (
         RequestSpec(
@@ -1327,7 +1335,7 @@ def _linked_list_capre_trial_spec(
             path="/function/oop_traverse",
             body={
                 "start_id": spec.target_id,
-                "policy": "capre",
+                "policy": "dbridge_like",
                 "postgres_uri": adapter.postgres_uri,
                 "access_log": str(access_log),
                 "actual_file": str(actual_file),
@@ -1344,40 +1352,40 @@ def _linked_list_capre_trial_spec(
     )
 
 
-def _linked_list_capre_metrics(payload: object) -> dict[str, object]:
+def _linked_list_dbridge_like_metrics(payload: object) -> dict[str, object]:
     if not isinstance(payload, dict) or not payload.get("ok"):
-        raise RuntimeError(f"capre returned failed payload: {payload!r}")
+        raise RuntimeError(f"dbridge_like returned failed payload: {payload!r}")
     data = payload.get("data")
     result = data.get("result") if isinstance(data, dict) else None
-    capre_metrics = result.get("metrics") if isinstance(result, dict) else None
+    dbridge_like_metrics = result.get("metrics") if isinstance(result, dict) else None
     reports = result.get("reports") if isinstance(result, dict) else None
-    if not isinstance(capre_metrics, dict) or not isinstance(reports, list):
-        raise RuntimeError(f"capre returned malformed payload: {payload!r}")
-    if int(capre_metrics.get("visited", -1)) != len(reports):
+    if not isinstance(dbridge_like_metrics, dict) or not isinstance(reports, list):
+        raise RuntimeError(f"dbridge_like returned malformed payload: {payload!r}")
+    if int(dbridge_like_metrics.get("visited", -1)) != len(reports):
         raise RuntimeError(
-            "capre visited mismatch: "
-            f"metrics={capre_metrics.get('visited')} reports={len(reports)}"
+            "dbridge_like visited mismatch: "
+            f"metrics={dbridge_like_metrics.get('visited')} reports={len(reports)}"
         )
-    return capre_metrics
+    return dbridge_like_metrics
 
 
-def _linked_list_capre_quality(capre_metrics: dict[str, object]) -> dict[str, str]:
+def _linked_list_dbridge_like_quality(dbridge_like_metrics: dict[str, object]) -> dict[str, str]:
     return {
-        "coverage": str(capre_metrics.get("coverage", "")),
-        "accuracy": str(capre_metrics.get("accuracy", "")),
-        "actual_ids": str(capre_metrics.get("actual_ids", "")),
-        "plan_ids": str(capre_metrics.get("prefetched_ids", "")),
-        "covered_ids": str(capre_metrics.get("covered_ids", "")),
-        "overfetch_ids": str(capre_metrics.get("overfetch_ids", "")),
-        "undercoverage_ids": str(capre_metrics.get("undercoverage_ids", "")),
+        "coverage": str(dbridge_like_metrics.get("coverage", "")),
+        "accuracy": str(dbridge_like_metrics.get("accuracy", "")),
+        "actual_ids": str(dbridge_like_metrics.get("actual_ids", "")),
+        "plan_ids": str(dbridge_like_metrics.get("prefetched_ids", "")),
+        "covered_ids": str(dbridge_like_metrics.get("covered_ids", "")),
+        "overfetch_ids": str(dbridge_like_metrics.get("overfetch_ids", "")),
+        "undercoverage_ids": str(dbridge_like_metrics.get("undercoverage_ids", "")),
     }
 
 
-def _linked_list_capre_counts(capre_metrics: dict[str, object]) -> dict[str, str]:
-    l1 = str(capre_metrics.get("l1", ""))
-    l2 = str(capre_metrics.get("l2", "0"))
-    l3 = str(capre_metrics.get("l3", ""))
-    miss = str(capre_metrics.get("miss", "0"))
+def _linked_list_dbridge_like_counts(dbridge_like_metrics: dict[str, object]) -> dict[str, str]:
+    l1 = str(dbridge_like_metrics.get("l1", ""))
+    l2 = str(dbridge_like_metrics.get("l2", "0"))
+    l3 = str(dbridge_like_metrics.get("l3", ""))
+    miss = str(dbridge_like_metrics.get("miss", "0"))
     return {
         "l1_hit_rate": _hit_rate(l1, l3),
         "l1": l1,
@@ -1832,7 +1840,7 @@ def _config_values(
 
 
 def _limits_for_policy(policy: str, limits: list[int]) -> list[int]:
-    if policy in {"none", "oracle", "capre"}:
+    if policy in {"none", "oracle", "dbridge_like"}:
         return [0]
     positive = [x for x in limits if x > 0]
     return positive or [0]

@@ -33,7 +33,7 @@ from lib.prefetch_exp.db import load_db_settings  # noqa: E402
 
 
 DEFAULT_MANIFEST = SWEEP_TOOL_ROOT / "manifests" / "linked_list.yaml"
-DEFAULT_POLICIES = ["none", "capre"]
+DEFAULT_POLICIES = ["none", "dbridge_like"]
 BASELINE_LIMIT = 0
 
 
@@ -42,12 +42,6 @@ def main() -> int:
     parser.add_argument("--manifest", default=str(DEFAULT_MANIFEST))
     parser.add_argument("--postgres-uri", default="")
     parser.add_argument("--start-id", default="")
-    parser.add_argument(
-        "--transport",
-        choices=("http", "direct"),
-        default=os.environ.get("LINKED_LIST_OOP_TRANSPORT", "http"),
-        help="http runs the Jac /function/oop_traverse endpoint; direct raw-PgSQL mode is retired.",
-    )
     parser.add_argument("--base-url", default=os.environ.get("BASE_URL", "localhost:8000"))
     parser.add_argument("--jac-bin", default=os.environ.get("JAC_BIN", "jac"))
     parser.add_argument(
@@ -67,24 +61,11 @@ def main() -> int:
         ),
     )
     parser.add_argument("--policies", default=" ".join(DEFAULT_POLICIES))
-    parser.add_argument(
-        "--prefetch-limits",
-        default="",
-        help=(
-            "Deprecated compatibility option. CAPRe is a baseline and does "
-            "not consume TTG-style prefetch limits; rows use prefetch_limit=0."
-        ),
-    )
     parser.add_argument("--trials", type=int, default=3)
     parser.add_argument(
         "--out-dir",
         default="",
-        help="Defaults to analysis/linked_list_oop_capre_<timestamp> under the repo root.",
-    )
-    parser.add_argument(
-        "--include-none-at-all-limits",
-        action="store_true",
-        help="Deprecated compatibility flag; baseline policies always run once.",
+        help="Defaults to analysis/linked_list_oop_dbridge_like_<timestamp> under the repo root.",
     )
     args = parser.parse_args()
 
@@ -92,7 +73,6 @@ def main() -> int:
     _validate_linked_list_manifest_hint(manifest_path)
 
     policies = _canonical_policies(_split_words(args.policies))
-    _ignored_limits = _parse_ints(args.prefetch_limits) if args.prefetch_limits.strip() else []
     if args.trials <= 0:
         raise ValueError("--trials must be positive")
 
@@ -110,18 +90,17 @@ def main() -> int:
     oop_linked_list.write_results_header(results_path)
 
     metadata: dict[str, Any] = {
-        "mode": f"linked_list_oop_{args.transport}",
+        "mode": "linked_list_oop_http",
         "created_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "manifest": str(manifest_path),
         "app_dir": str(APP_DIR.resolve()),
         "postgres_uri": _redact_uri(postgres_uri),
-        "transport": args.transport,
+        "transport": "http",
         "base_url": args.base_url,
         "jac_bin": args.jac_bin,
         "reuse_server": args.reuse_server,
         "policies": policies,
         "prefetch_limits": [BASELINE_LIMIT],
-        "ignored_prefetch_limits": _ignored_limits,
         "trials": args.trials,
         "start_id": start_id,
         "setup_nodes_file": str(Path(args.setup_nodes_file).resolve()) if args.setup_nodes_file else "",
@@ -129,8 +108,8 @@ def main() -> int:
             "No Jac walker/spawn/visit execution is used by OOP policies.",
             "The request target is the first node from Jac setup_graph, or an explicit matching start-id.",
             "Next edges are resolved by explicit SQL over Jac's persisted PgSQL schema, not by Jac spatial hop resolution.",
-            "capre is an OOP baseline; it resolves and materializes the next Item after report and before the next object read.",
-            "prefetch_limit is an OSP/TTG budget concept and is not applied to capre.",
+            "dbridge_like is an OOP baseline; it schedules a background helper to resolve and materialize the next Item while the current Item is consumed.",
+            "prefetch_limit is an OSP/TTG budget concept and is not applied to dbridge_like.",
         ],
     }
     (out_dir / "metadata.json").write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n")
@@ -139,19 +118,14 @@ def main() -> int:
     print(f"manifest : {manifest_path}")
     print(f"db       : {_redact_uri(postgres_uri)}")
     print(f"out_dir  : {out_dir}")
-    print(f"transport: {args.transport}")
+    print("transport: http")
     print(f"baselines: {' '.join(policies)}")
-    print(f"limits   : {BASELINE_LIMIT} (schema placeholder; not a CAPRe budget)")
+    print(f"limits   : {BASELINE_LIMIT} (schema placeholder; not a dbridge_like budget)")
     print(f"trials   : {args.trials}")
     print(f"start_id : {start_id}")
     print("")
 
-    if args.transport == "http":
-        _run_http_cases(args, policies, start_id, postgres_uri, results_path, logs_dir, plans_dir, out_dir)
-    elif args.transport == "direct":
-        raise RuntimeError("direct raw-PgSQL CAPRe mode was removed; use --transport http")
-    else:
-        _run_direct_cases(args, policies, start_id, postgres_uri, results_path, logs_dir, plans_dir)
+    _run_http_cases(args, policies, start_id, postgres_uri, results_path, logs_dir, plans_dir, out_dir)
 
     print("")
     print("========================================")
@@ -160,19 +134,6 @@ def main() -> int:
     print("========================================")
     print(results_path.read_text())
     return 0
-
-
-def _run_direct_cases(
-    args: argparse.Namespace,
-    policies: list[str],
-    start_id: str,
-    postgres_uri: str,
-    results_path: Path,
-    logs_dir: Path,
-    plans_dir: Path,
-) -> None:
-    del args, policies, start_id, postgres_uri, results_path, logs_dir, plans_dir;
-    raise RuntimeError("direct raw-PgSQL CAPRe mode was removed; use --transport http")
 
 
 def _run_http_cases(
@@ -254,6 +215,7 @@ def _run_http_cases(
                 print(
                     f"  Trial {trial}: {_row_float(row, 'e2e_ms'):.3f}ms "
                     f"db={_row_float(row, 'db_ms'):.3f}ms q={row['query_count']} "
+                    f"wait={_row_float(row, 'prefetch_wait_ms'):.3f}ms "
                     f"L1={row['l1']} L3={row['l3']} "
                     f"coverage={_row_float(row, 'coverage'):.3f} "
                     f"accuracy={_row_float(row, 'accuracy'):.3f}"
@@ -434,16 +396,11 @@ def _nodes_from_setup_json(parsed: Any) -> list[Any]:
 
 def _default_out_dir() -> Path:
     stamp = time.strftime("%Y%m%d_%H%M%S")
-    return REPO_ROOT / "analysis" / f"linked_list_oop_capre_{stamp}"
+    return REPO_ROOT / "analysis" / f"linked_list_oop_dbridge_like_{stamp}"
 
 
 def _split_words(raw: str) -> list[str]:
     return [x.strip().lower() for x in raw.replace(",", " ").split() if x.strip()]
-
-
-def _parse_ints(raw: str) -> list[int]:
-    vals = [int(x) for x in raw.replace(",", " ").split() if x.strip()]
-    return vals
 
 
 def _canonical_policies(raw_policies: list[str]) -> list[str]:

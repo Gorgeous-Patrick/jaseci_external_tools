@@ -1,4 +1,4 @@
-"""Shared schema helpers for LinkedList's Jac-native OOP/CAPRe endpoint."""
+"""Shared schema helpers for LinkedList's Jac-native OOP/DBridge-like endpoint."""
 
 from __future__ import annotations
 
@@ -20,6 +20,8 @@ RESULT_COLUMNS = [
     "db_ms",
     "cpu_ms",
     "prefetch_ms",
+    "materialize_ms",
+    "prefetch_wait_ms",
     "query_count",
     "l1",
     "l2",
@@ -39,17 +41,15 @@ RESULT_COLUMNS = [
     "error",
 ]
 
-POLICY_ALIASES = {
+SUPPORTED_POLICIES = {
     "none": "none",
-    "oop-none": "none",
-    "capre": "capre",
-    "oop-capre": "capre",
+    "dbridge_like": "dbridge_like",
 }
 
 
 def canonical_policy(policy: str) -> str:
     try:
-        return POLICY_ALIASES[policy.strip().lower()]
+        return SUPPORTED_POLICIES[policy.strip().lower()]
     except KeyError as exc:
         raise ValueError(f"unsupported LinkedList OOP policy: {policy}") from exc
 
@@ -69,7 +69,7 @@ def append_row(path: Path, row: dict[str, Any]) -> None:
 
 __all__ = [
     "RESULT_COLUMNS",
-    "POLICY_ALIASES",
+    "SUPPORTED_POLICIES",
     "canonical_policy",
     "write_results_header",
     "append_row",

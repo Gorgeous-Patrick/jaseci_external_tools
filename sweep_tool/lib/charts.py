@@ -17,7 +17,7 @@ TIERS = ["L1", "L2", "L3", "MISS"]
 TIER_COLOR = {"L1": "#2ca02c", "L2": "#e6b800", "L3": "#ff7f0e", "MISS": "#d62728"}
 POLICY_COLOR = {
     "oracle": "#2ca02c",
-    "capre": "#d62728",
+    "dbridge_like": "#d62728",
     "ttg": "#1f77b4",
     "none": "#7f7f7f",
     "markov": "#9467bd",
@@ -30,7 +30,7 @@ POLICY_COLOR = {
 }
 POLICY_ORDER = {
     "none": 0,
-    "capre": 1,
+    "dbridge_like": 1,
     "ttg": 2,
     "oracle": 3,
     "selep": 4,

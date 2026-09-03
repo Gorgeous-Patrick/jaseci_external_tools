@@ -28,6 +28,8 @@ RESULT_COLUMNS = [
     "topo_idx_ms",
     "ttg_ms",
     "prefetch_ms",
+    "materialize_ms",
+    "prefetch_wait_ms",
     "walker_ms",
     "l1_hit_rate",
     "l1",
@@ -65,6 +67,8 @@ def profile_breakdown(profile_csv: Path) -> dict[str, str]:
         "topo_idx_ms": row.get("topo_idx_ms", ""),
         "ttg_ms": row.get("ttg_ms", ""),
         "prefetch_ms": row.get("prefetch_ms", ""),
+        "materialize_ms": row.get("materialize_ms", ""),
+        "prefetch_wait_ms": row.get("prefetch_wait_ms", ""),
         "walker_ms": row.get("walker_ms", ""),
     }
 

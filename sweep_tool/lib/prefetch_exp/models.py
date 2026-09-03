@@ -128,6 +128,8 @@ class TrialResult:
     topo_idx_ms: str = ""
     ttg_ms: str = ""
     prefetch_ms: str = ""
+    materialize_ms: str = ""
+    prefetch_wait_ms: str = ""
     walker_ms: str = ""
     l1_hit_rate: str = ""
     l1: str = ""
