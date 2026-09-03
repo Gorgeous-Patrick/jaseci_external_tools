@@ -1185,7 +1185,7 @@ def _run_trial(
     dbridge_like_response_file: Path | None = None
     trial_env: dict[str, str] | None = None
     if policy == "dbridge_like":
-        call_spec, dbridge_like_response_file, trial_env = _linked_list_dbridge_like_trial_spec(
+        call_spec, dbridge_like_response_file, trial_env = _dbridge_like_trial_spec(
             adapter, spec, access_log, profile_dir, profile_csv, limit, trial, options
         )
     editor.patch(
@@ -1230,18 +1230,21 @@ def _run_trial(
         payload = _response_payload_or_raise(resp, call_spec)
         if dbridge_like_response_file is not None:
             dbridge_like_response_file.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
-        adapter.validate_response(call_spec, payload)
+            result = _dbridge_like_result(payload)
+            adapter.validate_response(spec, {"data": {"reports": result["reports"]}})
+        else:
+            adapter.validate_response(call_spec, payload)
     finally:
         process.stop_process(proc)
         adapter.stop_stale_servers()
 
     _assert_trial_profiles(profile_dir, profile_csv)
     db_after = _db_query_count(adapter) if options.count_db else ""
-    dbridge_like_metrics = _linked_list_dbridge_like_metrics(payload) if policy == "dbridge_like" else {}
+    dbridge_like_metrics = _dbridge_like_metrics(payload) if policy == "dbridge_like" else {}
     if dbridge_like_metrics:
-        counts = _linked_list_dbridge_like_counts(dbridge_like_metrics)
+        counts = _dbridge_like_counts(dbridge_like_metrics)
         profile = metrics.profile_breakdown(profile_csv)
-        quality = _linked_list_dbridge_like_quality(dbridge_like_metrics)
+        quality = _dbridge_like_quality(dbridge_like_metrics)
     else:
         counts = metrics.tier_counts(access_log)
         profile = metrics.profile_breakdown(profile_csv)
@@ -1313,7 +1316,7 @@ def _run_trial(
     )
 
 
-def _linked_list_dbridge_like_trial_spec(
+def _dbridge_like_trial_spec(
     adapter,
     spec: RequestSpec,
     access_log: Path,
@@ -1323,8 +1326,6 @@ def _linked_list_dbridge_like_trial_spec(
     trial: int,
     options: SweepOptions,
 ) -> tuple[RequestSpec, Path, dict[str, str]]:
-    if adapter.name != "linked_list":
-        raise ValueError("dbridge_like baseline is currently implemented only for linked_list")
     plans_dir = adapter.app_dir / "dbridge_like_plans"
     safe_walker = _safe(spec.walker)
     safe_request = _safe(_request_id(spec))[:80]
@@ -1336,7 +1337,6 @@ def _linked_list_dbridge_like_trial_spec(
         / f"http_response_{safe_walker}_policydbridge_like_limit{limit}_trial{trial}.json"
     )
     trial_env = {
-        "JAC_DBRIDGE_LIKE_START_ID": str(spec.target_id),
         "JAC_DBRIDGE_LIKE_ACCESS_LOG": str(access_log),
         "JAC_DBRIDGE_LIKE_ACTUAL_FILE": str(actual_file),
         "JAC_DBRIDGE_LIKE_PREFETCH_FILE": str(prefetch_file),
@@ -1346,8 +1346,8 @@ def _linked_list_dbridge_like_trial_spec(
     return (
         RequestSpec(
             walker=spec.walker,
-            path="/function/oop_traverse",
-            body={},
+            path=_dbridge_like_endpoint(adapter.name, spec),
+            body=dict(spec.body or {}),
             target_id=spec.target_id,
             request_id=_request_id(spec),
             token=spec.token,
@@ -1357,24 +1357,41 @@ def _linked_list_dbridge_like_trial_spec(
     )
 
 
-def _linked_list_dbridge_like_metrics(payload: object) -> dict[str, object]:
+def _dbridge_like_endpoint(adapter_name: str, spec: RequestSpec) -> str:
+    if adapter_name == "linked_list" and spec.walker == "Traverse" and spec.target_id:
+        return f"/dbridge_like/Traverse/{spec.target_id}"
+    if adapter_name == "jacord" and spec.walker == "load_channel" and spec.target_id:
+        return f"/dbridge_like/load_channel/{spec.target_id}"
+    if adapter_name == "jdrive" and spec.walker == "VisibleFolderTree" and spec.target_id:
+        return f"/dbridge_like/VisibleFolderTree/{spec.target_id}"
+    if adapter_name == "littlex5" and spec.walker == "load_feed":
+        return "/dbridge_like/load_feed"
+    raise ValueError(
+        "dbridge_like baseline does not support "
+        f"{adapter_name}.{spec.walker} target={spec.target_id!r}"
+    )
+
+
+def _dbridge_like_result(payload: object) -> dict[str, object]:
     if not isinstance(payload, dict) or not payload.get("ok"):
         raise RuntimeError(f"dbridge_like returned failed payload: {payload!r}")
     data = payload.get("data")
     result = data.get("result") if isinstance(data, dict) else None
-    dbridge_like_metrics = result.get("metrics") if isinstance(result, dict) else None
-    reports = result.get("reports") if isinstance(result, dict) else None
-    if not isinstance(dbridge_like_metrics, dict) or not isinstance(reports, list):
+    if not isinstance(result, dict):
         raise RuntimeError(f"dbridge_like returned malformed payload: {payload!r}")
-    if int(dbridge_like_metrics.get("visited", -1)) != len(reports):
-        raise RuntimeError(
-            "dbridge_like visited mismatch: "
-            f"metrics={dbridge_like_metrics.get('visited')} reports={len(reports)}"
-        )
+    return result
+
+
+def _dbridge_like_metrics(payload: object) -> dict[str, object]:
+    result = _dbridge_like_result(payload)
+    dbridge_like_metrics = result.get("metrics")
+    reports = result.get("reports")
+    if not isinstance(dbridge_like_metrics, dict) or not isinstance(reports, list):
+        raise RuntimeError(f"dbridge_like returned malformed result: {result!r}")
     return dbridge_like_metrics
 
 
-def _linked_list_dbridge_like_quality(dbridge_like_metrics: dict[str, object]) -> dict[str, str]:
+def _dbridge_like_quality(dbridge_like_metrics: dict[str, object]) -> dict[str, str]:
     return {
         "coverage": str(dbridge_like_metrics.get("coverage", "")),
         "accuracy": str(dbridge_like_metrics.get("accuracy", "")),
@@ -1386,7 +1403,7 @@ def _linked_list_dbridge_like_quality(dbridge_like_metrics: dict[str, object]) -
     }
 
 
-def _linked_list_dbridge_like_counts(dbridge_like_metrics: dict[str, object]) -> dict[str, str]:
+def _dbridge_like_counts(dbridge_like_metrics: dict[str, object]) -> dict[str, str]:
     l1 = str(dbridge_like_metrics.get("l1", ""))
     l2 = str(dbridge_like_metrics.get("l2", "0"))
     l3 = str(dbridge_like_metrics.get("l3", ""))

@@ -176,7 +176,6 @@ def _run_http_cases(
                         "DATABASE_URL": postgres_uri,
                         "JAC_PROFILE_DIR": str(profile_dir),
                         "JAC_PROFILE_CSV": str(profile_csv),
-                        "JAC_DBRIDGE_LIKE_START_ID": start_id,
                         "JAC_DBRIDGE_LIKE_ACCESS_LOG": str(access_log),
                         "JAC_DBRIDGE_LIKE_ACTUAL_FILE": str(actual_file),
                         "JAC_DBRIDGE_LIKE_PREFETCH_FILE": str(prefetch_file),
@@ -190,7 +189,7 @@ def _run_http_cases(
                 token = process.login(args.base_url, args.username, args.password)
                 resp = process.post_json(
                     args.base_url,
-                    "/function/oop_traverse",
+                    f"/dbridge_like/Traverse/{start_id}",
                     {},
                     token=token,
                 )

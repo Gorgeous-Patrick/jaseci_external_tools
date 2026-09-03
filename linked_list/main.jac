@@ -4,10 +4,12 @@ import json;
 import os;
 import time;
 import from concurrent.futures { ThreadPoolExecutor }
+import from http { HTTPMethod }
 import from pathlib { Path }
 import from typing { cast }
 import from jaclang { JacRuntimeInterface as Jac }
 import from jaclang.project.config { get_config }
+import from jaclang.runtime.builtin { restspec }
 import from jaclang.server.session {
     _access_log_reset_for_tests,
     hit_stats_reset,
@@ -223,12 +225,8 @@ def _write_oop_profile(
     );
 }
 
-def oop_traverse() -> any {
-    start_id = os.environ.get("JAC_DBRIDGE_LIKE_START_ID", "").strip();
-    if not start_id {
-        raise ValueError("JAC_DBRIDGE_LIKE_START_ID is required");
-    }
-
+@restspec(method=HTTPMethod.POST, path="/dbridge_like/Traverse/{start_id}")
+def oop_traverse(start_id: str) -> any {
     access_log = os.environ.get("JAC_DBRIDGE_LIKE_ACCESS_LOG", "").strip();
     cfg = get_config();
     if not access_log and cfg is not None {
