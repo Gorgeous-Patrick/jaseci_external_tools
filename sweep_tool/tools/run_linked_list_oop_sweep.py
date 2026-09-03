@@ -3,9 +3,9 @@
 
 The measured workload deliberately avoids Jac walkers, spawn, visit, TTG, and
 the Jac prefetch policy interface.  It treats the persisted Jac graph as a
-plain object store and traverses Item.next through ordinary object methods.
-The request target must still come from the same Jac setup_graph result that
-the regular benchmark uses.
+plain object store plus an explicit SQL association resolver for Next edges.
+The request target must still come from the same Jac setup_graph result that the
+regular benchmark uses.
 """
 
 from __future__ import annotations
@@ -46,7 +46,7 @@ def main() -> int:
         "--transport",
         choices=("http", "direct"),
         default=os.environ.get("LINKED_LIST_OOP_TRANSPORT", "http"),
-        help="http runs the Jac /function/oop_traverse endpoint; direct uses the PgSQL mirror.",
+        help="http runs the Jac /function/oop_traverse endpoint; direct raw-PgSQL mode is retired.",
     )
     parser.add_argument("--base-url", default=os.environ.get("BASE_URL", "localhost:8000"))
     parser.add_argument("--jac-bin", default=os.environ.get("JAC_BIN", "jac"))
@@ -76,7 +76,6 @@ def main() -> int:
         ),
     )
     parser.add_argument("--trials", type=int, default=3)
-    parser.add_argument("--visit-limit", type=int, default=10000)
     parser.add_argument(
         "--out-dir",
         default="",
@@ -96,8 +95,6 @@ def main() -> int:
     _ignored_limits = _parse_ints(args.prefetch_limits) if args.prefetch_limits.strip() else []
     if args.trials <= 0:
         raise ValueError("--trials must be positive")
-    if args.visit_limit <= 0:
-        raise ValueError("--visit-limit must be positive")
 
     start_id = _resolve_start_id(args.start_id, args.setup_nodes_file)
     postgres_uri = args.postgres_uri or _postgres_uri_from_local_config()
@@ -126,13 +123,13 @@ def main() -> int:
         "prefetch_limits": [BASELINE_LIMIT],
         "ignored_prefetch_limits": _ignored_limits,
         "trials": args.trials,
-        "visit_limit": args.visit_limit,
         "start_id": start_id,
         "setup_nodes_file": str(Path(args.setup_nodes_file).resolve()) if args.setup_nodes_file else "",
         "notes": [
             "No Jac walker/spawn/visit execution is used by OOP policies.",
             "The request target is the first node from Jac setup_graph, or an explicit matching start-id.",
-            "capre is an OOP baseline; it performs one-hop Item.next prefetch after report and before the next object read.",
+            "Next edges are resolved by explicit SQL over Jac's persisted PgSQL schema, not by Jac spatial hop resolution.",
+            "capre is an OOP baseline; it resolves and materializes the next Item after report and before the next object read.",
             "prefetch_limit is an OSP/TTG budget concept and is not applied to capre.",
         ],
     }
@@ -151,6 +148,8 @@ def main() -> int:
 
     if args.transport == "http":
         _run_http_cases(args, policies, start_id, postgres_uri, results_path, logs_dir, plans_dir, out_dir)
+    elif args.transport == "direct":
+        raise RuntimeError("direct raw-PgSQL CAPRe mode was removed; use --transport http")
     else:
         _run_direct_cases(args, policies, start_id, postgres_uri, results_path, logs_dir, plans_dir)
 
@@ -172,53 +171,8 @@ def _run_direct_cases(
     logs_dir: Path,
     plans_dir: Path,
 ) -> None:
-    profiles_dir = results_path.parent / "profiles"
-    for policy in policies:
-        limit = BASELINE_LIMIT
-        print("========================================")
-        print(f"Case: baseline={policy}")
-        print("========================================")
-        for trial in range(1, args.trials + 1):
-            profile_dir = (
-                profiles_dir
-                / f"policy_{_safe(policy)}"
-                / f"limit_{limit}"
-                / "Traverse"
-                / f"trial_{trial}"
-            )
-            store = None
-            try:
-                metrics, store, _reports = oop_linked_list.traverse_linked_list(
-                    postgres_uri,
-                    policy=policy,
-                    prefetch_limit=limit,
-                    visit_limit=args.visit_limit,
-                    start_id=start_id,
-                    profile_dir=str(profile_dir),
-                    profile_csv=str(profile_dir / "profile.csv"),
-                )
-                metrics.trial = trial
-                access_log = logs_dir / f"access_log_Traverse_policy{_safe(policy)}_limit{limit}_trial{trial}.csv"
-                actual_file = plans_dir / f"actual_policy{_safe(policy)}_limit{limit}_trial{trial}.uuids"
-                prefetch_file = plans_dir / f"prefetch_policy{_safe(policy)}_limit{limit}_trial{trial}.uuids"
-                store.write_access_log(access_log)
-                oop_linked_list.write_uuid_list(actual_file, store.actual_order)
-                oop_linked_list.write_uuid_list(prefetch_file, store.prefetched_order)
-                metrics.access_log = str(access_log)
-                metrics.actual_file = str(actual_file)
-                metrics.prefetch_file = str(prefetch_file)
-                _assert_profile_files(profile_dir)
-                oop_linked_list.append_result(results_path, metrics)
-                print(
-                    f"  Trial {trial}: {metrics.e2e_ms:.3f}ms "
-                    f"db={metrics.db_ms:.3f}ms q={metrics.query_count} "
-                    f"L1={metrics.l1} L3={metrics.l3} "
-                    f"coverage={metrics.coverage:.3f} "
-                    f"accuracy={metrics.accuracy:.3f}"
-                )
-            finally:
-                if store is not None:
-                    store.close()
+    del args, policies, start_id, postgres_uri, results_path, logs_dir, plans_dir;
+    raise RuntimeError("direct raw-PgSQL CAPRe mode was removed; use --transport http")
 
 
 def _run_http_cases(
@@ -275,8 +229,6 @@ def _run_http_cases(
                     "/function/oop_traverse",
                     {
                         "start_id": start_id,
-                        "prefetch_limit": limit,
-                        "visit_limit": args.visit_limit,
                         "policy": policy,
                         "postgres_uri": postgres_uri,
                         "access_log": str(access_log),

@@ -1,21 +1,76 @@
-"""Compatibility wrapper for LinkedList's in-app OOP/CAPRe implementation."""
+"""Shared schema helpers for LinkedList's Jac-native OOP/CAPRe endpoint."""
 
 from __future__ import annotations
 
-import importlib.util
-import sys
+import csv
 from pathlib import Path
+from typing import Any
 
 
-APP_MODULE_PATH = Path(__file__).resolve().parents[3] / "linked_list" / "oop_capre.py"
-SPEC = importlib.util.spec_from_file_location("_linked_list_oop_capre", APP_MODULE_PATH)
-if SPEC is None or SPEC.loader is None:
-    raise ImportError(f"cannot load LinkedList OOP/CAPRe module from {APP_MODULE_PATH}")
-MODULE = importlib.util.module_from_spec(SPEC)
-sys.modules[SPEC.name] = MODULE
-SPEC.loader.exec_module(MODULE)
+RESULT_COLUMNS = [
+    "policy",
+    "prefetch_limit",
+    "trial",
+    "start_id",
+    "visited",
+    "checksum",
+    "first_value",
+    "last_value",
+    "e2e_ms",
+    "db_ms",
+    "cpu_ms",
+    "prefetch_ms",
+    "query_count",
+    "l1",
+    "l2",
+    "l3",
+    "miss",
+    "actual_ids",
+    "prefetched_ids",
+    "covered_ids",
+    "overfetch_ids",
+    "undercoverage_ids",
+    "coverage",
+    "accuracy",
+    "serialized_bytes",
+    "access_log",
+    "actual_file",
+    "prefetch_file",
+    "error",
+]
 
-for NAME in MODULE.__all__:
-    globals()[NAME] = getattr(MODULE, NAME)
+POLICY_ALIASES = {
+    "none": "none",
+    "oop-none": "none",
+    "capre": "capre",
+    "oop-capre": "capre",
+}
 
-__all__ = list(MODULE.__all__)
+
+def canonical_policy(policy: str) -> str:
+    try:
+        return POLICY_ALIASES[policy.strip().lower()]
+    except KeyError as exc:
+        raise ValueError(f"unsupported LinkedList OOP policy: {policy}") from exc
+
+
+def write_results_header(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=RESULT_COLUMNS)
+        writer.writeheader()
+
+
+def append_row(path: Path, row: dict[str, Any]) -> None:
+    with path.open("a", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=RESULT_COLUMNS)
+        writer.writerow(row)
+
+
+__all__ = [
+    "RESULT_COLUMNS",
+    "POLICY_ALIASES",
+    "canonical_policy",
+    "write_results_header",
+    "append_row",
+]

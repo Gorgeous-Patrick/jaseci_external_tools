@@ -1327,8 +1327,6 @@ def _linked_list_capre_trial_spec(
             path="/function/oop_traverse",
             body={
                 "start_id": spec.target_id,
-                "prefetch_limit": 0,
-                "visit_limit": int(options.env.get("JAC_VISIT_LIMIT") or "10000"),
                 "policy": "capre",
                 "postgres_uri": adapter.postgres_uri,
                 "access_log": str(access_log),
@@ -1377,13 +1375,15 @@ def _linked_list_capre_quality(capre_metrics: dict[str, object]) -> dict[str, st
 
 def _linked_list_capre_counts(capre_metrics: dict[str, object]) -> dict[str, str]:
     l1 = str(capre_metrics.get("l1", ""))
+    l2 = str(capre_metrics.get("l2", "0"))
     l3 = str(capre_metrics.get("l3", ""))
+    miss = str(capre_metrics.get("miss", "0"))
     return {
         "l1_hit_rate": _hit_rate(l1, l3),
         "l1": l1,
-        "l2": "0",
+        "l2": l2,
         "l3": l3,
-        "miss": "0",
+        "miss": miss,
     }
 
 
