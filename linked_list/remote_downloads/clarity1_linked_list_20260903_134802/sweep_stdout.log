@@ -1,0 +1,83 @@
+=== Python prefetch policy sweep: linked_list ===
+app_dir : /workspace/jaseci_external_tools/linked_list
+config  : /workspace/jaseci_external_tools/linked_list/jac.toml
+policies: none dbridge_like ttg
+limits  : 0 1250
+trials  : 1
+db      : remote_ssh ssh=clarity2 remote_app_dir=/home/baichuan/jaseci_remote_apps/linked_list postgres=postgresql://jac:jac@clarity2.eecs.umich.edu:5432/jac_db
+oracle  : mode=auto dir=/workspace/jaseci_external_tools/linked_list/oracle_plans
+markov  : mode=auto dir=/workspace/jaseci_external_tools/linked_list/markov_models
+coaccess: mode=auto dir=/workspace/jaseci_external_tools/linked_list/coaccess_models threshold=0.05
+pooled  : train_ns=10 trials=1 seed=42
+co-pool : train_ns=10 trials=1 seed=42
+random : n=20 train_k=5 seed=42 policies=none dbridge_like ttg selep
+selep   : mode=lstm top_k=42 look_back=4 blocks=pg-buffercache relations=anchors,graph_types
+
+auth    : user=user source=quick_run.sh live setup user
+
+========================================
+Case: policy=none prefetch_limit=0
+========================================
+ Container postgres  Stopping
+ Container postgres  Stopped
+ Container postgres  Removing
+ Container postgres  Removed
+ Network linked_list_default  Removing
+ Network linked_list_default  Removed
+ℹ Nothing to clean - no build artifact directories exist.
+LinkedList setup_graph created 1000 node(s)
+Creating remote TTG Postgres indexes and analyzing planner stats
+NOTICE:  relation "idx_anchors_edge_src_type_order" already exists, skipping
+NOTICE:  relation "idx_anchors_edge_dst_type_order" already exists, skipping
+CREATE INDEX
+CREATE INDEX
+ANALYZE
+  Trial 1: policy=none limit=0 2531.044ms L1=0 L2=0 L3=1004
+
+========================================
+Case: policy=dbridge_like prefetch_limit=0
+========================================
+ Container postgres  Stopping
+ Container postgres  Stopped
+ Container postgres  Removing
+ Container postgres  Removed
+ Network linked_list_default  Removing
+ Network linked_list_default  Removed
+ℹ Nothing to clean - no build artifact directories exist.
+LinkedList setup_graph created 1000 node(s)
+Creating remote TTG Postgres indexes and analyzing planner stats
+NOTICE:  relation "idx_anchors_edge_src_type_order" already exists, skipping
+NOTICE:  relation "idx_anchors_edge_dst_type_order" already exists, skipping
+CREATE INDEX
+CREATE INDEX
+ANALYZE
+  Trial 1: policy=dbridge_like limit=0 2063.530ms L1=0 L2=0 L3=1000
+
+========================================
+Case: policy=ttg prefetch_limit=1250
+========================================
+ Container postgres  Stopping
+ Container postgres  Stopped
+ Container postgres  Removing
+ Container postgres  Removed
+ Network linked_list_default  Removing
+ Network linked_list_default  Removed
+ℹ Nothing to clean - no build artifact directories exist.
+LinkedList setup_graph created 1000 node(s)
+Creating remote TTG Postgres indexes and analyzing planner stats
+NOTICE:  relation "idx_anchors_edge_src_type_order" already exists, skipping
+NOTICE:  relation "idx_anchors_edge_dst_type_order" already exists, skipping
+CREATE INDEX
+CREATE INDEX
+ANALYZE
+  Trial 1: policy=ttg limit=1250 876.524ms L1=998 L2=0 L3=6
+
+========================================
+Sweep complete
+Results saved to: /workspace/jaseci_external_tools/linked_list/sweep_prefetch_limit.csv
+========================================
+policy,walker,prefetch_limit,trial,e2e_ms,request_id,request_order,train_n,trial_count,pool_seed,coverage,accuracy,actual_ids,plan_ids,covered_ids,overfetch_ids,undercoverage_ids,topo_idx_ms,ttg_ms,prefetch_ms,materialize_ms,prefetch_wait_ms,walker_ms,l1_hit_rate,l1,l2,l3,miss,db_q,oracle_file,oracle_topology_file,model_file,model_topology_file,selep_events,selep_matched_events,selep_predictions,selep_blocks,selep_blocks_skipped,selep_prewarm_calls,selep_prewarm_ms,selep_errors
+none,Traverse,0,1,2531.044151633978,c27a5890-ca36-42a4-b87a-5e8fede2aef6,,,1,,,,,,,,,0.000,0.000,0.000,,,2434.467,0.0,0,0,1004,0,,,,,,,,,,,,,
+dbridge_like,Traverse,0,1,2063.5297568514943,8b599cbe-7905-4771-a4ab-fabb6b6ea225,,,1,,99.9,100.0,1000,999,999,0,1,0.000,0.000,1885.472,1138.052,1947.440,37.732,0.0,0,0,1000,0,1000,,,,,,,,,,,,
+ttg,Traverse,1250,1,876.523818820715,c21394f7-b834-46b8-ba71-69a4ab07bd94,,,1,,,,,,,,,0.000,183.513,80.150,,,602.208,99.4,998,0,6,0,,,,,,,,,,,,,
+

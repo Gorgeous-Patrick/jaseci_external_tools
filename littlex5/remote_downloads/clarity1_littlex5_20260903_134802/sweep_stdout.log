@@ -1,0 +1,145 @@
+=== Python prefetch policy sweep: littlex5 ===
+app_dir : /workspace/jaseci_external_tools/littlex5
+config  : /workspace/jaseci_external_tools/littlex5/jac.sweep.toml
+policies: none ttg oracle
+limits  : 0 2500 5000 7500 10000 12500
+trials  : 1
+db      : remote_ssh ssh=clarity2 remote_app_dir=/home/baichuan/jaseci_remote_apps/littlex5 postgres=postgresql://jac:jac@clarity2.eecs.umich.edu:5432/jac_db
+oracle  : mode=auto dir=/workspace/jaseci_external_tools/littlex5/oracle_plans
+markov  : mode=auto dir=/workspace/jaseci_external_tools/littlex5/markov_models
+coaccess: mode=auto dir=/workspace/jaseci_external_tools/littlex5/coaccess_models threshold=0.05
+pooled  : train_ns=5 trials=1 seed=42
+co-pool : train_ns=5 trials=1 seed=42
+random : n=20 train_k=5 seed=42 policies=none ttg
+selep   : mode=lstm top_k=42 look_back=4 blocks=pg-buffercache relations=anchors,graph_types
+
+auth    : user=sim_user_56 source=backup.pgdump seeded sim_user benchmark target
+
+========================================
+Case: policy=none prefetch_limit=0
+========================================
+ Network littlex5_default  Removing
+ Network littlex5_default  Removed
+remote docker compose name conflict; removing stale benchmark Postgres container
+postgres
+ Container postgres  Creating
+ Container postgres  Created
+ Container postgres  Starting
+ Container postgres  Started
+=== LittleX restoring configured dump: backup.pgdump -> clarity2:/home/baichuan/jaseci_remote_apps/littlex5/backup.pgdump (262482727 bytes) ===
+Creating remote TTG Postgres indexes and analyzing planner stats
+CREATE INDEX
+CREATE INDEX
+ANALYZE
+  Trial 1: policy=none limit=0 9563.720ms L1=10200 L2=0 L3=10205
+
+========================================
+Case: policy=ttg prefetch_limit=2500
+========================================
+ Container postgres  Stopping
+ Container postgres  Stopped
+ Container postgres  Removing
+ Container postgres  Removed
+ Network littlex5_default  Removing
+ Network littlex5_default  Removed
+=== LittleX restoring configured dump: backup.pgdump -> clarity2:/home/baichuan/jaseci_remote_apps/littlex5/backup.pgdump (262482727 bytes) ===
+Creating remote TTG Postgres indexes and analyzing planner stats
+CREATE INDEX
+CREATE INDEX
+ANALYZE
+  Trial 1: policy=ttg limit=2500 9539.839ms L1=12486 L2=0 L3=7919
+
+========================================
+Case: policy=ttg prefetch_limit=5000
+========================================
+ Container postgres  Stopping
+ Container postgres  Stopped
+ Container postgres  Removing
+ Container postgres  Removed
+ Network littlex5_default  Removing
+ Network littlex5_default  Removed
+=== LittleX restoring configured dump: backup.pgdump -> clarity2:/home/baichuan/jaseci_remote_apps/littlex5/backup.pgdump (262482727 bytes) ===
+Creating remote TTG Postgres indexes and analyzing planner stats
+CREATE INDEX
+CREATE INDEX
+ANALYZE
+  Trial 1: policy=ttg limit=5000 10450.237ms L1=14974 L2=0 L3=5431
+
+========================================
+Case: policy=ttg prefetch_limit=7500
+========================================
+ Container postgres  Stopping
+ Container postgres  Stopped
+ Container postgres  Removing
+ Container postgres  Removed
+ Network littlex5_default  Removing
+ Network littlex5_default  Removed
+=== LittleX restoring configured dump: backup.pgdump -> clarity2:/home/baichuan/jaseci_remote_apps/littlex5/backup.pgdump (262482727 bytes) ===
+Creating remote TTG Postgres indexes and analyzing planner stats
+CREATE INDEX
+CREATE INDEX
+ANALYZE
+  Trial 1: policy=ttg limit=7500 9961.418ms L1=17461 L2=0 L3=2944
+
+========================================
+Case: policy=ttg prefetch_limit=10000
+========================================
+ Container postgres  Stopping
+ Container postgres  Stopped
+ Container postgres  Removing
+ Container postgres  Removed
+ Network littlex5_default  Removing
+ Network littlex5_default  Removed
+=== LittleX restoring configured dump: backup.pgdump -> clarity2:/home/baichuan/jaseci_remote_apps/littlex5/backup.pgdump (262482727 bytes) ===
+Creating remote TTG Postgres indexes and analyzing planner stats
+CREATE INDEX
+CREATE INDEX
+ANALYZE
+  Trial 1: policy=ttg limit=10000 10588.983ms L1=19949 L2=0 L3=456
+
+========================================
+Case: policy=ttg prefetch_limit=12500
+========================================
+ Container postgres  Stopping
+ Container postgres  Stopped
+ Container postgres  Removing
+ Container postgres  Removed
+ Network littlex5_default  Removing
+ Network littlex5_default  Removed
+=== LittleX restoring configured dump: backup.pgdump -> clarity2:/home/baichuan/jaseci_remote_apps/littlex5/backup.pgdump (262482727 bytes) ===
+Creating remote TTG Postgres indexes and analyzing planner stats
+CREATE INDEX
+CREATE INDEX
+ANALYZE
+  Trial 1: policy=ttg limit=12500 10475.791ms L1=20200 L2=0 L3=205
+
+========================================
+Case: policy=oracle prefetch_limit=0
+========================================
+ Container postgres  Stopping
+ Container postgres  Stopped
+ Container postgres  Removing
+ Container postgres  Removed
+ Network littlex5_default  Removing
+ Network littlex5_default  Removed
+=== LittleX restoring configured dump: backup.pgdump -> clarity2:/home/baichuan/jaseci_remote_apps/littlex5/backup.pgdump (262482727 bytes) ===
+Creating remote TTG Postgres indexes and analyzing planner stats
+CREATE INDEX
+CREATE INDEX
+ANALYZE
+    oracle record: wrote 10253 UUID(s) to /workspace/jaseci_external_tools/littlex5/oracle_plans/littlex5/load_feed/sim_user_56_limit0_trial1.uuids
+  Trial 1: policy=oracle limit=0 11220.839ms L1=30401 L2=0 L3=4
+
+========================================
+Sweep complete
+Results saved to: /workspace/jaseci_external_tools/littlex5/sweep_prefetch_limit.csv
+========================================
+policy,walker,prefetch_limit,trial,e2e_ms,request_id,request_order,train_n,trial_count,pool_seed,coverage,accuracy,actual_ids,plan_ids,covered_ids,overfetch_ids,undercoverage_ids,topo_idx_ms,ttg_ms,prefetch_ms,walker_ms,l1_hit_rate,l1,l2,l3,miss,db_q,oracle_file,model_file,selep_events,selep_matched_events,selep_predictions,selep_blocks,selep_blocks_skipped,selep_prewarm_calls,selep_prewarm_ms,selep_errors
+none,load_feed,0,1,9563.71992547065,sim_user_56,,,1,,,,,,,,,0.000,0.000,0.000,8266.712,50.0,10200,0,10205,0,,,,,,,,,,,
+ttg,load_feed,2500,1,9539.839072152972,sim_user_56,,,1,,,,,,,,,0.000,515.289,487.887,7717.018,61.2,12486,0,7919,0,,,,,,,,,,,
+ttg,load_feed,5000,1,10450.237057171762,sim_user_56,,,1,,,,,,,,,0.000,755.621,649.860,8303.243,73.4,14974,0,5431,0,,,,,,,,,,,
+ttg,load_feed,7500,1,9961.417729966342,sim_user_56,,,1,,,,,,,,,0.000,989.380,939.013,7453.529,85.6,17461,0,2944,0,,,,,,,,,,,
+ttg,load_feed,10000,1,10588.983436115086,sim_user_56,,,1,,,,,,,,,0.000,1207.145,1316.774,8015.087,97.8,19949,0,456,0,,,,,,,,,,,
+ttg,load_feed,12500,1,10475.790902040899,sim_user_56,,,1,,,,,,,,,0.000,1297.978,1293.124,7772.068,99.0,20200,0,205,0,,,,,,,,,,,
+oracle,load_feed,0,1,11220.838898792863,sim_user_56,,,1,,,,,,,,,2307.101,2393.740,860.024,6777.806,100.0,30401,0,4,0,,/workspace/jaseci_external_tools/littlex5/oracle_plans/littlex5/load_feed/sim_user_56_limit0_trial1.uuids,,,,,,,,,
+
