@@ -1031,31 +1031,32 @@ def train_original_selep_model(
     dict[str, list[list[float]]],
 ]:
     table_list = original_table_list(records)
-    configure_original_selep(args, table_list)
-    table_manager = build_original_table_manager(records, args, table_list)
-    partition_manager, block_partitions, partition_blocks, partition_stats = build_original_partition_manager(
-        records,
-        table_manager,
-        args,
-    )
-    (
-        partition_events,
-        event_vectors,
-        event_exact,
-        event_shape,
-        event_vectors_exact,
-        event_vectors_shape,
-    ) = build_original_workload(records, workload_path, partition_manager, block_partitions, args)
-    vocab = sorted(partition_manager.partitions.keys(), key=partition_sort_key)
-    model = train_original_lstm_model(
-        event_vectors,
-        partition_events,
-        vocab,
-        args,
-        model_dir,
-        rows=len(table_list),
-        cols=args.encoding_length,
-    )
+    with Pushd(Path(args.selep_root).expanduser().resolve()):
+        configure_original_selep(args, table_list)
+        table_manager = build_original_table_manager(records, args, table_list)
+        partition_manager, block_partitions, partition_blocks, partition_stats = build_original_partition_manager(
+            records,
+            table_manager,
+            args,
+        )
+        (
+            partition_events,
+            event_vectors,
+            event_exact,
+            event_shape,
+            event_vectors_exact,
+            event_vectors_shape,
+        ) = build_original_workload(records, workload_path, partition_manager, block_partitions, args)
+        vocab = sorted(partition_manager.partitions.keys(), key=partition_sort_key)
+        model = train_original_lstm_model(
+            event_vectors,
+            partition_events,
+            vocab,
+            args,
+            model_dir,
+            rows=len(table_list),
+            cols=args.encoding_length,
+        )
     model.update(
         {
             "model_type": "selep_original_lstm",
@@ -1118,6 +1119,20 @@ def configure_original_selep(args: argparse.Namespace, table_list: list[str]) ->
     Config.look_back = int(args.look_back)
     Config.prefetching_k = int(args.top_k)
     Config.tb_encoding_method = str(args.table_encoding_method)
+
+
+class Pushd:
+    def __init__(self, path: Path) -> None:
+        self.path = path
+        self.previous: Path | None = None
+
+    def __enter__(self) -> None:
+        self.previous = Path.cwd()
+        os.chdir(self.path)
+
+    def __exit__(self, exc_type: Any, exc: Any, tb: Any) -> None:
+        if self.previous is not None:
+            os.chdir(self.previous)
 
 
 def original_table_list(records: list[dict[str, Any]]) -> list[str]:
