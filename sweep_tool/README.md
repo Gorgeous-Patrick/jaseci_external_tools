@@ -96,11 +96,15 @@ Useful knobs:
   block partitions from prior SQL history, and asynchronously issues
   `pg_prewarm`. This is a storage-layer policy; it does not produce or replay
   Jac UUID prefetch plans.
-- `SELEP_MODEL_KIND=lstm` — trains SeLeP's binary LSTM in the sidecar Python
-  environment. Use `frequency` only for fast plumbing smoke tests.
+- `SELEP_MODEL_KIND=faithful` — trains the faithful SeLeP policy path in the
+  sidecar Python environment: SeLeP semantic block encoding,
+  affinity/Clay-style partitioning, partition encodings, and the SeLeP
+  ED-LSTM. Use `lstm` or
+  `frequency` only for adapter or plumbing smoke tests.
 - `SELEP_TOP_K=42` — number of predicted partitions per SQL event.
-- `SELEP_MAX_BLOCK_SELECTS=256` — maximum training SELECT statements replayed
-  through `pg_buffercache` to map SQL events to PostgreSQL blocks.
+- `SELEP_MAX_BLOCK_SELECTS=0` — maximum training SELECT statements replayed
+  through `pg_buffercache` to map SQL events to PostgreSQL blocks; `0` uses
+  all observed SELECT events.
 
 The result CSV keeps the old timing/tier columns and adds `policy` and
 `oracle_file` / `model_file`. For `selep`, `model_file` points at the
@@ -163,7 +167,7 @@ Default local paths:
 
 ```text
 Local SeLeP repo   : /home/patrickli/Space/jaseci_env/SeLeP
-Local SeLeP python : /home/patrickli/Space/jaseci_env/SeLeP/.venv-lstm/bin/python
+Local SeLeP python : /home/patrickli/Space/jaseci_env/SeLeP/.devenv/state/venv/bin/python
 Image SeLeP repo   : /workspace/SeLeP
 Image SeLeP python : /opt/selep-venv/bin/python
 Output             : linked_list/selep_smoke/
@@ -172,7 +176,7 @@ Output             : linked_list/selep_smoke/
 CLI equivalent for a fresh LinkedList block/LSTM smoke:
 
 ```bash
-/home/patrickli/Space/jaseci_env/SeLeP/.venv-lstm/bin/python \
+/home/patrickli/Space/jaseci_env/SeLeP/.devenv/state/venv/bin/python \
   tools/run_linked_list_selep_smoke.py \
   --jac-bin /home/patrickli/Space/jaseci/jac/zig-out/bin/jac \
   --python /home/patrickli/Space/jaseci_env/jaseci_external_tools/.venv/bin/python \
@@ -187,7 +191,7 @@ CLI equivalent for a fresh LinkedList block/LSTM smoke:
 To retrain/test only from an existing workload without touching the remote DB:
 
 ```bash
-/home/patrickli/Space/jaseci_env/SeLeP/.venv-lstm/bin/python \
+/home/patrickli/Space/jaseci_env/SeLeP/.devenv/state/venv/bin/python \
   tools/run_linked_list_selep_smoke.py \
   --skip-collect \
   --skip-workload-rebuild \

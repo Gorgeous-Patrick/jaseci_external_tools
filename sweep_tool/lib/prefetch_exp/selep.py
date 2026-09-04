@@ -34,8 +34,17 @@ class SelepModelConfig:
     block_source: str
     look_back: int
     top_k: int
+    encoding_length: int
+    encoding_epochs: int
+    table_encoding_method: str
+    semantic_rows_per_block: int
     block_limit: int
     max_block_selects: int
+    clay_repartition_threshold: int
+    clay_initial_fill: str
+    clay_empty_fraction: str
+    clay_max_load: str
+    clay_weight_reset: str
     sql_contains: str
 
 
@@ -49,7 +58,7 @@ class SelepTrialPaths:
 
 def describe(options: SweepOptions) -> str:
     return (
-        f"mode={env_value(options, 'SELEP_MODEL_KIND', 'lstm')} "
+        f"mode={env_value(options, 'SELEP_MODEL_KIND', 'faithful')} "
         f"top_k={selep_top_k(options)} "
         f"look_back={env_int(options, 'SELEP_LOOK_BACK', 4)} "
         f"blocks={env_value(options, 'SELEP_BLOCK_SOURCE', 'pg-buffercache')} "
@@ -89,12 +98,21 @@ def model_config(
         train_trace_path=logs_dir / f"selep_train_trace_{safe_walker}_{safe_request}_limit{limit}.jsonl",
         train_access_log=logs_dir / f"selep_train_access_{safe_walker}_{safe_request}_limit{limit}.csv",
         train_log_path=logs_dir / f"selep_train_{safe_walker}_{safe_request}_limit{limit}.log",
-        model_kind=env_value(options, "SELEP_MODEL_KIND", "lstm").lower(),
+        model_kind=env_value(options, "SELEP_MODEL_KIND", "faithful").lower(),
         block_source=env_value(options, "SELEP_BLOCK_SOURCE", "pg-buffercache").lower(),
         look_back=env_int(options, "SELEP_LOOK_BACK", 4),
         top_k=selep_top_k(options),
-        block_limit=env_int(options, "SELEP_BLOCK_LIMIT", selep_top_k(options)),
-        max_block_selects=env_int(options, "SELEP_MAX_BLOCK_SELECTS", 256),
+        encoding_length=env_int(options, "SELEP_ENCODING_LENGTH", 32),
+        encoding_epochs=env_int(options, "SELEP_ENCODING_EPOCHS", 100),
+        table_encoding_method=env_value(options, "SELEP_TABLE_ENCODING_METHOD", "AutoEncoder_1"),
+        semantic_rows_per_block=env_int(options, "SELEP_SEMANTIC_ROWS_PER_BLOCK", 64),
+        block_limit=env_int(options, "SELEP_BLOCK_LIMIT", 0),
+        max_block_selects=env_int(options, "SELEP_MAX_BLOCK_SELECTS", 0),
+        clay_repartition_threshold=env_int(options, "SELEP_CLAY_REPARTITION_THRESHOLD", 2500),
+        clay_initial_fill=env_value(options, "SELEP_CLAY_INITIAL_FILL", "0.90"),
+        clay_empty_fraction=env_value(options, "SELEP_CLAY_EMPTY_FRACTION", "0.10"),
+        clay_max_load=env_value(options, "SELEP_CLAY_MAX_LOAD", "1.0"),
+        clay_weight_reset=env_value(options, "SELEP_CLAY_WEIGHT_RESET", "0.10"),
         sql_contains=env_value(options, "SELEP_SQL_CONTAINS", ""),
     )
 
@@ -159,15 +177,33 @@ def run_training_script(adapter: Any, cfg: SelepModelConfig, options: SweepOptio
         "--top-k",
         str(cfg.top_k),
         "--test-fraction",
-        env_value(options, "SELEP_TEST_FRACTION", "0.20"),
+        env_value(options, "SELEP_TEST_FRACTION", "0.10"),
+        "--encoding-length",
+        str(cfg.encoding_length),
+        "--encoding-epochs",
+        str(cfg.encoding_epochs),
+        "--table-encoding-method",
+        cfg.table_encoding_method,
+        "--semantic-rows-per-block",
+        str(cfg.semantic_rows_per_block),
         "--partition-size",
-        str(env_int(options, "SELEP_PARTITION_SIZE", 8)),
+        str(env_int(options, "SELEP_PARTITION_SIZE", 128)),
         "--partitions",
         str(env_int(options, "SELEP_HASH_PARTITIONS", 64)),
         "--block-source",
         cfg.block_source,
         "--max-block-selects",
         str(cfg.max_block_selects),
+        "--clay-repartition-threshold",
+        str(cfg.clay_repartition_threshold),
+        "--clay-initial-fill",
+        cfg.clay_initial_fill,
+        "--clay-empty-fraction",
+        cfg.clay_empty_fraction,
+        "--clay-max-load",
+        cfg.clay_max_load,
+        "--clay-weight-reset",
+        cfg.clay_weight_reset,
         "--sql-contains",
         cfg.sql_contains,
         "--relation-allowlist",
@@ -183,9 +219,9 @@ def run_training_script(adapter: Any, cfg: SelepModelConfig, options: SweepOptio
         "--postgres-db",
         adapter.db_manager.postgres_db,
         "--lstm-epochs",
-        str(env_int(options, "SELEP_LSTM_EPOCHS", 5)),
+        str(env_int(options, "SELEP_LSTM_EPOCHS", 75)),
         "--lstm-batch-size",
-        str(env_int(options, "SELEP_LSTM_BATCH_SIZE", 16)),
+        str(env_int(options, "SELEP_LSTM_BATCH_SIZE", 32)),
         "--lstm-validation-fraction",
         env_value(options, "SELEP_LSTM_VALIDATION_FRACTION", "0.10"),
         "--lstm-seed",
@@ -374,7 +410,11 @@ def selep_python_path(options: SweepOptions) -> Path:
     if image_python.exists():
         return image_python
     repo = selep_repo_path(options)
-    for candidate in (repo / ".venv-lstm" / "bin" / "python", repo / ".venv" / "bin" / "python"):
+    for candidate in (
+        repo / ".devenv" / "state" / "venv" / "bin" / "python",
+        repo / ".venv-lstm" / "bin" / "python",
+        repo / ".venv" / "bin" / "python",
+    ):
         if candidate.exists():
             return candidate
     return Path("python3")

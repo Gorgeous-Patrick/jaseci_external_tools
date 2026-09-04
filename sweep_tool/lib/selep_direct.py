@@ -19,7 +19,18 @@ from pathlib import Path
 
 SWEEP_TOOL_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SELEP_REPO = SWEEP_TOOL_ROOT.parents[1] / "SeLeP"
-DEFAULT_SELEP_PYTHON = DEFAULT_SELEP_REPO / ".venv" / "bin" / "python"
+def _default_selep_python() -> Path:
+    for candidate in (
+        DEFAULT_SELEP_REPO / ".devenv" / "state" / "venv" / "bin" / "python",
+        DEFAULT_SELEP_REPO / ".venv-lstm" / "bin" / "python",
+        DEFAULT_SELEP_REPO / ".venv" / "bin" / "python",
+    ):
+        if candidate.exists():
+            return candidate
+    return DEFAULT_SELEP_REPO / ".devenv" / "state" / "venv" / "bin" / "python"
+
+
+DEFAULT_SELEP_PYTHON = _default_selep_python()
 LOG_PATH = SWEEP_TOOL_ROOT / "selep_direct.log"
 PID_PATH = SWEEP_TOOL_ROOT / "selep_direct.pid"
 METADATA_PATH = SWEEP_TOOL_ROOT / "selep_direct_last_run.json"
@@ -92,7 +103,7 @@ def _bool(value: str | bool | int | None, default: bool = False) -> bool:
 def config_from_env(env: dict[str, str] | None = None) -> SelepDirectConfig:
     env = env or os.environ
     repo = Path(env.get("SELEP_REPO", str(DEFAULT_SELEP_REPO))).expanduser()
-    python = Path(env.get("SELEP_PYTHON", str(repo / ".venv" / "bin" / "python"))).expanduser()
+    python = Path(env.get("SELEP_PYTHON", str(_default_selep_python()))).expanduser()
     return SelepDirectConfig(
         repo=repo.resolve(),
         python=python.resolve(),

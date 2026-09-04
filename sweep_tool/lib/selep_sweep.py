@@ -19,14 +19,28 @@ LINKED_LIST_ROOT = REPO_ROOT / "linked_list"
 DEFAULT_SELEP_REPO = Path(
     os.environ.get("SELEP_REPO", str(SWEEP_TOOL_ROOT.parents[1] / "SeLeP"))
 )
-DEFAULT_SELEP_PYTHON = Path(
-    os.environ.get(
-        "SELEP_PYTHON",
-        "/opt/selep-venv/bin/python"
-        if Path("/opt/selep-venv/bin/python").exists()
-        else str(DEFAULT_SELEP_REPO / ".venv-lstm" / "bin" / "python"),
-    )
-)
+def _default_selep_python() -> Path:
+    for candidate in (
+        Path("/opt/selep-venv/bin/python"),
+        DEFAULT_SELEP_REPO / ".devenv" / "state" / "venv" / "bin" / "python",
+        DEFAULT_SELEP_REPO / ".venv-lstm" / "bin" / "python",
+        DEFAULT_SELEP_REPO / ".venv" / "bin" / "python",
+    ):
+        if candidate.exists():
+            return candidate
+    return DEFAULT_SELEP_REPO / ".devenv" / "state" / "venv" / "bin" / "python"
+
+
+DEFAULT_SELEP_PYTHON = Path(os.environ.get("SELEP_PYTHON", str(_default_selep_python())))
+
+
+def _path_exists(path: str | Path) -> bool:
+    try:
+        return Path(path).exists()
+    except PermissionError:
+        return False
+
+
 DEFAULT_SWEEP_PYTHON = (
     REPO_ROOT / ".venv" / "bin" / "python"
     if (REPO_ROOT / ".venv" / "bin" / "python").exists()
@@ -37,7 +51,7 @@ DEFAULT_OUT_DIR = LINKED_LIST_ROOT / "selep_smoke"
 DEFAULT_SSH_OPTIONS = os.environ.get(
     "SWEEP_DB_SSH_OPTIONS",
     "-F /root/.ssh/config -o UserKnownHostsFile=/tmp/known_hosts -o StrictHostKeyChecking=accept-new"
-    if Path("/root/.ssh/config").exists()
+    if _path_exists("/root/.ssh/config")
     else "-F /home/patrickli/.ssh/config",
 )
 

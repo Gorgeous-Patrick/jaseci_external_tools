@@ -60,6 +60,7 @@ def _random_paired_values(
     seed: int,
     policies: str,
     limits: list[int] | None,
+    selep_values: dict[str, object] | None = None,
 ) -> dict:
     values = {
         "SWEEP_POLICIES": "random-paired",
@@ -69,16 +70,8 @@ def _random_paired_values(
         "SWEEP_RANDOM_POLICIES": policies,
         "SWEEP_MARKOV_POOL_SIZE": n + train_k,
     }
-    if "selep" in {part.strip().lower() for part in policies.split()}:
-        values.update(
-            {
-                "SELEP_MODEL_KIND": "frequency",
-                "SELEP_TOP_K": 8,
-                "SELEP_BLOCK_LIMIT": 8,
-                "SELEP_MAX_BLOCK_SELECTS": 32,
-                "SELEP_LSTM_EPOCHS": 1,
-            }
-        )
+    if "selep" in {part.strip().lower() for part in policies.split()} and selep_values:
+        values.update(selep_values)
     if limits is not None:
         values["SWEEP_PREFETCH_LIMITS"] = limits
     return values
@@ -296,44 +289,237 @@ with tab_random:
         default=random_app_options,
         key="random_apps",
     )
+    random_defaults_manifest = (
+        manifest_by_name[selected_random_apps[0]]
+        if selected_random_apps and selected_random_apps[0] in manifest_by_name
+        else default_run_all_manifests[0]
+    )
 
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2, c3 = st.columns(3)
     with c1:
         random_n = st.number_input(
             "Measured N",
-            value=20,
+            value=int(_manifest_param_default(random_defaults_manifest, "SWEEP_RANDOM_N", 20)),
             min_value=1,
             step=1,
             key="random_n",
         )
     with c2:
-        random_train_k = st.number_input(
-            "Train K",
-            value=5,
-            min_value=0,
-            step=1,
-            key="random_train_k",
-        )
-    with c3:
         random_seed = st.number_input(
             "Random paired seed",
-            value=42,
+            value=int(_manifest_param_default(random_defaults_manifest, "SWEEP_RANDOM_SEED", 42)),
             step=1,
             key="random_seed",
         )
-    with c4:
+    with c3:
         random_policies = st.text_input(
             "Random paired policies",
-            value="none ttg selep",
-            help="Supported in stream mode: none, ttg, selep, history, manual.",
+            value=str(_manifest_param_default(random_defaults_manifest, "SWEEP_RANDOM_POLICIES", "none dbridge_like ttg selep")),
+            help="Supported in stream mode: none, dbridge_like, ttg, selep, history, manual.",
             key="random_policies",
         )
+
     st.caption(
-        "TTG limits are app-specific. Defaults below come from each app's manifest. "
-        "Random-paired includes SeLeP by default with a lightweight frequency "
-        "model and top_k=8."
+        "Random-paired runs the same measured stream across policies. "
+        "Train K and TTG limits are app-specific below. SeLeP settings shown here are passed to every selected app."
     )
+
+    with st.expander("SeLeP settings", expanded=True):
+        model_choices = ["faithful", "lstm", "frequency", "original"]
+        default_model_kind = str(
+            _manifest_param_default(random_defaults_manifest, "SELEP_MODEL_KIND", "faithful")
+        )
+        if default_model_kind not in model_choices:
+            default_model_kind = "faithful"
+        block_source_choices = ["pg-buffercache", "hash"]
+        default_block_source = str(
+            _manifest_param_default(random_defaults_manifest, "SELEP_BLOCK_SOURCE", "pg-buffercache")
+        )
+        if default_block_source not in block_source_choices:
+            default_block_source = "pg-buffercache"
+        sc1, sc2, sc3, sc4 = st.columns(4)
+        with sc1:
+            selep_model_kind = st.selectbox(
+                "SeLeP model",
+                model_choices,
+                index=model_choices.index(default_model_kind),
+                key="random_selep_model_kind",
+            )
+            selep_top_k = st.number_input(
+                "SeLeP top-k partitions",
+                value=int(_manifest_param_default(random_defaults_manifest, "SELEP_TOP_K", 42)),
+                min_value=1,
+                step=1,
+                key="random_selep_top_k",
+            )
+        with sc2:
+            selep_look_back = st.number_input(
+                "SeLeP lookback",
+                value=int(_manifest_param_default(random_defaults_manifest, "SELEP_LOOK_BACK", 4)),
+                min_value=1,
+                step=1,
+                key="random_selep_look_back",
+            )
+            selep_partition_size = st.number_input(
+                "SeLeP partition size",
+                value=int(_manifest_param_default(random_defaults_manifest, "SELEP_PARTITION_SIZE", 128)),
+                min_value=1,
+                step=1,
+                key="random_selep_partition_size",
+            )
+        with sc3:
+            selep_block_limit = st.number_input(
+                "SeLeP block cap",
+                value=int(_manifest_param_default(random_defaults_manifest, "SELEP_BLOCK_LIMIT", 0)),
+                min_value=0,
+                step=1,
+                key="random_selep_block_limit",
+            )
+            selep_max_block_selects = st.number_input(
+                "SeLeP max SELECTs",
+                value=int(_manifest_param_default(random_defaults_manifest, "SELEP_MAX_BLOCK_SELECTS", 0)),
+                min_value=0,
+                step=1,
+                key="random_selep_max_block_selects",
+            )
+        with sc4:
+            selep_lstm_epochs = st.number_input(
+                "SeLeP epochs",
+                value=int(_manifest_param_default(random_defaults_manifest, "SELEP_LSTM_EPOCHS", 75)),
+                min_value=1,
+                step=1,
+                key="random_selep_lstm_epochs",
+            )
+            selep_lstm_batch_size = st.number_input(
+                "SeLeP batch size",
+                value=int(_manifest_param_default(random_defaults_manifest, "SELEP_LSTM_BATCH_SIZE", 32)),
+                min_value=1,
+                step=1,
+                key="random_selep_lstm_batch_size",
+            )
+        vf1, vf2, vf3, vf4 = st.columns(4)
+        with vf1:
+            selep_test_fraction = st.text_input(
+                "SeLeP test fraction",
+                value=str(_manifest_param_default(random_defaults_manifest, "SELEP_TEST_FRACTION", "0.10")),
+                key="random_selep_test_fraction",
+            )
+        with vf2:
+            selep_validation_fraction = st.text_input(
+                "SeLeP validation fraction",
+                value=str(_manifest_param_default(random_defaults_manifest, "SELEP_LSTM_VALIDATION_FRACTION", "0.10")),
+                key="random_selep_validation_fraction",
+            )
+        with vf3:
+            selep_encoding_epochs = st.number_input(
+                "SeLeP encoding epochs",
+                value=int(_manifest_param_default(random_defaults_manifest, "SELEP_ENCODING_EPOCHS", 100)),
+                min_value=1,
+                step=1,
+                key="random_selep_encoding_epochs",
+            )
+        with vf4:
+            selep_rows_per_block = st.number_input(
+                "Rows per block",
+                value=int(_manifest_param_default(random_defaults_manifest, "SELEP_SEMANTIC_ROWS_PER_BLOCK", 64)),
+                min_value=1,
+                step=1,
+                key="random_selep_rows_per_block",
+            )
+        ec1, ec2 = st.columns([1, 1])
+        with ec1:
+            selep_encoding_length = st.number_input(
+                "SeLeP encoding length",
+                value=int(_manifest_param_default(random_defaults_manifest, "SELEP_ENCODING_LENGTH", 32)),
+                min_value=1,
+                step=1,
+                key="random_selep_encoding_length",
+            )
+        with ec2:
+            selep_table_encoding_method = st.text_input(
+                "SeLeP table encoder",
+                value=str(_manifest_param_default(random_defaults_manifest, "SELEP_TABLE_ENCODING_METHOD", "AutoEncoder_1")),
+                key="random_selep_table_encoding_method",
+            )
+        clay1, clay2, clay3, clay4 = st.columns(4)
+        with clay1:
+            selep_clay_repartition_threshold = st.number_input(
+                "Clay repartition threshold",
+                value=int(_manifest_param_default(random_defaults_manifest, "SELEP_CLAY_REPARTITION_THRESHOLD", 2500)),
+                min_value=1,
+                step=1,
+                key="random_selep_clay_repartition_threshold",
+            )
+        with clay2:
+            selep_clay_initial_fill = st.text_input(
+                "Clay initial fill",
+                value=str(_manifest_param_default(random_defaults_manifest, "SELEP_CLAY_INITIAL_FILL", "0.90")),
+                key="random_selep_clay_initial_fill",
+            )
+        with clay3:
+            selep_clay_empty_fraction = st.text_input(
+                "Clay empty fraction",
+                value=str(_manifest_param_default(random_defaults_manifest, "SELEP_CLAY_EMPTY_FRACTION", "0.10")),
+                key="random_selep_clay_empty_fraction",
+            )
+        with clay4:
+            selep_clay_max_load = st.text_input(
+                "Clay max load",
+                value=str(_manifest_param_default(random_defaults_manifest, "SELEP_CLAY_MAX_LOAD", "1.0")),
+                key="random_selep_clay_max_load",
+            )
+            selep_clay_weight_reset = st.text_input(
+                "Clay weight reset",
+                value=str(_manifest_param_default(random_defaults_manifest, "SELEP_CLAY_WEIGHT_RESET", "0.10")),
+                key="random_selep_clay_weight_reset",
+            )
+        dc1, dc2, dc3 = st.columns([1, 2, 1])
+        with dc1:
+            selep_block_source = st.selectbox(
+                "SeLeP block source",
+                block_source_choices,
+                index=block_source_choices.index(default_block_source),
+                key="random_selep_block_source",
+            )
+        with dc2:
+            selep_relation_allowlist = st.text_input(
+                "SeLeP relations",
+                value=str(_manifest_param_default(random_defaults_manifest, "SELEP_RELATION_ALLOWLIST", "anchors,graph_types")),
+                key="random_selep_relation_allowlist",
+            )
+        with dc3:
+            selep_relation_kinds = st.text_input(
+                "SeLeP relation kinds",
+                value=str(_manifest_param_default(random_defaults_manifest, "SELEP_RELATION_KINDS", "r")),
+                key="random_selep_relation_kinds",
+            )
+    random_selep_values = {
+        "SELEP_MODEL_KIND": selep_model_kind,
+        "SELEP_TOP_K": int(selep_top_k),
+        "SELEP_LOOK_BACK": int(selep_look_back),
+        "SELEP_PARTITION_SIZE": int(selep_partition_size),
+        "SELEP_BLOCK_LIMIT": int(selep_block_limit),
+        "SELEP_BLOCK_SOURCE": selep_block_source,
+        "SELEP_RELATION_ALLOWLIST": selep_relation_allowlist,
+        "SELEP_RELATION_KINDS": selep_relation_kinds,
+        "SELEP_MAX_BLOCK_SELECTS": int(selep_max_block_selects),
+        "SELEP_CLAY_REPARTITION_THRESHOLD": int(selep_clay_repartition_threshold),
+        "SELEP_CLAY_INITIAL_FILL": selep_clay_initial_fill,
+        "SELEP_CLAY_EMPTY_FRACTION": selep_clay_empty_fraction,
+        "SELEP_CLAY_MAX_LOAD": selep_clay_max_load,
+        "SELEP_CLAY_WEIGHT_RESET": selep_clay_weight_reset,
+        "SELEP_TEST_FRACTION": selep_test_fraction,
+        "SELEP_ENCODING_LENGTH": int(selep_encoding_length),
+        "SELEP_ENCODING_EPOCHS": int(selep_encoding_epochs),
+        "SELEP_TABLE_ENCODING_METHOD": selep_table_encoding_method,
+        "SELEP_SEMANTIC_ROWS_PER_BLOCK": int(selep_rows_per_block),
+        "SELEP_LSTM_EPOCHS": int(selep_lstm_epochs),
+        "SELEP_LSTM_BATCH_SIZE": int(selep_lstm_batch_size),
+        "SELEP_LSTM_VALIDATION_FRACTION": selep_validation_fraction,
+    }
+
     random_limits_by_name: dict[str, str] = {}
+    random_train_k_by_name: dict[str, int] = {}
     for name in selected_random_apps:
         m_for_limits = manifest_by_name.get(name)
         if m_for_limits is None:
@@ -341,11 +527,24 @@ with tab_random:
         default_limits = _format_int_list(
             _manifest_param_default(m_for_limits, "SWEEP_PREFETCH_LIMITS", "")
         )
-        random_limits_by_name[name] = st.text_input(
-            f"{name} TTG limits",
-            value=default_limits,
-            key=f"random_limits_{name}",
-        )
+        default_train_k = int(_manifest_param_default(m_for_limits, "SWEEP_RANDOM_TRAIN_K", 20))
+        tc, lc = st.columns([1, 3])
+        with tc:
+            random_train_k_by_name[name] = int(
+                st.number_input(
+                    f"{name} Train K",
+                    value=default_train_k,
+                    min_value=0,
+                    step=1,
+                    key=f"random_train_k_{name}",
+                )
+            )
+        with lc:
+            random_limits_by_name[name] = st.text_input(
+                f"{name} TTG limits",
+                value=default_limits,
+                key=f"random_limits_{name}",
+            )
 
     random_running, random_pid = sweep_runner.is_run_all_running()
     rr_status, rr_kill, rr_launch = st.columns([3, 1, 1])
@@ -381,10 +580,11 @@ with tab_random:
                     st.stop()
                 form_values_by_name[manifest.name] = _random_paired_values(
                     int(random_n),
-                    int(random_train_k),
+                    int(random_train_k_by_name.get(manifest.name, 20)),
                     int(random_seed),
                     random_policies,
                     limits,
+                    random_selep_values,
                 )
             info = sweep_runner.kickoff_all(
                 random_manifests,

@@ -73,6 +73,175 @@ parameters:
     default: 42
     help: Seed used to shuffle the adapter's seeded spawn pool before training selection.
 
+  - name: SWEEP_RANDOM_N
+    label: Random paired N
+    kind: int
+    default: 20
+    help: Number of measured stream requests used by random-paired sweeps.
+
+  - name: SWEEP_RANDOM_TRAIN_K
+    label: Random paired train K
+    kind: int
+    default: 20
+    help: Number of sampled requests used to train stream predictors such as SeLeP.
+
+  - name: SWEEP_RANDOM_SEED
+    label: Random paired seed
+    kind: int
+    default: 42
+    help: Seed used to shuffle the seeded spawn pool for random-paired sweeps.
+
+  - name: SWEEP_RANDOM_POLICIES
+    label: Random paired policies
+    kind: str
+    default: "none dbridge_like ttg selep"
+    help: Stream-safe runtime policies compared when SWEEP_POLICIES=random-paired.
+
+  - name: SELEP_MODEL_KIND
+    label: SeLeP model
+    kind: enum
+    default: "faithful"
+    choices: ["faithful", "lstm", "frequency", "original"]
+    help: >
+      SeLeP sidecar model. faithful uses SeLeP semantic block encoding,
+      affinity/Clay-style partitioning, partition encodings, and the SeLeP
+      ED-LSTM; lstm keeps the older binary-vector adapter; frequency is a
+      plumbing-only fallback.
+
+  - name: SELEP_TOP_K
+    label: SeLeP partitions
+    kind: int
+    default: 42
+    help: Number of partitions predicted per SQL event.
+
+  - name: SELEP_LOOK_BACK
+    label: SeLeP lookback
+    kind: int
+    default: 4
+    help: Number of prior partition-access events used as LSTM input.
+
+  - name: SELEP_PARTITION_SIZE
+    label: SeLeP partition size
+    kind: int
+    default: 128
+    help: Maximum PostgreSQL blocks per SeLeP partition.
+
+  - name: SELEP_BLOCK_LIMIT
+    label: SeLeP block cap
+    kind: int
+    default: 0
+    help: Maximum PostgreSQL blocks prewarmed per prediction; 0 keeps all blocks in the predicted partitions.
+
+  - name: SELEP_TEST_FRACTION
+    label: SeLeP test fraction
+    kind: str
+    default: "0.10"
+    help: Fraction of supervised SeLeP examples reserved for held-out model reporting.
+
+  - name: SELEP_ENCODING_LENGTH
+    label: SeLeP encoding length
+    kind: int
+    default: 32
+    help: Width of SeLeP block and partition semantic encodings.
+
+  - name: SELEP_ENCODING_EPOCHS
+    label: SeLeP encoding epochs
+    kind: int
+    default: 100
+    help: Maximum epochs for SeLeP semantic block autoencoder training.
+
+  - name: SELEP_TABLE_ENCODING_METHOD
+    label: SeLeP table encoder
+    kind: str
+    default: "AutoEncoder_1"
+    help: SeLeP table/block encoder method; AutoEncoder_1 matches the MLP encoder path.
+
+  - name: SELEP_SEMANTIC_ROWS_PER_BLOCK
+    label: SeLeP rows/block
+    kind: int
+    default: 64
+    help: Maximum table rows sampled from each observed PostgreSQL block for semantic encoding.
+
+  - name: SELEP_BLOCK_SOURCE
+    label: SeLeP blocks
+    kind: enum
+    default: "pg-buffercache"
+    choices: ["pg-buffercache", "hash"]
+    help: >
+      pg-buffercache replays training queries to discover PostgreSQL blocks;
+      hash is only for plumbing smoke tests.
+
+  - name: SELEP_RELATION_ALLOWLIST
+    label: SeLeP relations
+    kind: str
+    default: "anchors,graph_types"
+    help: >
+      Comma-separated PostgreSQL relations retained from the replayed request
+      block trace. The default keeps Jac data/topology tables and excludes
+      auth/catalog noise.
+
+  - name: SELEP_RELATION_KINDS
+    label: SeLeP relation kinds
+    kind: str
+    default: "r"
+    help: >
+      Comma-separated pg_class relkind values retained from pg_buffercache.
+      The default keeps heap tables and excludes indexes.
+
+  - name: SELEP_MAX_BLOCK_SELECTS
+    label: SeLeP max SELECTs
+    kind: int
+    default: 0
+    help: Maximum successful SELECT events replayed while building block partitions; 0 uses all observed SELECT events.
+
+  - name: SELEP_CLAY_REPARTITION_THRESHOLD
+    label: SeLeP Clay repartition threshold
+    kind: int
+    default: 2500
+    help: Training-query window before Clay-style affinity repartitioning.
+
+  - name: SELEP_CLAY_INITIAL_FILL
+    label: SeLeP Clay initial fill
+    kind: str
+    default: "0.90"
+    help: Initial physical-block partition fill fraction before reserving empty partitions.
+
+  - name: SELEP_CLAY_EMPTY_FRACTION
+    label: SeLeP Clay empty fraction
+    kind: str
+    default: "0.10"
+    help: Fraction of extra empty partitions reserved for Clay clump relocation.
+
+  - name: SELEP_CLAY_MAX_LOAD
+    label: SeLeP Clay max load
+    kind: str
+    default: "1.0"
+    help: Overload threshold for Clay-style repartitioning.
+
+  - name: SELEP_CLAY_WEIGHT_RESET
+    label: SeLeP Clay weight reset
+    kind: str
+    default: "0.10"
+    help: Affinity weight decay applied after each repartitioning window.
+
+  - name: SELEP_LSTM_EPOCHS
+    label: SeLeP epochs
+    kind: int
+    default: 75
+    help: Maximum LSTM training epochs for the SeLeP sidecar model; early stopping may end sooner.
+
+  - name: SELEP_LSTM_BATCH_SIZE
+    label: SeLeP batch size
+    kind: int
+    default: 32
+    help: Batch size used when training the SeLeP LSTM.
+
+  - name: SELEP_LSTM_VALIDATION_FRACTION
+    label: SeLeP validation
+    kind: str
+    default: "0.10"
+    help: Fraction of training examples held out for SeLeP LSTM validation and early stopping.
+
   - name: TEST_USER
     label: Benchmark user
     kind: str
