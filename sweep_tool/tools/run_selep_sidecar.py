@@ -53,6 +53,7 @@ def main() -> int:
     train.add_argument("--partitions", type=int, default=64)
     train.add_argument("--block-source", choices=["jac-ctid", "pg-buffercache", "hash"], default="jac-ctid")
     train.add_argument("--max-block-selects", type=int, default=0)
+    train.add_argument("--jac-ctid-resolve-batch-size", type=int, default=1000)
     train.add_argument("--clay-repartition-threshold", type=int, default=2500)
     train.add_argument("--clay-initial-fill", type=float, default=0.90)
     train.add_argument("--clay-empty-fraction", type=float, default=0.10)
@@ -663,6 +664,7 @@ def collect_jac_ctid_blocks(
     wait_postgres_ready(args)
     enriched: list[dict[str, Any]] = []
     materialize_blocks = prefetch_jac_materialize_blocks(args, classified)
+    resolve_blocks = prefetch_jac_resolve_blocks(args, classified)
     label_cache: dict[str, list[str]] = {}
     skipped: Counter[str] = Counter()
     empty = 0
@@ -678,7 +680,7 @@ def collect_jac_ctid_blocks(
             blocks = label_cache[key]
             cache_hits += 1
         else:
-            blocks = query_jac_ctid_blocks(args, record, kind, materialize_blocks)
+            blocks = query_jac_ctid_blocks(record, kind, materialize_blocks, resolve_blocks, key)
             label_cache[key] = blocks
             cache_misses += 1
 
@@ -798,16 +800,175 @@ ORDER BY 1;
     return out
 
 
-def query_jac_ctid_blocks(
+def prefetch_jac_resolve_blocks(
     args: argparse.Namespace,
+    records: list[tuple[int, dict[str, Any], str]],
+) -> dict[str, list[str]]:
+    grouped: dict[str, list[tuple[str, list[str]]]] = defaultdict(list)
+    out: dict[str, list[str]] = {}
+    seen: set[str] = set()
+    empty_origins = 0
+
+    for _idx, record, kind in records:
+        if kind != "resolve":
+            continue
+        key = event_key(record, include_params=True)
+        if key in seen:
+            continue
+        seen.add(key)
+        query, origins = render_batched_jac_resolve_query(record)
+        out[key] = []
+        if not origins:
+            empty_origins += 1
+            continue
+        grouped[query].append((key, origins))
+
+    if not seen:
+        return {}
+
+    batch_size = max(1, int(getattr(args, "jac_ctid_resolve_batch_size", 1000) or 1000))
+    total_batched = sum(len(items) for items in grouped.values())
+    print(
+        "jac-ctid resolve batch preload: "
+        f"unique={len(seen)} batched={total_batched} "
+        f"empty_origin={empty_origins} groups={len(grouped)} "
+        f"batch_size={batch_size}",
+        flush=True,
+    )
+
+    processed = 0
+    batches = 0
+    for query, items in grouped.items():
+        for chunk in chunked(items, batch_size):
+            batches += 1
+            proc = db_psql_when_ready(
+                args,
+                batched_jac_resolve_block_sql(query, chunk),
+                capture=True,
+            )
+            for line in proc.stdout.splitlines():
+                key, sep, raw_blocks = line.strip().partition("|")
+                if sep and key:
+                    out[key] = [block for block in raw_blocks.split(",") if block]
+            processed += len(chunk)
+            print(
+                "jac-ctid resolve batch "
+                f"{processed}/{total_batched}: batches={batches}",
+                flush=True,
+            )
+
+    return out
+
+
+def render_batched_jac_resolve_query(record: dict[str, Any]) -> tuple[str, list[str]]:
+    sql = record.get("sql") or record.get("pos_sql") or ""
+    params = dict(record.get("params") or record.get("args") or {})
+    origins = [str(value) for value in flatten_sql_values(params.get("origin")) if value]
+    if "origin" not in params:
+        raise RuntimeError(
+            "unsupported Jac resolve for batched ctid labeling: missing :origin "
+            f"parameter in {compact_sql(sql)[:300]}"
+        )
+
+    match = re.search(
+        r"^\s*SELECT\s+(?P<node>n\d+)\.id\s*,\s*(?P<edge>e\d+)\.id\s+"
+        r"FROM\s+unnest\s*\(\s*CAST\s*\(\s*:origin\s+AS\s+uuid\[\]\s*\)\s*\)\s+"
+        r"WITH\s+ORDINALITY\s+AS\s+(?P<frontier>f\d+)\s*\(\s*id\s*,\s*ord\s*\)\s*",
+        sql,
+        re.IGNORECASE | re.DOTALL,
+    )
+    if not match:
+        raise RuntimeError(
+            "unsupported Jac resolve for batched ctid labeling: expected "
+            f"SELECT n.id, e.id FROM unnest(CAST(:origin AS uuid[])); got {compact_sql(sql)[:300]}"
+        )
+
+    node_alias = match.group("node")
+    edge_alias = match.group("edge")
+    frontier_alias = match.group("frontier")
+    suffix = strip_trailing_order_by(sql[match.end() :])
+    if not suffix:
+        raise RuntimeError(
+            "unsupported Jac resolve for batched ctid labeling: missing join suffix "
+            f"in {compact_sql(sql)[:300]}"
+        )
+
+    query = (
+        f"SELECT {frontier_alias}.event_key, {node_alias}.id, {edge_alias}.id "
+        f"FROM input_rows AS {frontier_alias} {suffix}"
+    )
+    params.pop("origin", None)
+    rendered = render_sql(query, params).rstrip().rstrip(";")
+    unresolved = re.search(r"(?<!:):[A-Za-z_][A-Za-z0-9_]*", rendered)
+    if unresolved:
+        raise RuntimeError(
+            "unsupported Jac resolve for batched ctid labeling: unresolved SQL "
+            f"parameter {unresolved.group(0)} in {compact_sql(sql)[:300]}"
+        )
+    return rendered, origins
+
+
+def strip_trailing_order_by(sql: str) -> str:
+    compact = sql.strip().rstrip(";")
+    lowered = compact.lower()
+    idx = lowered.rfind(" order by ")
+    if idx >= 0:
+        return compact[:idx].strip()
+    return compact
+
+
+def batched_jac_resolve_block_sql(query: str, items: list[tuple[str, list[str]]]) -> str:
+    values = ",\n  ".join(
+        f"({sql_quote(key)}, {uuid_array_sql(origins)})" for key, origins in items
+    )
+    return f"""
+WITH input_events(event_key, origins) AS (
+  VALUES
+  {values}
+),
+input_rows(event_key, id, ord) AS (
+  SELECT input_events.event_key, u.id, u.ord
+  FROM input_events
+  CROSS JOIN LATERAL unnest(input_events.origins) WITH ORDINALITY AS u(id, ord)
+),
+q(event_key, node_id, edge_id) AS (
+  {query}
+),
+wanted(event_key, id) AS (
+  SELECT event_key, node_id FROM q WHERE node_id IS NOT NULL
+  UNION
+  SELECT event_key, edge_id FROM q WHERE edge_id IS NOT NULL
+),
+blocks(event_key, block) AS (
+  SELECT DISTINCT wanted.event_key, 'anchors_' || ((a.ctid::text::point)[0]::bigint)::text
+  FROM anchors a
+  JOIN wanted ON wanted.id = a.id
+)
+SELECT event_key, string_agg(block, ',' ORDER BY block)
+FROM blocks
+GROUP BY event_key
+ORDER BY event_key;
+"""
+
+
+def uuid_array_sql(values: list[str]) -> str:
+    if not values:
+        return "ARRAY[]::uuid[]"
+    items = ", ".join(f"{sql_quote(value)}::uuid" for value in values)
+    return f"ARRAY[{items}]::uuid[]"
+
+
+def query_jac_ctid_blocks(
     record: dict[str, Any],
     kind: str,
     materialize_blocks: dict[str, str],
+    resolve_blocks: dict[str, list[str]],
+    key: str,
 ) -> list[str]:
     if kind == "materialize":
         return query_jac_materialize_blocks(record, materialize_blocks)
     if kind == "resolve":
-        return query_jac_resolve_blocks(args, record)
+        return resolve_blocks.get(key, [])
     raise AssertionError(kind)
 
 

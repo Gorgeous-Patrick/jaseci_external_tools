@@ -194,6 +194,8 @@ def run_training_script(adapter: Any, cfg: SelepModelConfig, options: SweepOptio
         cfg.block_source,
         "--max-block-selects",
         str(cfg.max_block_selects),
+        "--jac-ctid-resolve-batch-size",
+        str(env_int(options, "SELEP_JAC_CTID_RESOLVE_BATCH_SIZE", 1000)),
         "--clay-repartition-threshold",
         str(cfg.clay_repartition_threshold),
         "--clay-initial-fill",
