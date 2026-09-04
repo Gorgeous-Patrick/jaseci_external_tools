@@ -51,7 +51,7 @@ def main() -> int:
     train.add_argument("--semantic-rows-per-block", type=int, default=64)
     train.add_argument("--partition-size", type=int, default=128)
     train.add_argument("--partitions", type=int, default=64)
-    train.add_argument("--block-source", choices=["pg-buffercache", "hash"], default="pg-buffercache")
+    train.add_argument("--block-source", choices=["jac-ctid", "pg-buffercache", "hash"], default="jac-ctid")
     train.add_argument("--max-block-selects", type=int, default=0)
     train.add_argument("--clay-repartition-threshold", type=int, default=2500)
     train.add_argument("--clay-initial-fill", type=float, default=0.90)
@@ -109,6 +109,8 @@ def train_command(args: argparse.Namespace) -> int:
     records = select_sql_records(raw_records, args.sql_contains, args.max_block_selects)
     if args.block_source == "pg-buffercache":
         records = collect_pg_buffercache_blocks(args, records)
+    elif args.block_source == "jac-ctid":
+        records = collect_jac_ctid_blocks(args, records)
     else:
         records = attach_hash_blocks(records, args.partitions)
 
@@ -639,6 +641,219 @@ def collect_pg_buffercache_blocks(
     return enriched
 
 
+def collect_jac_ctid_blocks(
+    args: argparse.Namespace,
+    records: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    relation_allowlist = parse_csv_set(args.relation_allowlist)
+    relation_kinds = parse_csv_set(args.relation_kinds)
+    if relation_allowlist and "anchors" not in relation_allowlist:
+        raise RuntimeError("SELEP_BLOCK_SOURCE=jac-ctid requires anchors in SELEP_RELATION_ALLOWLIST")
+    if relation_kinds and "r" not in relation_kinds:
+        raise RuntimeError("SELEP_BLOCK_SOURCE=jac-ctid requires relkind r in SELEP_RELATION_KINDS")
+
+    classified: list[tuple[int, dict[str, Any], str]] = []
+    for idx, record in enumerate(records, start=1):
+        try:
+            kind = jac_ctid_sql_kind(record)
+        except RuntimeError as exc:
+            raise RuntimeError(f"{exc} (record {idx}/{len(records)})") from exc
+        classified.append((idx, record, kind))
+
+    wait_postgres_ready(args)
+    enriched: list[dict[str, Any]] = []
+    materialize_blocks = prefetch_jac_materialize_blocks(args, classified)
+    label_cache: dict[str, list[str]] = {}
+    skipped: Counter[str] = Counter()
+    empty = 0
+    cache_hits = 0
+    cache_misses = 0
+    for idx, record, kind in classified:
+        if kind == "skip":
+            skipped["runtime_noise"] += 1
+            continue
+
+        key = event_key(record, include_params=True)
+        if key in label_cache:
+            blocks = label_cache[key]
+            cache_hits += 1
+        else:
+            blocks = query_jac_ctid_blocks(args, record, kind, materialize_blocks)
+            label_cache[key] = blocks
+            cache_misses += 1
+
+        if not blocks:
+            empty += 1
+            continue
+        item = dict(record)
+        item["_result_blocks"] = blocks
+        enriched.append(item)
+        if idx == 1 or idx % 1000 == 0 or idx == len(records):
+            print(
+                f"jac-ctid label {idx}/{len(records)}: "
+                f"kind={kind} blocks={len(blocks)} "
+                f"block_bearing={len(enriched)} cache_hits={cache_hits}",
+                flush=True,
+            )
+
+    if not enriched:
+        raise RuntimeError(
+            "jac-ctid labeling produced no block-bearing records; "
+            "extend the Jac SQL classifier or use SELEP_BLOCK_SOURCE=pg-buffercache for validation"
+        )
+    print(
+        "jac-ctid label summary: "
+        f"selected={len(records)} block_bearing={len(enriched)} "
+        f"empty={empty} skipped={dict(skipped)} "
+        f"unique_queries={cache_misses} cache_hits={cache_hits}",
+        flush=True,
+    )
+    return enriched
+
+
+def jac_ctid_sql_kind(record: dict[str, Any]) -> str:
+    sql = compact_sql(record.get("sql") or record.get("pos_sql") or "")
+    lowered = sql.lower()
+    params = record.get("params") or record.get("args") or {}
+    if is_jac_ctid_ignored_select(lowered):
+        return "skip"
+    if is_jac_materialize_sql(sql, params):
+        return "materialize"
+    if is_jac_resolve_sql(sql):
+        return "resolve"
+    raise RuntimeError(
+        "unsupported SELECT for SELEP_BLOCK_SOURCE=jac-ctid: "
+        f"{sql[:300]}"
+    )
+
+
+def is_jac_ctid_ignored_select(lowered_sql: str) -> bool:
+    sql = f" {lowered_sql} "
+    return (
+        lowered_sql.startswith("select 1")
+        or " from identity_" in sql
+        or " join identity_" in sql
+        or " from kv_state" in sql
+        or re.search(r"^select\s+(distinct\s+)?type_name\s+from\s+graph_types\b", lowered_sql) is not None
+        or " from pg_" in sql
+        or " information_schema." in sql
+        or "current_setting(" in lowered_sql
+        or "version()" in lowered_sql
+    )
+
+
+def is_jac_materialize_sql(sql: str, params: dict[str, Any]) -> bool:
+    lowered = sql.lower()
+    return (
+        "ids" in params
+        and re.search(r"\bfrom\s+anchors\s+a\b", sql, re.IGNORECASE) is not None
+        and re.search(r"\bselect\s+a\.id\b", lowered) is not None
+    )
+
+
+def is_jac_resolve_sql(sql: str) -> bool:
+    return (
+        re.search(r"^select\s+n\d+\.id\s*,\s*e\d+\.id\s+from\b", sql, re.IGNORECASE) is not None
+        and re.search(r"\bjoin\s+anchors\s+e\d+\b", sql, re.IGNORECASE) is not None
+        and "edgeanchor" in sql.lower()
+    )
+
+
+def prefetch_jac_materialize_blocks(
+    args: argparse.Namespace,
+    records: list[tuple[int, dict[str, Any], str]],
+) -> dict[str, str]:
+    ids: set[str] = set()
+    for _idx, record, kind in records:
+        if kind != "materialize":
+            continue
+        params = record.get("params") or record.get("args") or {}
+        ids.update(str(value) for value in flatten_sql_values(params.get("ids")) if value)
+    if not ids:
+        return {}
+
+    out: dict[str, str] = {}
+    ordered = sorted(ids)
+    for chunk in chunked(ordered, 2000):
+        values = ", ".join(sql_quote(value) for value in chunk)
+        sql = f"""
+WITH wanted(id) AS (
+  SELECT unnest(ARRAY[{values}]::uuid[])
+)
+SELECT w.id::text, 'anchors_' || ((a.ctid::text::point)[0]::bigint)::text
+FROM wanted w
+JOIN anchors a ON a.id = w.id
+ORDER BY 1;
+"""
+        proc = db_psql_when_ready(args, sql, capture=True)
+        for line in proc.stdout.splitlines():
+            raw_id, sep, block = line.strip().partition("|")
+            if sep and raw_id and block:
+                out[raw_id] = block
+    print(
+        "jac-ctid materialize preload: "
+        f"ids={len(ordered)} mapped={len(out)} chunks={math.ceil(len(ordered) / 2000)}",
+        flush=True,
+    )
+    return out
+
+
+def query_jac_ctid_blocks(
+    args: argparse.Namespace,
+    record: dict[str, Any],
+    kind: str,
+    materialize_blocks: dict[str, str],
+) -> list[str]:
+    if kind == "materialize":
+        return query_jac_materialize_blocks(record, materialize_blocks)
+    if kind == "resolve":
+        return query_jac_resolve_blocks(args, record)
+    raise AssertionError(kind)
+
+
+def query_jac_materialize_blocks(record: dict[str, Any], materialize_blocks: dict[str, str]) -> list[str]:
+    params = record.get("params") or record.get("args") or {}
+    ids = flatten_sql_values(params.get("ids"))
+    return sorted({materialize_blocks[str(value)] for value in ids if str(value) in materialize_blocks})
+
+
+def query_jac_resolve_blocks(args: argparse.Namespace, record: dict[str, Any]) -> list[str]:
+    sql = record.get("sql") or record.get("pos_sql") or ""
+    params = record.get("params") or record.get("args") or {}
+    replay = render_sql(sql, params).rstrip().rstrip(";")
+    block_sql = f"""
+WITH q(node_id, edge_id) AS (
+  {replay}
+),
+wanted(id) AS (
+  SELECT node_id FROM q WHERE node_id IS NOT NULL
+  UNION
+  SELECT edge_id FROM q WHERE edge_id IS NOT NULL
+)
+SELECT DISTINCT 'anchors_' || ((a.ctid::text::point)[0]::bigint)::text
+FROM anchors a
+JOIN wanted w ON w.id = a.id
+ORDER BY 1;
+"""
+    return psql_lines(args, block_sql)
+
+
+def psql_lines(args: argparse.Namespace, sql: str) -> list[str]:
+    proc = db_psql_when_ready(args, sql, capture=True)
+    return [line.strip() for line in proc.stdout.splitlines() if line.strip()]
+
+
+def flatten_sql_values(value: Any) -> list[Any]:
+    if value is None:
+        return []
+    if isinstance(value, (list, tuple, set)):
+        out: list[Any] = []
+        for item in value:
+            out.extend(flatten_sql_values(item))
+        return out
+    return [value]
+
+
 def attach_hash_blocks(records: list[dict[str, Any]], partition_count: int) -> list[dict[str, Any]]:
     out = []
     for record in records:
@@ -689,7 +904,11 @@ ORDER BY 1;
 
 def restart_postgres(args: argparse.Namespace) -> None:
     db_command(args, ["docker", "restart", args.postgres_container])
-    deadline = time.time() + 60.0
+    wait_postgres_ready(args)
+
+
+def wait_postgres_ready(args: argparse.Namespace, timeout: float = 60.0) -> None:
+    deadline = time.time() + timeout
     last = ""
     while time.time() < deadline:
         proc = db_command(
@@ -711,7 +930,38 @@ def restart_postgres(args: argparse.Namespace) -> None:
         if proc.returncode == 0:
             return
         time.sleep(0.5)
-    raise RuntimeError(f"Postgres did not become ready after restart: {last.strip()}")
+    raise RuntimeError(f"Postgres did not become ready: {last.strip()}")
+
+
+def db_psql_when_ready(
+    args: argparse.Namespace,
+    sql: str,
+    capture: bool = False,
+    attempts: int = 3,
+) -> subprocess.CompletedProcess[str]:
+    last_exc: RuntimeError | None = None
+    for attempt in range(max(1, attempts)):
+        wait_postgres_ready(args, timeout=30.0)
+        try:
+            return db_psql(args, sql, capture=capture)
+        except RuntimeError as exc:
+            last_exc = exc
+            if not is_transient_postgres_startup_error(str(exc)):
+                raise
+            if attempt + 1 < attempts:
+                time.sleep(1.0)
+    assert last_exc is not None
+    raise last_exc
+
+
+def is_transient_postgres_startup_error(message: str) -> bool:
+    lowered = message.lower()
+    return (
+        "no such file or directory" in lowered
+        or "the database system is starting up" in lowered
+        or "could not connect to server" in lowered
+        or "connection refused" in lowered
+    )
 
 
 def db_psql(args: argparse.Namespace, sql: str, capture: bool = False) -> subprocess.CompletedProcess[str]:
@@ -1781,7 +2031,7 @@ def mean_matrix(matrices: list[Any]) -> list[list[float]]:
     return np.mean(np.asarray(matrices, dtype=float), axis=0).tolist()
 
 
-def chunked(values: list[int], size: int):
+def chunked(values: list[Any], size: int):
     for idx in range(0, len(values), size):
         yield values[idx : idx + size]
 

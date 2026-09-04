@@ -217,10 +217,11 @@ parameters:
   - name: SELEP_BLOCK_SOURCE
     label: SeLeP blocks
     kind: enum
-    default: "pg-buffercache"
-    choices: ["pg-buffercache", "hash"]
+    default: "jac-ctid"
+    choices: ["jac-ctid", "pg-buffercache", "hash"]
     help: >
-      pg-buffercache replays training queries to discover PostgreSQL blocks;
+      jac-ctid derives Jac anchor heap blocks without restarting PostgreSQL;
+      pg-buffercache keeps the original-style replay labeler for validation;
       hash is only for plumbing smoke tests.
 
   - name: SELEP_RELATION_ALLOWLIST

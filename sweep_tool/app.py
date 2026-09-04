@@ -90,6 +90,31 @@ def _format_int_list(value: object) -> str:
     return str(value or "")
 
 
+def _render_log_tail(
+    path: Path,
+    *,
+    refresh_key: str,
+    missing_label: str,
+    max_bytes: int = 15_000,
+    clear_cache: bool = False,
+) -> None:
+    label_col, refresh_col = st.columns([5, 1])
+    with label_col:
+        st.caption(f"tail of `{path}`")
+    with refresh_col:
+        if st.button("Refresh", key=refresh_key, use_container_width=True):
+            if clear_cache:
+                st.cache_data.clear()
+            st.rerun()
+    if path.exists():
+        text = path.read_text()
+        if len(text) > max_bytes:
+            text = "(truncated head)\n" + text[-max_bytes:]
+        st.code(text or "(empty)", language="text")
+    else:
+        st.info(f"No {missing_label} at `{path}` yet.")
+
+
 tab_run, tab_random, tab_analyze, tab_raw, tab_churn, tab_selep = st.tabs(
     ["Run", "Random paired", "Analyze", "Raw data", "Churn", "SeLeP"]
 )
@@ -171,11 +196,11 @@ with tab_run:
             st.rerun()
     if sweep_runner.run_all_log_path().exists():
         with st.expander("Tail of run_all.log", expanded=False):
-            text = sweep_runner.run_all_log_path().read_text()
-            max_bytes = 15_000
-            if len(text) > max_bytes:
-                text = "…(truncated head)…\n" + text[-max_bytes:]
-            st.code(text or "(empty)", language="text")
+            _render_log_tail(
+                sweep_runner.run_all_log_path(),
+                refresh_key="run_all_refresh_log",
+                missing_label="run-all output",
+            )
 
     st.divider()
 
@@ -248,18 +273,11 @@ with tab_run:
     st.divider()
     st.subheader("Sweep output")
     log_path = sweep_runner.stdout_log_path(m)
-    st.caption(f"tail of `{log_path}`")
-    if st.button("Refresh", key="run_refresh_log"):
-        st.rerun()
-    if log_path.exists():
-        text = log_path.read_text()
-        # Show only the last ~15KB so a giant log doesn't slow the tab.
-        max_bytes = 15_000
-        if len(text) > max_bytes:
-            text = "…(truncated head)…\n" + text[-max_bytes:]
-        st.code(text or "(empty)", language="text")
-    else:
-        st.info(f"No sweep has produced output at `{log_path}` yet.")
+    _render_log_tail(
+        log_path,
+        refresh_key="run_refresh_log",
+        missing_label="sweep output",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -331,12 +349,12 @@ with tab_random:
         )
         if default_model_kind not in model_choices:
             default_model_kind = "faithful"
-        block_source_choices = ["pg-buffercache", "hash"]
+        block_source_choices = ["jac-ctid", "pg-buffercache", "hash"]
         default_block_source = str(
-            _manifest_param_default(random_defaults_manifest, "SELEP_BLOCK_SOURCE", "pg-buffercache")
+            _manifest_param_default(random_defaults_manifest, "SELEP_BLOCK_SOURCE", "jac-ctid")
         )
         if default_block_source not in block_source_choices:
-            default_block_source = "pg-buffercache"
+            default_block_source = "jac-ctid"
         sc1, sc2, sc3, sc4 = st.columns(4)
         with sc1:
             selep_model_kind = st.selectbox(
@@ -599,11 +617,11 @@ with tab_random:
 
     if sweep_runner.run_all_log_path().exists():
         with st.expander("Tail of run_all.log", expanded=False):
-            text = sweep_runner.run_all_log_path().read_text()
-            max_bytes = 15_000
-            if len(text) > max_bytes:
-                text = "…(truncated head)…\n" + text[-max_bytes:]
-            st.code(text or "(empty)", language="text")
+            _render_log_tail(
+                sweep_runner.run_all_log_path(),
+                refresh_key="random_run_all_refresh_log",
+                missing_label="run-all output",
+            )
 
     summary_rows = []
     for name in selected_random_apps:
@@ -828,18 +846,12 @@ with tab_churn:
         st.divider()
         log_path = sweep_runner.jacord_churn_stdout_log_path(jacord_manifest)
         st.subheader("Churn output")
-        st.caption(f"tail of `{log_path}`")
-        if st.button("Refresh churn", key="churn_refresh"):
-            st.cache_data.clear()
-            st.rerun()
-        if log_path.exists():
-            text = log_path.read_text()
-            max_bytes = 15_000
-            if len(text) > max_bytes:
-                text = "(truncated head)\n" + text[-max_bytes:]
-            st.code(text or "(empty)", language="text")
-        else:
-            st.info(f"No churn output at `{log_path}` yet.")
+        _render_log_tail(
+            log_path,
+            refresh_key="churn_refresh_log",
+            missing_label="churn output",
+            clear_cache=True,
+        )
 
         churn_csv = jacord_manifest.app_dir / "churn_results.csv"
         churn_df = parsers.load_csv(churn_csv)
@@ -1049,15 +1061,11 @@ with tab_selep:
 
     st.divider()
     st.subheader("SeLeP output")
-    st.caption(f"tail of `{selep_sweep.LOG_PATH}`")
-    if selep_sweep.LOG_PATH.exists():
-        text = selep_sweep.LOG_PATH.read_text()
-        max_bytes = 15_000
-        if len(text) > max_bytes:
-            text = "(truncated head)\n" + text[-max_bytes:]
-        st.code(text or "(empty)", language="text")
-    else:
-        st.info(f"No SeLeP LSTM output at `{selep_sweep.LOG_PATH}` yet.")
+    _render_log_tail(
+        selep_sweep.LOG_PATH,
+        refresh_key="selep_refresh_log",
+        missing_label="SeLeP LSTM output",
+    )
 
     if selep_config.summary_path.exists():
         with st.expander("Last SeLeP summary", expanded=True):

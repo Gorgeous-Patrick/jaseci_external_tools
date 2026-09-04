@@ -61,7 +61,7 @@ def describe(options: SweepOptions) -> str:
         f"mode={env_value(options, 'SELEP_MODEL_KIND', 'faithful')} "
         f"top_k={selep_top_k(options)} "
         f"look_back={env_int(options, 'SELEP_LOOK_BACK', 4)} "
-        f"blocks={env_value(options, 'SELEP_BLOCK_SOURCE', 'pg-buffercache')} "
+        f"blocks={env_value(options, 'SELEP_BLOCK_SOURCE', 'jac-ctid')} "
         f"relations={env_value(options, 'SELEP_RELATION_ALLOWLIST', 'anchors,graph_types')}"
     )
 
@@ -99,7 +99,7 @@ def model_config(
         train_access_log=logs_dir / f"selep_train_access_{safe_walker}_{safe_request}_limit{limit}.csv",
         train_log_path=logs_dir / f"selep_train_{safe_walker}_{safe_request}_limit{limit}.log",
         model_kind=env_value(options, "SELEP_MODEL_KIND", "faithful").lower(),
-        block_source=env_value(options, "SELEP_BLOCK_SOURCE", "pg-buffercache").lower(),
+        block_source=env_value(options, "SELEP_BLOCK_SOURCE", "jac-ctid").lower(),
         look_back=env_int(options, "SELEP_LOOK_BACK", 4),
         top_k=selep_top_k(options),
         encoding_length=env_int(options, "SELEP_ENCODING_LENGTH", 32),
