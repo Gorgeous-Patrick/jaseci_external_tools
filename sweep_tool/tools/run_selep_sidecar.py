@@ -28,7 +28,18 @@ from typing import Any
 STOP = False
 
 
+def raise_csv_field_size_limit() -> None:
+    limit = sys.maxsize
+    while True:
+        try:
+            csv.field_size_limit(limit)
+            return
+        except OverflowError:
+            limit //= 10
+
+
 def main() -> int:
+    raise_csv_field_size_limit()
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
 
