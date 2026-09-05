@@ -73,9 +73,10 @@ python -m lib.prefetch_exp.cli --manifest manifests/<app>.yaml
 The backend accepts the same manifest parameters as environment variables.
 Useful knobs:
 
-- `SWEEP_POLICIES="none ttg oracle"` — space-separated policy list. Supported
-  values include `none`, `ttg`, `oracle`, `markov`, `markov1-pooled`,
-  `coaccess`, `coaccess-pooled`, `selep`, `history`, and `manual`.
+- `SWEEP_POLICIES="none dbridge_like capre ttg oracle"` — space-separated
+  policy list. Supported values include `none`, `dbridge_like`, `capre`,
+  `ttg`, `oracle`, `markov`, `markov1-pooled`, `coaccess`,
+  `coaccess-pooled`, `selep`, `history`, and `manual`.
 - `SWEEP_PREFETCH_LIMITS="500 1000 2000"` — positive limits for predictive
   policies; `none` runs once at limit 0.
 - `SWEEP_ORACLE_MODE=auto` — run a non-counted `prefetching="none"` request,
