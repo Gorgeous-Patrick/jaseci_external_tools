@@ -68,9 +68,17 @@ tar -C "$CONTEXT_ROOT" \
   --exclude='**/churn_profiles' \
   --exclude='**/churn_models' \
   --exclude='**/sweep_runs' \
+  --exclude='**/remote_downloads' \
+  --exclude='**/remote_downloads/**' \
   --exclude='**/oracle_plans' \
+  --exclude='**/dbridge_like_plans' \
+  --exclude='**/dbridge_like_plans/**' \
   --exclude='**/markov_models' \
   --exclude='**/coaccess_models' \
+  --exclude='**/selep_models' \
+  --exclude='**/selep_models/**' \
+  --exclude='**/results' \
+  --exclude='**/results/**' \
   --exclude='**/node_modules' \
   --exclude='**/*.prof' \
   --exclude='**/*.log' \
