@@ -164,6 +164,23 @@ class TrialResult:
     selep_block_misses: str = ""
     selep_general_block_hits: str = ""
     selep_general_block_misses: str = ""
+    capre_prefetch_l3_requests: str = ""
+    capre_prefetch_l3_objects: str = ""
+    capre_demand_l3_requests: str = ""
+    capre_demand_l3_objects: str = ""
+    capre_total_l3_requests: str = ""
+    capre_useful_prefetches: str = ""
+    capre_late_prefetches: str = ""
+    capre_unused_prefetches: str = ""
+    capre_duplicate_prefetches_suppressed: str = ""
+    capre_peak_inflight: str = ""
+    capre_avg_inflight: str = ""
+    capre_app_db_round_trips: str = ""
+    capre_limit_dropped: str = ""
+    capre_depth_dropped: str = ""
+    capre_drain_ms: str = ""
+    capre_trace_file: str = ""
+    capre_metrics_file: str = ""
 
 
 def _split_words(raw: str) -> list[str]:

@@ -19,6 +19,7 @@ SUPPORTED_POLICIES = {
     "none",
     "ttg",
     "oracle",
+    "capre",
     "dbridge_like",
     "markov",
     "history",
@@ -1508,6 +1509,25 @@ def _run_trial(
         l3=counts.get("l3", ""),
         miss=counts.get("miss", ""),
         db_q=db_q,
+        capre_prefetch_l3_requests=profile.get("capre_prefetch_l3_requests", ""),
+        capre_prefetch_l3_objects=profile.get("capre_prefetch_l3_objects", ""),
+        capre_demand_l3_requests=profile.get("capre_demand_l3_requests", ""),
+        capre_demand_l3_objects=profile.get("capre_demand_l3_objects", ""),
+        capre_total_l3_requests=profile.get("capre_total_l3_requests", ""),
+        capre_useful_prefetches=profile.get("capre_useful_prefetches", ""),
+        capre_late_prefetches=profile.get("capre_late_prefetches", ""),
+        capre_unused_prefetches=profile.get("capre_unused_prefetches", ""),
+        capre_duplicate_prefetches_suppressed=profile.get(
+            "capre_duplicate_prefetches_suppressed", ""
+        ),
+        capre_peak_inflight=profile.get("capre_peak_inflight", ""),
+        capre_avg_inflight=profile.get("capre_avg_inflight", ""),
+        capre_app_db_round_trips=profile.get("capre_app_db_round_trips", ""),
+        capre_limit_dropped=profile.get("capre_limit_dropped", ""),
+        capre_depth_dropped=profile.get("capre_depth_dropped", ""),
+        capre_drain_ms=profile.get("capre_drain_ms", ""),
+        capre_trace_file=profile.get("capre_trace_file", ""),
+        capre_metrics_file=profile.get("capre_metrics_file", ""),
         oracle_file=str(oracle_file) if oracle_file is not None else "",
         oracle_topology_file=(
             str(oracle_topology_file) if oracle_topology_file is not None else ""
@@ -2046,7 +2066,9 @@ def _config_values(
     coaccess_topology_file: str = "",
     coaccess_record_topology_file: str = "",
 ) -> dict[str, object]:
-    effective = "none" if policy == "none" or (limit <= 0 and policy != "oracle") else policy
+    effective = "none" if policy == "none" or (
+        limit <= 0 and policy not in {"oracle", "capre"}
+    ) else policy
     return {
         "access_log": access_log,
         "topology_index": True,
@@ -2093,6 +2115,7 @@ def _is_random_runtime_policy(policy: str) -> bool:
     return policy in {
         "none",
         "dbridge_like",
+        "capre",
         "ttg",
         "history",
         "manual",

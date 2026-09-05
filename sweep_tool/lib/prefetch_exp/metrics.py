@@ -62,6 +62,23 @@ RESULT_COLUMNS = [
     "selep_block_misses",
     "selep_general_block_hits",
     "selep_general_block_misses",
+    "capre_prefetch_l3_requests",
+    "capre_prefetch_l3_objects",
+    "capre_demand_l3_requests",
+    "capre_demand_l3_objects",
+    "capre_total_l3_requests",
+    "capre_useful_prefetches",
+    "capre_late_prefetches",
+    "capre_unused_prefetches",
+    "capre_duplicate_prefetches_suppressed",
+    "capre_peak_inflight",
+    "capre_avg_inflight",
+    "capre_app_db_round_trips",
+    "capre_limit_dropped",
+    "capre_depth_dropped",
+    "capre_drain_ms",
+    "capre_trace_file",
+    "capre_metrics_file",
 ]
 
 
@@ -83,6 +100,25 @@ def profile_breakdown(profile_csv: Path) -> dict[str, str]:
         "materialize_ms": row.get("materialize_ms", ""),
         "prefetch_wait_ms": row.get("prefetch_wait_ms", ""),
         "walker_ms": row.get("walker_ms", ""),
+        "capre_prefetch_l3_requests": row.get("capre_prefetch_l3_requests", ""),
+        "capre_prefetch_l3_objects": row.get("capre_prefetch_l3_objects", ""),
+        "capre_demand_l3_requests": row.get("capre_demand_l3_requests", ""),
+        "capre_demand_l3_objects": row.get("capre_demand_l3_objects", ""),
+        "capre_total_l3_requests": row.get("capre_total_l3_requests", ""),
+        "capre_useful_prefetches": row.get("capre_useful_prefetches", ""),
+        "capre_late_prefetches": row.get("capre_late_prefetches", ""),
+        "capre_unused_prefetches": row.get("capre_unused_prefetches", ""),
+        "capre_duplicate_prefetches_suppressed": row.get(
+            "capre_duplicate_prefetches_suppressed", ""
+        ),
+        "capre_peak_inflight": row.get("capre_peak_inflight", ""),
+        "capre_avg_inflight": row.get("capre_avg_inflight", ""),
+        "capre_app_db_round_trips": row.get("capre_app_db_round_trips", ""),
+        "capre_limit_dropped": row.get("capre_limit_dropped", ""),
+        "capre_depth_dropped": row.get("capre_depth_dropped", ""),
+        "capre_drain_ms": row.get("capre_drain_ms", ""),
+        "capre_trace_file": row.get("capre_trace_file", ""),
+        "capre_metrics_file": row.get("capre_metrics_file", ""),
     }
 
 
