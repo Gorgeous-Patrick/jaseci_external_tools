@@ -101,7 +101,7 @@ class SweepOptions:
             random_train_k=int(env.get("SWEEP_RANDOM_TRAIN_K") or "5"),
             random_seed=int(env.get("SWEEP_RANDOM_SEED") or "42"),
             random_policies=_split_words(
-                env.get("SWEEP_RANDOM_POLICIES") or "none dbridge_like ttg selep"
+                env.get("SWEEP_RANDOM_POLICIES") or "none selep ttg"
             ),
             count_db=_env_bool(env.get("JAC_COUNT_DB") or env.get("JAC_COUNT_MONGO")),
             env=env,
@@ -152,6 +152,18 @@ class TrialResult:
     selep_prewarm_calls: str = ""
     selep_prewarm_ms: str = ""
     selep_errors: str = ""
+    selep_score_file: str = ""
+    selep_score_workload: str = ""
+    selep_block_cache_size: str = ""
+    selep_score_events: str = ""
+    selep_block_accesses: str = ""
+    selep_general_block_hit_ratio: str = ""
+    selep_combined_block_hit_ratio: str = ""
+    selep_miss_coverage: str = ""
+    selep_block_hits: str = ""
+    selep_block_misses: str = ""
+    selep_general_block_hits: str = ""
+    selep_general_block_misses: str = ""
 
 
 def _split_words(raw: str) -> list[str]:

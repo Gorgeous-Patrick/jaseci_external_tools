@@ -864,6 +864,14 @@ def _run_random_stream_trial(
             "SeLeP sidecar reported pg_prewarm error(s); "
             f"see {sidecar_paths.sidecar_stats} and {sidecar_paths.sidecar_log}"
         )
+    score_stats: dict[str, object] = {}
+    score_fields: dict[str, str] = {}
+    if policy == "selep":
+        assert cfg is not None and sidecar_paths is not None
+        score_stats = selep.score_trial(adapter, cfg, sidecar_paths, options)
+        score_fields = _selep_score_fields(score_stats, sidecar_paths)
+        for result in request_results:
+            _apply_selep_score_fields(result, score_fields)
 
     summary: dict[str, object] = {
         "policy": policy,
@@ -893,6 +901,7 @@ def _run_random_stream_trial(
         "selep_prewarm_calls": str(stats.get("prewarm_calls", "")),
         "selep_prewarm_ms": str(stats.get("prewarm_ms", "")),
         "selep_errors": error_text,
+        **score_fields,
     }
     summary_path = (
         adapter.app_dir
@@ -1282,6 +1291,8 @@ def _run_selep_trial(
             )
     else:
         error_text = ""
+    score_stats = selep.score_trial(adapter, cfg, sidecar_paths, options)
+    score_fields = _selep_score_fields(score_stats, sidecar_paths)
     return TrialResult(
         policy="selep",
         walker=spec.walker,
@@ -1311,6 +1322,7 @@ def _run_selep_trial(
         selep_prewarm_calls=str(stats.get("prewarm_calls", "")),
         selep_prewarm_ms=str(stats.get("prewarm_ms", "")),
         selep_errors=error_text,
+        **score_fields,
     )
 
 
@@ -2218,6 +2230,52 @@ def _sum_trial_int_field(results: list[TrialResult], attr: str) -> str:
             return ""
         seen = True
     return str(total) if seen else ""
+
+
+def _selep_score_fields(
+    stats: dict[str, object],
+    paths: selep.SelepTrialPaths,
+) -> dict[str, str]:
+    general = stats.get("general_block_cache")
+    combined = stats.get("combined_block_cache")
+    general_cache = general if isinstance(general, dict) else {}
+    combined_cache = combined if isinstance(combined, dict) else {}
+    return {
+        "selep_score_file": str(paths.score_stats),
+        "selep_score_workload": str(paths.score_workload),
+        "selep_block_cache_size": _score_value(stats.get("cache_size_blocks")),
+        "selep_score_events": _score_value(stats.get("block_labeled_events")),
+        "selep_block_accesses": _score_value(stats.get("demand_block_accesses")),
+        "selep_general_block_hit_ratio": _score_value(general_cache.get("hit_ratio")),
+        "selep_combined_block_hit_ratio": _score_value(combined_cache.get("hit_ratio")),
+        "selep_miss_coverage": _score_value(stats.get("miss_coverage")),
+        "selep_block_hits": _score_value(combined_cache.get("hits")),
+        "selep_block_misses": _score_misses(combined_cache),
+        "selep_general_block_hits": _score_value(general_cache.get("hits")),
+        "selep_general_block_misses": _score_misses(general_cache),
+    }
+
+
+def _apply_selep_score_fields(result: TrialResult, fields: dict[str, str]) -> None:
+    for key, value in fields.items():
+        setattr(result, key, value)
+
+
+def _score_misses(cache: dict[object, object]) -> str:
+    total = cache.get("total_access")
+    hits = cache.get("hits")
+    try:
+        return str(int(total) - int(hits))
+    except (TypeError, ValueError):
+        return ""
+
+
+def _score_value(value: object) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, float):
+        return f"{value:.6f}"
+    return str(value)
 
 
 def _db_query_count(adapter) -> str:

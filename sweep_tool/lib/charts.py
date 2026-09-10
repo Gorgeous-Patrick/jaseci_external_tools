@@ -121,6 +121,48 @@ def _hide_repeated_none_baseline(df: pd.DataFrame) -> pd.DataFrame:
     return df[~(is_none & is_nonzero_limit)]
 
 
+def _dedupe_selep_score_rows(df: pd.DataFrame) -> pd.DataFrame:
+    if "selep_combined_block_hit_ratio" not in df.columns:
+        return pd.DataFrame()
+    work = df.copy()
+    if "policy" in work.columns:
+        work = work[work["policy"].fillna("").astype(str).str.lower() == "selep"]
+    work = work[
+        work["selep_combined_block_hit_ratio"].notna()
+        & (work["selep_combined_block_hit_ratio"].astype(str).str.strip() != "")
+    ]
+    if work.empty:
+        return pd.DataFrame()
+    if "selep_score_file" in work.columns:
+        scored = work[
+            work["selep_score_file"].notna()
+            & (work["selep_score_file"].astype(str).str.strip() != "")
+        ]
+        if not scored.empty:
+            return scored.drop_duplicates(subset=["selep_score_file"]).copy()
+    return work
+
+
+def _int_or_blank(value: object) -> str:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return ""
+    if np.isnan(number):
+        return ""
+    return str(int(number))
+
+
+def _pct_or_blank(value: object) -> str:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return ""
+    if np.isnan(number):
+        return ""
+    return f"{number * 100.0:.1f}%"
+
+
 def _positioned_policy_limit_bars(
     df: pd.DataFrame,
 ) -> tuple[pd.DataFrame, list[float], float]:
@@ -443,6 +485,76 @@ def _db_request_count_from_csv(df: pd.DataFrame) -> go.Figure:
     return fig
 
 
+def selep_block_hit_ratio(df: pd.DataFrame) -> go.Figure:
+    """SeLeP's original block-cache hit ratio, not the Jac runtime L1 rate."""
+    required = {"selep_combined_block_hit_ratio", "prefetch_limit"}
+    if df.empty or not required.issubset(df.columns):
+        return go.Figure()
+
+    work = _dedupe_selep_score_rows(df)
+    if work.empty:
+        return go.Figure()
+    for col in ("prefetch_limit", "selep_combined_block_hit_ratio"):
+        work[col] = pd.to_numeric(work[col], errors="coerce")
+    work = work.dropna(subset=["prefetch_limit", "selep_combined_block_hit_ratio"])
+    if work.empty:
+        return go.Figure()
+
+    stats = (
+        work.groupby("prefetch_limit")["selep_combined_block_hit_ratio"]
+        .agg(
+            median="median",
+            p25=lambda s: s.quantile(0.25),
+            p75=lambda s: s.quantile(0.75),
+            trials="count",
+        )
+        .reset_index()
+        .sort_values("prefetch_limit")
+    )
+    if stats.empty:
+        return go.Figure()
+
+    y = stats["median"] * 100.0
+    upper = np.maximum((stats["p75"] - stats["median"]) * 100.0, 0)
+    lower = np.maximum((stats["median"] - stats["p25"]) * 100.0, 0)
+    custom = np.stack(
+        [stats["prefetch_limit"], stats["p25"] * 100.0, stats["p75"] * 100.0, stats["trials"]],
+        axis=-1,
+    )
+    fig = go.Figure()
+    fig.add_bar(
+        x=[_format_limit(limit) for limit in stats["prefetch_limit"]],
+        y=y,
+        name="selep",
+        marker_color=_policy_color("selep"),
+        error_y=dict(
+            type="data",
+            array=upper,
+            arrayminus=lower,
+            visible=bool((upper > 0).any() or (lower > 0).any()),
+            thickness=1.2,
+            width=3,
+        ),
+        customdata=custom,
+        hovertemplate=(
+            "prefetch_limit=%{customdata[0]:.0f}<br>"
+            "median block HR=%{y:.1f}%<br>"
+            "IQR=%{customdata[1]:.1f}%-"
+            "%{customdata[2]:.1f}%<br>"
+            "score runs=%{customdata[3]:.0f}"
+            "<extra></extra>"
+        ),
+    )
+    fig.update_layout(
+        title="SeLeP block-cache hit ratio (original metric)",
+        xaxis_title="prefetch_limit",
+        yaxis_title="Hit ratio (%)",
+        template="plotly_white",
+        margin=dict(l=60, r=20, t=60, b=60),
+    )
+    return fig
+
+
 def hit_rate_summary(df: pd.DataFrame) -> pd.DataFrame:
     """Compact per-policy summary for the Analyze tab."""
     required = {"prefetch_limit", "l1_hit_rate", "l1", "l2", "l3", "miss"}
@@ -497,6 +609,54 @@ def hit_rate_summary(df: pd.DataFrame) -> pd.DataFrame:
                 "median_L1_at_best": int(best_hit.l1),
                 "median_L3_at_best": int(best_hit.l3),
                 "trials_at_best": int(best_hit.trials),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def selep_block_hit_summary(df: pd.DataFrame) -> pd.DataFrame:
+    """Compact summary for SeLeP's original block-cache replay metric."""
+    if df.empty or "selep_combined_block_hit_ratio" not in df.columns:
+        return pd.DataFrame()
+    work = _dedupe_selep_score_rows(df)
+    if work.empty:
+        return pd.DataFrame()
+    numeric_cols = [
+        "prefetch_limit",
+        "train_n",
+        "selep_block_cache_size",
+        "selep_score_events",
+        "selep_block_accesses",
+        "selep_general_block_hit_ratio",
+        "selep_combined_block_hit_ratio",
+        "selep_miss_coverage",
+        "selep_block_hits",
+        "selep_block_misses",
+        "selep_general_block_hits",
+        "selep_general_block_misses",
+    ]
+    for col in numeric_cols:
+        if col in work.columns:
+            work[col] = pd.to_numeric(work[col], errors="coerce")
+    work = work.dropna(subset=["selep_combined_block_hit_ratio"])
+    if work.empty:
+        return pd.DataFrame()
+    rows = []
+    for row in work.sort_values(["prefetch_limit", "train_n"], na_position="last").itertuples(index=False):
+        get = row._asdict().get
+        rows.append(
+            {
+                "prefetch_limit": _int_or_blank(get("prefetch_limit")),
+                "train_n": _int_or_blank(get("train_n")),
+                "cache_blocks": _int_or_blank(get("selep_block_cache_size")),
+                "score_events": _int_or_blank(get("selep_score_events")),
+                "block_accesses": _int_or_blank(get("selep_block_accesses")),
+                "selep_block_hr": _pct_or_blank(get("selep_combined_block_hit_ratio")),
+                "no_prefetch_block_hr": _pct_or_blank(get("selep_general_block_hit_ratio")),
+                "miss_coverage": _pct_or_blank(get("selep_miss_coverage")),
+                "selep_hits": _int_or_blank(get("selep_block_hits")),
+                "selep_misses": _int_or_blank(get("selep_block_misses")),
+                "score_file": str(get("selep_score_file") or ""),
             }
         )
     return pd.DataFrame(rows)

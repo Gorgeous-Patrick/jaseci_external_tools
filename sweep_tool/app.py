@@ -332,7 +332,7 @@ with tab_random:
     with c3:
         random_policies = st.text_input(
             "Random paired policies",
-            value=str(_manifest_param_default(random_defaults_manifest, "SWEEP_RANDOM_POLICIES", "none dbridge_like ttg selep")),
+            value=str(_manifest_param_default(random_defaults_manifest, "SWEEP_RANDOM_POLICIES", "none selep ttg")),
             help="Supported in stream mode: none, dbridge_like, ttg, selep, history, manual.",
             key="random_policies",
         )
@@ -401,6 +401,13 @@ with tab_random:
                 key="random_selep_max_block_selects",
             )
         with sc4:
+            selep_cache_size = st.number_input(
+                "SeLeP cache blocks",
+                value=int(_manifest_param_default(random_defaults_manifest, "SELEP_CACHE_SIZE", 66000)),
+                min_value=1,
+                step=1,
+                key="random_selep_cache_size",
+            )
             selep_lstm_epochs = st.number_input(
                 "SeLeP epochs",
                 value=int(_manifest_param_default(random_defaults_manifest, "SELEP_LSTM_EPOCHS", 75)),
@@ -517,6 +524,7 @@ with tab_random:
         "SELEP_LOOK_BACK": int(selep_look_back),
         "SELEP_PARTITION_SIZE": int(selep_partition_size),
         "SELEP_BLOCK_LIMIT": int(selep_block_limit),
+        "SELEP_CACHE_SIZE": int(selep_cache_size),
         "SELEP_BLOCK_SOURCE": selep_block_source,
         "SELEP_RELATION_ALLOWLIST": selep_relation_allowlist,
         "SELEP_RELATION_KINDS": selep_relation_kinds,
@@ -645,6 +653,10 @@ with tab_random:
                     "stream_wall_ms": row.get("stream_wall_ms", ""),
                     "train_ms": row.get("train_ms", ""),
                     "l1_hit_rate": row.get("l1_hit_rate", ""),
+                    "selep_block_hr": row.get("selep_combined_block_hit_ratio", ""),
+                    "selep_miss_coverage": row.get("selep_miss_coverage", ""),
+                    "selep_block_cache": row.get("selep_block_cache_size", ""),
+                    "selep_score": row.get("selep_score_file", ""),
                     "summary": row.get("summary_path", str(path)),
                 }
             )
@@ -682,8 +694,12 @@ with tab_analyze:
     else:
         summary = charts.hit_rate_summary(df)
         if not summary.empty:
-            st.subheader("Hit-rate summary")
+            st.subheader("Runtime cache hit-rate summary")
             st.dataframe(summary, use_container_width=True, hide_index=True)
+        selep_summary = charts.selep_block_hit_summary(df)
+        if not selep_summary.empty:
+            st.subheader("SeLeP block-cache summary")
+            st.dataframe(selep_summary, use_container_width=True, hide_index=True)
 
         # Render each chart only if it has data; otherwise the panel is
         # a blank axes block, which is confusing.  Older sweeps predate
@@ -691,6 +707,7 @@ with tab_analyze:
         # log-based charts come back empty for them.
         chart_specs = [
             ("chart_l1_hit_rate_by_policy", charts.l1_hit_rate_by_policy, (df,)),
+            ("chart_selep_block_hit_ratio", charts.selep_block_hit_ratio, (df,)),
             ("chart_cache_tier_mix", charts.cache_tier_mix, (df,)),
             ("chart_e2e_stack", charts.e2e_stack, (df,)),
             ("chart_memory_time_reduction", charts.memory_time_reduction, (df, m.app_dir / m.profiles_dir)),

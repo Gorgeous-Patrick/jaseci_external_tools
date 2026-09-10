@@ -46,9 +46,22 @@ RESULT_COLUMNS = [
     "selep_predictions",
     "selep_blocks",
     "selep_blocks_skipped",
+    "selep_blocks_already_warmed",
     "selep_prewarm_calls",
     "selep_prewarm_ms",
     "selep_errors",
+    "selep_score_file",
+    "selep_score_workload",
+    "selep_block_cache_size",
+    "selep_score_events",
+    "selep_block_accesses",
+    "selep_general_block_hit_ratio",
+    "selep_combined_block_hit_ratio",
+    "selep_miss_coverage",
+    "selep_block_hits",
+    "selep_block_misses",
+    "selep_general_block_hits",
+    "selep_general_block_misses",
 ]
 
 

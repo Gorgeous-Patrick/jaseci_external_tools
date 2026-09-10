@@ -94,11 +94,31 @@ def main() -> int:
     serve.add_argument("--block-limit", type=int, default=0)
     serve.add_argument("--poll-sec", type=float, default=0.01)
 
+    score = sub.add_parser("score", help="replay a measured SeLeP trace with original block-cache hit-ratio metrics")
+    score.add_argument("--model", required=True)
+    score.add_argument("--trace", required=True)
+    score.add_argument("--stats-out", required=True)
+    score.add_argument("--workload-out", default="")
+    score.add_argument("--selep-root", required=True)
+    score.add_argument("--top-k", type=int, default=0)
+    score.add_argument("--block-limit", type=int, default=0)
+    score.add_argument("--cache-size", type=int, default=66000)
+    score.add_argument("--block-source", choices=["jac-ctid", "pg-buffercache", "hash"], default="jac-ctid")
+    score.add_argument("--max-block-selects", type=int, default=0)
+    score.add_argument("--jac-ctid-resolve-batch-size", type=int, default=1000)
+    score.add_argument("--sql-contains", default="")
+    score.add_argument("--relation-allowlist", default="anchors,graph_types")
+    score.add_argument("--relation-kinds", default="r")
+    score.add_argument("--partitions", type=int, default=64)
+    add_db_args(score)
+
     args = parser.parse_args()
     if args.command == "train":
         return train_command(args)
     if args.command == "serve":
         return serve_command(args)
+    if args.command == "score":
+        return score_command(args)
     raise AssertionError(args.command)
 
 
@@ -248,6 +268,59 @@ def serve_command(args: argparse.Namespace) -> int:
     return 0
 
 
+def score_command(args: argparse.Namespace) -> int:
+    stats_path = Path(args.stats_out).expanduser().resolve()
+    stats_path.parent.mkdir(parents=True, exist_ok=True)
+    workload_path = Path(args.workload_out).expanduser().resolve() if args.workload_out else None
+    if workload_path is not None:
+        workload_path.parent.mkdir(parents=True, exist_ok=True)
+
+    raw_records = load_trace(Path(args.trace))
+    selected_records = select_sql_records(raw_records, args.sql_contains, args.max_block_selects)
+    if args.block_source == "pg-buffercache":
+        records = collect_pg_buffercache_blocks(args, selected_records)
+    elif args.block_source == "jac-ctid":
+        records = collect_jac_ctid_blocks(args, selected_records)
+    else:
+        records = attach_hash_blocks(selected_records, args.partitions)
+
+    predictor = SelepPredictor(
+        Path(args.model).expanduser().resolve(),
+        Path(args.selep_root).expanduser().resolve(),
+        top_k_override=args.top_k,
+    )
+    report = replay_selep_block_cache(
+        records,
+        predictor,
+        Path(args.selep_root).expanduser().resolve(),
+        cache_size=args.cache_size,
+        block_limit=args.block_limit,
+    )
+    report.update(
+        {
+            "model": str(Path(args.model).expanduser().resolve()),
+            "trace": str(Path(args.trace).expanduser().resolve()),
+            "block_source": args.block_source,
+            "selected_sql_events": len(selected_records),
+            "block_labeled_events": len(records),
+            "top_k": int(args.top_k or predictor.top_k),
+            "block_limit": int(args.block_limit),
+        }
+    )
+    if workload_path is not None:
+        write_scored_workload(records, predictor, workload_path)
+        report["workload"] = str(workload_path)
+    stats_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    print(
+        "SeLeP score: "
+        f"events={report['block_labeled_events']} "
+        f"combined_hit={report['combined_block_cache']['hit_ratio']:.6f} "
+        f"coverage={report['miss_coverage']:.6f} stats={stats_path}",
+        flush=True,
+    )
+    return 0
+
+
 class SelepPredictor:
     def __init__(self, model_path: Path, selep_root: Path, top_k_override: int = 0):
         self.model_path = model_path
@@ -262,6 +335,10 @@ class SelepPredictor:
             for part, blocks in (self.model.get("partition_blocks") or {}).items()
             if isinstance(blocks, list)
         }
+        self.block_to_partition: dict[str, str] = {}
+        for part, blocks in self.partition_blocks.items():
+            for block in blocks:
+                self.block_to_partition.setdefault(block, part)
         self.event_exact = {
             str(key): [str(part) for part in parts]
             for key, parts in (self.model.get("event_partitions_exact") or {}).items()
@@ -394,6 +471,120 @@ class SelepPredictor:
                 if block_limit > 0 and len(out) >= block_limit:
                     return out
         return out
+
+    def partitions_for_blocks(self, blocks: list[str]) -> list[str]:
+        parts = {
+            self.block_to_partition[block]
+            for block in blocks
+            if block in self.block_to_partition
+        }
+        return sorted(parts, key=partition_sort_key)
+
+
+def replay_selep_block_cache(
+    records: list[dict[str, Any]],
+    predictor: SelepPredictor,
+    selep_root: Path,
+    *,
+    cache_size: int,
+    block_limit: int,
+) -> dict[str, Any]:
+    if cache_size <= 0:
+        raise ValueError(f"SeLeP block-cache scoring requires positive cache_size, got {cache_size}")
+    sys.path.insert(0, str(selep_root))
+    from Backend.Database.LRUCache import LRUCache
+
+    general_cache = LRUCache(int(cache_size))
+    combined_cache = LRUCache(int(cache_size))
+    requested_blocks: set[str] = set()
+    prefetched_blocks: set[str] = set()
+    requested_partitions: set[str] = set()
+    prefetched_partitions: set[str] = set()
+    matched_events = 0
+    predictions = 0
+    demand_blocks = 0
+    unpartitioned_demand_blocks = 0
+    prefetch_block_candidates = 0
+
+    for idx, record in enumerate(records):
+        blocks = [str(block) for block in record.get("_result_blocks") or []]
+        if not blocks:
+            continue
+        demand_blocks += len(blocks)
+        requested_blocks.update(blocks)
+        requested_partitions.update(predictor.partitions_for_blocks(blocks))
+        unpartitioned_demand_blocks += sum(1 for block in blocks if block not in predictor.block_to_partition)
+        for block in blocks:
+            general_cache.put(block, increase_hit=True)
+            combined_cache.put(block, increase_hit=True)
+
+        observed, predicted = predictor.observe(record)
+        if observed:
+            matched_events += 1
+        if idx == len(records) - 1 or not predicted:
+            continue
+        predictions += 1
+        prefetched_partitions.update(predicted)
+        blocks_to_prefetch = predictor.blocks_for(predicted, block_limit)
+        prefetch_block_candidates += len(blocks_to_prefetch)
+        prefetched_blocks.update(blocks_to_prefetch)
+        for block in blocks_to_prefetch:
+            combined_cache.put(block, increase_hit=False, insert_type="p")
+
+    general_report = general_cache.report_dict()
+    combined_report = combined_cache.report_dict()
+    total_misses = int(general_cache.get_total_access() - general_cache.hit_count)
+    combined_misses = int(combined_cache.get_total_access() - combined_cache.hit_count)
+    eliminated_misses = total_misses - combined_misses
+    miss_coverage = eliminated_misses / total_misses if total_misses else 0.0
+    useless_blocks = len(prefetched_blocks - requested_blocks)
+    useless_partitions = len(prefetched_partitions - requested_partitions)
+    return {
+        "cache_size_blocks": int(cache_size),
+        "demand_block_accesses": int(demand_blocks),
+        "unpartitioned_demand_block_accesses": int(unpartitioned_demand_blocks),
+        "matched_events": int(matched_events),
+        "predictions": int(predictions),
+        "prefetch_block_candidates": int(prefetch_block_candidates),
+        "prefetched_unique_blocks": int(len(prefetched_blocks)),
+        "prefetched_unique_partitions": int(len(prefetched_partitions)),
+        "requested_unique_blocks": int(len(requested_blocks)),
+        "requested_unique_partitions": int(len(requested_partitions)),
+        "useless_prefs": int(useless_blocks),
+        "useless_par_prefs": int(useless_partitions),
+        "total_misses": int(total_misses),
+        "combined_misses": int(combined_misses),
+        "eliminated_misses": int(eliminated_misses),
+        "miss_coverage": float(miss_coverage),
+        "general_block_cache": general_report,
+        "combined_block_cache": combined_report,
+    }
+
+
+def write_scored_workload(
+    records: list[dict[str, Any]],
+    predictor: SelepPredictor,
+    workload_path: Path,
+) -> None:
+    with workload_path.open("w", newline="") as fh:
+        writer = csv.DictWriter(
+            fh,
+            fieldnames=["theTime", "ClientIP", "row", "statement", "resultBlock", "resultPartitions"],
+        )
+        writer.writeheader()
+        for record in records:
+            blocks = [str(block) for block in record.get("_result_blocks") or []]
+            parts = predictor.partitions_for_blocks(blocks)
+            writer.writerow(
+                {
+                    "theTime": str(record.get("ts_ns") or ""),
+                    "ClientIP": str(record.get("thread_id") or ""),
+                    "row": str(record.get("row_count") or 0),
+                    "statement": compact_sql(record.get("sql") or record.get("pos_sql") or ""),
+                    "resultBlock": "[" + ", ".join(blocks) + "]",
+                    "resultPartitions": "[" + ", ".join(parts) + "]",
+                }
+            )
 
 def tail_trace(
     trace_path: Path,

@@ -39,6 +39,7 @@ class SelepModelConfig:
     table_encoding_method: str
     semantic_rows_per_block: int
     block_limit: int
+    cache_size: int
     max_block_selects: int
     clay_repartition_threshold: int
     clay_initial_fill: str
@@ -54,6 +55,9 @@ class SelepTrialPaths:
     sidecar_log: Path
     sidecar_stats: Path
     ready_file: Path
+    score_log: Path
+    score_stats: Path
+    score_workload: Path
 
 
 def describe(options: SweepOptions) -> str:
@@ -107,6 +111,7 @@ def model_config(
         table_encoding_method=env_value(options, "SELEP_TABLE_ENCODING_METHOD", "AutoEncoder_1"),
         semantic_rows_per_block=env_int(options, "SELEP_SEMANTIC_ROWS_PER_BLOCK", 64),
         block_limit=env_int(options, "SELEP_BLOCK_LIMIT", 0),
+        cache_size=env_int(options, "SELEP_CACHE_SIZE", 66000),
         max_block_selects=env_int(options, "SELEP_MAX_BLOCK_SELECTS", 0),
         clay_repartition_threshold=env_int(options, "SELEP_CLAY_REPARTITION_THRESHOLD", 2500),
         clay_initial_fill=env_value(options, "SELEP_CLAY_INITIAL_FILL", "0.90"),
@@ -269,6 +274,9 @@ def trial_paths(
         sidecar_log=logs_dir / f"selep_sidecar_{suffix}.log",
         sidecar_stats=logs_dir / f"selep_sidecar_{suffix}.json",
         ready_file=logs_dir / f"selep_sidecar_{suffix}.ready",
+        score_log=logs_dir / f"selep_score_{suffix}.log",
+        score_stats=logs_dir / f"selep_score_{suffix}.json",
+        score_workload=logs_dir / f"selep_score_workload_{suffix}.csv",
     )
 
 
@@ -321,6 +329,81 @@ def start_sidecar(
     finally:
         stop_process_group(proc)
         log_fh.close()
+
+
+def score_trial(
+    adapter: Any,
+    cfg: SelepModelConfig,
+    paths: SelepTrialPaths,
+    options: SweepOptions,
+) -> dict[str, Any]:
+    for path in (paths.score_stats, paths.score_workload):
+        path.unlink(missing_ok=True)
+    selep_python = selep_python_path(options)
+    selep_repo = selep_repo_path(options)
+    cmd = [
+        str(selep_python),
+        str(SIDECAR_SCRIPT),
+        "score",
+        "--model",
+        str(cfg.model_path),
+        "--trace",
+        str(paths.trace_path),
+        "--stats-out",
+        str(paths.score_stats),
+        "--workload-out",
+        str(paths.score_workload),
+        "--selep-root",
+        str(selep_repo),
+        "--top-k",
+        str(cfg.top_k),
+        "--block-limit",
+        str(cfg.block_limit),
+        "--cache-size",
+        str(cfg.cache_size),
+        "--block-source",
+        cfg.block_source,
+        "--max-block-selects",
+        str(cfg.max_block_selects),
+        "--jac-ctid-resolve-batch-size",
+        str(env_int(options, "SELEP_JAC_CTID_RESOLVE_BATCH_SIZE", 1000)),
+        "--sql-contains",
+        cfg.sql_contains,
+        "--relation-allowlist",
+        env_value(options, "SELEP_RELATION_ALLOWLIST", "anchors,graph_types"),
+        "--relation-kinds",
+        env_value(options, "SELEP_RELATION_KINDS", "r"),
+        "--partitions",
+        str(env_int(options, "SELEP_HASH_PARTITIONS", 64)),
+        "--db-mode",
+        adapter.db_manager.settings.mode,
+        "--postgres-container",
+        adapter.db_manager.postgres_container,
+        "--postgres-user",
+        adapter.db_manager.postgres_user,
+        "--postgres-db",
+        adapter.db_manager.postgres_db,
+    ]
+    settings = adapter.db_manager.settings
+    if settings.mode == "remote_ssh":
+        cmd.extend(["--ssh-target", settings.ssh_target])
+        for opt in settings.ssh_options:
+            cmd.append(f"--ssh-option={opt}")
+
+    with paths.score_log.open("w", buffering=1) as log:
+        log.write(" ".join(str(part) for part in cmd) + "\n")
+        proc = subprocess.run(
+            cmd,
+            cwd=str(SWEEP_TOOL_ROOT),
+            env={**os.environ.copy(), **options.env},
+            text=True,
+            stdout=log,
+            stderr=subprocess.STDOUT,
+            check=False,
+        )
+    if proc.returncode != 0:
+        raise RuntimeError(f"SeLeP block-cache scoring failed; see {paths.score_log}")
+    return load_stats(paths.score_stats)
 
 
 def load_stats(path: Path) -> dict[str, Any]:
