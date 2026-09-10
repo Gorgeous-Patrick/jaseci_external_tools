@@ -342,6 +342,67 @@ walker load_feed_stepwise {
     }
 }
 
+walker friend_of_friend {
+    has root_profile_id: str = "",
+        level1_remaining: int = -1,
+        seen_profiles: dict[str, bool] = {},
+        direct_count: int = 0,
+        fof_count: int = 0,
+        duplicate_count: int = 0,
+        username_bytes: int = 0,
+        bio_bytes: int = 0,
+        reports: list[dict] = [];
+
+    can run with Root entry {
+        visit [-->[?:Profile]];
+    }
+
+    can expand with Profile entry {
+        pid = jid(here);
+        if not self.root_profile_id {
+            self.root_profile_id = pid;
+            self.seen_profiles[pid] = True;
+            self.username_bytes += len(here.username);
+            self.bio_bytes += len(here.bio);
+            direct = [->:Follow:->[?:Profile]];
+            self.level1_remaining = len(direct);
+            visit [->:Follow:->[?:Profile]];
+            return;
+        }
+
+        is_direct = self.level1_remaining > 0;
+        if is_direct {
+            self.level1_remaining -= 1;
+        }
+        if pid in self.seen_profiles {
+            self.duplicate_count += 1;
+            return;
+        }
+
+        self.seen_profiles[pid] = True;
+        self.username_bytes += len(here.username);
+        self.bio_bytes += len(here.bio);
+        if is_direct {
+            self.direct_count += 1;
+            visit [->:Follow:->[?:Profile]];
+        } else {
+            self.fof_count += 1;
+        }
+    }
+
+    can deliver with Root exit {
+        report {
+            "root_profile_id": self.root_profile_id,
+            "direct_profiles": self.direct_count,
+            "friend_of_friend_profiles": self.fof_count,
+            "duplicate_profiles": self.duplicate_count,
+            "unique_profiles": len(self.seen_profiles) - 1,
+            "username_bytes": self.username_bytes,
+            "bio_bytes": self.bio_bytes
+        };
+    }
+}
+
 walker get_channels {
     has seen: dict[str, bool] = {},
         results: list[ChannelView] = [],

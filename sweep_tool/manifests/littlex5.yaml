@@ -133,10 +133,12 @@ parameters:
     label: Walker
     kind: enum
     default: "load_feed"
-    choices: ["load_feed", "load_feed_stepwise"]
+    choices: ["load_feed", "load_feed_stepwise", "friend_of_friend"]
     help: >
       LittleX walker under test. load_feed_stepwise keeps the same feed
       shape but enters followed Profile nodes before visiting their posts.
+      friend_of_friend performs a two-hop social traversal and returns a
+      compact summary to avoid response serialization dominating the run.
 
   - name: LITTLEX_USER_POOL_SIZE
     label: User pool size

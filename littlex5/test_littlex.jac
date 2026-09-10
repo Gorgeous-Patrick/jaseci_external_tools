@@ -9,7 +9,7 @@ Run with:  jac test test_littlex.jac
 
 import os;
 import from tempfile { mkdtemp }
-import from jaclang.runtimelib.testing { JacTestClient }
+import from jaclang.testing.testing { JacTestClient }
 
 glob SERVER = os.path.join(os.path.dirname(__file__), "server.jac");
 
@@ -242,6 +242,46 @@ test "feed includes tweets from followed users" {
     contents = {t["content"] for t in feed};
     assert "alice's update" in contents;
     assert "bob's update" in contents;
+
+    client.close();
+}
+
+test "friend_of_friend walks two social hops" {
+    client = make_client();
+    client.register_user("alice", "secret123");
+    client.register_user("bob", "secret123");
+    client.register_user("carol", "secret123");
+    client.register_user("dave", "secret123");
+
+    client.login("dave", "secret123");
+    dave_profile = first_report(
+        client.post("/walker/setup_profile", json={"username": "dave", "bio": "d"})
+    );
+
+    client.login("bob", "secret123");
+    bob_profile = first_report(
+        client.post("/walker/setup_profile", json={"username": "bob", "bio": "b"})
+    );
+    client.post("/walker/follow_user", json={"target_id": dave_profile["id"]});
+
+    client.login("carol", "secret123");
+    carol_profile = first_report(
+        client.post("/walker/setup_profile", json={"username": "carol", "bio": "c"})
+    );
+    client.post("/walker/follow_user", json={"target_id": dave_profile["id"]});
+
+    client.login("alice", "secret123");
+    client.post("/walker/setup_profile", json={"username": "alice", "bio": "a"});
+    client.post("/walker/follow_user", json={"target_id": bob_profile["id"]});
+    client.post("/walker/follow_user", json={"target_id": carol_profile["id"]});
+
+    summary = first_report(client.post("/walker/friend_of_friend", json={}));
+    assert summary["direct_profiles"] == 2;
+    assert summary["friend_of_friend_profiles"] == 1;
+    assert summary["duplicate_profiles"] == 1;
+    assert summary["unique_profiles"] == 3;
+    assert summary["username_bytes"] > 0;
+    assert summary["bio_bytes"] > 0;
 
     client.close();
 }
