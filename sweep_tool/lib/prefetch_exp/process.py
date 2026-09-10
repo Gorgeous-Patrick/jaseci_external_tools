@@ -107,8 +107,10 @@ def post_json(
     path: str,
     body: dict[str, Any],
     token: str = "",
-    timeout_sec: float = 300.0,
+    timeout_sec: float | None = None,
 ) -> HttpResponse:
+    if timeout_sec is None:
+        timeout_sec = _http_timeout_sec()
     data = json.dumps(body).encode("utf-8")
     headers = {"Content-Type": "application/json"}
     if token:
@@ -129,6 +131,17 @@ def post_json(
         status = exc.code
     elapsed_ms = (time.perf_counter() - start) * 1000
     return HttpResponse(status=status, elapsed_ms=elapsed_ms, body=payload)
+
+
+def _http_timeout_sec() -> float:
+    raw = os.environ.get("SWEEP_HTTP_TIMEOUT_SEC") or os.environ.get("SWEEP_HTTP_TIMEOUT")
+    if not raw:
+        return 300.0
+    try:
+        timeout = float(raw)
+    except ValueError:
+        return 300.0
+    return timeout if timeout > 0 else 300.0
 
 
 def login(base_url: str, username: str, password: str) -> str:

@@ -299,6 +299,14 @@ parameters:
       Postgres dump restored before each case. The default backup.pgdump is
       the large LittleX seed.
 
+  - name: SWEEP_HTTP_TIMEOUT_SEC
+    label: HTTP timeout
+    kind: int
+    default: 900
+    help: >
+      Per-walker HTTP request timeout. The large 10k-user LittleX seed can
+      exceed the generic 300s default for low-coverage policies.
+
   - name: TEST_USER
     label: Benchmark user
     kind: str
