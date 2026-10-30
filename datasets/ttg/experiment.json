@@ -1,0 +1,17 @@
+{
+  "format_version": 1,
+  "dataset_scales": ["smoke", "small", "medium"],
+  "seed_splits": {"development": 42, "validation": 43, "evaluation": 44},
+  "policies": ["disabled", "existing_ttg", "dependency_ttg"],
+  "network_rtt_ms": [0, 1, 5, 20],
+  "cache_conditions": ["fresh_session_warm_database", "persistent_session_warm_database"],
+  "measured_repetitions": 11,
+  "policy_order": "alternate forward/reverse per repetition",
+  "snapshot_rule": "Restore the same initial snapshot before each whole session and policy; retain caches between its operations.",
+  "worker_rule": "Drain and attribute background work at session end; record foreground completion and drain completion separately.",
+  "timing_boundary": "Database driver execute entry until all result rows for that command are consumed; includes transport, server wait/execution and driver decoding.",
+  "sql_count": "Count every executed command including setup, ID discovery, payload loading, cleanup, retry and fallback, tagged by category. Record setup separately from the timed session.",
+  "overfetch": "Record unique prefetched node versions and payload bytes, whether later consumed before invalidation/session end, plus duplicate transferred bytes separately.",
+  "required_output": ["run_manifest.json", "operations.jsonl", "db_calls.jsonl", "node_accesses.jsonl", "summary.json"],
+  "execution_status": "configuration_only"
+}

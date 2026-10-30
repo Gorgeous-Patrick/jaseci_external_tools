@@ -6,3 +6,8 @@ remote_downloads/clarity1_selep_20260904/**/*.tar.gz filter=lfs diff=lfs merge=l
 remote_downloads/clarity1_selep_20260904/**/*.csv filter=lfs diff=lfs merge=lfs -text
 remote_downloads/clarity1_selep_20260904/**/*.log filter=lfs diff=lfs merge=lfs -text
 remote_downloads/clarity1_selep_20260904/**/*.jsonl filter=lfs diff=lfs merge=lfs -text
+
+# Small reproducible study artifacts use regular Git; preserve captured bytes.
+app_suite/** -filter !diff !merge
+datasets/ttg/** -filter !diff !merge
+results/20261030-ttg-app-performance/** -filter !diff !merge -text
