@@ -34,6 +34,11 @@ def verify():
     by_original = {x['original']: x for x in origins}
     for item in origins:
         assert digest(local(root, item['package_path'])) == item['sha256']
+    inputs = json.loads((root / 'manifests/small-supplement-inputs-v1.json').read_text())['files']
+    assert len(inputs) == 21
+    for original, sha in inputs.items():
+        relative = str(Path(original).relative_to('/home/baichuan/jaseci'))
+        assert by_original[relative]['sha256'] == sha
     report = json.loads((root / 'report/small-report-v2/report-integrity.json').read_text())
     assert report['passed'] and report['pages'] == 7
     for name, sha in report['files'].items():
