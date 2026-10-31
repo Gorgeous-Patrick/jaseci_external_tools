@@ -1,0 +1,4627 @@
+{
+  "passed": true,
+  "scope": "PARTIAL: LittleX and IssueDesk only; not all30 or paper61",
+  "authorization": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/formal-run-authorization.json",
+    "sha256": "d1fc7443300f79ce5bc2185f900182466d60bed336906d99c54540c585d1dc02"
+  },
+  "source_hashes": {
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/gate.py": "3c12c0551e279e775fc34e30de991b5f8a058d11aca803c035bcd52cd0a86be2",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/evidence.py": "ca6885daa156a38bbeb65e7f2b5a5254a16fbff5298400995146b93e8210f0c6",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/intervals.py": "6873d698aaf4f3da7cf4fab8222334e73e7449a1cb9df094c6e71fe689e05fc3",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/observation.py": "5a6d00b7d8d606c2bb8d28a273adb4828df2813c4bdecd8a2db1c53f9add791a",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/protocol.py": "98fe741f8ffa8290f229d7399008b970ca355c49e274e2aea1693db8b52aabc3",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/worker_clock.py": "9a016a61c91fc7a8a71087545480089294ef0a2c5565de59df8b9fb103b179b4",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/configuration.py": "0f11cd643ed0232d62d7f6ce6459d6f19ddfd850678931f36881583a14cae54e",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/continuation_probe.py": "a4da9fccb1141c2d7148f5d5da377a6f95511517e2fce06353c43f743bd8b485",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/boundary_overlay.py": "ae81ced8ea460a9f041fe09fc11fed662406827221d6eda36f569a27b14d4f93",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/http_observer.py": "47ddb5b2011a6443f5ff1ae0e71156f2aaf769990c84bc038ceebd02a293b3ba",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/control_server.py": "98b0f7d91baa306b025a6921e3ac62f3290252894a9fd5d3ade92281e0aca365",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/perf_serve.py": "491d9f52f51c4452c119888a72323aa837a7711af98ac00c37a5a1dab4b62f6a",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/runtime.sh": "276b9d76834fc6c0ddaceddf27268b9cdadadea6b6c8046d3a1b783d4f5bf47a",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/owned_postgres.py": "9f391d89c9da1bf2d3392a81f452e3a665a4657af95ff0491f55e163c1451817",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/sql_admin.py": "749c699383f43c748b4c426a8a5f258d886c485d859d5a8b1e9ee6af5196d409",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/sql_reconciliation.py": "e2b6bdd8ff728a3a3bdda77fb09d950f62f501a5cff53f304bb1997b90ed8630",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/app_tier_adapter.py": "2ce06f56c45546edb992f8bd4b42c51c84765405c6c0994af9a4baf7617a875e",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/application_matrix.py": "9b28fed81dcc2d70c83a7e596440c0f08690d19ee66a07683e56fd7f7c28dfbe",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/application_matrix_v2.py": "737e7b16b5361791ed76520376b727cf2c7589cabfc8a2a5123a95a27505f287",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/cleanup_guard_v2.py": "e933ea705631f9a4ba2dbe0e9392786893ae325a6831db179a2c797d5201ba21",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/semantic_cleanup_v2.py": "75d14f7949e2f618dc656b90cd455b57efb8d0d82ec5059ba636dba522037fe5",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/owned_postgres_v2.py": "582b98f536d4d1adbdb438482e973145644033b92538e55d87ccadfdf07a1489",
+    "/home/baichuan/jaseci/reproduction/ttg-app-performance/workloads.py": "47726359c48f6b8765694682546936eeba437868a81b4ce8b0cf99a3dfc52fce",
+    "/home/baichuan/jaseci/reproduction/ttg-app-performance/semantic_responses.py": "e3b3c332fb53ba9b6c4ce6abbd78b8e2fa1fdd1d406e403acb16e30769f5e0a0",
+    "/home/baichuan/jaseci/reproduction/ttg-app-performance/identity.py": "daf86b8c61f05ff10a5827292fc30c735833ad3509efda2273ee86b0ece70195",
+    "/home/baichuan/jaseci/reproduction/ttg-app-performance/metrics.py": "88311798f6881b07ac3c0ce71c38978933202f5abe897c90bac6415a019d032d",
+    "/home/baichuan/jaseci/reproduction/ttg-app-performance/gate.py": "2acd58ecc53ba25d36130b014611944960a2f655ef3f720dd41d5251c2be6048",
+    "/home/baichuan/jaseci/project-notes/measurements/ttg-app-performance-20261030/set-field-schema-v1.json": "5263e7d38c708abae87a73bb2c1d7893ea93a96333e4bce98995736b728fc40f",
+    "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/native.py": "f44bf3905bd248df2f7c2fe10db3c926a847d170c963e889bffac94d51435228",
+    "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/evaluate.py": "7779afff206c86c6bf4c6539f44f64dfea0bc0509b01dfcbe91429644cee5dc9",
+    "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/scenarios.py": "0f14dc8327012fb3e4e0360b41563b53578415607590b17f4e46cd7a21531c68",
+    "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/additional_scenarios.py": "dc3184c70e2858d85f67afd714dc5ab66ee397d0e1a98476aaa789f772db367b",
+    "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/datasets/ttg/build.py": "a617dd95626a60babcf56dc10fba0ed3dc4a5c24ceca3033fea0b97401c129b9",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/small_runner_v1.py": "5731982351a4f60d28f05e421b6d1dbe9142f2f61b4d94c5c0d6a52109aa8d11",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/small_metrics_v1.py": "7b3ce9ce7bc810f6fe68e79cb6c50cb87f5f0cf784fbee567ba222b48c50fb21",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/small_export_v1.py": "55454693226bbb8fba8159cbf46e564e5b0518bcf1cdc0c08c566ddf8bad0afc",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/build_small_review_v1.py": "d5dbd597d4ded05ca06b2c5b170d349deb0347d27c1068260de18efc706a7c96",
+    "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/test_small_v1.py": "f8bef6ce1771aa0da8e880aebaca3b2ca7b29ef2a4f0daef5edc9eabcf636f87"
+  },
+  "index": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/index.json",
+    "sha256": "4d1615013c6bab33cd6daa31151e300771e887b90d831b30e9a70101057847f0"
+  },
+  "warmup_workflows": 12,
+  "measured_workflows": 36,
+  "logical_cells": 12,
+  "table": [
+    {
+      "app": "littlex",
+      "config_id": "none",
+      "n": 3,
+      "metrics": {
+        "protocol_sum_ns": {
+          "n": 3,
+          "median": 39859274,
+          "minimum": 37702641,
+          "maximum": 40174917,
+          "q1": 38780957.5,
+          "q3": 40017095.5,
+          "iqr": 1236138.0,
+          "samples": [
+            37702641,
+            40174917,
+            39859274
+          ]
+        },
+        "protocol_union_ns": {
+          "n": 3,
+          "median": 39859274,
+          "minimum": 37702641,
+          "maximum": 40174917,
+          "q1": 38780957.5,
+          "q3": 40017095.5,
+          "iqr": 1236138.0,
+          "samples": [
+            37702641,
+            40174917,
+            39859274
+          ]
+        },
+        "driver_sum_ns": {
+          "n": 3,
+          "median": 44704435,
+          "minimum": 42667483,
+          "maximum": 45198891,
+          "q1": 43685959.0,
+          "q3": 44951663.0,
+          "iqr": 1265704.0,
+          "samples": [
+            42667483,
+            45198891,
+            44704435
+          ]
+        },
+        "driver_union_ns": {
+          "n": 3,
+          "median": 44704435,
+          "minimum": 42667483,
+          "maximum": 45198891,
+          "q1": 43685959.0,
+          "q3": 44951663.0,
+          "iqr": 1265704.0,
+          "samples": [
+            42667483,
+            45198891,
+            44704435
+          ]
+        },
+        "sql_dispatches": {
+          "n": 3,
+          "median": 153,
+          "minimum": 153,
+          "maximum": 153,
+          "q1": 153.0,
+          "q3": 153.0,
+          "iqr": 0.0,
+          "samples": [
+            153,
+            153,
+            153
+          ]
+        },
+        "sql_data": {
+          "n": 3,
+          "median": 90,
+          "minimum": 90,
+          "maximum": 90,
+          "q1": 90.0,
+          "q3": 90.0,
+          "iqr": 0.0,
+          "samples": [
+            90,
+            90,
+            90
+          ]
+        },
+        "sql_control": {
+          "n": 3,
+          "median": 63,
+          "minimum": 63,
+          "maximum": 63,
+          "q1": 63.0,
+          "q3": 63.0,
+          "iqr": 0.0,
+          "samples": [
+            63,
+            63,
+            63
+          ]
+        },
+        "sql_other": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "command_complete": {
+          "n": 3,
+          "median": 153,
+          "minimum": 153,
+          "maximum": 153,
+          "q1": 153.0,
+          "q3": 153.0,
+          "iqr": 0.0,
+          "samples": [
+            153,
+            153,
+            153
+          ]
+        },
+        "protocol_cycles": {
+          "n": 3,
+          "median": 153,
+          "minimum": 153,
+          "maximum": 153,
+          "q1": 153.0,
+          "q3": 153.0,
+          "iqr": 0.0,
+          "samples": [
+            153,
+            153,
+            153
+          ]
+        },
+        "server_error_messages": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "data_rows": {
+          "n": 3,
+          "median": 201,
+          "minimum": 201,
+          "maximum": 201,
+          "q1": 201.0,
+          "q3": 201.0,
+          "iqr": 0.0,
+          "samples": [
+            201,
+            201,
+            201
+          ]
+        },
+        "data_row_payload_bytes": {
+          "n": 3,
+          "median": 82078,
+          "minimum": 82078,
+          "maximum": 82078,
+          "q1": 82078.0,
+          "q3": 82078.0,
+          "iqr": 0.0,
+          "samples": [
+            82078,
+            82078,
+            82078
+          ]
+        },
+        "distinct_backend_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "separate_process_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "business_HTTP_requests": [
+        9,
+        9,
+        9
+      ]
+    },
+    {
+      "app": "littlex",
+      "config_id": "legacy_ttg_thread",
+      "n": 3,
+      "metrics": {
+        "protocol_sum_ns": {
+          "n": 3,
+          "median": 116583374,
+          "minimum": 113838592,
+          "maximum": 116949847,
+          "q1": 115210983.0,
+          "q3": 116766610.5,
+          "iqr": 1555627.5,
+          "samples": [
+            113838592,
+            116583374,
+            116949847
+          ]
+        },
+        "protocol_union_ns": {
+          "n": 3,
+          "median": 116399576,
+          "minimum": 113743910,
+          "maximum": 116808568,
+          "q1": 115071743.0,
+          "q3": 116604072.0,
+          "iqr": 1532329.0,
+          "samples": [
+            113743910,
+            116399576,
+            116808568
+          ]
+        },
+        "driver_sum_ns": {
+          "n": 3,
+          "median": 134460244,
+          "minimum": 131787018,
+          "maximum": 134839365,
+          "q1": 133123631.0,
+          "q3": 134649804.5,
+          "iqr": 1526173.5,
+          "samples": [
+            131787018,
+            134460244,
+            134839365
+          ]
+        },
+        "driver_union_ns": {
+          "n": 3,
+          "median": 134228604,
+          "minimum": 131618519,
+          "maximum": 134650781,
+          "q1": 132923561.5,
+          "q3": 134439692.5,
+          "iqr": 1516131.0,
+          "samples": [
+            131618519,
+            134228604,
+            134650781
+          ]
+        },
+        "sql_dispatches": {
+          "n": 3,
+          "median": 144,
+          "minimum": 144,
+          "maximum": 144,
+          "q1": 144.0,
+          "q3": 144.0,
+          "iqr": 0.0,
+          "samples": [
+            144,
+            144,
+            144
+          ]
+        },
+        "sql_data": {
+          "n": 3,
+          "median": 74,
+          "minimum": 74,
+          "maximum": 74,
+          "q1": 74.0,
+          "q3": 74.0,
+          "iqr": 0.0,
+          "samples": [
+            74,
+            74,
+            74
+          ]
+        },
+        "sql_control": {
+          "n": 3,
+          "median": 70,
+          "minimum": 70,
+          "maximum": 70,
+          "q1": 70.0,
+          "q3": 70.0,
+          "iqr": 0.0,
+          "samples": [
+            70,
+            70,
+            70
+          ]
+        },
+        "sql_other": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "command_complete": {
+          "n": 3,
+          "median": 144,
+          "minimum": 144,
+          "maximum": 144,
+          "q1": 144.0,
+          "q3": 144.0,
+          "iqr": 0.0,
+          "samples": [
+            144,
+            144,
+            144
+          ]
+        },
+        "protocol_cycles": {
+          "n": 3,
+          "median": 144,
+          "minimum": 144,
+          "maximum": 144,
+          "q1": 144.0,
+          "q3": 144.0,
+          "iqr": 0.0,
+          "samples": [
+            144,
+            144,
+            144
+          ]
+        },
+        "server_error_messages": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "data_rows": {
+          "n": 3,
+          "median": 354,
+          "minimum": 354,
+          "maximum": 354,
+          "q1": 354.0,
+          "q3": 354.0,
+          "iqr": 0.0,
+          "samples": [
+            354,
+            354,
+            354
+          ]
+        },
+        "data_row_payload_bytes": {
+          "n": 3,
+          "median": 105634,
+          "minimum": 105634,
+          "maximum": 105634,
+          "q1": 105634.0,
+          "q3": 105634.0,
+          "iqr": 0.0,
+          "samples": [
+            105634,
+            105634,
+            105634
+          ]
+        },
+        "distinct_backend_overlap_ns": {
+          "n": 3,
+          "median": 141279,
+          "minimum": 94682,
+          "maximum": 183798,
+          "q1": 117980.5,
+          "q3": 162538.5,
+          "iqr": 44558.0,
+          "samples": [
+            94682,
+            183798,
+            141279
+          ]
+        },
+        "separate_process_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "business_HTTP_requests": [
+        9,
+        9,
+        9
+      ]
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_thread",
+      "n": 3,
+      "metrics": {
+        "protocol_sum_ns": {
+          "n": 3,
+          "median": 50362220,
+          "minimum": 47636179,
+          "maximum": 64063365,
+          "q1": 48999199.5,
+          "q3": 57212792.5,
+          "iqr": 8213593.0,
+          "samples": [
+            50362220,
+            47636179,
+            64063365
+          ]
+        },
+        "protocol_union_ns": {
+          "n": 3,
+          "median": 43831334,
+          "minimum": 41347577,
+          "maximum": 56471548,
+          "q1": 42589455.5,
+          "q3": 50151441.0,
+          "iqr": 7561985.5,
+          "samples": [
+            43831334,
+            41347577,
+            56471548
+          ]
+        },
+        "driver_sum_ns": {
+          "n": 3,
+          "median": 55564948,
+          "minimum": 52681610,
+          "maximum": 70800800,
+          "q1": 54123279.0,
+          "q3": 63182874.0,
+          "iqr": 9059595.0,
+          "samples": [
+            55564948,
+            52681610,
+            70800800
+          ]
+        },
+        "driver_union_ns": {
+          "n": 3,
+          "median": 48598138,
+          "minimum": 45967654,
+          "maximum": 62658387,
+          "q1": 47282896.0,
+          "q3": 55628262.5,
+          "iqr": 8345366.5,
+          "samples": [
+            48598138,
+            45967654,
+            62658387
+          ]
+        },
+        "sql_dispatches": {
+          "n": 3,
+          "median": 167,
+          "minimum": 167,
+          "maximum": 167,
+          "q1": 167.0,
+          "q3": 167.0,
+          "iqr": 0.0,
+          "samples": [
+            167,
+            167,
+            167
+          ]
+        },
+        "sql_data": {
+          "n": 3,
+          "median": 90,
+          "minimum": 90,
+          "maximum": 90,
+          "q1": 90.0,
+          "q3": 90.0,
+          "iqr": 0.0,
+          "samples": [
+            90,
+            90,
+            90
+          ]
+        },
+        "sql_control": {
+          "n": 3,
+          "median": 77,
+          "minimum": 77,
+          "maximum": 77,
+          "q1": 77.0,
+          "q3": 77.0,
+          "iqr": 0.0,
+          "samples": [
+            77,
+            77,
+            77
+          ]
+        },
+        "sql_other": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "command_complete": {
+          "n": 3,
+          "median": 167,
+          "minimum": 167,
+          "maximum": 167,
+          "q1": 167.0,
+          "q3": 167.0,
+          "iqr": 0.0,
+          "samples": [
+            167,
+            167,
+            167
+          ]
+        },
+        "protocol_cycles": {
+          "n": 3,
+          "median": 167,
+          "minimum": 167,
+          "maximum": 167,
+          "q1": 167.0,
+          "q3": 167.0,
+          "iqr": 0.0,
+          "samples": [
+            167,
+            167,
+            167
+          ]
+        },
+        "server_error_messages": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "data_rows": {
+          "n": 3,
+          "median": 201,
+          "minimum": 201,
+          "maximum": 201,
+          "q1": 201.0,
+          "q3": 201.0,
+          "iqr": 0.0,
+          "samples": [
+            201,
+            201,
+            201
+          ]
+        },
+        "data_row_payload_bytes": {
+          "n": 3,
+          "median": 83287,
+          "minimum": 83287,
+          "maximum": 83287,
+          "q1": 83287.0,
+          "q3": 83287.0,
+          "iqr": 0.0,
+          "samples": [
+            83287,
+            83287,
+            83287
+          ]
+        },
+        "distinct_backend_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "separate_process_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "business_HTTP_requests": [
+        9,
+        9,
+        9
+      ]
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_process",
+      "n": 3,
+      "metrics": {
+        "protocol_sum_ns": {
+          "n": 3,
+          "median": 49514143,
+          "minimum": 49362490,
+          "maximum": 55144395,
+          "q1": 49438316.5,
+          "q3": 52329269.0,
+          "iqr": 2890952.5,
+          "samples": [
+            49514143,
+            55144395,
+            49362490
+          ]
+        },
+        "protocol_union_ns": {
+          "n": 3,
+          "median": 49514143,
+          "minimum": 49362490,
+          "maximum": 55144395,
+          "q1": 49438316.5,
+          "q3": 52329269.0,
+          "iqr": 2890952.5,
+          "samples": [
+            49514143,
+            55144395,
+            49362490
+          ]
+        },
+        "driver_sum_ns": {
+          "n": 3,
+          "median": 57255042,
+          "minimum": 56975540,
+          "maximum": 63812445,
+          "q1": 57115291.0,
+          "q3": 60533743.5,
+          "iqr": 3418452.5,
+          "samples": [
+            57255042,
+            63812445,
+            56975540
+          ]
+        },
+        "driver_union_ns": {
+          "n": 3,
+          "median": 57255042,
+          "minimum": 56975540,
+          "maximum": 63812445,
+          "q1": 57115291.0,
+          "q3": 60533743.5,
+          "iqr": 3418452.5,
+          "samples": [
+            57255042,
+            63812445,
+            56975540
+          ]
+        },
+        "sql_dispatches": {
+          "n": 3,
+          "median": 159,
+          "minimum": 159,
+          "maximum": 159,
+          "q1": 159.0,
+          "q3": 159.0,
+          "iqr": 0.0,
+          "samples": [
+            159,
+            159,
+            159
+          ]
+        },
+        "sql_data": {
+          "n": 3,
+          "median": 90,
+          "minimum": 90,
+          "maximum": 90,
+          "q1": 90.0,
+          "q3": 90.0,
+          "iqr": 0.0,
+          "samples": [
+            90,
+            90,
+            90
+          ]
+        },
+        "sql_control": {
+          "n": 3,
+          "median": 69,
+          "minimum": 69,
+          "maximum": 69,
+          "q1": 69.0,
+          "q3": 69.0,
+          "iqr": 0.0,
+          "samples": [
+            69,
+            69,
+            69
+          ]
+        },
+        "sql_other": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "command_complete": {
+          "n": 3,
+          "median": 159,
+          "minimum": 159,
+          "maximum": 159,
+          "q1": 159.0,
+          "q3": 159.0,
+          "iqr": 0.0,
+          "samples": [
+            159,
+            159,
+            159
+          ]
+        },
+        "protocol_cycles": {
+          "n": 3,
+          "median": 159,
+          "minimum": 159,
+          "maximum": 159,
+          "q1": 159.0,
+          "q3": 159.0,
+          "iqr": 0.0,
+          "samples": [
+            159,
+            159,
+            159
+          ]
+        },
+        "server_error_messages": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "data_rows": {
+          "n": 3,
+          "median": 201,
+          "minimum": 201,
+          "maximum": 201,
+          "q1": 201.0,
+          "q3": 201.0,
+          "iqr": 0.0,
+          "samples": [
+            201,
+            201,
+            201
+          ]
+        },
+        "data_row_payload_bytes": {
+          "n": 3,
+          "median": 83287,
+          "minimum": 83287,
+          "maximum": 83287,
+          "q1": 83287.0,
+          "q3": 83287.0,
+          "iqr": 0.0,
+          "samples": [
+            83287,
+            83287,
+            83287
+          ]
+        },
+        "distinct_backend_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "separate_process_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "business_HTTP_requests": [
+        9,
+        9,
+        9
+      ]
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_thread",
+      "n": 3,
+      "metrics": {
+        "protocol_sum_ns": {
+          "n": 3,
+          "median": 47845826,
+          "minimum": 45158029,
+          "maximum": 49463177,
+          "q1": 46501927.5,
+          "q3": 48654501.5,
+          "iqr": 2152574.0,
+          "samples": [
+            45158029,
+            49463177,
+            47845826
+          ]
+        },
+        "protocol_union_ns": {
+          "n": 3,
+          "median": 42873247,
+          "minimum": 41018714,
+          "maximum": 43898396,
+          "q1": 41945980.5,
+          "q3": 43385821.5,
+          "iqr": 1439841.0,
+          "samples": [
+            41018714,
+            43898396,
+            42873247
+          ]
+        },
+        "driver_sum_ns": {
+          "n": 3,
+          "median": 53190570,
+          "minimum": 50235107,
+          "maximum": 54593055,
+          "q1": 51712838.5,
+          "q3": 53891812.5,
+          "iqr": 2178974.0,
+          "samples": [
+            50235107,
+            54593055,
+            53190570
+          ]
+        },
+        "driver_union_ns": {
+          "n": 3,
+          "median": 47875214,
+          "minimum": 45772281,
+          "maximum": 48683982,
+          "q1": 46823747.5,
+          "q3": 48279598.0,
+          "iqr": 1455850.5,
+          "samples": [
+            45772281,
+            48683982,
+            47875214
+          ]
+        },
+        "sql_dispatches": {
+          "n": 3,
+          "median": 165,
+          "minimum": 165,
+          "maximum": 165,
+          "q1": 165.0,
+          "q3": 165.0,
+          "iqr": 0.0,
+          "samples": [
+            165,
+            165,
+            165
+          ]
+        },
+        "sql_data": {
+          "n": 3,
+          "median": 90,
+          "minimum": 90,
+          "maximum": 90,
+          "q1": 90.0,
+          "q3": 90.0,
+          "iqr": 0.0,
+          "samples": [
+            90,
+            90,
+            90
+          ]
+        },
+        "sql_control": {
+          "n": 3,
+          "median": 75,
+          "minimum": 75,
+          "maximum": 75,
+          "q1": 75.0,
+          "q3": 75.0,
+          "iqr": 0.0,
+          "samples": [
+            75,
+            75,
+            75
+          ]
+        },
+        "sql_other": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "command_complete": {
+          "n": 3,
+          "median": 165,
+          "minimum": 165,
+          "maximum": 165,
+          "q1": 165.0,
+          "q3": 165.0,
+          "iqr": 0.0,
+          "samples": [
+            165,
+            165,
+            165
+          ]
+        },
+        "protocol_cycles": {
+          "n": 3,
+          "median": 165,
+          "minimum": 165,
+          "maximum": 165,
+          "q1": 165.0,
+          "q3": 165.0,
+          "iqr": 0.0,
+          "samples": [
+            165,
+            165,
+            165
+          ]
+        },
+        "server_error_messages": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "data_rows": {
+          "n": 3,
+          "median": 201,
+          "minimum": 201,
+          "maximum": 201,
+          "q1": 201.0,
+          "q3": 201.0,
+          "iqr": 0.0,
+          "samples": [
+            201,
+            201,
+            201
+          ]
+        },
+        "data_row_payload_bytes": {
+          "n": 3,
+          "median": 83038,
+          "minimum": 83038,
+          "maximum": 83038,
+          "q1": 83038.0,
+          "q3": 83038.0,
+          "iqr": 0.0,
+          "samples": [
+            83038,
+            83038,
+            83038
+          ]
+        },
+        "distinct_backend_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "separate_process_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "business_HTTP_requests": [
+        9,
+        9,
+        9
+      ]
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_process",
+      "n": 3,
+      "metrics": {
+        "protocol_sum_ns": {
+          "n": 3,
+          "median": 50052815,
+          "minimum": 49311242,
+          "maximum": 51723759,
+          "q1": 49682028.5,
+          "q3": 50888287.0,
+          "iqr": 1206258.5,
+          "samples": [
+            51723759,
+            49311242,
+            50052815
+          ]
+        },
+        "protocol_union_ns": {
+          "n": 3,
+          "median": 50052815,
+          "minimum": 49311242,
+          "maximum": 51723759,
+          "q1": 49682028.5,
+          "q3": 50888287.0,
+          "iqr": 1206258.5,
+          "samples": [
+            51723759,
+            49311242,
+            50052815
+          ]
+        },
+        "driver_sum_ns": {
+          "n": 3,
+          "median": 57770901,
+          "minimum": 56990111,
+          "maximum": 59638645,
+          "q1": 57380506.0,
+          "q3": 58704773.0,
+          "iqr": 1324267.0,
+          "samples": [
+            59638645,
+            56990111,
+            57770901
+          ]
+        },
+        "driver_union_ns": {
+          "n": 3,
+          "median": 57770901,
+          "minimum": 56990111,
+          "maximum": 59638645,
+          "q1": 57380506.0,
+          "q3": 58704773.0,
+          "iqr": 1324267.0,
+          "samples": [
+            59638645,
+            56990111,
+            57770901
+          ]
+        },
+        "sql_dispatches": {
+          "n": 3,
+          "median": 159,
+          "minimum": 159,
+          "maximum": 159,
+          "q1": 159.0,
+          "q3": 159.0,
+          "iqr": 0.0,
+          "samples": [
+            159,
+            159,
+            159
+          ]
+        },
+        "sql_data": {
+          "n": 3,
+          "median": 90,
+          "minimum": 90,
+          "maximum": 90,
+          "q1": 90.0,
+          "q3": 90.0,
+          "iqr": 0.0,
+          "samples": [
+            90,
+            90,
+            90
+          ]
+        },
+        "sql_control": {
+          "n": 3,
+          "median": 69,
+          "minimum": 69,
+          "maximum": 69,
+          "q1": 69.0,
+          "q3": 69.0,
+          "iqr": 0.0,
+          "samples": [
+            69,
+            69,
+            69
+          ]
+        },
+        "sql_other": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "command_complete": {
+          "n": 3,
+          "median": 159,
+          "minimum": 159,
+          "maximum": 159,
+          "q1": 159.0,
+          "q3": 159.0,
+          "iqr": 0.0,
+          "samples": [
+            159,
+            159,
+            159
+          ]
+        },
+        "protocol_cycles": {
+          "n": 3,
+          "median": 159,
+          "minimum": 159,
+          "maximum": 159,
+          "q1": 159.0,
+          "q3": 159.0,
+          "iqr": 0.0,
+          "samples": [
+            159,
+            159,
+            159
+          ]
+        },
+        "server_error_messages": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "data_rows": {
+          "n": 3,
+          "median": 201,
+          "minimum": 201,
+          "maximum": 201,
+          "q1": 201.0,
+          "q3": 201.0,
+          "iqr": 0.0,
+          "samples": [
+            201,
+            201,
+            201
+          ]
+        },
+        "data_row_payload_bytes": {
+          "n": 3,
+          "median": 83266,
+          "minimum": 83266,
+          "maximum": 83266,
+          "q1": 83266.0,
+          "q3": 83266.0,
+          "iqr": 0.0,
+          "samples": [
+            83266,
+            83266,
+            83266
+          ]
+        },
+        "distinct_backend_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "separate_process_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "business_HTTP_requests": [
+        9,
+        9,
+        9
+      ]
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "none",
+      "n": 3,
+      "metrics": {
+        "protocol_sum_ns": {
+          "n": 3,
+          "median": 140772825,
+          "minimum": 131296523,
+          "maximum": 154130939,
+          "q1": 136034674.0,
+          "q3": 147451882.0,
+          "iqr": 11417208.0,
+          "samples": [
+            140772825,
+            154130939,
+            131296523
+          ]
+        },
+        "protocol_union_ns": {
+          "n": 3,
+          "median": 140772825,
+          "minimum": 131296523,
+          "maximum": 154130939,
+          "q1": 136034674.0,
+          "q3": 147451882.0,
+          "iqr": 11417208.0,
+          "samples": [
+            140772825,
+            154130939,
+            131296523
+          ]
+        },
+        "driver_sum_ns": {
+          "n": 3,
+          "median": 161200497,
+          "minimum": 151593875,
+          "maximum": 175425226,
+          "q1": 156397186.0,
+          "q3": 168312861.5,
+          "iqr": 11915675.5,
+          "samples": [
+            161200497,
+            175425226,
+            151593875
+          ]
+        },
+        "driver_union_ns": {
+          "n": 3,
+          "median": 161200497,
+          "minimum": 151593875,
+          "maximum": 175425226,
+          "q1": 156397186.0,
+          "q3": 168312861.5,
+          "iqr": 11915675.5,
+          "samples": [
+            161200497,
+            175425226,
+            151593875
+          ]
+        },
+        "sql_dispatches": {
+          "n": 3,
+          "median": 555,
+          "minimum": 555,
+          "maximum": 555,
+          "q1": 555.0,
+          "q3": 555.0,
+          "iqr": 0.0,
+          "samples": [
+            555,
+            555,
+            555
+          ]
+        },
+        "sql_data": {
+          "n": 3,
+          "median": 366,
+          "minimum": 366,
+          "maximum": 366,
+          "q1": 366.0,
+          "q3": 366.0,
+          "iqr": 0.0,
+          "samples": [
+            366,
+            366,
+            366
+          ]
+        },
+        "sql_control": {
+          "n": 3,
+          "median": 189,
+          "minimum": 189,
+          "maximum": 189,
+          "q1": 189.0,
+          "q3": 189.0,
+          "iqr": 0.0,
+          "samples": [
+            189,
+            189,
+            189
+          ]
+        },
+        "sql_other": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "command_complete": {
+          "n": 3,
+          "median": 555,
+          "minimum": 555,
+          "maximum": 555,
+          "q1": 555.0,
+          "q3": 555.0,
+          "iqr": 0.0,
+          "samples": [
+            555,
+            555,
+            555
+          ]
+        },
+        "protocol_cycles": {
+          "n": 3,
+          "median": 555,
+          "minimum": 555,
+          "maximum": 555,
+          "q1": 555.0,
+          "q3": 555.0,
+          "iqr": 0.0,
+          "samples": [
+            555,
+            555,
+            555
+          ]
+        },
+        "server_error_messages": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "data_rows": {
+          "n": 3,
+          "median": 353,
+          "minimum": 353,
+          "maximum": 353,
+          "q1": 353.0,
+          "q3": 353.0,
+          "iqr": 0.0,
+          "samples": [
+            353,
+            353,
+            353
+          ]
+        },
+        "data_row_payload_bytes": {
+          "n": 3,
+          "median": 125144,
+          "minimum": 125144,
+          "maximum": 125144,
+          "q1": 125144.0,
+          "q3": 125144.0,
+          "iqr": 0.0,
+          "samples": [
+            125144,
+            125144,
+            125144
+          ]
+        },
+        "distinct_backend_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "separate_process_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "business_HTTP_requests": [
+        27,
+        27,
+        27
+      ]
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "legacy_ttg_thread",
+      "n": 3,
+      "metrics": {
+        "protocol_sum_ns": {
+          "n": 3,
+          "median": 296063000,
+          "minimum": 292529572,
+          "maximum": 325699362,
+          "q1": 294296286.0,
+          "q3": 310881181.0,
+          "iqr": 16584895.0,
+          "samples": [
+            292529572,
+            296063000,
+            325699362
+          ]
+        },
+        "protocol_union_ns": {
+          "n": 3,
+          "median": 293818714,
+          "minimum": 289486564,
+          "maximum": 322568289,
+          "q1": 291652639.0,
+          "q3": 308193501.5,
+          "iqr": 16540862.5,
+          "samples": [
+            289486564,
+            293818714,
+            322568289
+          ]
+        },
+        "driver_sum_ns": {
+          "n": 3,
+          "median": 365530706,
+          "minimum": 360581604,
+          "maximum": 404674941,
+          "q1": 363056155.0,
+          "q3": 385102823.5,
+          "iqr": 22046668.5,
+          "samples": [
+            360581604,
+            365530706,
+            404674941
+          ]
+        },
+        "driver_union_ns": {
+          "n": 3,
+          "median": 362388156,
+          "minimum": 356523133,
+          "maximum": 400384810,
+          "q1": 359455644.5,
+          "q3": 381386483.0,
+          "iqr": 21930838.5,
+          "samples": [
+            356523133,
+            362388156,
+            400384810
+          ]
+        },
+        "sql_dispatches": {
+          "n": 3,
+          "median": 569,
+          "minimum": 569,
+          "maximum": 569,
+          "q1": 569.0,
+          "q3": 569.0,
+          "iqr": 0.0,
+          "samples": [
+            569,
+            569,
+            569
+          ]
+        },
+        "sql_data": {
+          "n": 3,
+          "median": 354,
+          "minimum": 354,
+          "maximum": 354,
+          "q1": 354.0,
+          "q3": 354.0,
+          "iqr": 0.0,
+          "samples": [
+            354,
+            354,
+            354
+          ]
+        },
+        "sql_control": {
+          "n": 3,
+          "median": 215,
+          "minimum": 215,
+          "maximum": 215,
+          "q1": 215.0,
+          "q3": 215.0,
+          "iqr": 0.0,
+          "samples": [
+            215,
+            215,
+            215
+          ]
+        },
+        "sql_other": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "command_complete": {
+          "n": 3,
+          "median": 569,
+          "minimum": 569,
+          "maximum": 569,
+          "q1": 569.0,
+          "q3": 569.0,
+          "iqr": 0.0,
+          "samples": [
+            569,
+            569,
+            569
+          ]
+        },
+        "protocol_cycles": {
+          "n": 3,
+          "median": 569,
+          "minimum": 569,
+          "maximum": 569,
+          "q1": 569.0,
+          "q3": 569.0,
+          "iqr": 0.0,
+          "samples": [
+            569,
+            569,
+            569
+          ]
+        },
+        "server_error_messages": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "data_rows": {
+          "n": 3,
+          "median": 464,
+          "minimum": 464,
+          "maximum": 464,
+          "q1": 464.0,
+          "q3": 464.0,
+          "iqr": 0.0,
+          "samples": [
+            464,
+            464,
+            464
+          ]
+        },
+        "data_row_payload_bytes": {
+          "n": 3,
+          "median": 141922,
+          "minimum": 141922,
+          "maximum": 141922,
+          "q1": 141922.0,
+          "q3": 141922.0,
+          "iqr": 0.0,
+          "samples": [
+            141922,
+            141922,
+            141922
+          ]
+        },
+        "distinct_backend_overlap_ns": {
+          "n": 3,
+          "median": 3043008,
+          "minimum": 2244286,
+          "maximum": 3131073,
+          "q1": 2643647.0,
+          "q3": 3087040.5,
+          "iqr": 443393.5,
+          "samples": [
+            3043008,
+            2244286,
+            3131073
+          ]
+        },
+        "separate_process_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "business_HTTP_requests": [
+        27,
+        27,
+        27
+      ]
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_thread",
+      "n": 3,
+      "metrics": {
+        "protocol_sum_ns": {
+          "n": 3,
+          "median": 142029331,
+          "minimum": 140150574,
+          "maximum": 144186609,
+          "q1": 141089952.5,
+          "q3": 143107970.0,
+          "iqr": 2018017.5,
+          "samples": [
+            142029331,
+            140150574,
+            144186609
+          ]
+        },
+        "protocol_union_ns": {
+          "n": 3,
+          "median": 142029331,
+          "minimum": 140150574,
+          "maximum": 144186609,
+          "q1": 141089952.5,
+          "q3": 143107970.0,
+          "iqr": 2018017.5,
+          "samples": [
+            142029331,
+            140150574,
+            144186609
+          ]
+        },
+        "driver_sum_ns": {
+          "n": 3,
+          "median": 162566380,
+          "minimum": 160659931,
+          "maximum": 164934574,
+          "q1": 161613155.5,
+          "q3": 163750477.0,
+          "iqr": 2137321.5,
+          "samples": [
+            162566380,
+            160659931,
+            164934574
+          ]
+        },
+        "driver_union_ns": {
+          "n": 3,
+          "median": 162566380,
+          "minimum": 160659931,
+          "maximum": 164934574,
+          "q1": 161613155.5,
+          "q3": 163750477.0,
+          "iqr": 2137321.5,
+          "samples": [
+            162566380,
+            160659931,
+            164934574
+          ]
+        },
+        "sql_dispatches": {
+          "n": 3,
+          "median": 563,
+          "minimum": 563,
+          "maximum": 563,
+          "q1": 563.0,
+          "q3": 563.0,
+          "iqr": 0.0,
+          "samples": [
+            563,
+            563,
+            563
+          ]
+        },
+        "sql_data": {
+          "n": 3,
+          "median": 366,
+          "minimum": 366,
+          "maximum": 366,
+          "q1": 366.0,
+          "q3": 366.0,
+          "iqr": 0.0,
+          "samples": [
+            366,
+            366,
+            366
+          ]
+        },
+        "sql_control": {
+          "n": 3,
+          "median": 197,
+          "minimum": 197,
+          "maximum": 197,
+          "q1": 197.0,
+          "q3": 197.0,
+          "iqr": 0.0,
+          "samples": [
+            197,
+            197,
+            197
+          ]
+        },
+        "sql_other": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "command_complete": {
+          "n": 3,
+          "median": 563,
+          "minimum": 563,
+          "maximum": 563,
+          "q1": 563.0,
+          "q3": 563.0,
+          "iqr": 0.0,
+          "samples": [
+            563,
+            563,
+            563
+          ]
+        },
+        "protocol_cycles": {
+          "n": 3,
+          "median": 563,
+          "minimum": 563,
+          "maximum": 563,
+          "q1": 563.0,
+          "q3": 563.0,
+          "iqr": 0.0,
+          "samples": [
+            563,
+            563,
+            563
+          ]
+        },
+        "server_error_messages": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "data_rows": {
+          "n": 3,
+          "median": 353,
+          "minimum": 353,
+          "maximum": 353,
+          "q1": 353.0,
+          "q3": 353.0,
+          "iqr": 0.0,
+          "samples": [
+            353,
+            353,
+            353
+          ]
+        },
+        "data_row_payload_bytes": {
+          "n": 3,
+          "median": 125418,
+          "minimum": 125418,
+          "maximum": 125418,
+          "q1": 125418.0,
+          "q3": 125418.0,
+          "iqr": 0.0,
+          "samples": [
+            125418,
+            125418,
+            125418
+          ]
+        },
+        "distinct_backend_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "separate_process_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "business_HTTP_requests": [
+        27,
+        27,
+        27
+      ]
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_process",
+      "n": 3,
+      "metrics": {
+        "protocol_sum_ns": {
+          "n": 3,
+          "median": 188234425,
+          "minimum": 143479031,
+          "maximum": 192062149,
+          "q1": 165856728.0,
+          "q3": 190148287.0,
+          "iqr": 24291559.0,
+          "samples": [
+            192062149,
+            188234425,
+            143479031
+          ]
+        },
+        "protocol_union_ns": {
+          "n": 3,
+          "median": 188234425,
+          "minimum": 143479031,
+          "maximum": 192062149,
+          "q1": 165856728.0,
+          "q3": 190148287.0,
+          "iqr": 24291559.0,
+          "samples": [
+            192062149,
+            188234425,
+            143479031
+          ]
+        },
+        "driver_sum_ns": {
+          "n": 3,
+          "median": 216577178,
+          "minimum": 166234015,
+          "maximum": 221796430,
+          "q1": 191405596.5,
+          "q3": 219186804.0,
+          "iqr": 27781207.5,
+          "samples": [
+            221796430,
+            216577178,
+            166234015
+          ]
+        },
+        "driver_union_ns": {
+          "n": 3,
+          "median": 216577178,
+          "minimum": 166234015,
+          "maximum": 221796430,
+          "q1": 191405596.5,
+          "q3": 219186804.0,
+          "iqr": 27781207.5,
+          "samples": [
+            221796430,
+            216577178,
+            166234015
+          ]
+        },
+        "sql_dispatches": {
+          "n": 3,
+          "median": 559,
+          "minimum": 559,
+          "maximum": 559,
+          "q1": 559.0,
+          "q3": 559.0,
+          "iqr": 0.0,
+          "samples": [
+            559,
+            559,
+            559
+          ]
+        },
+        "sql_data": {
+          "n": 3,
+          "median": 366,
+          "minimum": 366,
+          "maximum": 366,
+          "q1": 366.0,
+          "q3": 366.0,
+          "iqr": 0.0,
+          "samples": [
+            366,
+            366,
+            366
+          ]
+        },
+        "sql_control": {
+          "n": 3,
+          "median": 193,
+          "minimum": 193,
+          "maximum": 193,
+          "q1": 193.0,
+          "q3": 193.0,
+          "iqr": 0.0,
+          "samples": [
+            193,
+            193,
+            193
+          ]
+        },
+        "sql_other": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "command_complete": {
+          "n": 3,
+          "median": 559,
+          "minimum": 559,
+          "maximum": 559,
+          "q1": 559.0,
+          "q3": 559.0,
+          "iqr": 0.0,
+          "samples": [
+            559,
+            559,
+            559
+          ]
+        },
+        "protocol_cycles": {
+          "n": 3,
+          "median": 559,
+          "minimum": 559,
+          "maximum": 559,
+          "q1": 559.0,
+          "q3": 559.0,
+          "iqr": 0.0,
+          "samples": [
+            559,
+            559,
+            559
+          ]
+        },
+        "server_error_messages": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "data_rows": {
+          "n": 3,
+          "median": 353,
+          "minimum": 353,
+          "maximum": 353,
+          "q1": 353.0,
+          "q3": 353.0,
+          "iqr": 0.0,
+          "samples": [
+            353,
+            353,
+            353
+          ]
+        },
+        "data_row_payload_bytes": {
+          "n": 3,
+          "median": 125418,
+          "minimum": 125418,
+          "maximum": 125418,
+          "q1": 125418.0,
+          "q3": 125418.0,
+          "iqr": 0.0,
+          "samples": [
+            125418,
+            125418,
+            125418
+          ]
+        },
+        "distinct_backend_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "separate_process_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "business_HTTP_requests": [
+        27,
+        27,
+        27
+      ]
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_thread",
+      "n": 3,
+      "metrics": {
+        "protocol_sum_ns": {
+          "n": 3,
+          "median": 145973496,
+          "minimum": 137227246,
+          "maximum": 147452488,
+          "q1": 141600371.0,
+          "q3": 146712992.0,
+          "iqr": 5112621.0,
+          "samples": [
+            147452488,
+            145973496,
+            137227246
+          ]
+        },
+        "protocol_union_ns": {
+          "n": 3,
+          "median": 145973496,
+          "minimum": 137227246,
+          "maximum": 147452488,
+          "q1": 141600371.0,
+          "q3": 146712992.0,
+          "iqr": 5112621.0,
+          "samples": [
+            147452488,
+            145973496,
+            137227246
+          ]
+        },
+        "driver_sum_ns": {
+          "n": 3,
+          "median": 166583131,
+          "minimum": 157617975,
+          "maximum": 168130675,
+          "q1": 162100553.0,
+          "q3": 167356903.0,
+          "iqr": 5256350.0,
+          "samples": [
+            168130675,
+            166583131,
+            157617975
+          ]
+        },
+        "driver_union_ns": {
+          "n": 3,
+          "median": 166583131,
+          "minimum": 157617975,
+          "maximum": 168130675,
+          "q1": 162100553.0,
+          "q3": 167356903.0,
+          "iqr": 5256350.0,
+          "samples": [
+            168130675,
+            166583131,
+            157617975
+          ]
+        },
+        "sql_dispatches": {
+          "n": 3,
+          "median": 561,
+          "minimum": 561,
+          "maximum": 561,
+          "q1": 561.0,
+          "q3": 561.0,
+          "iqr": 0.0,
+          "samples": [
+            561,
+            561,
+            561
+          ]
+        },
+        "sql_data": {
+          "n": 3,
+          "median": 366,
+          "minimum": 366,
+          "maximum": 366,
+          "q1": 366.0,
+          "q3": 366.0,
+          "iqr": 0.0,
+          "samples": [
+            366,
+            366,
+            366
+          ]
+        },
+        "sql_control": {
+          "n": 3,
+          "median": 195,
+          "minimum": 195,
+          "maximum": 195,
+          "q1": 195.0,
+          "q3": 195.0,
+          "iqr": 0.0,
+          "samples": [
+            195,
+            195,
+            195
+          ]
+        },
+        "sql_other": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "command_complete": {
+          "n": 3,
+          "median": 561,
+          "minimum": 561,
+          "maximum": 561,
+          "q1": 561.0,
+          "q3": 561.0,
+          "iqr": 0.0,
+          "samples": [
+            561,
+            561,
+            561
+          ]
+        },
+        "protocol_cycles": {
+          "n": 3,
+          "median": 561,
+          "minimum": 561,
+          "maximum": 561,
+          "q1": 561.0,
+          "q3": 561.0,
+          "iqr": 0.0,
+          "samples": [
+            561,
+            561,
+            561
+          ]
+        },
+        "server_error_messages": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "data_rows": {
+          "n": 3,
+          "median": 353,
+          "minimum": 353,
+          "maximum": 353,
+          "q1": 353.0,
+          "q3": 353.0,
+          "iqr": 0.0,
+          "samples": [
+            353,
+            353,
+            353
+          ]
+        },
+        "data_row_payload_bytes": {
+          "n": 3,
+          "median": 125340,
+          "minimum": 125340,
+          "maximum": 125340,
+          "q1": 125340.0,
+          "q3": 125340.0,
+          "iqr": 0.0,
+          "samples": [
+            125340,
+            125340,
+            125340
+          ]
+        },
+        "distinct_backend_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "separate_process_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "business_HTTP_requests": [
+        27,
+        27,
+        27
+      ]
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_process",
+      "n": 3,
+      "metrics": {
+        "protocol_sum_ns": {
+          "n": 3,
+          "median": 148872439,
+          "minimum": 147755100,
+          "maximum": 149148834,
+          "q1": 148313769.5,
+          "q3": 149010636.5,
+          "iqr": 696867.0,
+          "samples": [
+            147755100,
+            149148834,
+            148872439
+          ]
+        },
+        "protocol_union_ns": {
+          "n": 3,
+          "median": 148872439,
+          "minimum": 147755100,
+          "maximum": 149148834,
+          "q1": 148313769.5,
+          "q3": 149010636.5,
+          "iqr": 696867.0,
+          "samples": [
+            147755100,
+            149148834,
+            148872439
+          ]
+        },
+        "driver_sum_ns": {
+          "n": 3,
+          "median": 170978929,
+          "minimum": 169959066,
+          "maximum": 171227271,
+          "q1": 170468997.5,
+          "q3": 171103100.0,
+          "iqr": 634102.5,
+          "samples": [
+            169959066,
+            171227271,
+            170978929
+          ]
+        },
+        "driver_union_ns": {
+          "n": 3,
+          "median": 170978929,
+          "minimum": 169959066,
+          "maximum": 171227271,
+          "q1": 170468997.5,
+          "q3": 171103100.0,
+          "iqr": 634102.5,
+          "samples": [
+            169959066,
+            171227271,
+            170978929
+          ]
+        },
+        "sql_dispatches": {
+          "n": 3,
+          "median": 558,
+          "minimum": 558,
+          "maximum": 558,
+          "q1": 558.0,
+          "q3": 558.0,
+          "iqr": 0.0,
+          "samples": [
+            558,
+            558,
+            558
+          ]
+        },
+        "sql_data": {
+          "n": 3,
+          "median": 366,
+          "minimum": 366,
+          "maximum": 366,
+          "q1": 366.0,
+          "q3": 366.0,
+          "iqr": 0.0,
+          "samples": [
+            366,
+            366,
+            366
+          ]
+        },
+        "sql_control": {
+          "n": 3,
+          "median": 192,
+          "minimum": 192,
+          "maximum": 192,
+          "q1": 192.0,
+          "q3": 192.0,
+          "iqr": 0.0,
+          "samples": [
+            192,
+            192,
+            192
+          ]
+        },
+        "sql_other": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "command_complete": {
+          "n": 3,
+          "median": 558,
+          "minimum": 558,
+          "maximum": 558,
+          "q1": 558.0,
+          "q3": 558.0,
+          "iqr": 0.0,
+          "samples": [
+            558,
+            558,
+            558
+          ]
+        },
+        "protocol_cycles": {
+          "n": 3,
+          "median": 558,
+          "minimum": 558,
+          "maximum": 558,
+          "q1": 558.0,
+          "q3": 558.0,
+          "iqr": 0.0,
+          "samples": [
+            558,
+            558,
+            558
+          ]
+        },
+        "server_error_messages": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "data_rows": {
+          "n": 3,
+          "median": 353,
+          "minimum": 353,
+          "maximum": 353,
+          "q1": 353.0,
+          "q3": 353.0,
+          "iqr": 0.0,
+          "samples": [
+            353,
+            353,
+            353
+          ]
+        },
+        "data_row_payload_bytes": {
+          "n": 3,
+          "median": 125340,
+          "minimum": 125340,
+          "maximum": 125340,
+          "q1": 125340.0,
+          "q3": 125340.0,
+          "iqr": 0.0,
+          "samples": [
+            125340,
+            125340,
+            125340
+          ]
+        },
+        "distinct_backend_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "separate_process_overlap_ns": {
+          "n": 3,
+          "median": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "q1": 0.0,
+          "q3": 0.0,
+          "iqr": 0.0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "business_HTTP_requests": [
+        27,
+        27,
+        27
+      ]
+    }
+  ],
+  "ratios": [
+    {
+      "app": "littlex",
+      "config_id": "legacy_ttg_thread",
+      "metric": "protocol_sum_ns",
+      "ratio_to_off": 2.9248744972123677,
+      "definition": "ratio of independent workflow medians; not a paired causal estimate"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_thread",
+      "metric": "protocol_sum_ns",
+      "ratio_to_off": 1.263500684934703,
+      "definition": "ratio of independent workflow medians; not a paired causal estimate"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_process",
+      "metric": "protocol_sum_ns",
+      "ratio_to_off": 1.2422239050314865,
+      "definition": "ratio of independent workflow medians; not a paired causal estimate"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_thread",
+      "metric": "protocol_sum_ns",
+      "ratio_to_off": 1.2003687272377315,
+      "definition": "ratio of independent workflow medians; not a paired causal estimate"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_process",
+      "metric": "protocol_sum_ns",
+      "ratio_to_off": 1.2557382505260883,
+      "definition": "ratio of independent workflow medians; not a paired causal estimate"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "legacy_ttg_thread",
+      "metric": "protocol_sum_ns",
+      "ratio_to_off": 2.1031260827507015,
+      "definition": "ratio of independent workflow medians; not a paired causal estimate"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_thread",
+      "metric": "protocol_sum_ns",
+      "ratio_to_off": 1.008925771007295,
+      "definition": "ratio of independent workflow medians; not a paired causal estimate"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_process",
+      "metric": "protocol_sum_ns",
+      "ratio_to_off": 1.3371502987170998,
+      "definition": "ratio of independent workflow medians; not a paired causal estimate"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_thread",
+      "metric": "protocol_sum_ns",
+      "ratio_to_off": 1.0369437141010702,
+      "definition": "ratio of independent workflow medians; not a paired causal estimate"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_process",
+      "metric": "protocol_sum_ns",
+      "ratio_to_off": 1.0575367724559055,
+      "definition": "ratio of independent workflow medians; not a paired causal estimate"
+    }
+  ],
+  "samples": [
+    {
+      "app": "littlex",
+      "config_id": "none",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "littlex-none-excluded_warmup--1",
+      "protocol_sum_ns": 37973973,
+      "protocol_union_ns": 37973973,
+      "driver_sum_ns": 42904176,
+      "driver_union_ns": 42904176,
+      "sql_dispatches": 153,
+      "sql_data": 90,
+      "sql_control": 63,
+      "sql_other": 0,
+      "command_complete": 153,
+      "protocol_cycles": 153,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 82078,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "legacy_ttg_thread",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "littlex-legacy_ttg_thread-excluded_warmup--1",
+      "protocol_sum_ns": 115639714,
+      "protocol_union_ns": 115463822,
+      "driver_sum_ns": 133547784,
+      "driver_union_ns": 133324063,
+      "sql_dispatches": 144,
+      "sql_data": 74,
+      "sql_control": 70,
+      "sql_other": 0,
+      "command_complete": 144,
+      "protocol_cycles": 144,
+      "server_error_messages": 0,
+      "data_rows": 354,
+      "data_row_payload_bytes": 105634,
+      "distinct_backend_overlap_ns": 175892,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_thread",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "littlex-continuation_always_thread-excluded_warmup--1",
+      "protocol_sum_ns": 144501133,
+      "protocol_union_ns": 128089990,
+      "driver_sum_ns": 162488172,
+      "driver_union_ns": 144818069,
+      "sql_dispatches": 167,
+      "sql_data": 90,
+      "sql_control": 77,
+      "sql_other": 0,
+      "command_complete": 167,
+      "protocol_cycles": 167,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 83287,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_process",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "littlex-continuation_always_process-excluded_warmup--1",
+      "protocol_sum_ns": 48782475,
+      "protocol_union_ns": 48782475,
+      "driver_sum_ns": 56489837,
+      "driver_union_ns": 56489837,
+      "sql_dispatches": 159,
+      "sql_data": 90,
+      "sql_control": 69,
+      "sql_other": 0,
+      "command_complete": 159,
+      "protocol_cycles": 159,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 83287,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_thread",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "littlex-continuation_expected_benefit_thread-excluded_warmup--1",
+      "protocol_sum_ns": 45782182,
+      "protocol_union_ns": 42331139,
+      "driver_sum_ns": 50859855,
+      "driver_union_ns": 47099550,
+      "sql_dispatches": 165,
+      "sql_data": 90,
+      "sql_control": 75,
+      "sql_other": 0,
+      "command_complete": 165,
+      "protocol_cycles": 165,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 83038,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_process",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "littlex-continuation_expected_benefit_process-excluded_warmup--1",
+      "protocol_sum_ns": 50803659,
+      "protocol_union_ns": 50803659,
+      "driver_sum_ns": 58462578,
+      "driver_union_ns": 58462578,
+      "sql_dispatches": 159,
+      "sql_data": 90,
+      "sql_control": 69,
+      "sql_other": 0,
+      "command_complete": 159,
+      "protocol_cycles": 159,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 83266,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "none",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "littlex-none-measured-0",
+      "protocol_sum_ns": 37702641,
+      "protocol_union_ns": 37702641,
+      "driver_sum_ns": 42667483,
+      "driver_union_ns": 42667483,
+      "sql_dispatches": 153,
+      "sql_data": 90,
+      "sql_control": 63,
+      "sql_other": 0,
+      "command_complete": 153,
+      "protocol_cycles": 153,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 82078,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_process",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "littlex-continuation_expected_benefit_process-measured-0",
+      "protocol_sum_ns": 51723759,
+      "protocol_union_ns": 51723759,
+      "driver_sum_ns": 59638645,
+      "driver_union_ns": 59638645,
+      "sql_dispatches": 159,
+      "sql_data": 90,
+      "sql_control": 69,
+      "sql_other": 0,
+      "command_complete": 159,
+      "protocol_cycles": 159,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 83266,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_thread",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "littlex-continuation_expected_benefit_thread-measured-0",
+      "protocol_sum_ns": 45158029,
+      "protocol_union_ns": 41018714,
+      "driver_sum_ns": 50235107,
+      "driver_union_ns": 45772281,
+      "sql_dispatches": 165,
+      "sql_data": 90,
+      "sql_control": 75,
+      "sql_other": 0,
+      "command_complete": 165,
+      "protocol_cycles": 165,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 83038,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_process",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "littlex-continuation_always_process-measured-0",
+      "protocol_sum_ns": 49514143,
+      "protocol_union_ns": 49514143,
+      "driver_sum_ns": 57255042,
+      "driver_union_ns": 57255042,
+      "sql_dispatches": 159,
+      "sql_data": 90,
+      "sql_control": 69,
+      "sql_other": 0,
+      "command_complete": 159,
+      "protocol_cycles": 159,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 83287,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_thread",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "littlex-continuation_always_thread-measured-0",
+      "protocol_sum_ns": 50362220,
+      "protocol_union_ns": 43831334,
+      "driver_sum_ns": 55564948,
+      "driver_union_ns": 48598138,
+      "sql_dispatches": 167,
+      "sql_data": 90,
+      "sql_control": 77,
+      "sql_other": 0,
+      "command_complete": 167,
+      "protocol_cycles": 167,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 83287,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "legacy_ttg_thread",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "littlex-legacy_ttg_thread-measured-0",
+      "protocol_sum_ns": 113838592,
+      "protocol_union_ns": 113743910,
+      "driver_sum_ns": 131787018,
+      "driver_union_ns": 131618519,
+      "sql_dispatches": 144,
+      "sql_data": 74,
+      "sql_control": 70,
+      "sql_other": 0,
+      "command_complete": 144,
+      "protocol_cycles": 144,
+      "server_error_messages": 0,
+      "data_rows": 354,
+      "data_row_payload_bytes": 105634,
+      "distinct_backend_overlap_ns": 94682,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_thread",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "littlex-continuation_always_thread-measured-1",
+      "protocol_sum_ns": 47636179,
+      "protocol_union_ns": 41347577,
+      "driver_sum_ns": 52681610,
+      "driver_union_ns": 45967654,
+      "sql_dispatches": 167,
+      "sql_data": 90,
+      "sql_control": 77,
+      "sql_other": 0,
+      "command_complete": 167,
+      "protocol_cycles": 167,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 83287,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_process",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "littlex-continuation_always_process-measured-1",
+      "protocol_sum_ns": 55144395,
+      "protocol_union_ns": 55144395,
+      "driver_sum_ns": 63812445,
+      "driver_union_ns": 63812445,
+      "sql_dispatches": 159,
+      "sql_data": 90,
+      "sql_control": 69,
+      "sql_other": 0,
+      "command_complete": 159,
+      "protocol_cycles": 159,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 83287,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_thread",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "littlex-continuation_expected_benefit_thread-measured-1",
+      "protocol_sum_ns": 49463177,
+      "protocol_union_ns": 43898396,
+      "driver_sum_ns": 54593055,
+      "driver_union_ns": 48683982,
+      "sql_dispatches": 165,
+      "sql_data": 90,
+      "sql_control": 75,
+      "sql_other": 0,
+      "command_complete": 165,
+      "protocol_cycles": 165,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 83038,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_process",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "littlex-continuation_expected_benefit_process-measured-1",
+      "protocol_sum_ns": 49311242,
+      "protocol_union_ns": 49311242,
+      "driver_sum_ns": 56990111,
+      "driver_union_ns": 56990111,
+      "sql_dispatches": 159,
+      "sql_data": 90,
+      "sql_control": 69,
+      "sql_other": 0,
+      "command_complete": 159,
+      "protocol_cycles": 159,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 83266,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "none",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "littlex-none-measured-1",
+      "protocol_sum_ns": 40174917,
+      "protocol_union_ns": 40174917,
+      "driver_sum_ns": 45198891,
+      "driver_union_ns": 45198891,
+      "sql_dispatches": 153,
+      "sql_data": 90,
+      "sql_control": 63,
+      "sql_other": 0,
+      "command_complete": 153,
+      "protocol_cycles": 153,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 82078,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "legacy_ttg_thread",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "littlex-legacy_ttg_thread-measured-1",
+      "protocol_sum_ns": 116583374,
+      "protocol_union_ns": 116399576,
+      "driver_sum_ns": 134460244,
+      "driver_union_ns": 134228604,
+      "sql_dispatches": 144,
+      "sql_data": 74,
+      "sql_control": 70,
+      "sql_other": 0,
+      "command_complete": 144,
+      "protocol_cycles": 144,
+      "server_error_messages": 0,
+      "data_rows": 354,
+      "data_row_payload_bytes": 105634,
+      "distinct_backend_overlap_ns": 183798,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_thread",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "littlex-continuation_always_thread-measured-2",
+      "protocol_sum_ns": 64063365,
+      "protocol_union_ns": 56471548,
+      "driver_sum_ns": 70800800,
+      "driver_union_ns": 62658387,
+      "sql_dispatches": 167,
+      "sql_data": 90,
+      "sql_control": 77,
+      "sql_other": 0,
+      "command_complete": 167,
+      "protocol_cycles": 167,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 83287,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "legacy_ttg_thread",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "littlex-legacy_ttg_thread-measured-2",
+      "protocol_sum_ns": 116949847,
+      "protocol_union_ns": 116808568,
+      "driver_sum_ns": 134839365,
+      "driver_union_ns": 134650781,
+      "sql_dispatches": 144,
+      "sql_data": 74,
+      "sql_control": 70,
+      "sql_other": 0,
+      "command_complete": 144,
+      "protocol_cycles": 144,
+      "server_error_messages": 0,
+      "data_rows": 354,
+      "data_row_payload_bytes": 105634,
+      "distinct_backend_overlap_ns": 141279,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "none",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "littlex-none-measured-2",
+      "protocol_sum_ns": 39859274,
+      "protocol_union_ns": 39859274,
+      "driver_sum_ns": 44704435,
+      "driver_union_ns": 44704435,
+      "sql_dispatches": 153,
+      "sql_data": 90,
+      "sql_control": 63,
+      "sql_other": 0,
+      "command_complete": 153,
+      "protocol_cycles": 153,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 82078,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_process",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "littlex-continuation_expected_benefit_process-measured-2",
+      "protocol_sum_ns": 50052815,
+      "protocol_union_ns": 50052815,
+      "driver_sum_ns": 57770901,
+      "driver_union_ns": 57770901,
+      "sql_dispatches": 159,
+      "sql_data": 90,
+      "sql_control": 69,
+      "sql_other": 0,
+      "command_complete": 159,
+      "protocol_cycles": 159,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 83266,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_thread",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "littlex-continuation_expected_benefit_thread-measured-2",
+      "protocol_sum_ns": 47845826,
+      "protocol_union_ns": 42873247,
+      "driver_sum_ns": 53190570,
+      "driver_union_ns": 47875214,
+      "sql_dispatches": 165,
+      "sql_data": 90,
+      "sql_control": 75,
+      "sql_other": 0,
+      "command_complete": 165,
+      "protocol_cycles": 165,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 83038,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_process",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "littlex-continuation_always_process-measured-2",
+      "protocol_sum_ns": 49362490,
+      "protocol_union_ns": 49362490,
+      "driver_sum_ns": 56975540,
+      "driver_union_ns": 56975540,
+      "sql_dispatches": 159,
+      "sql_data": 90,
+      "sql_control": 69,
+      "sql_other": 0,
+      "command_complete": 159,
+      "protocol_cycles": 159,
+      "server_error_messages": 0,
+      "data_rows": 201,
+      "data_row_payload_bytes": 83287,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 9
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "none",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "issue_desk-none-excluded_warmup--1",
+      "protocol_sum_ns": 150815002,
+      "protocol_union_ns": 150815002,
+      "driver_sum_ns": 171622658,
+      "driver_union_ns": 171622658,
+      "sql_dispatches": 555,
+      "sql_data": 366,
+      "sql_control": 189,
+      "sql_other": 0,
+      "command_complete": 555,
+      "protocol_cycles": 555,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125144,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_process",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "issue_desk-continuation_expected_benefit_process-excluded_warmup--1",
+      "protocol_sum_ns": 150022892,
+      "protocol_union_ns": 150022892,
+      "driver_sum_ns": 173826787,
+      "driver_union_ns": 173826787,
+      "sql_dispatches": 558,
+      "sql_data": 366,
+      "sql_control": 192,
+      "sql_other": 0,
+      "command_complete": 558,
+      "protocol_cycles": 558,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125340,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_thread",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "issue_desk-continuation_expected_benefit_thread-excluded_warmup--1",
+      "protocol_sum_ns": 141654913,
+      "protocol_union_ns": 141654913,
+      "driver_sum_ns": 162252428,
+      "driver_union_ns": 162252428,
+      "sql_dispatches": 561,
+      "sql_data": 366,
+      "sql_control": 195,
+      "sql_other": 0,
+      "command_complete": 561,
+      "protocol_cycles": 561,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125340,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_process",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "issue_desk-continuation_always_process-excluded_warmup--1",
+      "protocol_sum_ns": 149343466,
+      "protocol_union_ns": 149343466,
+      "driver_sum_ns": 172119736,
+      "driver_union_ns": 172119736,
+      "sql_dispatches": 559,
+      "sql_data": 366,
+      "sql_control": 193,
+      "sql_other": 0,
+      "command_complete": 559,
+      "protocol_cycles": 559,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125418,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_thread",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "issue_desk-continuation_always_thread-excluded_warmup--1",
+      "protocol_sum_ns": 144010986,
+      "protocol_union_ns": 144010986,
+      "driver_sum_ns": 164479177,
+      "driver_union_ns": 164479177,
+      "sql_dispatches": 563,
+      "sql_data": 366,
+      "sql_control": 197,
+      "sql_other": 0,
+      "command_complete": 563,
+      "protocol_cycles": 563,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125418,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "legacy_ttg_thread",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "issue_desk-legacy_ttg_thread-excluded_warmup--1",
+      "protocol_sum_ns": 294977774,
+      "protocol_union_ns": 292479236,
+      "driver_sum_ns": 362786897,
+      "driver_union_ns": 359337263,
+      "sql_dispatches": 569,
+      "sql_data": 354,
+      "sql_control": 215,
+      "sql_other": 0,
+      "command_complete": 569,
+      "protocol_cycles": 569,
+      "server_error_messages": 0,
+      "data_rows": 464,
+      "data_row_payload_bytes": 141922,
+      "distinct_backend_overlap_ns": 2498538,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_thread",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "issue_desk-continuation_always_thread-measured-0",
+      "protocol_sum_ns": 142029331,
+      "protocol_union_ns": 142029331,
+      "driver_sum_ns": 162566380,
+      "driver_union_ns": 162566380,
+      "sql_dispatches": 563,
+      "sql_data": 366,
+      "sql_control": 197,
+      "sql_other": 0,
+      "command_complete": 563,
+      "protocol_cycles": 563,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125418,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_process",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "issue_desk-continuation_always_process-measured-0",
+      "protocol_sum_ns": 192062149,
+      "protocol_union_ns": 192062149,
+      "driver_sum_ns": 221796430,
+      "driver_union_ns": 221796430,
+      "sql_dispatches": 559,
+      "sql_data": 366,
+      "sql_control": 193,
+      "sql_other": 0,
+      "command_complete": 559,
+      "protocol_cycles": 559,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125418,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_thread",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "issue_desk-continuation_expected_benefit_thread-measured-0",
+      "protocol_sum_ns": 147452488,
+      "protocol_union_ns": 147452488,
+      "driver_sum_ns": 168130675,
+      "driver_union_ns": 168130675,
+      "sql_dispatches": 561,
+      "sql_data": 366,
+      "sql_control": 195,
+      "sql_other": 0,
+      "command_complete": 561,
+      "protocol_cycles": 561,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125340,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_process",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "issue_desk-continuation_expected_benefit_process-measured-0",
+      "protocol_sum_ns": 147755100,
+      "protocol_union_ns": 147755100,
+      "driver_sum_ns": 169959066,
+      "driver_union_ns": 169959066,
+      "sql_dispatches": 558,
+      "sql_data": 366,
+      "sql_control": 192,
+      "sql_other": 0,
+      "command_complete": 558,
+      "protocol_cycles": 558,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125340,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "none",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "issue_desk-none-measured-0",
+      "protocol_sum_ns": 140772825,
+      "protocol_union_ns": 140772825,
+      "driver_sum_ns": 161200497,
+      "driver_union_ns": 161200497,
+      "sql_dispatches": 555,
+      "sql_data": 366,
+      "sql_control": 189,
+      "sql_other": 0,
+      "command_complete": 555,
+      "protocol_cycles": 555,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125144,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "legacy_ttg_thread",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "issue_desk-legacy_ttg_thread-measured-0",
+      "protocol_sum_ns": 292529572,
+      "protocol_union_ns": 289486564,
+      "driver_sum_ns": 360581604,
+      "driver_union_ns": 356523133,
+      "sql_dispatches": 569,
+      "sql_data": 354,
+      "sql_control": 215,
+      "sql_other": 0,
+      "command_complete": 569,
+      "protocol_cycles": 569,
+      "server_error_messages": 0,
+      "data_rows": 464,
+      "data_row_payload_bytes": 141922,
+      "distinct_backend_overlap_ns": 3043008,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_thread",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "issue_desk-continuation_always_thread-measured-1",
+      "protocol_sum_ns": 140150574,
+      "protocol_union_ns": 140150574,
+      "driver_sum_ns": 160659931,
+      "driver_union_ns": 160659931,
+      "sql_dispatches": 563,
+      "sql_data": 366,
+      "sql_control": 197,
+      "sql_other": 0,
+      "command_complete": 563,
+      "protocol_cycles": 563,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125418,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "legacy_ttg_thread",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "issue_desk-legacy_ttg_thread-measured-1",
+      "protocol_sum_ns": 296063000,
+      "protocol_union_ns": 293818714,
+      "driver_sum_ns": 365530706,
+      "driver_union_ns": 362388156,
+      "sql_dispatches": 569,
+      "sql_data": 354,
+      "sql_control": 215,
+      "sql_other": 0,
+      "command_complete": 569,
+      "protocol_cycles": 569,
+      "server_error_messages": 0,
+      "data_rows": 464,
+      "data_row_payload_bytes": 141922,
+      "distinct_backend_overlap_ns": 2244286,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "none",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "issue_desk-none-measured-1",
+      "protocol_sum_ns": 154130939,
+      "protocol_union_ns": 154130939,
+      "driver_sum_ns": 175425226,
+      "driver_union_ns": 175425226,
+      "sql_dispatches": 555,
+      "sql_data": 366,
+      "sql_control": 189,
+      "sql_other": 0,
+      "command_complete": 555,
+      "protocol_cycles": 555,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125144,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_process",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "issue_desk-continuation_expected_benefit_process-measured-1",
+      "protocol_sum_ns": 149148834,
+      "protocol_union_ns": 149148834,
+      "driver_sum_ns": 171227271,
+      "driver_union_ns": 171227271,
+      "sql_dispatches": 558,
+      "sql_data": 366,
+      "sql_control": 192,
+      "sql_other": 0,
+      "command_complete": 558,
+      "protocol_cycles": 558,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125340,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_thread",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "issue_desk-continuation_expected_benefit_thread-measured-1",
+      "protocol_sum_ns": 145973496,
+      "protocol_union_ns": 145973496,
+      "driver_sum_ns": 166583131,
+      "driver_union_ns": 166583131,
+      "sql_dispatches": 561,
+      "sql_data": 366,
+      "sql_control": 195,
+      "sql_other": 0,
+      "command_complete": 561,
+      "protocol_cycles": 561,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125340,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_process",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "issue_desk-continuation_always_process-measured-1",
+      "protocol_sum_ns": 188234425,
+      "protocol_union_ns": 188234425,
+      "driver_sum_ns": 216577178,
+      "driver_union_ns": 216577178,
+      "sql_dispatches": 559,
+      "sql_data": 366,
+      "sql_control": 193,
+      "sql_other": 0,
+      "command_complete": 559,
+      "protocol_cycles": 559,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125418,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_thread",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "issue_desk-continuation_expected_benefit_thread-measured-2",
+      "protocol_sum_ns": 137227246,
+      "protocol_union_ns": 137227246,
+      "driver_sum_ns": 157617975,
+      "driver_union_ns": 157617975,
+      "sql_dispatches": 561,
+      "sql_data": 366,
+      "sql_control": 195,
+      "sql_other": 0,
+      "command_complete": 561,
+      "protocol_cycles": 561,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125340,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_process",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "issue_desk-continuation_expected_benefit_process-measured-2",
+      "protocol_sum_ns": 148872439,
+      "protocol_union_ns": 148872439,
+      "driver_sum_ns": 170978929,
+      "driver_union_ns": 170978929,
+      "sql_dispatches": 558,
+      "sql_data": 366,
+      "sql_control": 192,
+      "sql_other": 0,
+      "command_complete": 558,
+      "protocol_cycles": 558,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125340,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "none",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "issue_desk-none-measured-2",
+      "protocol_sum_ns": 131296523,
+      "protocol_union_ns": 131296523,
+      "driver_sum_ns": 151593875,
+      "driver_union_ns": 151593875,
+      "sql_dispatches": 555,
+      "sql_data": 366,
+      "sql_control": 189,
+      "sql_other": 0,
+      "command_complete": 555,
+      "protocol_cycles": 555,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125144,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "legacy_ttg_thread",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "issue_desk-legacy_ttg_thread-measured-2",
+      "protocol_sum_ns": 325699362,
+      "protocol_union_ns": 322568289,
+      "driver_sum_ns": 404674941,
+      "driver_union_ns": 400384810,
+      "sql_dispatches": 569,
+      "sql_data": 354,
+      "sql_control": 215,
+      "sql_other": 0,
+      "command_complete": 569,
+      "protocol_cycles": 569,
+      "server_error_messages": 0,
+      "data_rows": 464,
+      "data_row_payload_bytes": 141922,
+      "distinct_backend_overlap_ns": 3131073,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_thread",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "issue_desk-continuation_always_thread-measured-2",
+      "protocol_sum_ns": 144186609,
+      "protocol_union_ns": 144186609,
+      "driver_sum_ns": 164934574,
+      "driver_union_ns": 164934574,
+      "sql_dispatches": 563,
+      "sql_data": 366,
+      "sql_control": 197,
+      "sql_other": 0,
+      "command_complete": 563,
+      "protocol_cycles": 563,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125418,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_process",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "issue_desk-continuation_always_process-measured-2",
+      "protocol_sum_ns": 143479031,
+      "protocol_union_ns": 143479031,
+      "driver_sum_ns": 166234015,
+      "driver_union_ns": 166234015,
+      "sql_dispatches": 559,
+      "sql_data": 366,
+      "sql_control": 193,
+      "sql_other": 0,
+      "command_complete": 559,
+      "protocol_cycles": 559,
+      "server_error_messages": 0,
+      "data_rows": 353,
+      "data_row_payload_bytes": 125418,
+      "distinct_backend_overlap_ns": 0,
+      "separate_process_overlap_ns": 0,
+      "business_HTTP_requests": 27
+    }
+  ],
+  "raw_references": [
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-none-excluded_warmup--1/artifacts.json",
+        "sha256": "764b598cacb2b440f0541f19f771dd7e58268b2cc8d904fa385a05d4d299b6b4",
+        "files_checked": 32
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-none-excluded_warmup--1.json",
+        "sha256": "208ed60b3290ed5d681c6e14fd270e1e0009a8beccb617b4ad292f8144839cc8"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-none-excluded_warmup--1.json",
+        "sha256": "70f1e6109be29957230e6319654e7b21ee15aaae5f3b2996eb53b4c32e10335c"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-legacy_ttg_thread-excluded_warmup--1/artifacts.json",
+        "sha256": "ef21df1726ed64b95bb62cb3be40f8edbad2dfd447d0621abcc4623acd245a97",
+        "files_checked": 32
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-legacy_ttg_thread-excluded_warmup--1.json",
+        "sha256": "71a7e381e391e2c600e3991cfe0891c3b824546da9dc2af6d3507e2f20a1fc7b"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-legacy_ttg_thread-excluded_warmup--1.json",
+        "sha256": "fffa9862cc1b31cec6472a5f7aa845baa5e8512ef444e741714418fdb2f433b2"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-continuation_always_thread-excluded_warmup--1/artifacts.json",
+        "sha256": "3a1c25feee0c86d402aac02560516818b723cd2457d6c166587c711a1d10d2ed",
+        "files_checked": 32
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-continuation_always_thread-excluded_warmup--1.json",
+        "sha256": "8885a888482788efab3af263ddae6ef0cefe9287aeb74e78bbbd215d33d80186"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-continuation_always_thread-excluded_warmup--1.json",
+        "sha256": "905433c3c30672c9899e9a134d9154f3fec684eadc106925c42f2fa4dc4bf769"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-continuation_always_process-excluded_warmup--1/artifacts.json",
+        "sha256": "471e1c59fe88300d115eca7b5075d4659b5848f32884e9a1143b403e3525d886",
+        "files_checked": 56
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-continuation_always_process-excluded_warmup--1.json",
+        "sha256": "07628fa206f5925568c9fb7884ce6a47e091e687bfac3628343e00b4bbb668ba"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-continuation_always_process-excluded_warmup--1.json",
+        "sha256": "98064f70a7ab4a073fc7e13930ddbdeb80adc5b653c6c40ba8a4ba81fd066463"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-continuation_expected_benefit_thread-excluded_warmup--1/artifacts.json",
+        "sha256": "48978f03ab281ea330ba90c2b1a5683cb9b7e0dbbed7b5ff4c4346fc7438009d",
+        "files_checked": 32
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-continuation_expected_benefit_thread-excluded_warmup--1.json",
+        "sha256": "b393aad37d3453815b42a38f3309b982a2a25416139ac60db72b9b6230e13ee3"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-continuation_expected_benefit_thread-excluded_warmup--1.json",
+        "sha256": "46f96a7c39b262127f75aa98689a3690c42746c50d2e399861608fc5ac38fc0d"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-continuation_expected_benefit_process-excluded_warmup--1/artifacts.json",
+        "sha256": "d799161a50acabaf9706c32357db5aeefebdfcc41b7209fe0332ba7a24425b47",
+        "files_checked": 46
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-continuation_expected_benefit_process-excluded_warmup--1.json",
+        "sha256": "d672e7415cd59ee3387d4e70a91c46f9b5a5c94ee22918b74760e5634256e487"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-continuation_expected_benefit_process-excluded_warmup--1.json",
+        "sha256": "6dc0a3aea1b4541f6dc9f88a0da6673ebeb0bcefec770119bff533983da67f7f"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-none-measured-0/artifacts.json",
+        "sha256": "8276cec007a7595103f648608e8c9ba9f079ada3f32ca1cceaf5077e7398a3da",
+        "files_checked": 32
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-none-measured-0.json",
+        "sha256": "9f9e31a55d3f598640515848a1ecab5954ae34bfdaaea744509ec94a0ac212de"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-none-measured-0.json",
+        "sha256": "838b41e0bab15ae81000f05a1faa5e440741672921e69df58ebe9ec488e76abe"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-continuation_expected_benefit_process-measured-0/artifacts.json",
+        "sha256": "940c77197b564b35669ea61626e1bf96623b3ec480393db8d2c9cd4e20c24e37",
+        "files_checked": 46
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-continuation_expected_benefit_process-measured-0.json",
+        "sha256": "4a1c90760cb331e3b3a54454d6835456f20584088a8c052c4dbb99c99a5c5cf7"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-continuation_expected_benefit_process-measured-0.json",
+        "sha256": "85b980674bcf02aaec0b7b5dd450c87359c0456869e9470788bb69415f74f887"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-continuation_expected_benefit_thread-measured-0/artifacts.json",
+        "sha256": "f542aed5ff67fbb84af1a7e72f7e5bb42443f99b6bb1126318b79d892bd704f5",
+        "files_checked": 32
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-continuation_expected_benefit_thread-measured-0.json",
+        "sha256": "6e46e1224c842dc5ea10f5820deaa57e48e4487a665630ef99494baf1156fcd1"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-continuation_expected_benefit_thread-measured-0.json",
+        "sha256": "9e844418c61e87b6dd6d17327b2f1623ff8013abc2c00f19ad94ca5e0de902b5"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-continuation_always_process-measured-0/artifacts.json",
+        "sha256": "81a6f1b89700b1391a6c4764493d6fe0b92cd9b83afd396ba0b2efde0501dfe3",
+        "files_checked": 56
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-continuation_always_process-measured-0.json",
+        "sha256": "2ee94f9d9ecde7226b9d21ac66c463968d04a2be3783964963c5fda111e2d7fd"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-continuation_always_process-measured-0.json",
+        "sha256": "79336c8561f100c69d4d8e1ecb8f711c0bf371e502e040d11de5babb905edc43"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-continuation_always_thread-measured-0/artifacts.json",
+        "sha256": "f58834d1862dcf1722b55ab79c7b5fd33c9423ebb7bae99f8f8f398cdc54ccf9",
+        "files_checked": 32
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-continuation_always_thread-measured-0.json",
+        "sha256": "6c5d845c2290b7e1c0972b5f8a3470af32c7eddb41cefc4df0b1e40f12814a91"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-continuation_always_thread-measured-0.json",
+        "sha256": "a11df78e0df97e3f2e4a4ff7a7eb4a0788c855326b96e234e9992fc8f4db3eef"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-legacy_ttg_thread-measured-0/artifacts.json",
+        "sha256": "8a94234383a77631666ad2fc800c398101e0552ffa2d6e1ddb68a3f496470c1c",
+        "files_checked": 32
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-legacy_ttg_thread-measured-0.json",
+        "sha256": "856e113ce2779c74843f7ffb218d2a07a6aff86a9a334ca924a64fc53fac003a"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-legacy_ttg_thread-measured-0.json",
+        "sha256": "801f81d2151aba2aae09336454df48736eb918627cc2995d82d1bb4fac85cf7b"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-continuation_always_thread-measured-1/artifacts.json",
+        "sha256": "96d2b1797ad04c0e33431c81727bdeb31aa6605b8b8a95d313388c39657e30f2",
+        "files_checked": 32
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-continuation_always_thread-measured-1.json",
+        "sha256": "8f0b99710df605d06f5693af04fb9691614922e663bd4b4187274bb215573737"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-continuation_always_thread-measured-1.json",
+        "sha256": "4de38accd3ef151213ba1f2431e41729b38d7957206857e9421eadf3651cd830"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-continuation_always_process-measured-1/artifacts.json",
+        "sha256": "2d702ea87a5621c3086f905bf3d3ea2a8254b57b182a4f9c1bf66d93500ab9ff",
+        "files_checked": 56
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-continuation_always_process-measured-1.json",
+        "sha256": "32b0027575b20ca0ec251a312d6160a31bf235f60bf54c0dbf133de2f063b2b4"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-continuation_always_process-measured-1.json",
+        "sha256": "cd87a3ec92c3c90651e23df4cdaa2afcb73f5eda6012adf4bb8e050983f827b6"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-continuation_expected_benefit_thread-measured-1/artifacts.json",
+        "sha256": "b7c7491131de593a84ce3b9f2675609eaf2fa05c8a46a41bcd77bb96b3b3b082",
+        "files_checked": 32
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-continuation_expected_benefit_thread-measured-1.json",
+        "sha256": "75502147a52f5d6efa7fd3c951d83c8ae2adf28256915139824e9793cfd624d2"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-continuation_expected_benefit_thread-measured-1.json",
+        "sha256": "59757a60601470fc730b5ccaa8693d31b4900ed7335250adf4ea054793b14c6c"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-continuation_expected_benefit_process-measured-1/artifacts.json",
+        "sha256": "db9af000b526844e7fc37e8f11f3e78863cf3189d90a6ea91c7599e163a35ca5",
+        "files_checked": 46
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-continuation_expected_benefit_process-measured-1.json",
+        "sha256": "e4ee0d2361364c983add5bd4e675f39bdc20269772b9e125c7c9a5b59dd26ff1"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-continuation_expected_benefit_process-measured-1.json",
+        "sha256": "76570401a53f00e55dd431765ba9e800e37a1b45b108c81e277ed590dcd79aef"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-none-measured-1/artifacts.json",
+        "sha256": "04088e80286a43e6dcc2139faee7f2db8d162f26a9030a9de82ecc4636feebe5",
+        "files_checked": 32
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-none-measured-1.json",
+        "sha256": "e11640ff77d91b79df74d2c1e8dcf25b682591eb3ca32a8dbb2e0af6f926cf2f"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-none-measured-1.json",
+        "sha256": "6e4cd50c04677020afaf8795b08e51ba7153dc1745fd8ea21d041d60eba41352"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-legacy_ttg_thread-measured-1/artifacts.json",
+        "sha256": "8a1041c1f3db8f7427f5cbfd546e6dd9d01f03ac5a4cf16d64c091c21a9449ef",
+        "files_checked": 32
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-legacy_ttg_thread-measured-1.json",
+        "sha256": "e6de26f3f05b5193932b9314854874df5a4641097fbebcc1fdab2a440ae04fdc"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-legacy_ttg_thread-measured-1.json",
+        "sha256": "0a184f6a4d4065a581dc6aa3c4c8f65b5627d0b29553aacb6ded444ccd594d43"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-continuation_always_thread-measured-2/artifacts.json",
+        "sha256": "c94936f718acda204106ee4dee050bfc7829396d695a51224bb45c3d121572f1",
+        "files_checked": 32
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-continuation_always_thread-measured-2.json",
+        "sha256": "0d689c05cbe9db471ea80ff9d9ddcf66a2f0b674eb02e58436e21e9b8fa08e4f"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-continuation_always_thread-measured-2.json",
+        "sha256": "248a9bd97fac63c5f053d01529a662b28a3ff296c9665e387682dc8e5f3edf69"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-legacy_ttg_thread-measured-2/artifacts.json",
+        "sha256": "0fe124ddfe1de89457506f4b0a6055a3df44043e3ae67d7dc58a74b97d76c6cb",
+        "files_checked": 32
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-legacy_ttg_thread-measured-2.json",
+        "sha256": "74713fabdd09d4427637235c6dcdccab522b297ad1426097419c4fe73f5c139b"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-legacy_ttg_thread-measured-2.json",
+        "sha256": "e437d3993508f68358a782f32aef7fa5fbdba482dcadf4dee4bed82b16665d78"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-none-measured-2/artifacts.json",
+        "sha256": "20acc9f598338b1c075980fc5eb3edcdf645ef0422fdfa545fa249596aea1713",
+        "files_checked": 32
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-none-measured-2.json",
+        "sha256": "0309f98481eda20413a14e80586b5c92507a72726fb22d894e06404522bd5aa8"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-none-measured-2.json",
+        "sha256": "e02c1ead0e5b638ad990ca8fd4539b2b1244010c89f274985a505fa2e15972a5"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-continuation_expected_benefit_process-measured-2/artifacts.json",
+        "sha256": "afcec50d75893d29439b7eaa1c62b53664c09b6757f4e5da5b485fe1f3ab8920",
+        "files_checked": 46
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-continuation_expected_benefit_process-measured-2.json",
+        "sha256": "df3e68c1e10b09f037010ff26e8358db69d196574f680860dd9bedf0ddf89e5e"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-continuation_expected_benefit_process-measured-2.json",
+        "sha256": "3873c5360aa860f0697910e925c637c53264d38b2fa3ad28610126db9c486641"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-continuation_expected_benefit_thread-measured-2/artifacts.json",
+        "sha256": "ba5dae55f49525c96d25521750e3873edd5f7370e12043e7a3992ee90006e144",
+        "files_checked": 32
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-continuation_expected_benefit_thread-measured-2.json",
+        "sha256": "839cb7aa39e0f6c15eae9671fc5025f438ba04a969abd3dc894a287907bbde6f"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-continuation_expected_benefit_thread-measured-2.json",
+        "sha256": "36d44897d4342025eb3aff8d4bb1ee5330faeb8b1f932c7caaab9afe04f91a91"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/littlex-continuation_always_process-measured-2/artifacts.json",
+        "sha256": "abfbb3be5817916f95006b48a87050f2a96cabe80176e2d28da7e506fa571c44",
+        "files_checked": 56
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/littlex-continuation_always_process-measured-2.json",
+        "sha256": "73d6a12831000af691a856427a8ddef4e28559f20f5bba47c4ac5e909bcf32de"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/littlex-continuation_always_process-measured-2.json",
+        "sha256": "b2b4f74e32f957d322a72343e214fc598d5453ddf45e1d65c2db60aa96c68b30"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-none-excluded_warmup--1/artifacts.json",
+        "sha256": "39d99130de194fdbbdacf0dcf326a03f718d6abdd4385619cf0ca2fcee355925",
+        "files_checked": 21
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-none-excluded_warmup--1.json",
+        "sha256": "91516206cec211d6977a08e1f01336f18d15112fb84020aab5364203a3d7cc3b"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-none-excluded_warmup--1.json",
+        "sha256": "f571c4a870a187acd5a032f0b3982fc2d81a13018f533e70f3457e591847f272"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-continuation_expected_benefit_process-excluded_warmup--1/artifacts.json",
+        "sha256": "7bb81f0676157cb34830634dd48cc7d894d94c2aef25a8d5cb56807f5b5c64cd",
+        "files_checked": 29
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-continuation_expected_benefit_process-excluded_warmup--1.json",
+        "sha256": "0486c4f9f3d9f814cae4881b232e8386a249f7606b997632a9a46b4d0508d98d"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-continuation_expected_benefit_process-excluded_warmup--1.json",
+        "sha256": "2156d75692bc8353b521df17811d6e25d94dd2940cc1d2f07d60a0c7c2df1448"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-continuation_expected_benefit_thread-excluded_warmup--1/artifacts.json",
+        "sha256": "d2c7795ce01425c1857f6c97f98adad2e2c384e8d3eedf5213c53c1b0d12cae9",
+        "files_checked": 21
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-continuation_expected_benefit_thread-excluded_warmup--1.json",
+        "sha256": "b94d6ec355bc29fb6f5b03592f7395d2d9ba84b6f86e41babf77f93a71e5cf77"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-continuation_expected_benefit_thread-excluded_warmup--1.json",
+        "sha256": "3e1c1d39e30abba3f467c279910fe40f6ccc9840f6d97c4299a6f00f12a99496"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-continuation_always_process-excluded_warmup--1/artifacts.json",
+        "sha256": "daccbd9461b610531b184972b52ab995c176a7329d9ef7e7dc750ef75fe90e3d",
+        "files_checked": 43
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-continuation_always_process-excluded_warmup--1.json",
+        "sha256": "9e5e56bb6480fabbc071418fd926474201207c32dcca4744c3c11a7f52fefd7d"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-continuation_always_process-excluded_warmup--1.json",
+        "sha256": "d81183d82142778e7c79c7c17ae09271577627af11555305de22588cef29e679"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-continuation_always_thread-excluded_warmup--1/artifacts.json",
+        "sha256": "b8fd7ebb344d08a2c34656d2b200e273e28b1a9063f4ddc7bc90c83939be6cc7",
+        "files_checked": 21
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-continuation_always_thread-excluded_warmup--1.json",
+        "sha256": "e157b208b23710b935287326366d6ad04e6cafc08647a65fc557226b28c6e294"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-continuation_always_thread-excluded_warmup--1.json",
+        "sha256": "8a6c7183ee68dea222e66483a3f132be2a02aa61cc33b05fc25e2e7799f2c2a1"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-legacy_ttg_thread-excluded_warmup--1/artifacts.json",
+        "sha256": "47db7609535be2930bdbe90c8899281ca26fedcf9c9358cc99546933c24c5ef8",
+        "files_checked": 21
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-legacy_ttg_thread-excluded_warmup--1.json",
+        "sha256": "26a9ab794cab0408448e72576b2097a5d84953e93eae3a3d3c740692a1fc8ca3"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-legacy_ttg_thread-excluded_warmup--1.json",
+        "sha256": "3e47b024c7cb8a406397d6d7b720db6fae7734140402fe1c472c801965019deb"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-continuation_always_thread-measured-0/artifacts.json",
+        "sha256": "33267d7fc78ddc4a5149998a540291ddff1c34a90d509d50d4a5d4b4cf76a8ce",
+        "files_checked": 21
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-continuation_always_thread-measured-0.json",
+        "sha256": "b4b8db8dd354c1c062b393188e9bd12e25e29bab53175da2b19a8b3cc6b8337b"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-continuation_always_thread-measured-0.json",
+        "sha256": "4a7f93f03b37bb7a9382a852feb756010165af33a61fd62a50e8933ce1d5e8f7"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-continuation_always_process-measured-0/artifacts.json",
+        "sha256": "ea6ff48f614a404fbce3733d63a2dfc18aeb05c6a43d7aafa38ef05530bb0a6a",
+        "files_checked": 43
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-continuation_always_process-measured-0.json",
+        "sha256": "8340de206bcfd6ba7b764d50d644374d87a83e3b1ce9711529a7b3639f7839ab"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-continuation_always_process-measured-0.json",
+        "sha256": "bb8abc9624d3533b428b5342de0de0b22777c6fa38aa00cd3454798ea2c7c769"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-continuation_expected_benefit_thread-measured-0/artifacts.json",
+        "sha256": "cad2ba3784c8b3bb320420fa37c886fb8de09f9f597f1f12779a2b0596150522",
+        "files_checked": 21
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-continuation_expected_benefit_thread-measured-0.json",
+        "sha256": "1a553aa2b1b3c112f4ad801ecb9679bc775a64bbc71b19822b1b77b87118071f"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-continuation_expected_benefit_thread-measured-0.json",
+        "sha256": "edc4658f8b1b654db448e080f7181ee3f6b2569027974c8dde223418efacad9f"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-continuation_expected_benefit_process-measured-0/artifacts.json",
+        "sha256": "a0422e3631643604191f773d6a0b3c7c785f90e5a717d5f2e0ae28d308c99384",
+        "files_checked": 29
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-continuation_expected_benefit_process-measured-0.json",
+        "sha256": "c6bb7d44002c618527bda04a54ecc26ac1c058d0c99a6e0afccb3c325fb748dd"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-continuation_expected_benefit_process-measured-0.json",
+        "sha256": "3d445de6331f34a70d5d0b67997f7549e2a14db5e529463cba50734be096399e"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-none-measured-0/artifacts.json",
+        "sha256": "506c331fcc3c51c0e143ca743d5c9b0c2ed1e5a025287cbcf651ac9543ef13cc",
+        "files_checked": 21
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-none-measured-0.json",
+        "sha256": "5112274d9438bfb236c516a87ead5a4b179f70e50afc3654e4d390c8c87b0b93"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-none-measured-0.json",
+        "sha256": "752ecd55533293c894190b3f70e560767eeed2364e73591375f3c592fbbfbad0"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-legacy_ttg_thread-measured-0/artifacts.json",
+        "sha256": "3660ab18ca5f58dc2a430b13fbf342ff3a4ab2216bded3808c130721a58bbcab",
+        "files_checked": 21
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-legacy_ttg_thread-measured-0.json",
+        "sha256": "895536328f58de8cb23042336e4448b2882f3fe67310497aa8da26b75e16a111"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-legacy_ttg_thread-measured-0.json",
+        "sha256": "bdfceba9725aa354a7e5f124ceefb2c5e67e282ed7694457fa64e02fb39bb113"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-continuation_always_thread-measured-1/artifacts.json",
+        "sha256": "3a82df880d0167e1c3bac43ecab9b575bce19d8abdda3b9a7f7ac41b00059407",
+        "files_checked": 21
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-continuation_always_thread-measured-1.json",
+        "sha256": "a02386b84f5ec12eb1e57068de376ad1b07deb149b4a773b8d1041e8ad520527"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-continuation_always_thread-measured-1.json",
+        "sha256": "0f3a55e5b97c9df23054fc8e421dd0500a186db51af53a8b5bdb8b66ff91790d"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-legacy_ttg_thread-measured-1/artifacts.json",
+        "sha256": "dd8556b149e553af39904744ad55146a9e677aac5bfad5ee8f35065609ffaf7a",
+        "files_checked": 21
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-legacy_ttg_thread-measured-1.json",
+        "sha256": "60a7349ade2c1402eb5c046bffaceb9cd9acd6d02a7879504139f2e8086f2361"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-legacy_ttg_thread-measured-1.json",
+        "sha256": "e2c4c394b2230c1c2b4bce6297e60c0795b5baa86ab5658848a95e340b3c8f58"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-none-measured-1/artifacts.json",
+        "sha256": "ee0496c2f4fac3049e52bf84b9635c9618eb486ff5b1e5615e49eade9ef51611",
+        "files_checked": 21
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-none-measured-1.json",
+        "sha256": "96b713ae55ac7de63093be9f1b7651681eb8b600d566f272837878ac421d8dd3"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-none-measured-1.json",
+        "sha256": "d3e602678f055beb9071c1b3a773a8d6cc0bc6efe79a1861373bd53f448c24e1"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-continuation_expected_benefit_process-measured-1/artifacts.json",
+        "sha256": "92359466a140aacd12209e489ec725667fd210f38e83f90875fc0577cd524502",
+        "files_checked": 29
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-continuation_expected_benefit_process-measured-1.json",
+        "sha256": "cd0520580d0c8431d574e1a7584bd67ac0a3303f8b69bc998c917b9ad4baaf5b"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-continuation_expected_benefit_process-measured-1.json",
+        "sha256": "83dc87daf4d4f8224723b82b554d926409f0ca1aed28473432153e1ded4731a1"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-continuation_expected_benefit_thread-measured-1/artifacts.json",
+        "sha256": "804ba24def81b25ffd41bce3c6167d5e76316cec66db3fa28e10c5d8824c0630",
+        "files_checked": 21
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-continuation_expected_benefit_thread-measured-1.json",
+        "sha256": "919e9d7a6ee6184b7901340c6f6bd6c467a2e29a253aa1fbcda47b41747b5bf5"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-continuation_expected_benefit_thread-measured-1.json",
+        "sha256": "a7c352489275fed351b1241109a9987a0da93a15414ae58c5523e75246a30dc2"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-continuation_always_process-measured-1/artifacts.json",
+        "sha256": "9fdf21d39222964aaffcb7a6de16de8ae4757c9fce2e8635c6729c92fa4d2eb4",
+        "files_checked": 43
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-continuation_always_process-measured-1.json",
+        "sha256": "e93be0aa14efaa9623bdb83797854b9fec6e98f59fc909bfee154812e129abf3"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-continuation_always_process-measured-1.json",
+        "sha256": "6efbbe1e4f1f7ba8715da053f314bd485bd6ca5df6dbf62ddd35a5bb627b43d7"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-continuation_expected_benefit_thread-measured-2/artifacts.json",
+        "sha256": "90e52f6147f6e37027177dc69351941decea7542cce681b8702ee2793e79e6be",
+        "files_checked": 21
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-continuation_expected_benefit_thread-measured-2.json",
+        "sha256": "e4e2691897b7ac5d0196d86e6aaaa224edb73c507af2e44c9a513495a6713bdf"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-continuation_expected_benefit_thread-measured-2.json",
+        "sha256": "481c1b1e0ccddaa26830a30f8ac5852158f7d1adf8b78210b27a1fcb465de109"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-continuation_expected_benefit_process-measured-2/artifacts.json",
+        "sha256": "87e911e97d2b0f72801f25d70064e5a530e00e424a44c8b7e1639c41d1fda987",
+        "files_checked": 29
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-continuation_expected_benefit_process-measured-2.json",
+        "sha256": "33a08dcf25f359fef066021fdc39479652d1baec2d9085a7e99f92a302bb0380"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-continuation_expected_benefit_process-measured-2.json",
+        "sha256": "dd4a339f1ad8f154a1f8344edcf45892b18ba5ff9a37b054982a858643391dc8"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-none-measured-2/artifacts.json",
+        "sha256": "ea1d6526281b88dba52f08c6e5ec1060be1e3485367e41de7618accfbd0dbd0f",
+        "files_checked": 21
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-none-measured-2.json",
+        "sha256": "5045917dfd7193a67ab4477cba59c9646c6103fc449815b1ddf8f7da2510e12a"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-none-measured-2.json",
+        "sha256": "7a121562232d6ef2f88266062f468de88f73ef7ae7bead5aaf86d0165cd06630"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-legacy_ttg_thread-measured-2/artifacts.json",
+        "sha256": "8c6fe2a4ef2343b98486b45db7f91c4ddfd43860fb685d51bd803e59c3cbe0d9",
+        "files_checked": 21
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-legacy_ttg_thread-measured-2.json",
+        "sha256": "0424f8f21f0b8ba84e8bc4c9bd148bffa99ec8fddf60bfd69d7e520f9f64665e"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-legacy_ttg_thread-measured-2.json",
+        "sha256": "bd03994cb77e4c55623e8a28248a111a4062c0705b1fdb9fb93e9bc7425a0ada"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-continuation_always_thread-measured-2/artifacts.json",
+        "sha256": "ad1445f1a3d7e0358541faf3891b4d39555f811dab21b1a14159575241a4e0e0",
+        "files_checked": 21
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-continuation_always_thread-measured-2.json",
+        "sha256": "5a9667fe6bcca880286bfd5f1ef1e469ad320cbc56e8f104ffc8a7138f1772dc"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-continuation_always_thread-measured-2.json",
+        "sha256": "c60685e3d8c3b50110ac1f3e76fc631d461e269e0ab92895b1b75501dd670bcc"
+      }
+    },
+    {
+      "raw_seal": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/issue_desk-continuation_always_process-measured-2/artifacts.json",
+        "sha256": "b43aa7e2e80a21715441393e63ee0f5d17027a53e4862dc45a0ac2601d7f96fe",
+        "files_checked": 43
+      },
+      "metrics": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/metrics/issue_desk-continuation_always_process-measured-2.json",
+        "sha256": "ae08962bba0151412cd027c78fceff2165dc6f1404f58be1d42e794c636cb0c9"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1/cleanup-acceptance/issue_desk-continuation_always_process-measured-2.json",
+        "sha256": "d7a07f6608ee3653cebc215397b7d6acb6d6aad542008634a79bd01c215050e1"
+      }
+    }
+  ],
+  "primary_phase": "workflow",
+  "steady_reads_are_independent_repeats": false,
+  "dispersion": "n3; min/max and inclusive linear quartiles, no confidence interval claim",
+  "definition": "Actual PgWire send-to-Z protocol completion wall, includes row decoding/client progress; SQL dispatches/control/data retained",
+  "app_HTTP_e2e": "Instrumented auxiliary raw only; no clean e2e dataset",
+  "CPU": "Not measured; no CPU-cause claim"
+}

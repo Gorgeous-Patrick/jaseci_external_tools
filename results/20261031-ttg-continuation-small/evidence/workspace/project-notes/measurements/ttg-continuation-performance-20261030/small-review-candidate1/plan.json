@@ -1,0 +1,474 @@
+{
+  "case_ids": [
+    "apps/littlex",
+    "apps/issue_desk"
+  ],
+  "configurations": [
+    {
+      "id": "none",
+      "policy": "none",
+      "executor": "none",
+      "run": {
+        "topology_index": true,
+        "prefetch_limit": 256,
+        "prefetch_workers": 1,
+        "cross_root_resolve": true,
+        "prefetching": "none",
+        "ttg_prefetch_model": "always",
+        "async_prefetch": "thread"
+      },
+      "effective_config_sha256": "932fa15f306832abe5d391bd98881f61e953fe8a16ccf852ae6839164cf87f1e"
+    },
+    {
+      "id": "legacy_ttg_thread",
+      "policy": "legacy_ttg",
+      "executor": "thread",
+      "run": {
+        "topology_index": true,
+        "prefetch_limit": 256,
+        "prefetch_workers": 1,
+        "cross_root_resolve": true,
+        "prefetching": "ttg",
+        "ttg_prefetch_model": "always",
+        "async_prefetch": "thread"
+      },
+      "effective_config_sha256": "135ea707dee68e72d4a4e4cc504790fe6f0a38442096186cfea176962e6c27f6"
+    },
+    {
+      "id": "continuation_always_thread",
+      "policy": "continuation_always",
+      "executor": "thread",
+      "run": {
+        "topology_index": true,
+        "prefetch_limit": 256,
+        "prefetch_workers": 1,
+        "cross_root_resolve": true,
+        "prefetching": "ttg_dependency",
+        "ttg_prefetch_model": "always",
+        "async_prefetch": "thread"
+      },
+      "effective_config_sha256": "eb14268df25bd10a381d26a89f200d753c5af1826b91a8db92ebbd7491e2f071"
+    },
+    {
+      "id": "continuation_always_process",
+      "policy": "continuation_always",
+      "executor": "process",
+      "run": {
+        "topology_index": true,
+        "prefetch_limit": 256,
+        "prefetch_workers": 1,
+        "cross_root_resolve": true,
+        "prefetching": "ttg_dependency",
+        "ttg_prefetch_model": "always",
+        "async_prefetch": "process"
+      },
+      "effective_config_sha256": "e16076004d1ab525d907746623a51548bfdc7a8eef1c31984efd59513c5cd5f7"
+    },
+    {
+      "id": "continuation_expected_benefit_thread",
+      "policy": "continuation_expected_benefit",
+      "executor": "thread",
+      "run": {
+        "topology_index": true,
+        "prefetch_limit": 256,
+        "prefetch_workers": 1,
+        "cross_root_resolve": true,
+        "prefetching": "ttg_dependency",
+        "ttg_prefetch_model": "expected_benefit",
+        "async_prefetch": "thread"
+      },
+      "effective_config_sha256": "5589c5045b2c00635ebcc9a4a129731ce21cb684e679a852c79edad46976eb0f"
+    },
+    {
+      "id": "continuation_expected_benefit_process",
+      "policy": "continuation_expected_benefit",
+      "executor": "process",
+      "run": {
+        "topology_index": true,
+        "prefetch_limit": 256,
+        "prefetch_workers": 1,
+        "cross_root_resolve": true,
+        "prefetching": "ttg_dependency",
+        "ttg_prefetch_model": "expected_benefit",
+        "async_prefetch": "process"
+      },
+      "effective_config_sha256": "edb8ae2b2540a03c81967f04feb98606efb7a393889df0390cdf6e6bceff468b"
+    }
+  ],
+  "measured_repeats": 3,
+  "excluded_warmups": 1,
+  "seeds": [
+    42
+  ],
+  "schedule": [
+    {
+      "app": "littlex",
+      "config_id": "none",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "littlex-none-excluded_warmup--1"
+    },
+    {
+      "app": "littlex",
+      "config_id": "legacy_ttg_thread",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "littlex-legacy_ttg_thread-excluded_warmup--1"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_thread",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "littlex-continuation_always_thread-excluded_warmup--1"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_process",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "littlex-continuation_always_process-excluded_warmup--1"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_thread",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "littlex-continuation_expected_benefit_thread-excluded_warmup--1"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_process",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "littlex-continuation_expected_benefit_process-excluded_warmup--1"
+    },
+    {
+      "app": "littlex",
+      "config_id": "none",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "littlex-none-measured-0"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_process",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "littlex-continuation_expected_benefit_process-measured-0"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_thread",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "littlex-continuation_expected_benefit_thread-measured-0"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_process",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "littlex-continuation_always_process-measured-0"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_thread",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "littlex-continuation_always_thread-measured-0"
+    },
+    {
+      "app": "littlex",
+      "config_id": "legacy_ttg_thread",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "littlex-legacy_ttg_thread-measured-0"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_thread",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "littlex-continuation_always_thread-measured-1"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_process",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "littlex-continuation_always_process-measured-1"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_thread",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "littlex-continuation_expected_benefit_thread-measured-1"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_process",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "littlex-continuation_expected_benefit_process-measured-1"
+    },
+    {
+      "app": "littlex",
+      "config_id": "none",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "littlex-none-measured-1"
+    },
+    {
+      "app": "littlex",
+      "config_id": "legacy_ttg_thread",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "littlex-legacy_ttg_thread-measured-1"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_thread",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "littlex-continuation_always_thread-measured-2"
+    },
+    {
+      "app": "littlex",
+      "config_id": "legacy_ttg_thread",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "littlex-legacy_ttg_thread-measured-2"
+    },
+    {
+      "app": "littlex",
+      "config_id": "none",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "littlex-none-measured-2"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_process",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "littlex-continuation_expected_benefit_process-measured-2"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_expected_benefit_thread",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "littlex-continuation_expected_benefit_thread-measured-2"
+    },
+    {
+      "app": "littlex",
+      "config_id": "continuation_always_process",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "littlex-continuation_always_process-measured-2"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "none",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "issue_desk-none-excluded_warmup--1"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_process",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "issue_desk-continuation_expected_benefit_process-excluded_warmup--1"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_thread",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "issue_desk-continuation_expected_benefit_thread-excluded_warmup--1"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_process",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "issue_desk-continuation_always_process-excluded_warmup--1"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_thread",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "issue_desk-continuation_always_thread-excluded_warmup--1"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "legacy_ttg_thread",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "issue_desk-legacy_ttg_thread-excluded_warmup--1"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_thread",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "issue_desk-continuation_always_thread-measured-0"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_process",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "issue_desk-continuation_always_process-measured-0"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_thread",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "issue_desk-continuation_expected_benefit_thread-measured-0"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_process",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "issue_desk-continuation_expected_benefit_process-measured-0"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "none",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "issue_desk-none-measured-0"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "legacy_ttg_thread",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "issue_desk-legacy_ttg_thread-measured-0"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_thread",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "issue_desk-continuation_always_thread-measured-1"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "legacy_ttg_thread",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "issue_desk-legacy_ttg_thread-measured-1"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "none",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "issue_desk-none-measured-1"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_process",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "issue_desk-continuation_expected_benefit_process-measured-1"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_thread",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "issue_desk-continuation_expected_benefit_thread-measured-1"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_process",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "issue_desk-continuation_always_process-measured-1"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_thread",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "issue_desk-continuation_expected_benefit_thread-measured-2"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_expected_benefit_process",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "issue_desk-continuation_expected_benefit_process-measured-2"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "none",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "issue_desk-none-measured-2"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "legacy_ttg_thread",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "issue_desk-legacy_ttg_thread-measured-2"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_thread",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "issue_desk-continuation_always_thread-measured-2"
+    },
+    {
+      "app": "issue_desk",
+      "config_id": "continuation_always_process",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "issue_desk-continuation_always_process-measured-2"
+    }
+  ],
+  "quiet_window_confirmed": false,
+  "startup_ipc_accounting": "included_and_separate",
+  "cache_regime": "Fresh equivalent DB each workflow; deterministic seed/setup warms PG+OS; no cache-flush claim",
+  "model_regime": "Fresh process-local profile per independent workflow trial; natural learning within ordered workflow; excluded warmup has separate state and is not transferred",
+  "expected_benefit_defaults": {
+    "min_samples": 3,
+    "margin_ms": 0.0,
+    "unused_weight": 1.0,
+    "cold_start_prefetch": true,
+    "probe_every": 20
+  },
+  "lifecycle": "Unchanged accepted30 evaluator: fresh sessions, source-defined workflow/steady warmup/steady read/final restart",
+  "primary_phase": "workflow",
+  "steady_reads_are_replicates": false,
+  "clean_e2e_cases": 0,
+  "complete_180_preflight": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/apps-preflight-866222-v2/index.json",
+    "sha256": "c14af5d6737cb55196ddf3c7df9ff3bb2d329f2c7877ecf9db0c7c1701c33435"
+  },
+  "preflight_complete": false,
+  "source_suite_manifest": {
+    "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/snapshot.json",
+    "sha256": "ef180e4e3548780779ca6e894a9a3c564d81dbace299ede6c25710ae6456aea7"
+  },
+  "trial_databases": 48,
+  "warmup_workflows": 12,
+  "measured_workflows": 36,
+  "timing_logging": "off",
+  "partial_scope": "Only LittleX+IssueDesk, all6 policies; full91 remains future work",
+  "numerical_export": "small_export_v1.py; n3 independent workflows/cell; sums and union separate, controls retained",
+  "storage": "48raw cases approximately150-250MB plus one owned cluster; stop below3GiB; preserve failures",
+  "planned_output": "/home/baichuan/jaseci/project-notes/measurements/ttg-continuation-performance-20261030/small-formal-v1",
+  "planned_cluster": "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/pg-small-formal-v1"
+}
