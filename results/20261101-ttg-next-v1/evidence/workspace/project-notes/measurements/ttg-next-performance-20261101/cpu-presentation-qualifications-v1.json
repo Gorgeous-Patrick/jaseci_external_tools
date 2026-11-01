@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "raw_summary": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-performance-20261101/cpu-summary-v1.json",
+    "sha256": "db5c8aeb9edf397058f6faa7200977ba5a9da06ddc0b7a56a4996b3b91c5bc0a"
+  },
+  "review": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-review-20261101/cpu-summary-v1-review.json",
+    "sha256": "97929e630b31b71d51f2bd1274fb8bfc0a0aa78c3035548fff4a561f01272bc0"
+  },
+  "corrections": [
+    {
+      "raw_wording": "whole emitted module bundle",
+      "accepted_wording": "selected walker template bundle (plan.sql_templates)",
+      "reason": "runtime_blocks selects one walker plan, then hydrates its bundle; all-walker module generation cost is a separate compiler measurement."
+    },
+    {
+      "raw_wording": "100calls/block,3 repeated blocks",
+      "accepted_wording": "Runtime construction100calls/block; compiler1 actual compile/sample. Both have3 samples per regime.",
+      "reason": "Compiler calls block with default n1; runtime uses args.iterations100."
+    },
+    {
+      "raw_wording": "LittleX batch construction",
+      "accepted_wording": "Declared compiler-emitted collect events4/5 construction microbenchmark; not selected in primary9282 load_feed, which uses root linear only.",
+      "reason": "Exact primary SQL and compact outcomes/source limiter reviewed separately."
+    }
+  ],
+  "numeric_changes": false,
+  "raw_results_unchanged": true,
+  "no_rerun_required": true
+}

@@ -1,0 +1,34 @@
+{
+  "status": "bounded offline PASS; no DB execution or performance conclusion",
+  "sources": {
+    "reproduction/ttg-next-sql-research/variants.py": "cfe6003a9a2dd814c2aa67b2f70ee2eedb9c7e20c381e9c57ee9a345b41d1360",
+    "reproduction/ttg-next-sql-research/lab.py": "dd77301254dc2a1090e5599b593089fbe68107750ba0418b0d5b57aabd062166",
+    "jac-ttg/jac/jaclang/data/impl/store.impl.jac": "a42598ada8e84226766d3881b29914dcd5b763be6010be9bdf58f5d4311de165"
+  },
+  "capture_transform_checks": [
+    {
+      "target": "fused-batch",
+      "capture_sha256": "432bb223b0e4cff71b719a264059bf2bdda14be1a558367f28d0394c0d288814",
+      "matches": 6,
+      "transformed_sha256": "a2d94dc4a873887959618ce822c0c7dcdf085b67d2d6ca342e77e9a95c01089a",
+      "only_matched_substrings_changed": true
+    },
+    {
+      "target": "fused-root",
+      "capture_sha256": "13fb819a8ba29ba108402cd96256fc1f38637a14d719f2d3596eeb553f24aaa9",
+      "matches": 4,
+      "transformed_sha256": "9e76e20085e22089852212767c619b7525062ab95b9d881e390a8f0c63cd12fa",
+      "only_matched_substrings_changed": true
+    }
+  ],
+  "tiny_sqlite_filter_equivalence_cases": 24,
+  "scope": "Exact positive WHERE/OR type membership predicates in two reviewed captures; original type fields/catalog columns are NOT NULL. NULL and duplicate catalog rows additionally tested as filter outcomes, not expression-value identity.",
+  "source_findings": [],
+  "lab_read_conclusion": "Exact original Bind byte re-encoding check, complete captured anchor and graph_types restoration check, ordered result equality before each plan, one serializable read-only transaction per statistics regime, 3 excluded+9 measured repetitions per variant with AB/BA rotation. Baseline DDL extraction selects anchors+graph_types and six anchors indexes; omitted unrelated identity tables are not referenced by these statements.",
+  "limits": [
+    "Original SQL and transformed SQL use the same named parameter values but transformed SQL removes SELECT-constant-only parameters and therefore need not have the same positional Bind packet shape.",
+    "EXISTS may be false while IN is NULL for nullable values; equality is asserted for these positive filtering contexts, not arbitrary negation or projected expression values.",
+    "All samples are warmed diagnostic EXPLAIN, not primary workflow timing or database prepared-plan reuse evidence.",
+    "Actual PG ordered-result and plan evidence remains pending the authorized isolated DB window."
+  ]
+}

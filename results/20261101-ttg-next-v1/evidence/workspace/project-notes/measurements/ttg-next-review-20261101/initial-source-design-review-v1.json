@@ -1,0 +1,97 @@
+{
+  "status": "initial source/design observations; new implementation not reviewed",
+  "baseline_commit": "85026d486de8e16d4b894aa5a5664c7873893e89",
+  "source_refs": {
+    "jac-ttg/jac/jaclang/runtime/osp_kernel.jac": {
+      "sha256": "afbca7ea714b17e4dc243986bec1b5206cb0d5cddfa1876f891f9aaa461c6b2b",
+      "equals_published_baseline": true
+    },
+    "jac-ttg/jac/jaclang/runtime/ttg_continuation.jac": {
+      "sha256": "3faceb9ab7f0224d732bc240dd601401a985b816ee0adf0a1feae1327cccea2b",
+      "equals_published_baseline": true
+    },
+    "jac-ttg/jac/jaclang/runtime/ttg_fusion.jac": {
+      "sha256": "21a69e74b8d9d0492efb10ca7d6ddd87e6f3f2e6c2667ccaed70be04d65f5f6d",
+      "equals_published_baseline": true
+    },
+    "jac-ttg/jac/jaclang/runtime/ttg_fusion_sql.jac": {
+      "sha256": "4a20d2785b715f0be95033420168a475494f4a5508a96a1a2f4119bb0dfacd3a",
+      "equals_published_baseline": true
+    },
+    "jac-ttg/jac/jaclang/runtime/ttg_dependency_prefetch.jac": {
+      "sha256": "861de4f4d0c532d0917d25839fa99254424678f32759491a8b8f226090526a04",
+      "equals_published_baseline": true
+    },
+    "jac-ttg/jac/jaclang/runtime/ttg_dependencies.jac": {
+      "sha256": "8d25bd0e02dbb00422fe64083d8dd08b6bfba9a093f9ddc2543cb5bdb0a094d3",
+      "equals_published_baseline": true
+    },
+    "jac-ttg/jac/jaclang/runtime/ttg_checkpoints.jac": {
+      "sha256": "bcc4abd205df074adb74da4183af9fa0295265722a7c388f62aa5c5536a606f5",
+      "equals_published_baseline": true
+    },
+    "jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac": {
+      "sha256": "0093a9b4d18ace0814d205e68f24ee3a67cfb34eda438b6500d68e2e3b6561f9",
+      "equals_published_baseline": true
+    },
+    "jac-ttg/jac/jaclang/compiler/backends/py/impl/jcir_gen_pass.impl.jac": {
+      "sha256": "efe40d302f09e59e6d653d813e318d36d290b9284480804a3c48d99a4a536243",
+      "equals_published_baseline": true
+    },
+    "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/issue_desk/server.jac": {
+      "sha256": "74ac636a0832e616302eaba0b67f4c563003f55192ed25e6326444d1fa85300a"
+    },
+    "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/knowledge_map/server.jac": {
+      "sha256": "a5aca633b659617cbb8156580eb08be9523e65be31af80d0f0d22a89ab80ca2c"
+    },
+    "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/additional_scenarios.py": {
+      "sha256": "dc3184c70e2858d85f67afd714dc5ab66ee397d0e1a98476aaa789f772db367b"
+    },
+    "reproduction/ttg-app-performance/suite-final-20261030-v1/originals/jdrive/server.jac": {
+      "sha256": "10a7f455d7ad63c44a05e7b3667d76f017f717968e6a89bae76cdcccd5859942"
+    },
+    "reproduction/ttg-app-performance/suite-final-20261030-v1/originals/jdrive/server.impl.jac": {
+      "sha256": "0ffa9c18875036ed0eeabd40e59d94c076db7ea36601ed405be36477c2dac731"
+    }
+  },
+  "authorized_assumption": "Already queued nodes trigger for prefetch; early disengage may overfetch; native execution remains unchanged",
+  "baseline_observations": [
+    {
+      "source": "runtime/ttg_continuation.jac:193,254,413",
+      "observation": "Pending is FIFO; new targets append after pending; self scalar state carries across activations, ability-local values reset; payload demand IDs deduplicate independently of queue execution."
+    },
+    {
+      "source": "runtime/ttg_fusion.jac:71",
+      "observation": "Current certification declines recursive linear expansion for any nonempty pending queue. This is the boundary being extended, not a finding against an unreviewed patch."
+    },
+    {
+      "source": "runtime/ttg_fusion.jac:202; data/impl/query_planner.impl.jac:278,888,895",
+      "observation": "Runtime builds fused SQL; native cache lookup compiles before cache check; publishing typed/native keys compiles twice per path. Compiler templates must cover selected cache publication/consumer paths if the no-runtime-build claim includes them."
+    },
+    {
+      "source": "compiler/backends/py/impl/jcir_gen_pass.impl.jac:3138; runtime/ttg_dependencies.jac:1119",
+      "observation": "Compile-time checkpoint serialization currently imports runtime dependency analysis and emits event graph only. New SQL template emission should keep compiler building separate from runtime selection/binding."
+    }
+  ],
+  "targeted_state_example": {
+    "pending": [
+      "B",
+      "C"
+    ],
+    "initial_self_i": 0,
+    "entry_semantics": "self.i += 1; visit X if self.i == 1 else Y",
+    "expected_demands": [
+      "B->X",
+      "C->Y"
+    ],
+    "failure_to_guard_against": "Binding both queued origins from identical initial scalar state incorrectly selects C->X; this is a targeted design regression, not a demonstrated new-source bug."
+  },
+  "coverage_reads": {
+    "issue_desk": "ProjectBoard.project enqueues HasEngineer then HasIssue; issue helper queries assignments/incoming blockers/comments. Existing mutators test dependencies/status. No inference that opaque helper calls are optimized.",
+    "knowledge_map": "KnowledgeBoard reads topics/links/backlinks/revisions inside dict/list append. ExploreLinks has a seen set and outgoing LinksTo visit. Existing scenario creates a two-article cycle, repeated link, invalid self-link and revision/publication state checks.",
+    "jdrive": "VisibleFolderTree propagates depths/paths via dictionaries, appends typed FolderTreeEntry, loops over Contains Folder with trashed==False, then visits same filtered path; deferred exit sorts/reports. This body has no seen-set or explicit permission branch."
+  },
+  "coverage_status": "Perf proposal pending; aim five distinct existing applications including original LL/LittleX plus three justified representatives, not a favorable-result subset. No new apps/full corpus rerun.",
+  "coordination": "Concrete AST/cache sites and scalar/FIFO witness sent to P6; source-backed candidate coverage and correction of JDrive shorthand sent to perf.",
+  "execution": "No DB/services/app execution/tests/installs/commits/push; only small source reads and hashes. Prior publication artifacts unchanged."
+}

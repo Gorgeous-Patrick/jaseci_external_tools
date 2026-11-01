@@ -1,0 +1,524 @@
+TTG+
+Construction savings are clear; DB results depend on the workload and eligible region.
+
+
+  Five existing applications · six fixed fixtures · all 18 cells with n = 3
+
+  LinkedList removes per-hop SQL versus Off; both TTG+ versions use16 per Traverse.
+
+  New versus850: workflow medians vary; LittleX, IssueDesk and KnowledgeMap remain slower than
+  Off.
+  Construction microbench: ~1.5 1.8ms AST ~4.7 7.0µs warm select/bind CPU.
+
+  One bound seed/demand origin per template query; four-origin batching is a separate native test.
+
+
+
+TTG+ | 85026d 9282e246 | primary n = 3 fresh workflows | seed 42                                     1
+Research problem: repeated runtime work
+Graph traversal interleaves path discovery, payload loading and application state.
+
+
+  Native visit requests the next ordered graph path, then materializes its target payloads.
+
+  Repeated hops can repeat SQL dispatches; runtime SQL AST construction adds client CPU work.
+
+  Future graph accesses depend on program position, guards, carried state and the pending FIFO
+  queue.
+  TTG+ combines queued continuation analysis, batched path SQL and compiler-emitted typed
+  templates.
+
+
+
+TTG+ | 85026d 9282e246 | primary n = 3 fresh workflows | seed 42                                 2
+At B: continue the known FIFO queue and carry state
+A has already queued B, C, D, E. Hook B observes self.i=0 and pending=[C,D,E].
+
+
+                                                           A                           can branch with FrontierBranch entry {
+                                                                                       self.i += 1;
+                                                                                       if self.i == 1 {
+                                                                                       visit [->:FrontierLeft:->
+                  B                        C                            D         E    [?:FrontierLeaf]];
+                 i=1                      i=2                          i=3       i=4   } else {
+                                                                                       visit [->:FrontierRight:->
+                                                                                       [?:FrontierLeaf]];
+          Left                       Right                         Right     Right     }
+                                                                                       }
+
+                 1                         12                          22        32
+
+
+
+  Prediction carries scalar state in FIFO order; native abilities and the native queue retain their execution order.
+  Graph uses short node names; code uses FrontierWalk native syntax. Reports [1,12,22,32] and final i = 4 match.
+
+TTG+ | 85026d 9282e246 | separate accepted native mechanism test                                                                3
+Compile once: emit SQL, then hydrate/select/bind
+SQL AST generation moves into the actual Jac compiler emitter for covered emitted regions.
+
+
+
+
+          Jac emitter                                Serialized SQL + fixed       Graph load                 Hook select region
+   compile_templates(events)                                 params           hydrate descriptors              bind typed values
+                                                     + typed runtime slots
+
+
+
+
+  Runtime slots: origins per site, actor UUID/text, row limit; linear regions also bind source type/module and depth.
+
+  Bound SQL unchanged PgWire boundary ordered per-origin path cache + merged process payload loading.
+  Covered primary paths report template_queries > 0 / legacy_fusion_calls = 0. Ordinary fallback still constructs its own queries.
+TTG+ | 85026d 9282e246 | primary n = 3 fresh workflows | seed 42                                                                     4
+One emitted template, many runtime origins
+Simplified SQL shape; actual SQL and exact fingerprints are retained in the sealed evidence.
+
+
+  SELECT slot, origin_order, target_id, arity
+  FROM unnest(:origins_1::uuid[]) WITH ORDINALITY AS seed
+  LEFT JOIN LATERAL (native ordered Post   Tweet path) ON TRUE
+  UNION ALL
+  SELECT ... FROM unnest(:origins_2::uuid[]) ...
+  ORDER BY slot, depth, ord
+  LIMIT :row_limit;
+
+
+
+
+  Linear form uses a recursive origin_id/depth CTE, continuing only while actual arity == 1 and type/module
+  match.
+  The analyzer supplies permitted program transitions; SQL checks graph cardinality. Ordered and empty results seed
+  native path cache.
+  9282 also changes the emitted type-membership predicate to uncorrelated IN. This is a version/package comparison.
+TTG+ | 85026d 9282e246 | primary n = 3 fresh workflows | seed 42                                                      5
+Four-origin capability and the disengage assumption
+Prediction assumes queued nodes trigger; native execution and cancellation remain authoritative.
+
+
+
+
+ Accepted native case                            Baseline                Next                      Native result
+
+ Four-origin FrontierWalk                        8 submitted             8 submitted               B,C,D,E; i=4
+                                                 8 promoted              8 promoted                reports1,12,22,32
+
+ FrontierCancel                                  5 submitted             7 submitted               entered[0,1]
+                                                 5 promoted / 0 unused   5 promoted / 2 unused     reports[] unchanged
+
+
+
+  The cancelled case demonstrates two extra predicted descendant payloads in this identity-bound fixture.
+  Queued parent endpoints were already demanded by native visit evaluation. Ability entry and payload demand are
+  distinct.
+
+TTG+ | 85026d 9282e246 | accepted native functional integration                                                          6
+Why these existing applications
+The selection was fixed before timing; unsupported and slower cells are retained.
+
+
+
+ Application                                        Native behavior and exercised oracle
+
+ LinkedList32 /1000                                 Traverse + Sum + Find(head/middle/tail/missing); exact order/count/state
+
+ LittleX original                                   Feed / search / likes / follow / create; feed order, authorship, graph and restart
+
+ IssueDesk                                          Engineer then issue visits; assignees/blockers/comments; mutations + cycle rejection
+
+ KnowledgeMap                                       Shared-topic graph, a b links and explicit seen guard; publish/review/revise + denials
+
+ JDrive                                             Folder depth/path dictionaries and trashed predicate; tree/trash/mkdir/persistence
+
+
+
+  Existing accepted Seed 42 fixtures, original native workflows and independent correctness oracles.
+
+TTG+ | 85026d 9282e246 | primary n = 3 fresh workflows | seed 42                                                                             7
+Complete fixed selection: DB protocol time
+Whole-workflow median and [min, max] ms; all counts are fresh workflows, n = 3 per cell.
+
+
+ Fixture                                        Off (9282)             TTG+ 85026d                     TTG+ 9282
+ LinkedList · 32                                115.081                94.461                          94.371
+                                                [113.695, 119.006]     [94.299, 96.609]                [93.375, 94.836]
+ LinkedList · 1,000                             3337.873               2360.957                        2310.506
+                                                [3147.031, 3387.414]   [2356.131, 2374.843]            [2250.325, 2311.392]
+ LittleX                                        42.578                 55.479                          53.566
+                                                [38.132, 43.135]       [54.380, 56.864]                [51.473, 54.371]
+ IssueDesk                                      139.440                154.267                         159.419
+                                                [138.211, 142.840]     [152.613, 157.884]              [157.615, 163.092]
+ KnowledgeMap                                   72.712                 78.997                          79.167
+                                                [71.422, 73.791]       [76.774, 84.614]                [79.033, 79.360]
+ JDrive                                         48.053                 46.784                          46.648
+                                                [45.434, 48.143]       [46.523, 47.214]                [45.128, 46.885]
+
+
+  All 72 observed protocol sums equal interval unions. Timing includes actual data and transaction-control SQL.
+TTG+ | 85026d 9282e246 | primary n = 3 fresh workflows | seed 42                                                              8
+All SQL is counted: data + control = TOTAL
+Whole workflow; every count is identical across its three measured repeats.
+
+
+
+ Fixture                                        Off                  85026d                            9282
+ LinkedList · 32                                318 + 42 = 360       196 + 47 = 243                    196 + 47 = 243
+ LinkedList · 1,000                             9030 + 42 = 9072     5036 + 47 = 5083                  5036 + 47 = 5083
+ LittleX                                        90 + 63 = 153        78 + 69 = 147                     82 + 69 = 151
+ IssueDesk                                      368 + 189 = 557      368 + 193 = 561                   368 + 193 = 561
+ KnowledgeMap                                   186 + 112 = 298      186 + 115 = 301                   186 + 115 = 301
+ JDrive                                         107 + 49 = 156       107 + 49 = 156                    107 + 49 = 156
+
+
+  Foreground, child payload reads, path discovery, identity/catalog and transaction completion are retained.
+TTG+ | 85026d 9282e246 | primary n = 3 fresh workflows | seed 42                                                          9
+Native Traverse: SQL reduction is already present in850
+TOTAL includes path discovery, payload reads, identity/catalog and controls; all n = 3 counts constant.
+
+
+
+ Fixture /mode                                 Protocol ms median [range]   Path          Payload         Control      TOTAL
+
+ LinkedList · 32 /Off (9282)                   25.357 [23.573, 26.281]      32            35              7            76
+
+ LinkedList · 32 /TTG+ 85026d                  7.056 [6.985, 7.329]         1             5               8            16
+
+ LinkedList · 32 /TTG+ 9282                    7.246 [6.585, 7.841]         1             5               8            16
+
+ LinkedList · 1,000 /Off (9282)                733.271 [719.127, 751.061]   1000          1003            7            2012
+
+ LinkedList · 1,000 /TTG+ 85026d               31.639 [31.164, 68.167]      1             5               8            16
+
+ LinkedList · 1,000 /TTG+ 9282                 66.599 [31.942, 68.083]      1             5               8            16
+
+
+
+  Every row also has1 identity and 1 catalog query. Fused path counts 1; Off ordinary paths32/1000. Exact visited32/1000.
+TTG+ | 85026d 9282e246 | primary n = 3 fresh workflows | seed 42                                                               10
+LL1000: the recursive SQL interval carries the variation
+Same 1,000 returned rows /161,806 DataRow payload bytes; one recursive call per Traverse.
+
+
+                                    60
+                                                                                                       850:55.257 /18.580 /18.421 ms
+                                    50                                                                 9282:55.135 /53.809 /18.901 ms
+Single recursive call protocol ms
+
+
+
+
+                                    40
+
+                                    30
+                                                                                                       Payload 5 calls stay around 10.6 11.1
+                                    20
+                                                                                                       ms.
+                                    10
+                                                                                                       Both versions have slow and fast
+                                                                                                       samples.
+                                    0    55.26 / 18.58 / 18.42              55.14 / 53.81 / 18.90      Primary per-run plans/statistics
+                                                85026d                              9282
+                                                                                                       are unavailable.
+
+
+                     Workflow medians: 3,337.873 ms Off 2,360.957 ms (850) 2,310.506 ms (9282); Traverse medians differ in the opposite direction.
+
+TTG+ | 85026d 9282e246 | primary n = 3 fresh workflows | seed 42                                                                                 11
+Matched recursive SQL: accepted native recaptures
+Two full six-operation workflows; exact captured SQL/Bind/state and original 1,000-row completion.
+
+
+
+
+ Version                                          Planning ms: first /         Execution ms: first /   Root shared hits
+                                                  repeat                       repeat
+
+ TTG+ 85026d                                      1.190 / 0.669                52.716 / 49.895         20136
+
+ TTG+ 9282                                        0.695 / 0.578                63.194 / 62.847         20136
+
+
+
+  Serializable transactions; statistics rows = 0 and reltuples = 1. Census and EXPLAIN warm buffers.
+
+  Shared reads = 0; spills = 0; JIT absent. Root buffer counters are direct inclusive values.
+
+  Diagnostic EXPLAIN: first/repeat measurements, separate from the primary n = 3 protocol samples.
+TTG+ | 85026d 9282e246 | separate exact-Bind native recaptures; first/repeat                                              12
+Controlled ANALYZE changes the plan and execution cost
+Restored captured relevant state, original DDL/indexes/settings and exact Bind; same ordered 1,000-row result.
+
+
+
+ Version                            Statistics regime                       Planning ms first/repeat   Execution ms first/repeat   Shared hits
+
+ TTG+ 85026d                        Before ANALYZE                          0.611 / 0.601              47.970 / 48.328             20126
+
+
+ TTG+ 85026d                        After ANALYZE                           0.552 / 0.572              13.386 / 13.413             16126
+
+
+ TTG+ 9282                          Before ANALYZE                          0.632 / 0.593              49.923 / 49.434             20126
+
+
+ TTG+ 9282                          After ANALYZE                           0.533 / 0.530              13.721 / 13.382             16126
+
+  Before: reltuples = 1 for anchors/types. After: anchors = 2,005, graph_types = 4. Shared reads = 0.
+  Controlled restored fixtures establish statistics sensitivity. Primary per-run plans/statistics are unavailable.
+TTG+ | 85026d 9282e246 | controlled SQL-only before/after ANALYZE; first/repeat                                                                  13
+Why ANALYZE helps in the controlled fixture
+Measured operator change at two path-evaluation sites in the controlled restored fixture.
+
+
+
+
+                       Before: BitmapAnd                                                                 After: BitmapOr(src,dst)
+               kind-only index + BitmapOr(src,dst)                                                   kind-only bitmap work removed
+                  1,000 kind rows × 1,000 loops                                                      endpoint anchors_pkey remains
+                       at each of two sites                                                            shared hits 20,126 16,126
+
+
+
+
+  Execution falls from about 48 50 ms to 13.4 13.7 ms on both restored versions; JIT is absent in all 12 diagnostic
+  plans.
+  Controlled restored fixture: captured relevant columns, original defaults for unused columns, fresh heap, warm buffers.
+  Next work: explicit statistics regimes, cost admission and database prepared-statement reuse. Primary per-run statistics unavailable.
+TTG+ | 85026d 9282e246 | separate matched SQL-plan evidence; all original ordered results verified                                        14
+LittleX: four feed requests add four data calls in9282
+Each feed:850 has 2 fused queries;9282 has 1 fused root query +2 ordinary collect paths.
+
+
+
+ Whole workflow                                 Off                85026d                   9282
+
+ Protocol ms median                             42.578             55.479                   53.566
+
+ Data +control =TOTAL                           90 +63 =153        78 +69 =147              82 +69 =151
+
+ Per feed path discovery                        3 ordinary         1 root +1 batch          1 root +2 ordinary
+
+ Per feed payload reads                         6                  4                        4
+
+  The four extra calls are path discovery; payload reads remain four per feed. Native outputs, order and final graph
+  match.
+TTG+ | 85026d 9282e246 | primary n = 3 fresh workflows | seed 42                                                       15
+LittleX limiter: one frontier attempt per continuation invocation
+Source-backed interpretation, joined to compact counters, emitted event IDs and actual SQL sequence.
+
+
+  frontier_attempted = []                                                              Event 1: Root Profile
+  resolve(active, event):                                                              consumes the one attempt
+  if cached_path: return cached_path
+  if graph.sql_templates and not frontier_attempted:                                   Events 4/5: collect visits
+  frontier_attempted.append(True)                                                      ordinary fallback and reuse cache
+  resolve_frontier(...)
+  if path_missing: resolve_ttg_path(...)                                               Later hooks return reused paths
+                                                                                       before another frontier attempt
+
+
+
+
+  Recorded: template query 1, linear region 1, fallback resolver 2 and reached collect events 4/5; source-backed control
+  interpretation.
+  Gather 277 is a real tail barrier after both visits. It is insufficient to explain the missing current-ability batch.
+  Proposed, untested: retry distinct proven regions/activations with path reuse/dedup; preserve guard and native semantics.
+TTG+ | 85026d 9282e246 | primary n = 3 fresh workflows | seed 42                                                              16
+One bound seed/demand origin per template query
+Fixed application queries use one bound seed/demand origin; a separate native integration binds four.
+
+
+
+ Fixture                              Template SQL                 Bound seed/demand   Submitted            Promoted
+                                                                   origins
+
+ LinkedList · 32                      81                           81                  140                  140
+ LinkedList · 1,000                   2501                         2501                4496                 4496
+ LittleX                              6                            6                   63                   63
+ IssueDesk                            9                            9                   14                   14
+ KnowledgeMap                         4                            4                   9                    9
+ JDrive                               0                            0                   0                    0
+  One seed recursively covers 1,000 LinkedList steps. Cross-queued-origin demand width remains one in the fixed applications.
+  Workflow counts are constant across n = 3; submission/promotion totals sum native per-scope ID sets.
+TTG+ | 85026d 9282e246 | primary n = 3 fresh workflows | seed 42                                                                17
+Domain cases: reached barriers and controls remain visible
+Actual compact checkpoint counts bind reached source locations and outcomes.
+
+
+  Application                                                      Observed evidence                           Measured result
+
+                                                                   9 template queries;14
+  IssueDesk                                                        submitted/promoted                          561SQL vs557 Off
+                                                                   project:98, engineer:104, issue:109         159.419ms vs139.440ms
+                                                                   barriers reached
+
+
+                                                                   4 templates;9 submitted/promoted            301SQL vs298 Off
+  KnowledgeMap                                                     article:52 / article:171 and start:165      79.167ms vs72.712 ms
+                                                                   barriers
+
+
+  JDrive                                                           0 template queries /0 submissions           156SQL in all modes
+                                                                   walk:45 /walk:48 /run:41 barriers reached   46.648ms vs48.053ms Off
+
+  Mutations, nested spawns, cycles/private views and restart/persistence were retained in independent stored replay and
+  physical state checks.
+
+TTG+ | 85026d 9282e246 | primary n = 3 fresh workflows | seed 42                                                                         18
+Construction-only thread CPU: AST versus templates
+Construction microbenchmark: 100 calls/block × 3 blocks; 10 excluded AST/warm priming calls.
+
+
+
+ Module/shape                                    850 AST µs/call                  9282 cold hydrate µs   9282 warm select+bind
+                                                                                                         µs
+
+ LinkedList / linear                             1468.939                         52.568                 4.705
+                                                 [1463.568, 1546.886]             [51.907, 53.801]       [4.704, 4.737]
+
+ LittleX / collect batch                         1843.307                         125.383                7.033
+                                                 [1841.916, 1848.335]             [124.803, 127.044]     [7.026, 7.058]
+
+
+  AST build count: 100/block for dynamic construction; 0 for hydration/selection/binding. Same-thread clock controls
+  passed.
+  Cold hydration covers the selected walker bundle. Inputs bind actual emitted sites and fixture IDs with declared
+  common2048 limits.
+  Declared LittleX collect-batch microbenchmark; the primary 9282 feed uses root linear.
+TTG+ | 85026d 9282e246 | separate DB-free construction diagnostic; n = 3 blocks                                                  19
+Selection and binding are measured separately
+Runtime only: 100 calls/block × 3 blocks; compiler measurements use 1 compile/block.
+
+
+
+ Declared emitted shape                        Select µs/call               Bind µs/call                 Select +bind µs/call
+
+ LinkedList / linear                           0.309                        4.449                        4.705
+                                               [0.305, 0.329]               [4.408, 4.449]               [4.704, 4.737]
+
+ LittleX / collect batch                       0.217                        6.861                        7.033
+                                               [0.216, 0.221]               [6.776, 7.025]               [7.026, 7.058]
+
+
+
+  Separate select/bind counters use opt-in timers; unprofiled blocks retain native clocks disabled.
+
+  Cold selected-walker hydration is separate; copying/spec validation/artifact metadata stay outside measured blocks.
+  LL uses a covered linear shape. LittleX uses declared collect events 4/5; primary9282 selects only root linear.
+TTG+ | 85026d 9282e246 | separate same-thread CPU construction diagnostic                                                       20
+Compilation and artifact growth are part of the tradeoff
+First compiler calls include lazy initialization; full CPU vectors and controls are preserved.
+
+
+
+ Module                                         Same-program CPU ms      Generated Python bytes           Bytecode bytes
+                                                850 /9282
+
+ LinkedList module                              250.7 [250.5, 267.4]     45682 219988                     36136 90124
+                                                242.2 [241.9, 245.8]
+
+ LittleX module                                 548.6 [503.0, 1064.3]    217118 1499200                   122908 280609
+                                                537.7 [536.7, 1051.7]
+
+
+
+  Same-program runs follow one excluded compile; n = 3. First fresh-program CPU: LL 3.9/3.8s; LittleX 4.6/4.5s
+  (850/9282).
+  All fresh/same-program, wall/thread CPU, emitted SQL bytes and opt-in generation counters remain in the editable data.
+  Full compiler vectors retain initialization and dispersion; generated Python and bytecode artifacts are larger.
+TTG+ | 85026d 9282e246 | separate actual compiler/emitter diagnostic                                                       21
+SQL generation: measured cost and size
+Actual emitter generation timers; separate profiled and unprofiled controls.
+
+
+
+ Module                                 Generation calls                      Generation thread        SQL bytes   Bundle bytes
+                                                                              CPU ms
+
+ LinkedList module                      6                                     11.901                   42360       53709
+                                                                              [11.874, 12.477]
+
+ LittleX module                         24                                    33.893                   124565      156172
+                                                                              [33.357, 34.078]
+
+
+
+  Counts include all walker checkpoint emission in the compiled module; bundles include catalog, batch, linear and native
+  descriptors.
+  SQL generation occurs during compilation; emitted descriptors, generated Python and bytecode sizes are measured.
+
+
+TTG+ | 85026d 9282e246 | actual compiler generation instrumentation; n = 3 profiled compile controls                              22
+Real process readers; zero observed SQL interval overlap
+A child process existing is insufficient: actual PgWire calls and distinct backend PIDs are recorded.
+
+
+  LL1000 representative Traverse: foreground PID [2931381]; child PID [2931673].
+
+  14 foreground SQL +2 child SQL; actual separate PostgreSQL backends.
+
+  All 72 protocol sums equal interval unions; observed SQL overlap = 0.
+
+  Python 3.14 has the GIL enabled; actual child SQL executes on independent PostgreSQL backends.
+
+  Startup/readiness and IPC remain in the natural workflow; DB totals cover only their actual SQL calls.
+
+
+
+
+TTG+ | 85026d 9282e246 | primary n = 3 fresh workflows | seed 42                                           23
+Measurement and lifecycle
+Primary clock: driver/socket sendall to ReadyForQuery, including response/row-decoding progress.
+
+
+  Clock immediately before real sendall receipt of ReadyForQuery Z; row decoding/progress included.
+
+  Parameter encoding/compiler/model work stays outside that interval; outer driver-call times retained
+  separately.
+  C CommandComplete, D rows/bytes, actual command cycles and SQL fingerprints retained; controls count.
+
+  Fresh per-trial DB; identical seeded actions; one profile reset after setup; Always/process 1; limit 2048/steps
+  32768.
+  OS/PG buffers warmed by seed/verification; SQL statement logging off; WAL min 32 / max 64 MB.
+
+
+
+
+TTG+ | 85026d 9282e246 | primary n = 3 fresh workflows | seed 42                                                    24
+What to improve next
+Proposals are untested improvements, selected from measured limits rather than assumed speedups.
+
+
+  Region-aware retry/dedup: remove the single-attempt LittleX limitation while preserving native cache
+  reuse.
+  Admission by opportunity and cost: wider eligible origins matter; current application queries observe
+  width1.
+  Deferred roadmap: cost-model admission and database prepared-statement reuse, evaluated against
+  workload selectivity.
+  Artifact budget: consider deduplicated descriptors, lazy region hydration and selective template
+  emission.
+  Retain guard/identity/oracle checks and intentional overfetch accounting; evaluate existing workflows
+  without dropping regressions.
+
+
+TTG+ | 85026d 9282e246 | primary n = 3 fresh workflows | seed 42                                          25
+Reproducible evidence and exact completed inventory
+72/72 primary workflows; 18/18 native correctness cases; five existing applications.
+
+
+  Runtime versions85026d and9282e246; primary Off uses9282. Same process 1/2048/32768 settings.
+
+  54 measured +18 excluded warmups; all 18 n = 3 cells, complete CSV/JSON, sealed SQL/HTTP/events and
+  semantic proofs.
+  Independent audit:142,488 driver records /3,184 sealed files; all request/count/interval/export statistics match.
+
+  Actual compiler output/artifacts and separate CPU controls; native four-origin/cancel evidence; source-bound
+  LittleX explanation.
+  Editable renderer + figure inputs + report/source hashes. Primary and diagnostic evidence remain separately
+  identified.
+
+
+
+TTG+ | 85026d 9282e246 | primary n = 3 fresh workflows | seed 42                                                      26
+

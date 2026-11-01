@@ -1,0 +1,23 @@
+waiting for server to start.... done
+server started
+waiting for server to shut down.... done
+server stopped
+Traceback (most recent call last):
+  File "/home/baichuan/jaseci/reproduction/ttg-next-diagnostics/runner.py", line 184, in <module>
+    main()
+  File "/home/baichuan/jaseci/reproduction/ttg-next-diagnostics/runner.py", line 166, in main
+    trial.run(case, cell, directory, pg, Path(plan['runtimes'][cell]['clean']['path']), runtimes[cell], expected)
+  File "/home/baichuan/jaseci/reproduction/ttg-next-performance/next_trial.py", line 62, in run
+    return self.linked_list(case,cell,directory,pg,runtime_manifest,overlay_manifest,expected,Server)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-next-performance/next_trial.py", line 111, in linked_list
+    self.finalize(case,cell,directory,server,pg,database,clean,overlay,expected)
+  File "/home/baichuan/jaseci/reproduction/ttg-next-performance/next_trial.py", line 116, in finalize
+    compression=compress_closed_traces(directory,True)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-next-performance/next_storage.py", line 12, in compress_closed_traces
+    require(directory.is_relative_to(OWN) or directory.is_relative_to(EVIDENCE),'Only NEW owned traces may be compressed')
+  File "/home/baichuan/jaseci/reproduction/ttg-plus-performance/interop.py", line 15, in require
+    if not value:raise ValueError(message)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Only NEW owned traces may be compressed

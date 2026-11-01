@@ -1,0 +1,48 @@
+{
+  "status": "source/oracle coverage proposal supported; final fixture and measurement plan pending",
+  "applications": [
+    "linked_list",
+    "littlex",
+    "issue_desk",
+    "knowledge_map",
+    "jdrive"
+  ],
+  "retained_workloads": [
+    "linked_list32",
+    "linked_list1000",
+    "original_littlex"
+  ],
+  "additional": {
+    "issue_desk": {
+      "source": "app_suite/apps/issue_desk/server.jac:89 ProjectBoard; :198 ReachIssue; :216 BlockIssue",
+      "oracle": "app_suite/evaluate.py:18-87 issue_desk",
+      "verified": "Sequential engineer then issue visits; nested ReachIssue spawn in BlockIssue. Oracle exercises duplicate blocker insertion, genuine cycle rejection, self-block rejection, blocked closure, status transitions, assignee idempotence, ordered comments, second-user isolation and unchanged final board."
+    },
+    "knowledge_map": {
+      "source": "app_suite/apps/knowledge_map/server.jac:25 Seed; :45 KnowledgeBoard; :159 ExploreLinks",
+      "oracle": "app_suite/additional_scenarios.py:237-247 knowledge_map",
+      "verified": "Seed shares one Topic across three Articles; board embeds graph reads in complex append. Scenario builds two-way LinksTo cycle, repeated link and invalid self-link; ExploreLinks uses seen set and returns the two titles. Revision/review/publication and private-user guards exercised. Shared Topic is topology convergence, not evidence of duplicate queued execution or explicit multi-visit batching."
+    },
+    "jdrive": {
+      "source": "originals/jdrive/server.impl.jac:44-69 VisibleFolderTree",
+      "oracle": "app_suite/native.py:291-328 result/verify_snapshot",
+      "verified": "Contains with trashed==False predicate, depths/paths dictionaries, deferred sort/output. Original oracle checks sorted paths/unique folder identities, list_folder, trash, mkdir and final node fields/topology. No explicit seen-set/permission branch in traversal body; exact final fixture action and isolation bindings still pending."
+    }
+  },
+  "caveats": [
+    "Coverage is justified independently of optimization success; retain all cases if unsupported or zero opportunity.",
+    "A benchmark operation must actually be exercised by final fixture actions before publication claims it as measured coverage.",
+    "Two LinkedList sizes are one application, giving five applications and at least six workload fixtures. No final sample/mode count or release is inferred here.",
+    "Correctness precedes controlled n3 performance; no new apps or full30/91 rerun."
+  ],
+  "source_sha256": {
+    "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/issue_desk/server.jac": "74ac636a0832e616302eaba0b67f4c563003f55192ed25e6326444d1fa85300a",
+    "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/evaluate.py": "7779afff206c86c6bf4c6539f44f64dfea0bc0509b01dfcbe91429644cee5dc9",
+    "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/knowledge_map/server.jac": "a5aca633b659617cbb8156580eb08be9523e65be31af80d0f0d22a89ab80ca2c",
+    "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/additional_scenarios.py": "dc3184c70e2858d85f67afd714dc5ab66ee397d0e1a98476aaa789f772db367b",
+    "reproduction/ttg-app-performance/suite-final-20261030-v1/originals/jdrive/server.jac": "10a7f455d7ad63c44a05e7b3667d76f017f717968e6a89bae76cdcccd5859942",
+    "reproduction/ttg-app-performance/suite-final-20261030-v1/originals/jdrive/server.impl.jac": "0ffa9c18875036ed0eeabd40e59d94c076db7ea36601ed405be36477c2dac731",
+    "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/native.py": "f44bf3905bd248df2f7c2fe10db3c926a847d170c963e889bffac94d51435228"
+  },
+  "execution": "Read-only source/oracle review; no DB/app/test job; no historical mutation."
+}

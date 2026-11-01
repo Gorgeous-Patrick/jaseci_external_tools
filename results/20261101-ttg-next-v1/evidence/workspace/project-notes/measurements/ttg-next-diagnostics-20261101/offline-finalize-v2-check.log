@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "/home/baichuan/jaseci/reproduction/ttg-next-diagnostics/check_finalize.py", line 41, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-next-diagnostics/check_finalize.py", line 31, in main
+    trial.finalize(case,'baseline850',directory,server,pg,target['database'],Path(plan['runtimes']['baseline850']['clean']['path']),Path(plan['runtimes']['baseline850']['overlay']['path']),None)
+  File "/home/baichuan/jaseci/reproduction/ttg-next-performance/next_trial.py", line 116, in finalize
+    compression=compress_closed_traces(directory,True)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-plus-performance/storage.py", line 12, in compress_closed_traces
+    require(directory.is_relative_to(OWN) or directory.is_relative_to(EVIDENCE),'Only NEW owned traces may be compressed')
+  File "/home/baichuan/jaseci/reproduction/ttg-plus-performance/interop.py", line 15, in require
+    if not value:raise ValueError(message)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Only NEW owned traces may be compressed

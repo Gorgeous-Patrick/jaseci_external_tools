@@ -1,0 +1,4239 @@
+{
+  "passed": true,
+  "pages": [
+    {
+      "page": 1,
+      "title": "TTG+",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "TTG+",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.129140625,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Construction savings are clear; DB results depend on the workload and eligible region.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.620546875,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Five existing applications \u00b7 six fixed fixtures \u00b7 all 18 cells with n = 3",
+          "bounds": [
+            0.065,
+            0.7288888888888889,
+            0.6478125,
+            0.76
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "LinkedList removes per-hop SQL versus Off; both TTG+ versions use16 per Traverse.",
+          "bounds": [
+            0.065,
+            0.6138888888888889,
+            0.798828125,
+            0.645
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "New versus850: workflow medians vary; LittleX, IssueDesk and KnowledgeMap remain slower than\nOff.",
+          "bounds": [
+            0.065,
+            0.4567777777777778,
+            0.926328125,
+            0.53
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Construction microbench: ~1.5\u20131.8ms AST \u2192 ~4.7\u20137.0\u00b5s warm select/bind CPU.",
+          "bounds": [
+            0.065,
+            0.38388888888888895,
+            0.76328125,
+            0.41500000000000004
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "One bound seed/demand origin per template query; four-origin batching is a separate native test.",
+          "bounds": [
+            0.065,
+            0.26888888888888896,
+            0.917578125,
+            0.30000000000000004
+          ]
+        }
+      ]
+    },
+    {
+      "page": 2,
+      "title": "Research problem: repeated runtime work",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "Research problem: repeated runtime work",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.63765625,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Graph traversal interleaves path discovery, payload loading and application state.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.5928125,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Native visit requests the next ordered graph path, then materializes its target payloads.",
+          "bounds": [
+            0.065,
+            0.7288888888888889,
+            0.869765625,
+            0.76
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Repeated hops can repeat SQL dispatches; runtime SQL AST construction adds client CPU work.",
+          "bounds": [
+            0.065,
+            0.5838888888888889,
+            0.94078125,
+            0.615
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Future graph accesses depend on program position, guards, carried state and the pending FIFO\nqueue.",
+          "bounds": [
+            0.065,
+            0.3967777777777778,
+            0.938203125,
+            0.47
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "TTG+ combines queued continuation analysis, batched path SQL and compiler-emitted typed\ntemplates.",
+          "bounds": [
+            0.065,
+            0.2517777777777777,
+            0.918671875,
+            0.32499999999999996
+          ]
+        }
+      ]
+    },
+    {
+      "page": 3,
+      "title": "At B: continue the known FIFO queue and carry state",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "At B: continue the known FIFO queue and carry state",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.783515625,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "A has already queued B, C, D, E. Hook B observes self.i=0 and pending=[C,D,E].",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.58,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "can branch with FrontierBranch entry {\nself.i += 1;\nif self.i == 1 {\nvisit [->:FrontierLeft:->\n[?:FrontierLeaf]];\n} else {\nvisit [->:FrontierRight:->\n[?:FrontierLeaf]];\n}\n}",
+          "bounds": [
+            0.64,
+            0.4537777777777778,
+            0.93984375,
+            0.74
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Prediction carries scalar state in FIFO order; native abilities and the native queue retain their execution order.",
+          "bounds": [
+            0.065,
+            0.17444444444444446,
+            0.876328125,
+            0.2011111111111111
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Graph uses short node names; code uses FrontierWalk native syntax. Reports [1,12,22,32] and final i = 4 match.",
+          "bounds": [
+            0.065,
+            0.11055555555555556,
+            0.801328125,
+            0.13277777777777777
+          ]
+        }
+      ]
+    },
+    {
+      "page": 4,
+      "title": "Compile once: emit SQL, then hydrate/select/bind",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "Compile once: emit SQL, then hydrate/select/bind",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.736015625,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "SQL AST generation moves into the actual Jac compiler emitter for covered emitted regions.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.65734375,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Runtime slots: origins per site, actor UUID/text, row limit; linear regions also bind source type/module and depth.",
+          "bounds": [
+            0.065,
+            0.27444444444444444,
+            0.9015625,
+            0.3011111111111111
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Bound SQL \u2192 unchanged PgWire boundary \u2192 ordered per-origin path cache + merged process payload loading.",
+          "bounds": [
+            0.065,
+            0.17444444444444446,
+            0.9403125,
+            0.2011111111111111
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Covered primary paths report template_queries > 0 / legacy_fusion_calls = 0. Ordinary fallback still constructs its own queries.",
+          "bounds": [
+            0.065,
+            0.09944444444444445,
+            0.89578125,
+            0.12277777777777778
+          ]
+        }
+      ]
+    },
+    {
+      "page": 5,
+      "title": "One emitted template, many runtime origins",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "One emitted template, many runtime origins",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.66890625,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Simplified SQL shape; actual SQL and exact fingerprints are retained in the sealed evidence.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.6596875,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "SELECT slot, origin_order, target_id, arity\nFROM unnest(:origins_1::uuid[]) WITH ORDINALITY AS seed\nLEFT JOIN LATERAL (native ordered Post \u2192 Tweet path) ON TRUE\nUNION ALL\nSELECT ... FROM unnest(:origins_2::uuid[]) ...\nORDER BY slot, depth, ord\nLIMIT :row_limit;",
+          "bounds": [
+            0.065,
+            0.48662500000000003,
+            0.6275,
+            0.76
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Linear form uses a recursive origin_id/depth CTE, continuing only while actual arity == 1 and type/module\nmatch.",
+          "bounds": [
+            0.065,
+            0.2524444444444444,
+            0.90015625,
+            0.3111111111111111
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "The analyzer supplies permitted program transitions; SQL checks graph cardinality. Ordered and empty results seed\nnative path cache.",
+          "bounds": [
+            0.065,
+            0.15355555555555556,
+            0.92484375,
+            0.2111111111111111
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "9282 also changes the emitted type-membership predicate to uncorrelated IN. This is a version/package comparison.",
+          "bounds": [
+            0.065,
+            0.10055555555555555,
+            0.83296875,
+            0.12277777777777778
+          ]
+        }
+      ]
+    },
+    {
+      "page": 6,
+      "title": "Four-origin capability and the disengage assumption",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "Four-origin capability and the disengage assumption",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.7796875,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Prediction assumes queued nodes trigger; native execution and cancellation remain authoritative.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.696640625,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "The cancelled case demonstrates two extra predicted descendant payloads in this identity-bound fixture.",
+          "bounds": [
+            0.065,
+            0.24444444444444446,
+            0.8909375,
+            0.27111111111111114
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Queued parent endpoints were already demanded by native visit evaluation. Ability entry and payload demand are\ndistinct.",
+          "bounds": [
+            0.065,
+            0.12355555555555556,
+            0.9178125,
+            0.1811111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Four-origin FrontierWalk",
+          "bounds": [
+            0.0639,
+            0.5578457234212629,
+            0.22999375,
+            0.5800679456434851
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "8 submitted\n8 promoted",
+          "bounds": [
+            0.2864,
+            0.544956834532374,
+            0.37030625,
+            0.592956834532374
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "8 submitted\n8 promoted",
+          "bounds": [
+            0.5089,
+            0.544956834532374,
+            0.59280625,
+            0.592956834532374
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "B,C,D,E; i=4\nreports1,12,22,32",
+          "bounds": [
+            0.7314,
+            0.544956834532374,
+            0.856165625,
+            0.592956834532374
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "FrontierCancel",
+          "bounds": [
+            0.0639,
+            0.4308745003996802,
+            0.164446875,
+            0.4530967226219025
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "5 submitted\n5 promoted / 0 unused",
+          "bounds": [
+            0.2864,
+            0.41798561151079133,
+            0.4454625,
+            0.4659856115107914
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "7 submitted\n5 promoted / 2 unused",
+          "bounds": [
+            0.5089,
+            0.41798561151079133,
+            0.667884375,
+            0.4659856115107914
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "entered[0,1]\nreports[] unchanged",
+          "bounds": [
+            0.7314,
+            0.41798561151079133,
+            0.874134375,
+            0.4659856115107914
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Accepted native case",
+          "bounds": [
+            0.0639,
+            0.6608601119104717,
+            0.23093125,
+            0.6830823341326939
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Baseline",
+          "bounds": [
+            0.2864,
+            0.6608601119104717,
+            0.353040625,
+            0.6830823341326939
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Next",
+          "bounds": [
+            0.5089,
+            0.6608601119104717,
+            0.545540625,
+            0.6830823341326939
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Native result",
+          "bounds": [
+            0.7314,
+            0.6608601119104717,
+            0.833040625,
+            0.6830823341326939
+          ]
+        }
+      ]
+    },
+    {
+      "page": 7,
+      "title": "Why these existing applications",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "Why these existing applications",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.492578125,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "The selection was fixed before timing; unsupported and slower cells are retained.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.58765625,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Existing accepted Seed 42 fixtures, original native workflows and independent correctness oracles.",
+          "bounds": [
+            0.065,
+            0.10055555555555555,
+            0.671328125,
+            0.12166666666666667
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LinkedList32 /1000",
+          "bounds": [
+            0.0639,
+            0.6116944444444445,
+            0.179134375,
+            0.6328055555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Traverse + Sum + Find(head/middle/tail/missing); exact order/count/state",
+          "bounds": [
+            0.3042,
+            0.6116944444444445,
+            0.75529375,
+            0.6328055555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LittleX original",
+          "bounds": [
+            0.0639,
+            0.5201944444444444,
+            0.152571875,
+            0.5413055555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Feed / search / likes / follow / create; feed order, authorship, graph and restart",
+          "bounds": [
+            0.3042,
+            0.5201944444444444,
+            0.78310625,
+            0.5413055555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "IssueDesk",
+          "bounds": [
+            0.0639,
+            0.4286944444444444,
+            0.125384375,
+            0.44980555555555546
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Engineer then issue visits; assignees/blockers/comments; mutations + cycle rejection",
+          "bounds": [
+            0.3042,
+            0.4286944444444444,
+            0.82810625,
+            0.44980555555555546
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "KnowledgeMap",
+          "bounds": [
+            0.0639,
+            0.33719444444444446,
+            0.156478125,
+            0.3583055555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Shared-topic graph, a\u2194b links and explicit seen guard; publish/review/revise + denials",
+          "bounds": [
+            0.3042,
+            0.33719444444444446,
+            0.832090625,
+            0.3583055555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "JDrive",
+          "bounds": [
+            0.0639,
+            0.24569444444444444,
+            0.09999375,
+            0.2668055555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Folder depth/path dictionaries and trashed predicate; tree/trash/mkdir/persistence",
+          "bounds": [
+            0.3042,
+            0.24569444444444444,
+            0.808496875,
+            0.2668055555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Application",
+          "bounds": [
+            0.0639,
+            0.7031944444444445,
+            0.14155625,
+            0.7243055555555555
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Native behavior and exercised oracle",
+          "bounds": [
+            0.3042,
+            0.7031944444444445,
+            0.56045,
+            0.7243055555555555
+          ]
+        }
+      ]
+    },
+    {
+      "page": 8,
+      "title": "Complete fixed selection: DB protocol time",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "Complete fixed selection: DB protocol time",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.643203125,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Whole-workflow median and [min, max] ms; all counts are fresh workflows, n = 3 per cell.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.643359375,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "All 72 observed protocol sums equal interval unions. Timing includes actual data and transaction-control SQL.",
+          "bounds": [
+            0.065,
+            0.09055555555555556,
+            0.782421875,
+            0.11277777777777778
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LinkedList \u00b7 32",
+          "bounds": [
+            0.0639,
+            0.6553247863247864,
+            0.15819687500000001,
+            0.6775470085470087
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "115.081\n[113.695, 119.006]",
+          "bounds": [
+            0.2864,
+            0.6424358974358975,
+            0.41280625,
+            0.6904358974358975
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "94.461\n[94.299, 96.609]",
+          "bounds": [
+            0.5089,
+            0.6424358974358975,
+            0.618978125,
+            0.6904358974358975
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "94.371\n[93.375, 94.836]",
+          "bounds": [
+            0.7314,
+            0.6424358974358975,
+            0.8410875,
+            0.6904358974358975
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LinkedList \u00b7 1,000",
+          "bounds": [
+            0.0639,
+            0.5724273504273505,
+            0.1789,
+            0.5946495726495727
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "3337.873\n[3147.031, 3387.414]",
+          "bounds": [
+            0.2864,
+            0.5595384615384615,
+            0.428978125,
+            0.6075384615384616
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "2360.957\n[2356.131, 2374.843]",
+          "bounds": [
+            0.5089,
+            0.5595384615384615,
+            0.6515562500000001,
+            0.6075384615384616
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "2310.506\n[2250.325, 2311.392]",
+          "bounds": [
+            0.7314,
+            0.5595384615384615,
+            0.874134375,
+            0.6075384615384616
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LittleX",
+          "bounds": [
+            0.0639,
+            0.4895299145299146,
+            0.10561875000000001,
+            0.5117521367521368
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "42.578\n[38.132, 43.135]",
+          "bounds": [
+            0.2864,
+            0.4766410256410257,
+            0.39585312500000003,
+            0.5246410256410258
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "55.479\n[54.380, 56.864]",
+          "bounds": [
+            0.5089,
+            0.4766410256410257,
+            0.61843125,
+            0.5246410256410258
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "53.566\n[51.473, 54.371]",
+          "bounds": [
+            0.7314,
+            0.4766410256410257,
+            0.84093125,
+            0.5246410256410258
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "IssueDesk",
+          "bounds": [
+            0.0639,
+            0.40663247863247864,
+            0.1298375,
+            0.42885470085470084
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "139.440\n[138.211, 142.840]",
+          "bounds": [
+            0.2864,
+            0.3937435897435897,
+            0.4123375,
+            0.44174358974358974
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "154.267\n[152.613, 157.884]",
+          "bounds": [
+            0.5089,
+            0.3937435897435897,
+            0.634915625,
+            0.44174358974358974
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "159.419\n[157.615, 163.092]",
+          "bounds": [
+            0.7314,
+            0.3937435897435897,
+            0.857728125,
+            0.44174358974358974
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "KnowledgeMap",
+          "bounds": [
+            0.0639,
+            0.32373504273504283,
+            0.163040625,
+            0.34595726495726503
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "72.712\n[71.422, 73.791]",
+          "bounds": [
+            0.2864,
+            0.31084615384615394,
+            0.396009375,
+            0.358846153846154
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "78.997\n[76.774, 84.614]",
+          "bounds": [
+            0.5089,
+            0.31084615384615394,
+            0.618509375,
+            0.358846153846154
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "79.167\n[79.033, 79.360]",
+          "bounds": [
+            0.7314,
+            0.31084615384615394,
+            0.841165625,
+            0.358846153846154
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "JDrive",
+          "bounds": [
+            0.0639,
+            0.2408376068376069,
+            0.10249375000000001,
+            0.2630598290598291
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "48.053\n[45.434, 48.143]",
+          "bounds": [
+            0.2864,
+            0.22794871794871802,
+            0.39585312500000003,
+            0.275948717948718
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "46.784\n[46.523, 47.214]",
+          "bounds": [
+            0.5089,
+            0.22794871794871802,
+            0.618509375,
+            0.275948717948718
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "46.648\n[45.128, 46.885]",
+          "bounds": [
+            0.7314,
+            0.22794871794871802,
+            0.840775,
+            0.275948717948718
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Fixture",
+          "bounds": [
+            0.0639,
+            0.7225811965811966,
+            0.11663437500000001,
+            0.7448034188034187
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Off (9282)",
+          "bounds": [
+            0.2864,
+            0.7225811965811966,
+            0.36155625,
+            0.7448034188034187
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "TTG+ 85026d",
+          "bounds": [
+            0.5089,
+            0.7225811965811966,
+            0.6079625,
+            0.7448034188034187
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "TTG+ 9282",
+          "bounds": [
+            0.7314,
+            0.7225811965811966,
+            0.812103125,
+            0.7448034188034187
+          ]
+        }
+      ]
+    },
+    {
+      "page": 9,
+      "title": "All SQL is counted: data + control = TOTAL",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "All SQL is counted: data + control = TOTAL",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.640625,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Whole workflow; every count is identical across its three measured repeats.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.550234375,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Foreground, child payload reads, path discovery, identity/catalog and transaction completion are retained.",
+          "bounds": [
+            0.065,
+            0.09055555555555556,
+            0.76109375,
+            0.11277777777777778
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LinkedList \u00b7 32",
+          "bounds": [
+            0.0639,
+            0.6307460317460317,
+            0.16460312500000002,
+            0.652968253968254
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "318 + 42 = 360",
+          "bounds": [
+            0.2864,
+            0.6307460317460317,
+            0.398196875,
+            0.652968253968254
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "196 + 47 = 243",
+          "bounds": [
+            0.5089,
+            0.6307460317460317,
+            0.62061875,
+            0.652968253968254
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "196 + 47 = 243",
+          "bounds": [
+            0.7314,
+            0.6307460317460317,
+            0.84311875,
+            0.652968253968254
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LinkedList \u00b7 1,000",
+          "bounds": [
+            0.0639,
+            0.5523174603174603,
+            0.18686875,
+            0.5745396825396826
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "9030 + 42 = 9072",
+          "bounds": [
+            0.2864,
+            0.5523174603174603,
+            0.416009375,
+            0.5745396825396826
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "5036 + 47 = 5083",
+          "bounds": [
+            0.5089,
+            0.5523174603174603,
+            0.6385875,
+            0.5745396825396826
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "5036 + 47 = 5083",
+          "bounds": [
+            0.7314,
+            0.5523174603174603,
+            0.8610875,
+            0.5745396825396826
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LittleX",
+          "bounds": [
+            0.0639,
+            0.4738888888888888,
+            0.10843125,
+            0.49611111111111106
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "90 + 63 = 153",
+          "bounds": [
+            0.2864,
+            0.4738888888888888,
+            0.389446875,
+            0.49611111111111106
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "78 + 69 = 147",
+          "bounds": [
+            0.5089,
+            0.4738888888888888,
+            0.611790625,
+            0.49611111111111106
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "82 + 69 = 151",
+          "bounds": [
+            0.7314,
+            0.4738888888888888,
+            0.83436875,
+            0.49611111111111106
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "IssueDesk",
+          "bounds": [
+            0.0639,
+            0.3954603174603174,
+            0.13436875,
+            0.4176825396825396
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "368 + 189 = 557",
+          "bounds": [
+            0.2864,
+            0.3954603174603174,
+            0.407103125,
+            0.4176825396825396
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "368 + 193 = 561",
+          "bounds": [
+            0.5089,
+            0.3954603174603174,
+            0.629525,
+            0.4176825396825396
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "368 + 193 = 561",
+          "bounds": [
+            0.7314,
+            0.3954603174603174,
+            0.852025,
+            0.4176825396825396
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "KnowledgeMap",
+          "bounds": [
+            0.0639,
+            0.317031746031746,
+            0.16968125,
+            0.33925396825396825
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "186 + 112 = 298",
+          "bounds": [
+            0.2864,
+            0.317031746031746,
+            0.406946875,
+            0.33925396825396825
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "186 + 115 = 301",
+          "bounds": [
+            0.5089,
+            0.317031746031746,
+            0.629603125,
+            0.33925396825396825
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "186 + 115 = 301",
+          "bounds": [
+            0.7314,
+            0.317031746031746,
+            0.852103125,
+            0.33925396825396825
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "JDrive",
+          "bounds": [
+            0.0639,
+            0.2386031746031746,
+            0.10507187500000001,
+            0.2608253968253968
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "107 + 49 = 156",
+          "bounds": [
+            0.2864,
+            0.2386031746031746,
+            0.398275,
+            0.2608253968253968
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "107 + 49 = 156",
+          "bounds": [
+            0.5089,
+            0.2386031746031746,
+            0.620775,
+            0.2608253968253968
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "107 + 49 = 156",
+          "bounds": [
+            0.7314,
+            0.2386031746031746,
+            0.843275,
+            0.2608253968253968
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Fixture",
+          "bounds": [
+            0.0639,
+            0.7091746031746033,
+            0.11999375000000001,
+            0.7313968253968255
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Off",
+          "bounds": [
+            0.2864,
+            0.7091746031746033,
+            0.31030625,
+            0.7313968253968255
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "85026d",
+          "bounds": [
+            0.5089,
+            0.7091746031746033,
+            0.56718125,
+            0.7313968253968255
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "9282",
+          "bounds": [
+            0.7314,
+            0.7091746031746033,
+            0.769915625,
+            0.7313968253968255
+          ]
+        }
+      ]
+    },
+    {
+      "page": 10,
+      "title": "Native Traverse: SQL reduction is already present in850",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "Native Traverse: SQL reduction is already present in850",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.82234375,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "TOTAL includes path discovery, payload reads, identity/catalog and controls; all n = 3 counts constant.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.727109375,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Every row also has1 identity and 1 catalog query. Fused path counts 1; Off ordinary paths32/1000. Exact visited32/1000.",
+          "bounds": [
+            0.065,
+            0.10055555555555555,
+            0.85421875,
+            0.12277777777777778
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LinkedList \u00b7 32 /Off (9282)",
+          "bounds": [
+            0.063544,
+            0.6318571428571429,
+            0.20502837499999998,
+            0.6518571428571429
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "25.357 [23.573, 26.281]",
+          "bounds": [
+            0.27999199999999996,
+            0.6318571428571429,
+            0.41233575,
+            0.6518571428571429
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "32",
+          "bounds": [
+            0.55696,
+            0.6318571428571429,
+            0.57071,
+            0.6518571428571429
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "35",
+          "bounds": [
+            0.6463160000000001,
+            0.6318571428571429,
+            0.660066,
+            0.6518571428571429
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "7",
+          "bounds": [
+            0.744216,
+            0.6318571428571429,
+            0.751091,
+            0.6518571428571429
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "76",
+          "bounds": [
+            0.8424720000000001,
+            0.6318571428571429,
+            0.8563001250000001,
+            0.6518571428571429
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LinkedList \u00b7 32 /TTG+ 85026d",
+          "bounds": [
+            0.063544,
+            0.5534285714285714,
+            0.22502837499999997,
+            0.5734285714285714
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "7.056 [6.985, 7.329]",
+          "bounds": [
+            0.27999199999999996,
+            0.5534285714285714,
+            0.391945125,
+            0.5734285714285714
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "1",
+          "bounds": [
+            0.55696,
+            0.5534285714285714,
+            0.5638350000000001,
+            0.5734285714285714
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "5",
+          "bounds": [
+            0.6463160000000001,
+            0.5534285714285714,
+            0.6531910000000001,
+            0.5734285714285714
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "8",
+          "bounds": [
+            0.744216,
+            0.5534285714285714,
+            0.751091,
+            0.5734285714285714
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "16",
+          "bounds": [
+            0.8424720000000001,
+            0.5534285714285714,
+            0.8563001250000001,
+            0.5734285714285714
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LinkedList \u00b7 32 /TTG+ 9282",
+          "bounds": [
+            0.063544,
+            0.4749999999999999,
+            0.21120024999999998,
+            0.49499999999999994
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "7.246 [6.585, 7.841]",
+          "bounds": [
+            0.27999199999999996,
+            0.4749999999999999,
+            0.391632625,
+            0.49499999999999994
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "1",
+          "bounds": [
+            0.55696,
+            0.4749999999999999,
+            0.5638350000000001,
+            0.49499999999999994
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "5",
+          "bounds": [
+            0.6463160000000001,
+            0.4749999999999999,
+            0.6531910000000001,
+            0.49499999999999994
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "8",
+          "bounds": [
+            0.744216,
+            0.4749999999999999,
+            0.751091,
+            0.49499999999999994
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "16",
+          "bounds": [
+            0.8424720000000001,
+            0.4749999999999999,
+            0.8563001250000001,
+            0.49499999999999994
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LinkedList \u00b7 1,000 /Off (9282)",
+          "bounds": [
+            0.063544,
+            0.3965714285714285,
+            0.22221587499999998,
+            0.4165714285714285
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "733.271 [719.127, 751.061]",
+          "bounds": [
+            0.27999199999999996,
+            0.3965714285714285,
+            0.43303887500000005,
+            0.4165714285714285
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "1000",
+          "bounds": [
+            0.55696,
+            0.3965714285714285,
+            0.5844600000000001,
+            0.4165714285714285
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "1003",
+          "bounds": [
+            0.6463160000000001,
+            0.3965714285714285,
+            0.6738160000000001,
+            0.4165714285714285
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "7",
+          "bounds": [
+            0.744216,
+            0.3965714285714285,
+            0.751091,
+            0.4165714285714285
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "2012",
+          "bounds": [
+            0.8424720000000001,
+            0.3965714285714285,
+            0.8699720000000001,
+            0.4165714285714285
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LinkedList \u00b7 1,000 /TTG+ 85026d",
+          "bounds": [
+            0.063544,
+            0.3181428571428571,
+            0.24221587499999997,
+            0.33814285714285713
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "31.639 [31.164, 68.167]",
+          "bounds": [
+            0.27999199999999996,
+            0.3181428571428571,
+            0.412570125,
+            0.33814285714285713
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "1",
+          "bounds": [
+            0.55696,
+            0.3181428571428571,
+            0.5638350000000001,
+            0.33814285714285713
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "5",
+          "bounds": [
+            0.6463160000000001,
+            0.3181428571428571,
+            0.6531910000000001,
+            0.33814285714285713
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "8",
+          "bounds": [
+            0.744216,
+            0.3181428571428571,
+            0.751091,
+            0.33814285714285713
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "16",
+          "bounds": [
+            0.8424720000000001,
+            0.3181428571428571,
+            0.8563001250000001,
+            0.33814285714285713
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LinkedList \u00b7 1,000 /TTG+ 9282",
+          "bounds": [
+            0.063544,
+            0.2397142857142857,
+            0.22838774999999997,
+            0.25971428571428573
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "66.599 [31.942, 68.083]",
+          "bounds": [
+            0.27999199999999996,
+            0.2397142857142857,
+            0.41264825,
+            0.25971428571428573
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "1",
+          "bounds": [
+            0.55696,
+            0.2397142857142857,
+            0.5638350000000001,
+            0.25971428571428573
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "5",
+          "bounds": [
+            0.6463160000000001,
+            0.2397142857142857,
+            0.6531910000000001,
+            0.25971428571428573
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "8",
+          "bounds": [
+            0.744216,
+            0.2397142857142857,
+            0.751091,
+            0.25971428571428573
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "16",
+          "bounds": [
+            0.8424720000000001,
+            0.2397142857142857,
+            0.8563001250000001,
+            0.25971428571428573
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Fixture /mode",
+          "bounds": [
+            0.063544,
+            0.7102857142857144,
+            0.149090875,
+            0.7302857142857144
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Protocol ms median [range]",
+          "bounds": [
+            0.27999199999999996,
+            0.7102857142857144,
+            0.45077325,
+            0.7302857142857144
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Path",
+          "bounds": [
+            0.55696,
+            0.7102857142857144,
+            0.5848506250000001,
+            0.7302857142857144
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Payload",
+          "bounds": [
+            0.6463160000000001,
+            0.7102857142857144,
+            0.694362875,
+            0.7302857142857144
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Control",
+          "bounds": [
+            0.744216,
+            0.7102857142857144,
+            0.78905975,
+            0.7302857142857144
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "TOTAL",
+          "bounds": [
+            0.8424720000000001,
+            0.7102857142857144,
+            0.8810657500000001,
+            0.7302857142857144
+          ]
+        }
+      ]
+    },
+    {
+      "page": 11,
+      "title": "LL1000: the recursive SQL interval carries the variation",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "LL1000: the recursive SQL interval carries the variation",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.81625,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Same 1,000 returned rows /161,806 DataRow payload bytes; one recursive call per Traverse.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.66234375,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "850:55.257 /18.580 /18.421 ms\n9282:55.135 /53.809 /18.901 ms",
+          "bounds": [
+            0.64,
+            0.6466666666666666,
+            0.911953125,
+            0.72
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Payload 5 calls stay around 10.6\u201311.1\nms.\nBoth versions have slow and fast\nsamples.\nPrimary per-run plans/statistics\nare unavailable.",
+          "bounds": [
+            0.64,
+            0.2766666666666666,
+            0.919140625,
+            0.5
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Workflow medians: 3,337.873 ms Off \u2192 2,360.957 ms (850) \u2192 2,310.506 ms (9282); Traverse medians differ in the opposite direction.",
+          "bounds": [
+            0.065,
+            0.12555555555555556,
+            0.94109375,
+            0.14777777777777779
+          ]
+        }
+      ]
+    },
+    {
+      "page": 12,
+      "title": "Matched recursive SQL: accepted native recaptures",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "Matched recursive SQL: accepted native recaptures",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.76390625,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Two full six-operation workflows; exact captured SQL/Bind/state and original 1,000-row completion.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.7028125,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Serializable transactions; statistics rows = 0 and reltuples = \u22121. Census and EXPLAIN warm buffers.",
+          "bounds": [
+            0.065,
+            0.28555555555555556,
+            0.76484375,
+            0.30777777777777776
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Shared reads = 0; spills = 0; JIT absent. Root buffer counters are direct inclusive values.",
+          "bounds": [
+            0.065,
+            0.18555555555555556,
+            0.680546875,
+            0.20777777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Diagnostic EXPLAIN: first/repeat measurements, separate from the primary n = 3 protocol samples.",
+          "bounds": [
+            0.065,
+            0.10055555555555555,
+            0.71625,
+            0.12277777777777778
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "TTG+ 85026d",
+          "bounds": [
+            0.0639,
+            0.5401493930905695,
+            0.160853125,
+            0.5623716153127918
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "1.190 / 0.669",
+          "bounds": [
+            0.2864,
+            0.5401493930905695,
+            0.379525,
+            0.5623716153127918
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "52.716 / 49.895",
+          "bounds": [
+            0.5089,
+            0.5401493930905695,
+            0.61968125,
+            0.5623716153127918
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "20136",
+          "bounds": [
+            0.7314,
+            0.5401493930905695,
+            0.77561875,
+            0.5623716153127918
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "TTG+ 9282",
+          "bounds": [
+            0.0639,
+            0.4453090569561158,
+            0.143040625,
+            0.46753127917833803
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "0.695 / 0.578",
+          "bounds": [
+            0.2864,
+            0.4453090569561158,
+            0.37968125,
+            0.46753127917833803
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "63.194 / 62.847",
+          "bounds": [
+            0.5089,
+            0.4453090569561158,
+            0.619525,
+            0.46753127917833803
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "20136",
+          "bounds": [
+            0.7314,
+            0.4453090569561158,
+            0.77561875,
+            0.46753127917833803
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Version",
+          "bounds": [
+            0.0639,
+            0.6637292250233426,
+            0.12280625,
+            0.6859514472455649
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Planning ms: first /\nrepeat",
+          "bounds": [
+            0.2864,
+            0.6508403361344537,
+            0.435696875,
+            0.6988403361344538
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Execution ms: first /\nrepeat",
+          "bounds": [
+            0.5089,
+            0.6508403361344537,
+            0.666478125,
+            0.6988403361344538
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Root shared hits",
+          "bounds": [
+            0.7314,
+            0.6637292250233426,
+            0.861009375,
+            0.6859514472455649
+          ]
+        }
+      ]
+    },
+    {
+      "page": 13,
+      "title": "Controlled ANALYZE changes the plan and execution cost",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "Controlled ANALYZE changes the plan and execution cost",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.838359375,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Restored captured relevant state, original DDL/indexes/settings and exact Bind; same ordered 1,000-row result.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.78515625,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Before: reltuples = \u22121 for anchors/types. After: anchors = 2,005, graph_types = 4. Shared reads = 0.",
+          "bounds": [
+            0.065,
+            0.15444444444444444,
+            0.77375,
+            0.17777777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Controlled restored fixtures establish statistics sensitivity. Primary per-run plans/statistics are unavailable.",
+          "bounds": [
+            0.065,
+            0.09055555555555556,
+            0.73484375,
+            0.11166666666666666
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "TTG+ 85026d",
+          "bounds": [
+            0.061408000000000004,
+            0.5842444444444445,
+            0.14625175,
+            0.6053555555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Before ANALYZE",
+          "bounds": [
+            0.22267599999999999,
+            0.5842444444444445,
+            0.321035375,
+            0.6053555555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "0.611 / 0.601",
+          "bounds": [
+            0.41028800000000004,
+            0.5842444444444445,
+            0.49169425000000005,
+            0.6053555555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "47.970 / 48.328",
+          "bounds": [
+            0.615344,
+            0.5842444444444445,
+            0.71237525,
+            0.6053555555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "20126",
+          "bounds": [
+            0.825384,
+            0.5842444444444445,
+            0.86397775,
+            0.6053555555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "TTG+ 85026d",
+          "bounds": [
+            0.061408000000000004,
+            0.47444444444444445,
+            0.14625175,
+            0.4955555555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "After ANALYZE",
+          "bounds": [
+            0.22267599999999999,
+            0.47444444444444445,
+            0.31033225,
+            0.4955555555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "0.552 / 0.572",
+          "bounds": [
+            0.41028800000000004,
+            0.47444444444444445,
+            0.49200675000000005,
+            0.4955555555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "13.386 / 13.413",
+          "bounds": [
+            0.615344,
+            0.47444444444444445,
+            0.712453375,
+            0.4955555555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "16126",
+          "bounds": [
+            0.825384,
+            0.47444444444444445,
+            0.8640558749999999,
+            0.4955555555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "TTG+ 9282",
+          "bounds": [
+            0.061408000000000004,
+            0.3646444444444445,
+            0.130783,
+            0.38575555555555563
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Before ANALYZE",
+          "bounds": [
+            0.22267599999999999,
+            0.3646444444444445,
+            0.321035375,
+            0.38575555555555563
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "0.632 / 0.593",
+          "bounds": [
+            0.41028800000000004,
+            0.3646444444444445,
+            0.4918505,
+            0.38575555555555563
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "49.923 / 49.434",
+          "bounds": [
+            0.615344,
+            0.3646444444444445,
+            0.712453375,
+            0.38575555555555563
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "20126",
+          "bounds": [
+            0.825384,
+            0.3646444444444445,
+            0.86397775,
+            0.38575555555555563
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "TTG+ 9282",
+          "bounds": [
+            0.061408000000000004,
+            0.2548444444444445,
+            0.130783,
+            0.2759555555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "After ANALYZE",
+          "bounds": [
+            0.22267599999999999,
+            0.2548444444444445,
+            0.31033225,
+            0.2759555555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "0.533 / 0.530",
+          "bounds": [
+            0.41028800000000004,
+            0.2548444444444445,
+            0.4918505,
+            0.2759555555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "13.721 / 13.382",
+          "bounds": [
+            0.615344,
+            0.2548444444444445,
+            0.712453375,
+            0.2759555555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "16126",
+          "bounds": [
+            0.825384,
+            0.2548444444444445,
+            0.8640558749999999,
+            0.2759555555555556
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Version",
+          "bounds": [
+            0.061408000000000004,
+            0.6940444444444445,
+            0.1129705,
+            0.7151555555555555
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Statistics regime",
+          "bounds": [
+            0.22267599999999999,
+            0.6940444444444445,
+            0.339551,
+            0.7151555555555555
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Planning ms first/repeat",
+          "bounds": [
+            0.41028800000000004,
+            0.6940444444444445,
+            0.57700675,
+            0.7151555555555555
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Execution ms first/repeat",
+          "bounds": [
+            0.615344,
+            0.6940444444444445,
+            0.789640875,
+            0.7151555555555555
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Shared hits",
+          "bounds": [
+            0.825384,
+            0.6940444444444445,
+            0.904134,
+            0.7151555555555555
+          ]
+        }
+      ]
+    },
+    {
+      "page": 14,
+      "title": "Why ANALYZE helps in the controlled fixture",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "Why ANALYZE helps in the controlled fixture",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.66265625,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Measured operator change at two path-evaluation sites in the controlled restored fixture.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.63734375,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Execution falls from about 48\u201350 ms to 13.4\u201313.7 ms on both restored versions; JIT is absent in all 12 diagnostic\nplans.",
+          "bounds": [
+            0.065,
+            0.23355555555555554,
+            0.896640625,
+            0.2911111111111111
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Controlled restored fixture: captured relevant columns, original defaults for unused columns, fresh heap, warm buffers.",
+          "bounds": [
+            0.065,
+            0.16555555555555557,
+            0.87015625,
+            0.18777777777777777
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Next work: explicit statistics regimes, cost admission and database prepared-statement reuse. Primary per-run statistics unavailable.",
+          "bounds": [
+            0.065,
+            0.09055555555555556,
+            0.93546875,
+            0.11277777777777778
+          ]
+        }
+      ]
+    },
+    {
+      "page": 15,
+      "title": "LittleX: four feed requests add four data calls in9282",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "LittleX: four feed requests add four data calls in9282",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.784296875,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Each feed:850 has 2 fused queries;9282 has 1 fused root query +2 ordinary collect paths.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.643671875,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "The four extra calls are path discovery; payload reads remain four per feed. Native outputs, order and final graph\nmatch.",
+          "bounds": [
+            0.065,
+            0.10355555555555555,
+            0.90515625,
+            0.16111111111111112
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Protocol ms median",
+          "bounds": [
+            0.0639,
+            0.5836888888888889,
+            0.20186875,
+            0.6059111111111112
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "42.578",
+          "bounds": [
+            0.2864,
+            0.5836888888888889,
+            0.33499375,
+            0.6059111111111112
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "55.479",
+          "bounds": [
+            0.5089,
+            0.5836888888888889,
+            0.557571875,
+            0.6059111111111112
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "53.566",
+          "bounds": [
+            0.7314,
+            0.5836888888888889,
+            0.780071875,
+            0.6059111111111112
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Data +control =TOTAL",
+          "bounds": [
+            0.0639,
+            0.4738888888888889,
+            0.22194687500000002,
+            0.4961111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "90 +63 =153",
+          "bounds": [
+            0.2864,
+            0.4738888888888889,
+            0.380540625,
+            0.4961111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "78 +69 =147",
+          "bounds": [
+            0.5089,
+            0.4738888888888889,
+            0.602884375,
+            0.4961111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "82 +69 =151",
+          "bounds": [
+            0.7314,
+            0.4738888888888889,
+            0.8254625,
+            0.4961111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Per feed path discovery",
+          "bounds": [
+            0.0639,
+            0.36408888888888896,
+            0.22874375,
+            0.38631111111111116
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "3 ordinary",
+          "bounds": [
+            0.2864,
+            0.36408888888888896,
+            0.35780625,
+            0.38631111111111116
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "1 root +1 batch",
+          "bounds": [
+            0.5089,
+            0.36408888888888896,
+            0.618821875,
+            0.38631111111111116
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "1 root +2 ordinary",
+          "bounds": [
+            0.7314,
+            0.36408888888888896,
+            0.86015,
+            0.38631111111111116
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Per feed payload reads",
+          "bounds": [
+            0.0639,
+            0.25428888888888895,
+            0.224134375,
+            0.27651111111111115
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "6",
+          "bounds": [
+            0.2864,
+            0.25428888888888895,
+            0.295228125,
+            0.27651111111111115
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "4",
+          "bounds": [
+            0.5089,
+            0.25428888888888895,
+            0.517728125,
+            0.27651111111111115
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "4",
+          "bounds": [
+            0.7314,
+            0.25428888888888895,
+            0.740228125,
+            0.27651111111111115
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Whole workflow",
+          "bounds": [
+            0.0639,
+            0.6934888888888888,
+            0.189525,
+            0.7157111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Off",
+          "bounds": [
+            0.2864,
+            0.6934888888888888,
+            0.31030625,
+            0.7157111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "85026d",
+          "bounds": [
+            0.5089,
+            0.6934888888888888,
+            0.56718125,
+            0.7157111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "9282",
+          "bounds": [
+            0.7314,
+            0.6934888888888888,
+            0.769915625,
+            0.7157111111111111
+          ]
+        }
+      ]
+    },
+    {
+      "page": 16,
+      "title": "LittleX limiter: one frontier attempt per continuation invocation",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "LittleX limiter: one frontier attempt per continuation invocation",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.931015625,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Source-backed interpretation, joined to compact counters, emitted event IDs and actual SQL sequence.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.730859375,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "frontier_attempted = []\nresolve(active, event):\nif cached_path: return cached_path\nif graph.sql_templates and not frontier_attempted:\nfrontier_attempted.append(True)\nresolve_frontier(...)\nif path_missing: resolve_ttg_path(...)",
+          "bounds": [
+            0.065,
+            0.4971041666666667,
+            0.53375,
+            0.76
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Event 1: Root \u2192 Profile\nconsumes the one attempt\n\nEvents 4/5: collect visits\nordinary fallback and reuse cache\n\nLater hooks return reused paths\nbefore another frontier attempt",
+          "bounds": [
+            0.63,
+            0.4653888888888889,
+            0.895234375,
+            0.76
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Recorded: template query 1, linear region 1, fallback resolver 2 and reached collect events 4/5; source-backed control\ninterpretation.",
+          "bounds": [
+            0.065,
+            0.1947777777777778,
+            0.890078125,
+            0.2427777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Gather 277 is a real tail barrier after both visits. It is insufficient to explain the missing current-ability batch.",
+          "bounds": [
+            0.065,
+            0.14055555555555554,
+            0.81953125,
+            0.16277777777777777
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Proposed, untested: retry distinct proven regions/activations with path reuse/dedup; preserve guard and native semantics.",
+          "bounds": [
+            0.065,
+            0.08055555555555556,
+            0.86765625,
+            0.10277777777777777
+          ]
+        }
+      ]
+    },
+    {
+      "page": 17,
+      "title": "One bound seed/demand origin per template query",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "One bound seed/demand origin per template query",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.75828125,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Fixed application queries use one bound seed/demand origin; a separate native integration binds four.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.7240625,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "One seed recursively covers 1,000 LinkedList steps. Cross-queued-origin demand width remains one in the fixed applications.",
+          "bounds": [
+            0.065,
+            0.16555555555555557,
+            0.886796875,
+            0.18777777777777777
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Workflow counts are constant across n = 3; submission/promotion totals sum native per-scope ID sets.",
+          "bounds": [
+            0.065,
+            0.10055555555555555,
+            0.735234375,
+            0.12277777777777778
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LinkedList \u00b7 32",
+          "bounds": [
+            0.062119999999999995,
+            0.5963749446657812,
+            0.156416875,
+            0.6185971668880034
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "81",
+          "bounds": [
+            0.24012,
+            0.5963749446657812,
+            0.256604375,
+            0.6185971668880034
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "81",
+          "bounds": [
+            0.41812000000000005,
+            0.5963749446657812,
+            0.43460437500000004,
+            0.6185971668880034
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "140",
+          "bounds": [
+            0.5961200000000001,
+            0.5963749446657812,
+            0.62096375,
+            0.6185971668880034
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "140",
+          "bounds": [
+            0.77412,
+            0.5963749446657812,
+            0.7989637500000001,
+            0.6185971668880034
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LinkedList \u00b7 1,000",
+          "bounds": [
+            0.062119999999999995,
+            0.5241956617972554,
+            0.17712,
+            0.5464178840194777
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "2501",
+          "bounds": [
+            0.24012,
+            0.5241956617972554,
+            0.273245,
+            0.5464178840194777
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "2501",
+          "bounds": [
+            0.41812000000000005,
+            0.5241956617972554,
+            0.45124500000000006,
+            0.5464178840194777
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "4496",
+          "bounds": [
+            0.5961200000000001,
+            0.5241956617972554,
+            0.6294012500000001,
+            0.5464178840194777
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "4496",
+          "bounds": [
+            0.77412,
+            0.5241956617972554,
+            0.8074012500000001,
+            0.5464178840194777
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LittleX",
+          "bounds": [
+            0.062119999999999995,
+            0.4520163789287295,
+            0.10383875,
+            0.4742386011509517
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "6",
+          "bounds": [
+            0.24012,
+            0.4520163789287295,
+            0.248479375,
+            0.4742386011509517
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "6",
+          "bounds": [
+            0.41812000000000005,
+            0.4520163789287295,
+            0.42647937500000005,
+            0.4742386011509517
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "63",
+          "bounds": [
+            0.5961200000000001,
+            0.4520163789287295,
+            0.6127606250000001,
+            0.4742386011509517
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "63",
+          "bounds": [
+            0.77412,
+            0.4520163789287295,
+            0.7907606250000001,
+            0.4742386011509517
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "IssueDesk",
+          "bounds": [
+            0.062119999999999995,
+            0.3798370960602036,
+            0.1280575,
+            0.4020593182824258
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "9",
+          "bounds": [
+            0.24012,
+            0.3798370960602036,
+            0.248479375,
+            0.4020593182824258
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "9",
+          "bounds": [
+            0.41812000000000005,
+            0.3798370960602036,
+            0.42647937500000005,
+            0.4020593182824258
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "14",
+          "bounds": [
+            0.5961200000000001,
+            0.3798370960602036,
+            0.6126825000000001,
+            0.4020593182824258
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "14",
+          "bounds": [
+            0.77412,
+            0.3798370960602036,
+            0.7906825000000001,
+            0.4020593182824258
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "KnowledgeMap",
+          "bounds": [
+            0.062119999999999995,
+            0.30765781319167773,
+            0.161260625,
+            0.32988003541389993
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "4",
+          "bounds": [
+            0.24012,
+            0.30765781319167773,
+            0.24840125000000002,
+            0.32988003541389993
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "4",
+          "bounds": [
+            0.41812000000000005,
+            0.30765781319167773,
+            0.42640125000000006,
+            0.32988003541389993
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "9",
+          "bounds": [
+            0.5961200000000001,
+            0.30765781319167773,
+            0.604479375,
+            0.32988003541389993
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "9",
+          "bounds": [
+            0.77412,
+            0.30765781319167773,
+            0.7824793750000001,
+            0.32988003541389993
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "JDrive",
+          "bounds": [
+            0.062119999999999995,
+            0.2354785303231518,
+            0.10071374999999999,
+            0.25770075254537406
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "0",
+          "bounds": [
+            0.24012,
+            0.2354785303231518,
+            0.24840125000000002,
+            0.25770075254537406
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "0",
+          "bounds": [
+            0.41812000000000005,
+            0.2354785303231518,
+            0.42640125000000006,
+            0.25770075254537406
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "0",
+          "bounds": [
+            0.5961200000000001,
+            0.2354785303231518,
+            0.6044012500000001,
+            0.25770075254537406
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "0",
+          "bounds": [
+            0.77412,
+            0.2354785303231518,
+            0.78240125,
+            0.25770075254537406
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Fixture",
+          "bounds": [
+            0.062119999999999995,
+            0.6904267374944665,
+            0.114854375,
+            0.7126489597166887
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Template SQL",
+          "bounds": [
+            0.24012,
+            0.6904267374944665,
+            0.340745,
+            0.7126489597166887
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Bound seed/demand\norigins",
+          "bounds": [
+            0.41812000000000005,
+            0.6775378486055775,
+            0.56827625,
+            0.7255378486055776
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Submitted",
+          "bounds": [
+            0.5961200000000001,
+            0.6904267374944665,
+            0.6729168750000001,
+            0.7126489597166887
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Promoted",
+          "bounds": [
+            0.77412,
+            0.6904267374944665,
+            0.84615125,
+            0.7126489597166887
+          ]
+        }
+      ]
+    },
+    {
+      "page": 18,
+      "title": "Domain cases: reached barriers and controls remain visible",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "Domain cases: reached barriers and controls remain visible",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.870078125,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Actual compact checkpoint counts bind reached source locations and outcomes.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.5796875,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Mutations, nested spawns, cycles/private views and restart/persistence were retained in independent stored replay and\nphysical state checks.",
+          "bounds": [
+            0.065,
+            0.12977777777777777,
+            0.90046875,
+            0.17777777777777778
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "IssueDesk",
+          "bounds": [
+            0.06686666666666667,
+            0.5757480158730158,
+            0.12835104166666667,
+            0.5968591269841269
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "9 template queries;14\nsubmitted/promoted\nproject:98, engineer:104, issue:109\nbarriers reached",
+          "bounds": [
+            0.3635333333333333,
+            0.5390813492063492,
+            0.5804864583333333,
+            0.6335257936507936
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "561SQL vs557 Off\n159.419ms vs139.440ms",
+          "bounds": [
+            0.6602,
+            0.5635257936507936,
+            0.814496875,
+            0.6090813492063492
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "KnowledgeMap",
+          "bounds": [
+            0.06686666666666667,
+            0.39492658730158725,
+            0.15944479166666667,
+            0.41603769841269833
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "4 templates;9 submitted/promoted\narticle:52 / article:171 and start:165\nbarriers",
+          "bounds": [
+            0.3635333333333333,
+            0.3704821428571428,
+            0.5854083333333333,
+            0.44048214285714277
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "301SQL vs298 Off\n79.167ms vs72.712 ms",
+          "bounds": [
+            0.6602,
+            0.382704365079365,
+            0.802934375,
+            0.4282599206349206
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "JDrive",
+          "bounds": [
+            0.06686666666666667,
+            0.2576765873015872,
+            0.10296041666666668,
+            0.27878769841269835
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "0 template queries /0 submissions\nwalk:45 /walk:48 /run:41 barriers reached",
+          "bounds": [
+            0.3635333333333333,
+            0.245454365079365,
+            0.6190802083333333,
+            0.2910099206349206
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "156SQL in all modes\n46.648ms vs48.053ms Off",
+          "bounds": [
+            0.6602,
+            0.245454365079365,
+            0.8212937499999999,
+            0.2910099206349206
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Application",
+          "bounds": [
+            0.06686666666666667,
+            0.7129980158730158,
+            0.14452291666666667,
+            0.7341091269841269
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Observed evidence",
+          "bounds": [
+            0.3635333333333333,
+            0.7129980158730158,
+            0.49517395833333333,
+            0.7341091269841269
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Measured result",
+          "bounds": [
+            0.6602,
+            0.7129980158730158,
+            0.7722312499999999,
+            0.7341091269841269
+          ]
+        }
+      ]
+    },
+    {
+      "page": 19,
+      "title": "Construction-only thread CPU: AST versus templates",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "Construction-only thread CPU: AST versus templates",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.77796875,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Construction microbenchmark: 100 calls/block \u00d7 3 blocks; 10 excluded AST/warm priming calls.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.68109375,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "AST build count: 100/block for dynamic construction; 0 for hydration/selection/binding. Same-thread clock controls\npassed.",
+          "bounds": [
+            0.065,
+            0.25355555555555553,
+            0.914296875,
+            0.3111111111111111
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Cold hydration covers the selected walker bundle. Inputs bind actual emitted sites and fixture IDs with declared\ncommon2048 limits.",
+          "bounds": [
+            0.065,
+            0.1597777777777778,
+            0.845859375,
+            0.20777777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Declared LittleX collect-batch microbenchmark; the primary 9282 feed uses root linear.",
+          "bounds": [
+            0.065,
+            0.10055555555555555,
+            0.635390625,
+            0.12277777777777778
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LinkedList / linear",
+          "bounds": [
+            0.0639,
+            0.568888888888889,
+            0.1867125,
+            0.5911111111111113
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "1468.939\n[1463.568, 1546.886]",
+          "bounds": [
+            0.2864,
+            0.556,
+            0.438509375,
+            0.6040000000000002
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "52.568\n[51.907, 53.801]",
+          "bounds": [
+            0.5089,
+            0.556,
+            0.625853125,
+            0.6040000000000002
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "4.705\n[4.704, 4.737]",
+          "bounds": [
+            0.7314,
+            0.556,
+            0.8304625,
+            0.6040000000000002
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LittleX / collect batch",
+          "bounds": [
+            0.0639,
+            0.46088888888888896,
+            0.2114,
+            0.4831111111111112
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "1843.307\n[1841.916, 1848.335]",
+          "bounds": [
+            0.2864,
+            0.44800000000000006,
+            0.43843125,
+            0.4960000000000001
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "125.383\n[124.803, 127.044]",
+          "bounds": [
+            0.5089,
+            0.44800000000000006,
+            0.643353125,
+            0.4960000000000001
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "7.033\n[7.026, 7.058]",
+          "bounds": [
+            0.7314,
+            0.44800000000000006,
+            0.83061875,
+            0.4960000000000001
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Module/shape",
+          "bounds": [
+            0.0639,
+            0.676888888888889,
+            0.17343125,
+            0.6991111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "850 AST \u00b5s/call",
+          "bounds": [
+            0.2864,
+            0.676888888888889,
+            0.40624375,
+            0.6991111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "9282 cold hydrate \u00b5s",
+          "bounds": [
+            0.5089,
+            0.676888888888889,
+            0.674290625,
+            0.6991111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "9282 warm select+bind\n\u00b5s",
+          "bounds": [
+            0.7314,
+            0.664,
+            0.91624375,
+            0.7120000000000001
+          ]
+        }
+      ]
+    },
+    {
+      "page": 20,
+      "title": "Selection and binding are measured separately",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "Selection and binding are measured separately",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.704140625,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Runtime only: 100 calls/block \u00d7 3 blocks; compiler measurements use 1 compile/block.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.624375,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Separate select/bind counters use opt-in timers; unprofiled blocks retain native clocks disabled.",
+          "bounds": [
+            0.065,
+            0.27444444444444444,
+            0.773828125,
+            0.3011111111111111
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Cold selected-walker hydration is separate; copying/spec validation/artifact metadata stay outside measured blocks.",
+          "bounds": [
+            0.065,
+            0.17555555555555555,
+            0.879921875,
+            0.19777777777777777
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "LL uses a covered linear shape. LittleX uses declared collect events 4/5; primary9282 selects only root linear.",
+          "bounds": [
+            0.065,
+            0.10055555555555555,
+            0.779921875,
+            0.12277777777777778
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LinkedList / linear",
+          "bounds": [
+            0.0639,
+            0.5934932054356514,
+            0.1867125,
+            0.6157154276578736
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "0.309\n[0.305, 0.329]",
+          "bounds": [
+            0.2864,
+            0.5806043165467625,
+            0.385696875,
+            0.6286043165467625
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "4.449\n[4.408, 4.449]",
+          "bounds": [
+            0.5089,
+            0.5806043165467625,
+            0.6079625,
+            0.6286043165467625
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "4.705\n[4.704, 4.737]",
+          "bounds": [
+            0.7314,
+            0.5806043165467625,
+            0.8304625,
+            0.6286043165467625
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LittleX / collect batch",
+          "bounds": [
+            0.0639,
+            0.4630903277378097,
+            0.2114,
+            0.4853125499600319
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "0.217\n[0.216, 0.221]",
+          "bounds": [
+            0.2864,
+            0.4502014388489208,
+            0.385540625,
+            0.4982014388489209
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "6.861\n[6.776, 7.025]",
+          "bounds": [
+            0.5089,
+            0.4502014388489208,
+            0.608040625,
+            0.4982014388489209
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "7.033\n[7.026, 7.058]",
+          "bounds": [
+            0.7314,
+            0.4502014388489208,
+            0.83061875,
+            0.4982014388489209
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Declared emitted shape",
+          "bounds": [
+            0.0639,
+            0.6992917665867306,
+            0.25155625,
+            0.7215139888089528
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Select \u00b5s/call",
+          "bounds": [
+            0.2864,
+            0.6992917665867306,
+            0.39061875,
+            0.7215139888089528
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Bind \u00b5s/call",
+          "bounds": [
+            0.5089,
+            0.6992917665867306,
+            0.599759375,
+            0.7215139888089528
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Select +bind \u00b5s/call",
+          "bounds": [
+            0.7314,
+            0.6992917665867306,
+            0.886634375,
+            0.7215139888089528
+          ]
+        }
+      ]
+    },
+    {
+      "page": 21,
+      "title": "Compilation and artifact growth are part of the tradeoff",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "Compilation and artifact growth are part of the tradeoff",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.821640625,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "First compiler calls include lazy initialization; full CPU vectors and controls are preserved.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.63765625,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Same-program runs follow one excluded compile; n = 3. First fresh-program CPU: LL \u2248 3.9/3.8s; LittleX \u2248 4.6/4.5s\n(850/9282).",
+          "bounds": [
+            0.065,
+            0.23977777777777778,
+            0.860234375,
+            0.2877777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "All fresh/same-program, wall/thread CPU, emitted SQL bytes and opt-in generation counters remain in the editable data.",
+          "bounds": [
+            0.065,
+            0.16555555555555557,
+            0.906015625,
+            0.18777777777777777
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Full compiler vectors retain initialization and dispersion; generated Python and bytecode artifacts are larger.",
+          "bounds": [
+            0.065,
+            0.10055555555555555,
+            0.77328125,
+            0.12277777777777778
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LinkedList module",
+          "bounds": [
+            0.0639,
+            0.5688888888888889,
+            0.18218125000000002,
+            0.5911111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "250.7 [250.5, 267.4]\n242.2 [241.9, 245.8]",
+          "bounds": [
+            0.2864,
+            0.5559999999999999,
+            0.420853125,
+            0.604
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "45682 \u2192 219988",
+          "bounds": [
+            0.5089,
+            0.5688888888888889,
+            0.6192125,
+            0.5911111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "36136 \u2192 90124",
+          "bounds": [
+            0.7314,
+            0.5688888888888889,
+            0.833665625,
+            0.5911111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LittleX module",
+          "bounds": [
+            0.0639,
+            0.45488888888888884,
+            0.1585875,
+            0.4771111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "548.6 [503.0, 1064.3]\n537.7 [536.7, 1051.7]",
+          "bounds": [
+            0.2864,
+            0.44199999999999995,
+            0.429134375,
+            0.49
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "217118 \u2192 1499200",
+          "bounds": [
+            0.5089,
+            0.45488888888888884,
+            0.635853125,
+            0.4771111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "122908 \u2192 280609",
+          "bounds": [
+            0.7314,
+            0.45488888888888884,
+            0.850071875,
+            0.4771111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Module",
+          "bounds": [
+            0.0639,
+            0.6828888888888888,
+            0.11780625,
+            0.705111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Same-program CPU ms\n850 /9282",
+          "bounds": [
+            0.2864,
+            0.6699999999999999,
+            0.4554625,
+            0.718
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Generated Python bytes",
+          "bounds": [
+            0.5089,
+            0.6828888888888888,
+            0.68843125,
+            0.705111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Bytecode bytes",
+          "bounds": [
+            0.7314,
+            0.6828888888888888,
+            0.84530625,
+            0.705111111111111
+          ]
+        }
+      ]
+    },
+    {
+      "page": 22,
+      "title": "SQL generation: measured cost and size",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "SQL generation: measured cost and size",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.6075,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Actual emitter generation timers; separate profiled and unprofiled controls.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.5475,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Counts include all walker checkpoint emission in the compiled module; bundles include catalog, batch, linear and native\ndescriptors.",
+          "bounds": [
+            0.065,
+            0.23977777777777778,
+            0.9053125,
+            0.2877777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "SQL generation occurs during compilation; emitted descriptors, generated Python and bytecode sizes are measured.",
+          "bounds": [
+            0.065,
+            0.16444444444444445,
+            0.929765625,
+            0.19111111111111112
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LinkedList module",
+          "bounds": [
+            0.062119999999999995,
+            0.5688888888888889,
+            0.18040124999999999,
+            0.5911111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "6",
+          "bounds": [
+            0.24012,
+            0.5688888888888889,
+            0.248479375,
+            0.5911111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "11.901\n[11.874, 12.477]",
+          "bounds": [
+            0.41812000000000005,
+            0.5559999999999999,
+            0.5275731250000001,
+            0.604
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "42360",
+          "bounds": [
+            0.5961200000000001,
+            0.5688888888888889,
+            0.6376043750000001,
+            0.5911111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "53709",
+          "bounds": [
+            0.77412,
+            0.5688888888888889,
+            0.815604375,
+            0.5911111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "LittleX module",
+          "bounds": [
+            0.062119999999999995,
+            0.45488888888888884,
+            0.1568075,
+            0.4771111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "24",
+          "bounds": [
+            0.24012,
+            0.45488888888888884,
+            0.2566825,
+            0.4771111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "33.893\n[33.357, 34.078]",
+          "bounds": [
+            0.41812000000000005,
+            0.44199999999999995,
+            0.5275731250000001,
+            0.49
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "124565",
+          "bounds": [
+            0.5961200000000001,
+            0.45488888888888884,
+            0.6458856250000001,
+            0.4771111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "156172",
+          "bounds": [
+            0.77412,
+            0.45488888888888884,
+            0.8238856250000001,
+            0.4771111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Module",
+          "bounds": [
+            0.062119999999999995,
+            0.6828888888888888,
+            0.11602625,
+            0.705111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Generation calls",
+          "bounds": [
+            0.24012,
+            0.6828888888888888,
+            0.359885625,
+            0.705111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Generation thread\nCPU ms",
+          "bounds": [
+            0.41812000000000005,
+            0.6699999999999999,
+            0.553666875,
+            0.718
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "SQL bytes",
+          "bounds": [
+            0.5961200000000001,
+            0.6828888888888888,
+            0.6701825000000001,
+            0.705111111111111
+          ]
+        },
+        {
+          "kind": "table",
+          "text": "Bundle bytes",
+          "bounds": [
+            0.77412,
+            0.6828888888888888,
+            0.8706825,
+            0.705111111111111
+          ]
+        }
+      ]
+    },
+    {
+      "page": 23,
+      "title": "Real process readers; zero observed SQL interval overlap",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "Real process readers; zero observed SQL interval overlap",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.843125,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "A child process existing is insufficient: actual PgWire calls and distinct backend PIDs are recorded.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.695,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "LL1000 representative Traverse: foreground PID [2931381]; child PID [2931673].",
+          "bounds": [
+            0.065,
+            0.7311111111111112,
+            0.731640625,
+            0.76
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "14 foreground SQL +2 child SQL; actual separate PostgreSQL backends.",
+          "bounds": [
+            0.065,
+            0.6161111111111112,
+            0.66,
+            0.645
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "All 72 protocol sums equal interval unions; observed SQL overlap = 0.",
+          "bounds": [
+            0.065,
+            0.5011111111111111,
+            0.645234375,
+            0.53
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Python 3.14 has the GIL enabled; actual child SQL executes on independent PostgreSQL backends.",
+          "bounds": [
+            0.065,
+            0.3861111111111112,
+            0.88203125,
+            0.41500000000000004
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Startup/readiness and IPC remain in the natural workflow; DB totals cover only their actual SQL calls.",
+          "bounds": [
+            0.065,
+            0.2711111111111112,
+            0.90171875,
+            0.30000000000000004
+          ]
+        }
+      ]
+    },
+    {
+      "page": 24,
+      "title": "Measurement and lifecycle",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "Measurement and lifecycle",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.42375,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Primary clock: driver/socket sendall to ReadyForQuery, including response/row-decoding progress.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.6975,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Clock immediately before real sendall \u2192 receipt of ReadyForQuery Z; row decoding/progress included.",
+          "bounds": [
+            0.065,
+            0.7333333333333333,
+            0.864921875,
+            0.76
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Parameter encoding/compiler/model work stays outside that interval; outer driver-call times retained\nseparately.",
+          "bounds": [
+            0.065,
+            0.5771666666666667,
+            0.85671875,
+            0.64
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "C CommandComplete, D rows/bytes, actual command cycles and SQL fingerprints retained; controls count.",
+          "bounds": [
+            0.065,
+            0.49333333333333335,
+            0.906171875,
+            0.52
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Fresh per-trial DB; identical seeded actions; one profile reset after setup; Always/process 1; limit 2048/steps\n32768.",
+          "bounds": [
+            0.065,
+            0.33716666666666667,
+            0.91296875,
+            0.4
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "OS/PG buffers warmed by seed/verification; SQL statement logging off; WAL min 32 / max 64 MB.",
+          "bounds": [
+            0.065,
+            0.25333333333333335,
+            0.82921875,
+            0.28
+          ]
+        }
+      ]
+    },
+    {
+      "page": 25,
+      "title": "What to improve next",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "What to improve next",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.353515625,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Proposals are untested improvements, selected from measured limits rather than assumed speedups.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.72109375,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Region-aware retry/dedup: remove the single-attempt LittleX limitation while preserving native cache\nreuse.",
+          "bounds": [
+            0.065,
+            0.6922222222222222,
+            0.906796875,
+            0.76
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Admission by opportunity and cost: wider eligible origins matter; current application queries observe\nwidth1.",
+          "bounds": [
+            0.065,
+            0.5722222222222222,
+            0.900703125,
+            0.64
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Deferred roadmap: cost-model admission and database prepared-statement reuse, evaluated against\nworkload selectivity.",
+          "bounds": [
+            0.065,
+            0.45222222222222225,
+            0.90640625,
+            0.52
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Artifact budget: consider deduplicated descriptors, lazy region hydration and selective template\nemission.",
+          "bounds": [
+            0.065,
+            0.3322222222222222,
+            0.861640625,
+            0.4
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Retain guard/identity/oracle checks and intentional overfetch accounting; evaluate existing workflows\nwithout dropping regressions.",
+          "bounds": [
+            0.065,
+            0.21222222222222226,
+            0.90984375,
+            0.28
+          ]
+        }
+      ]
+    },
+    {
+      "page": 26,
+      "title": "Reproducible evidence and exact completed inventory",
+      "passed": true,
+      "text_checks": [
+        {
+          "kind": "figure",
+          "text": "Reproducible evidence and exact completed inventory",
+          "bounds": [
+            0.055,
+            0.9111111111111111,
+            0.801328125,
+            0.9533333333333334
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "72/72 primary workflows; 18/18 native correctness cases; five existing applications.",
+          "bounds": [
+            0.055,
+            0.8605555555555555,
+            0.603515625,
+            0.8827777777777778
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Runtime versions85026d and9282e246; primary Off uses9282. Same process 1/2048/32768 settings.",
+          "bounds": [
+            0.065,
+            0.7333333333333333,
+            0.862265625,
+            0.76
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "54 measured +18 excluded warmups; all 18 n = 3 cells, complete CSV/JSON, sealed SQL/HTTP/events and\nsemantic proofs.",
+          "bounds": [
+            0.065,
+            0.5771666666666667,
+            0.89796875,
+            0.64
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Independent audit:142,488 driver records /3,184 sealed files; all request/count/interval/export statistics match.",
+          "bounds": [
+            0.065,
+            0.49333333333333335,
+            0.938984375,
+            0.52
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Actual compiler output/artifacts and separate CPU controls; native four-origin/cancel evidence; source-bound\nLittleX explanation.",
+          "bounds": [
+            0.065,
+            0.33716666666666667,
+            0.9196875,
+            0.4
+          ]
+        },
+        {
+          "kind": "figure",
+          "text": "Editable renderer + figure inputs + report/source hashes. Primary and diagnostic evidence remain separately\nidentified.",
+          "bounds": [
+            0.065,
+            0.21716666666666673,
+            0.925390625,
+            0.28
+          ]
+        }
+      ]
+    }
+  ],
+  "right_limit": 0.945,
+  "checks": "All figure text bounds and pair overlap; every table cell text contained by its cell."
+}

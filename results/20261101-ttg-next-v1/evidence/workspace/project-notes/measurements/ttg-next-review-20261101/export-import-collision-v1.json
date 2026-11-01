@@ -1,0 +1,14 @@
+{
+  "status": "confirmed historical unused export.py wiring defect; active capture unaffected; separate export_v2 fix authorized",
+  "source": {
+    "path": "reproduction/ttg-next-performance/export.py",
+    "sha256": "293bc6d3f2291ca7166f2680cbb9c2d0c337d57a61ec6f9bd2643c4ccc7c0876"
+  },
+  "actual_runner_module": "/home/baichuan/jaseci/reproduction/ttg-plus-performance/runner.py",
+  "actual_release_module": "review",
+  "actual_release_signature": "(plan_path)",
+  "two_argument_call_error": "release() takes 1 positional argument but 2 were given",
+  "cause": "next_interop prepends borrowed helper directories; from runner import release resolves old plus runner and its imported review.release. Help/import smoke succeeds but exporter invocation passes2args.",
+  "repair_scope": "NEW standalone export_v2 explicit path/unique module import and binding regression, separately source-versioned. Active153source18fc planfca6 remains immutable; no native18 rerun or runtime review.",
+  "execution": "Fresh Python import/path/signature + wrong-arity call only. No body execution, DB, app, raw capture or test rerun."
+}

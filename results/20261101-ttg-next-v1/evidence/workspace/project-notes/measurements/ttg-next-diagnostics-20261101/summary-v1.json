@@ -1,0 +1,4608 @@
+{
+  "passed": true,
+  "kind": "accepted_LL1000_SQL_diagnostic_summary",
+  "primary_performance": false,
+  "recapture": [
+    {
+      "config_id": "baseline850",
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-diagnostics-20261101/recapture-v2/cases/linked_list1000-baseline850-diagnostic/captures/ll1000-baseline850-recursive-pid3084247.json",
+        "sha256": "6edd5d76839f3bbd9c49a26b5d1b47a459665a486b5217c963fe7bfecc61181e"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-diagnostics-20261101/recapture-v2/cases/linked_list1000-baseline850-diagnostic/diagnostic-acceptance.json",
+        "sha256": "edc8ca04aee44a5b370eadc4ee7979387a72e346ece71690c2aeda2ce5819d49"
+      },
+      "actual_original_rows": 1000,
+      "wire_packet_sha256": "2465cac701567458b020d47be2bfea7430f4b00ad089e40785c9e46c0f57f9f7",
+      "state_isolation": "serializable",
+      "settings": [
+        [
+          "client_encoding",
+          "UTF8"
+        ],
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "effective_cache_size",
+          "524288"
+        ],
+        [
+          "enable_bitmapscan",
+          "on"
+        ],
+        [
+          "enable_hashjoin",
+          "on"
+        ],
+        [
+          "enable_indexscan",
+          "on"
+        ],
+        [
+          "enable_mergejoin",
+          "on"
+        ],
+        [
+          "enable_nestloop",
+          "on"
+        ],
+        [
+          "enable_seqscan",
+          "on"
+        ],
+        [
+          "jit",
+          "on"
+        ],
+        [
+          "plan_cache_mode",
+          "auto"
+        ],
+        [
+          "random_page_cost",
+          "4"
+        ],
+        [
+          "row_security",
+          "on"
+        ],
+        [
+          "search_path",
+          "\"$user\", public"
+        ],
+        [
+          "server_version_num",
+          "180006"
+        ],
+        [
+          "standard_conforming_strings",
+          "on"
+        ],
+        [
+          "statement_timeout",
+          "0"
+        ],
+        [
+          "work_mem",
+          "4096"
+        ]
+      ],
+      "relations": [
+        [
+          "anchors",
+          -1.0,
+          0,
+          2005,
+          0,
+          null,
+          null,
+          2005,
+          0,
+          0
+        ],
+        [
+          "graph_types",
+          -1.0,
+          0,
+          4,
+          0,
+          null,
+          null,
+          4,
+          0,
+          0
+        ]
+      ],
+      "statistics_rows": 0,
+      "plans": [
+        {
+          "repetition": 0,
+          "planning_ms": 1.19,
+          "execution_ms": 52.716,
+          "estimated_total_cost": 2732.25,
+          "jit": null,
+          "root_buffers": {
+            "Shared Hit Blocks": 20136,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "operators": [
+            {
+              "path": "Plan",
+              "Node Type": "Limit",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 52.514
+            },
+            {
+              "path": "Plan/Plans/0",
+              "Node Type": "Recursive Union",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 25.219
+            },
+            {
+              "path": "Plan/Plans/0/Plans/0",
+              "Node Type": "Result",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1",
+              "Node Type": "Nested Loop",
+              "Join Type": "Inner",
+              "Plan Rows": 3,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.025
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/0",
+              "Node Type": "WorkTable Scan",
+              "Filter": "(depth < '2048'::bigint)",
+              "Plan Rows": 3,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.0
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1",
+              "Node Type": "Subquery Scan",
+              "Filter": "((_t8.arch_type = 'Item'::text) AND (_t8.arch_module = 'server'::text))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.024
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+              "Node Type": "WindowAgg",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.024
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+              "Node Type": "Nested Loop",
+              "Join Type": "Inner",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.023
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Bitmap Heap Scan",
+              "Filter": "(((src = _t0_1.origin_id) OR (undirected AND (dst = _t0_1.origin_id))) AND ((arch_type = 'Next'::text) OR EXISTS(SubPlan 2)))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.021
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "BitmapAnd",
+              "Plan Rows": 1,
+              "Actual Rows": 0.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.02
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_kind_type",
+              "Index Cond": "(kind = 'EdgeAnchor'::text)",
+              "Plan Rows": 19,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.017
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "BitmapOr",
+              "Plan Rows": 38,
+              "Actual Rows": 0.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.002
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_src",
+              "Index Cond": "(src = _t0_1.origin_id)",
+              "Plan Rows": 19,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_dst",
+              "Index Cond": "(dst = _t0_1.origin_id)",
+              "Plan Rows": 19,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "Index Only Scan",
+              "Index Name": "graph_types_pkey",
+              "Index Cond": "((type_name = _t9.arch_type) AND (ancestor = 'Next'::text))",
+              "Plan Rows": 1,
+              "Actual Rows": 0,
+              "Actual Loops": 0,
+              "Actual Total Time": 0.0
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1",
+              "Node Type": "Index Scan",
+              "Index Name": "anchors_pkey",
+              "Index Cond": "(id = CASE WHEN (_t9.src = _t0_1.origin_id) THEN _t9.dst ELSE _t9.src END)",
+              "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '1e3d251e-9086-4fa4-a860-9774a8866abe'::text) OR EXISTS(SubPlan 1)))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 999,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0",
+              "Node Type": "Index Only Scan",
+              "Index Name": "idx_anchors_edge_src_type_order",
+              "Index Cond": "(src = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid)",
+              "Filter": "((((_t10.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+              "Plan Rows": 1,
+              "Actual Rows": 0,
+              "Actual Loops": 0,
+              "Actual Total Time": 0.0
+            },
+            {
+              "path": "Plan/Plans/1",
+              "Node Type": "Sort",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 52.467
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0",
+              "Node Type": "Nested Loop",
+              "Join Type": "Left",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 52.134
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0",
+              "Node Type": "CTE Scan",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 25.497
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1",
+              "Node Type": "WindowAgg",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.026
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+              "Node Type": "WindowAgg",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.026
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+              "Node Type": "Sort",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.025
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Nested Loop",
+              "Join Type": "Inner",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.024
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Bitmap Heap Scan",
+              "Filter": "(((src = _t0.origin_id) OR (undirected AND (dst = _t0.origin_id))) AND ((arch_type = 'Next'::text) OR EXISTS(SubPlan 6)))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.021
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "BitmapAnd",
+              "Plan Rows": 1,
+              "Actual Rows": 0.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.02
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_kind_type",
+              "Index Cond": "(kind = 'EdgeAnchor'::text)",
+              "Plan Rows": 19,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.017
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "BitmapOr",
+              "Plan Rows": 38,
+              "Actual Rows": 0.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.002
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_src",
+              "Index Cond": "(src = _t0.origin_id)",
+              "Plan Rows": 19,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_dst",
+              "Index Cond": "(dst = _t0.origin_id)",
+              "Plan Rows": 19,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "Index Only Scan",
+              "Index Name": "graph_types_pkey",
+              "Index Cond": "((type_name = _t3.arch_type) AND (ancestor = 'Next'::text))",
+              "Plan Rows": 1,
+              "Actual Rows": 0,
+              "Actual Loops": 0,
+              "Actual Total Time": 0.0
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "Index Scan",
+              "Index Name": "anchors_pkey",
+              "Index Cond": "(id = CASE WHEN (_t3.src = _t0.origin_id) THEN _t3.dst ELSE _t3.src END)",
+              "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '1e3d251e-9086-4fa4-a860-9774a8866abe'::text) OR EXISTS(SubPlan 5)))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 999,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "Node Type": "Index Only Scan",
+              "Index Name": "idx_anchors_edge_src_type_order",
+              "Index Cond": "(src = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid)",
+              "Filter": "((((_t4.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+              "Plan Rows": 1,
+              "Actual Rows": 0,
+              "Actual Loops": 0,
+              "Actual Total Time": 0.0
+            }
+          ]
+        },
+        {
+          "repetition": 1,
+          "planning_ms": 0.669,
+          "execution_ms": 49.895,
+          "estimated_total_cost": 2732.25,
+          "jit": null,
+          "root_buffers": {
+            "Shared Hit Blocks": 20136,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "operators": [
+            {
+              "path": "Plan",
+              "Node Type": "Limit",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 49.796
+            },
+            {
+              "path": "Plan/Plans/0",
+              "Node Type": "Recursive Union",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 24.051
+            },
+            {
+              "path": "Plan/Plans/0/Plans/0",
+              "Node Type": "Result",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1",
+              "Node Type": "Nested Loop",
+              "Join Type": "Inner",
+              "Plan Rows": 3,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.024
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/0",
+              "Node Type": "WorkTable Scan",
+              "Filter": "(depth < '2048'::bigint)",
+              "Plan Rows": 3,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.0
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1",
+              "Node Type": "Subquery Scan",
+              "Filter": "((_t8.arch_type = 'Item'::text) AND (_t8.arch_module = 'server'::text))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.023
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+              "Node Type": "WindowAgg",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.023
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+              "Node Type": "Nested Loop",
+              "Join Type": "Inner",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.022
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Bitmap Heap Scan",
+              "Filter": "(((src = _t0_1.origin_id) OR (undirected AND (dst = _t0_1.origin_id))) AND ((arch_type = 'Next'::text) OR EXISTS(SubPlan 2)))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.02
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "BitmapAnd",
+              "Plan Rows": 1,
+              "Actual Rows": 0.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.019
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_kind_type",
+              "Index Cond": "(kind = 'EdgeAnchor'::text)",
+              "Plan Rows": 19,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.016
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "BitmapOr",
+              "Plan Rows": 38,
+              "Actual Rows": 0.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.002
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_src",
+              "Index Cond": "(src = _t0_1.origin_id)",
+              "Plan Rows": 19,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_dst",
+              "Index Cond": "(dst = _t0_1.origin_id)",
+              "Plan Rows": 19,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "Index Only Scan",
+              "Index Name": "graph_types_pkey",
+              "Index Cond": "((type_name = _t9.arch_type) AND (ancestor = 'Next'::text))",
+              "Plan Rows": 1,
+              "Actual Rows": 0,
+              "Actual Loops": 0,
+              "Actual Total Time": 0.0
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1",
+              "Node Type": "Index Scan",
+              "Index Name": "anchors_pkey",
+              "Index Cond": "(id = CASE WHEN (_t9.src = _t0_1.origin_id) THEN _t9.dst ELSE _t9.src END)",
+              "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '1e3d251e-9086-4fa4-a860-9774a8866abe'::text) OR EXISTS(SubPlan 1)))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 999,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0",
+              "Node Type": "Index Only Scan",
+              "Index Name": "idx_anchors_edge_src_type_order",
+              "Index Cond": "(src = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid)",
+              "Filter": "((((_t10.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+              "Plan Rows": 1,
+              "Actual Rows": 0,
+              "Actual Loops": 0,
+              "Actual Total Time": 0.0
+            },
+            {
+              "path": "Plan/Plans/1",
+              "Node Type": "Sort",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 49.747
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0",
+              "Node Type": "Nested Loop",
+              "Join Type": "Left",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 49.496
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0",
+              "Node Type": "CTE Scan",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 24.319
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1",
+              "Node Type": "WindowAgg",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.025
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+              "Node Type": "WindowAgg",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.024
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+              "Node Type": "Sort",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.023
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Nested Loop",
+              "Join Type": "Inner",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.022
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Bitmap Heap Scan",
+              "Filter": "(((src = _t0.origin_id) OR (undirected AND (dst = _t0.origin_id))) AND ((arch_type = 'Next'::text) OR EXISTS(SubPlan 6)))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.02
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "BitmapAnd",
+              "Plan Rows": 1,
+              "Actual Rows": 0.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.019
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_kind_type",
+              "Index Cond": "(kind = 'EdgeAnchor'::text)",
+              "Plan Rows": 19,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.016
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "BitmapOr",
+              "Plan Rows": 38,
+              "Actual Rows": 0.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.002
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_src",
+              "Index Cond": "(src = _t0.origin_id)",
+              "Plan Rows": 19,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_dst",
+              "Index Cond": "(dst = _t0.origin_id)",
+              "Plan Rows": 19,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "Index Only Scan",
+              "Index Name": "graph_types_pkey",
+              "Index Cond": "((type_name = _t3.arch_type) AND (ancestor = 'Next'::text))",
+              "Plan Rows": 1,
+              "Actual Rows": 0,
+              "Actual Loops": 0,
+              "Actual Total Time": 0.0
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "Index Scan",
+              "Index Name": "anchors_pkey",
+              "Index Cond": "(id = CASE WHEN (_t3.src = _t0.origin_id) THEN _t3.dst ELSE _t3.src END)",
+              "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '1e3d251e-9086-4fa4-a860-9774a8866abe'::text) OR EXISTS(SubPlan 5)))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 999,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "Node Type": "Index Only Scan",
+              "Index Name": "idx_anchors_edge_src_type_order",
+              "Index Cond": "(src = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid)",
+              "Filter": "((((_t4.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+              "Plan Rows": 1,
+              "Actual Rows": 0,
+              "Actual Loops": 0,
+              "Actual Total Time": 0.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "config_id": "next",
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-diagnostics-20261101/recapture-v2/cases/linked_list1000-next-diagnostic/captures/ll1000-next-recursive-pid3099238.json",
+        "sha256": "0d041a31a5bf2753c7ee20d627887a50742c9a29a450e2f28a529253ac2d29d0"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-diagnostics-20261101/recapture-v2/cases/linked_list1000-next-diagnostic/diagnostic-acceptance.json",
+        "sha256": "0422d51988605218a856b4363b763966b04fd9a5081287abe699c0714f632d52"
+      },
+      "actual_original_rows": 1000,
+      "wire_packet_sha256": "234cd9441c4b27e0fb91bdd137d29f9b2b02686aced13fa424ee149ce575a0a0",
+      "state_isolation": "serializable",
+      "settings": [
+        [
+          "client_encoding",
+          "UTF8"
+        ],
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "effective_cache_size",
+          "524288"
+        ],
+        [
+          "enable_bitmapscan",
+          "on"
+        ],
+        [
+          "enable_hashjoin",
+          "on"
+        ],
+        [
+          "enable_indexscan",
+          "on"
+        ],
+        [
+          "enable_mergejoin",
+          "on"
+        ],
+        [
+          "enable_nestloop",
+          "on"
+        ],
+        [
+          "enable_seqscan",
+          "on"
+        ],
+        [
+          "jit",
+          "on"
+        ],
+        [
+          "plan_cache_mode",
+          "auto"
+        ],
+        [
+          "random_page_cost",
+          "4"
+        ],
+        [
+          "row_security",
+          "on"
+        ],
+        [
+          "search_path",
+          "\"$user\", public"
+        ],
+        [
+          "server_version_num",
+          "180006"
+        ],
+        [
+          "standard_conforming_strings",
+          "on"
+        ],
+        [
+          "statement_timeout",
+          "0"
+        ],
+        [
+          "work_mem",
+          "4096"
+        ]
+      ],
+      "relations": [
+        [
+          "anchors",
+          -1.0,
+          0,
+          2005,
+          0,
+          null,
+          null,
+          2005,
+          0,
+          0
+        ],
+        [
+          "graph_types",
+          -1.0,
+          0,
+          4,
+          0,
+          null,
+          null,
+          4,
+          0,
+          0
+        ]
+      ],
+      "statistics_rows": 0,
+      "plans": [
+        {
+          "repetition": 0,
+          "planning_ms": 0.695,
+          "execution_ms": 63.194,
+          "estimated_total_cost": 3515.65,
+          "jit": null,
+          "root_buffers": {
+            "Shared Hit Blocks": 20136,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "operators": [
+            {
+              "path": "Plan",
+              "Node Type": "Limit",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 63.015
+            },
+            {
+              "path": "Plan/Plans/0",
+              "Node Type": "Recursive Union",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 30.388
+            },
+            {
+              "path": "Plan/Plans/0/Plans/0",
+              "Node Type": "Result",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1",
+              "Node Type": "Nested Loop",
+              "Join Type": "Inner",
+              "Plan Rows": 3,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.03
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/0",
+              "Node Type": "WorkTable Scan",
+              "Filter": "(depth < '2048'::bigint)",
+              "Plan Rows": 3,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.0
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1",
+              "Node Type": "Subquery Scan",
+              "Filter": "((_t8.arch_type = 'Item'::text) AND (_t8.arch_module = 'server'::text))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.029
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+              "Node Type": "WindowAgg",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.029
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+              "Node Type": "Nested Loop",
+              "Join Type": "Inner",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.028
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Bitmap Heap Scan",
+              "Filter": "(((src = _t0_1.origin_id) OR (undirected AND (dst = _t0_1.origin_id))) AND ((arch_type = 'Next'::text) OR (ANY (arch_type = (hashed SubPlan 2).col1))))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.025
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "BitmapAnd",
+              "Plan Rows": 1,
+              "Actual Rows": 0.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.024
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_kind_type",
+              "Index Cond": "(kind = 'EdgeAnchor'::text)",
+              "Plan Rows": 19,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.02
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "BitmapOr",
+              "Plan Rows": 38,
+              "Actual Rows": 0.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.002
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_src",
+              "Index Cond": "(src = _t0_1.origin_id)",
+              "Plan Rows": 19,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_dst",
+              "Index Cond": "(dst = _t0_1.origin_id)",
+              "Plan Rows": 19,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "Seq Scan",
+              "Filter": "(ancestor = 'Next'::text)",
+              "Plan Rows": 4,
+              "Actual Rows": 0,
+              "Actual Loops": 0,
+              "Actual Total Time": 0.0
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1",
+              "Node Type": "Index Scan",
+              "Index Name": "anchors_pkey",
+              "Index Cond": "(id = CASE WHEN (_t9.src = _t0_1.origin_id) THEN _t9.dst ELSE _t9.src END)",
+              "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '8213aab5-7235-485d-b1d9-b188a914542a'::text) OR EXISTS(SubPlan 1)))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 999,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0",
+              "Node Type": "Index Only Scan",
+              "Index Name": "idx_anchors_edge_src_type_order",
+              "Index Cond": "(src = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid)",
+              "Filter": "((((_t10.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+              "Plan Rows": 1,
+              "Actual Rows": 0,
+              "Actual Loops": 0,
+              "Actual Total Time": 0.0
+            },
+            {
+              "path": "Plan/Plans/1",
+              "Node Type": "Sort",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 62.967
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0",
+              "Node Type": "Nested Loop",
+              "Join Type": "Left",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 62.58
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0",
+              "Node Type": "CTE Scan",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 30.727
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1",
+              "Node Type": "WindowAgg",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.031
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+              "Node Type": "WindowAgg",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.03
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+              "Node Type": "Sort",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.029
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Nested Loop",
+              "Join Type": "Inner",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.028
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Bitmap Heap Scan",
+              "Filter": "(((src = _t0.origin_id) OR (undirected AND (dst = _t0.origin_id))) AND ((arch_type = 'Next'::text) OR (ANY (arch_type = (hashed SubPlan 5).col1))))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.026
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "BitmapAnd",
+              "Plan Rows": 1,
+              "Actual Rows": 0.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.024
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_kind_type",
+              "Index Cond": "(kind = 'EdgeAnchor'::text)",
+              "Plan Rows": 19,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.02
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "BitmapOr",
+              "Plan Rows": 38,
+              "Actual Rows": 0.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.002
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_src",
+              "Index Cond": "(src = _t0.origin_id)",
+              "Plan Rows": 19,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_dst",
+              "Index Cond": "(dst = _t0.origin_id)",
+              "Plan Rows": 19,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "Seq Scan",
+              "Filter": "(ancestor = 'Next'::text)",
+              "Plan Rows": 4,
+              "Actual Rows": 0,
+              "Actual Loops": 0,
+              "Actual Total Time": 0.0
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "Index Scan",
+              "Index Name": "anchors_pkey",
+              "Index Cond": "(id = CASE WHEN (_t3.src = _t0.origin_id) THEN _t3.dst ELSE _t3.src END)",
+              "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '8213aab5-7235-485d-b1d9-b188a914542a'::text) OR EXISTS(SubPlan 4)))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 999,
+              "Actual Total Time": 0.002
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "Node Type": "Index Only Scan",
+              "Index Name": "idx_anchors_edge_src_type_order",
+              "Index Cond": "(src = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid)",
+              "Filter": "((((_t4.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+              "Plan Rows": 1,
+              "Actual Rows": 0,
+              "Actual Loops": 0,
+              "Actual Total Time": 0.0
+            }
+          ]
+        },
+        {
+          "repetition": 1,
+          "planning_ms": 0.578,
+          "execution_ms": 62.847,
+          "estimated_total_cost": 3515.65,
+          "jit": null,
+          "root_buffers": {
+            "Shared Hit Blocks": 20136,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "operators": [
+            {
+              "path": "Plan",
+              "Node Type": "Limit",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 62.662
+            },
+            {
+              "path": "Plan/Plans/0",
+              "Node Type": "Recursive Union",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 30.371
+            },
+            {
+              "path": "Plan/Plans/0/Plans/0",
+              "Node Type": "Result",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1",
+              "Node Type": "Nested Loop",
+              "Join Type": "Inner",
+              "Plan Rows": 3,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.03
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/0",
+              "Node Type": "WorkTable Scan",
+              "Filter": "(depth < '2048'::bigint)",
+              "Plan Rows": 3,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.0
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1",
+              "Node Type": "Subquery Scan",
+              "Filter": "((_t8.arch_type = 'Item'::text) AND (_t8.arch_module = 'server'::text))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.029
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+              "Node Type": "WindowAgg",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.029
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+              "Node Type": "Nested Loop",
+              "Join Type": "Inner",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.028
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Bitmap Heap Scan",
+              "Filter": "(((src = _t0_1.origin_id) OR (undirected AND (dst = _t0_1.origin_id))) AND ((arch_type = 'Next'::text) OR (ANY (arch_type = (hashed SubPlan 2).col1))))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.025
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "BitmapAnd",
+              "Plan Rows": 1,
+              "Actual Rows": 0.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.024
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_kind_type",
+              "Index Cond": "(kind = 'EdgeAnchor'::text)",
+              "Plan Rows": 19,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.02
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "BitmapOr",
+              "Plan Rows": 38,
+              "Actual Rows": 0.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.002
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_src",
+              "Index Cond": "(src = _t0_1.origin_id)",
+              "Plan Rows": 19,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_dst",
+              "Index Cond": "(dst = _t0_1.origin_id)",
+              "Plan Rows": 19,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "Seq Scan",
+              "Filter": "(ancestor = 'Next'::text)",
+              "Plan Rows": 4,
+              "Actual Rows": 0,
+              "Actual Loops": 0,
+              "Actual Total Time": 0.0
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1",
+              "Node Type": "Index Scan",
+              "Index Name": "anchors_pkey",
+              "Index Cond": "(id = CASE WHEN (_t9.src = _t0_1.origin_id) THEN _t9.dst ELSE _t9.src END)",
+              "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '8213aab5-7235-485d-b1d9-b188a914542a'::text) OR EXISTS(SubPlan 1)))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 999,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0",
+              "Node Type": "Index Only Scan",
+              "Index Name": "idx_anchors_edge_src_type_order",
+              "Index Cond": "(src = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid)",
+              "Filter": "((((_t10.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+              "Plan Rows": 1,
+              "Actual Rows": 0,
+              "Actual Loops": 0,
+              "Actual Total Time": 0.0
+            },
+            {
+              "path": "Plan/Plans/1",
+              "Node Type": "Sort",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 62.615
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0",
+              "Node Type": "Nested Loop",
+              "Join Type": "Left",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 62.318
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0",
+              "Node Type": "CTE Scan",
+              "Plan Rows": 31,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1,
+              "Actual Total Time": 30.702
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1",
+              "Node Type": "WindowAgg",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.031
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+              "Node Type": "WindowAgg",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.03
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+              "Node Type": "Sort",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.029
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Nested Loop",
+              "Join Type": "Inner",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.028
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Bitmap Heap Scan",
+              "Filter": "(((src = _t0.origin_id) OR (undirected AND (dst = _t0.origin_id))) AND ((arch_type = 'Next'::text) OR (ANY (arch_type = (hashed SubPlan 5).col1))))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.025
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "BitmapAnd",
+              "Plan Rows": 1,
+              "Actual Rows": 0.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.024
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_kind_type",
+              "Index Cond": "(kind = 'EdgeAnchor'::text)",
+              "Plan Rows": 19,
+              "Actual Rows": 1000.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.02
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "BitmapOr",
+              "Plan Rows": 38,
+              "Actual Rows": 0.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.002
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_src",
+              "Index Cond": "(src = _t0.origin_id)",
+              "Plan Rows": 19,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_anchors_dst",
+              "Index Cond": "(dst = _t0.origin_id)",
+              "Plan Rows": 19,
+              "Actual Rows": 1.0,
+              "Actual Loops": 1000,
+              "Actual Total Time": 0.001
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "Seq Scan",
+              "Filter": "(ancestor = 'Next'::text)",
+              "Plan Rows": 4,
+              "Actual Rows": 0,
+              "Actual Loops": 0,
+              "Actual Total Time": 0.0
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+              "Node Type": "Index Scan",
+              "Index Name": "anchors_pkey",
+              "Index Cond": "(id = CASE WHEN (_t3.src = _t0.origin_id) THEN _t3.dst ELSE _t3.src END)",
+              "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '8213aab5-7235-485d-b1d9-b188a914542a'::text) OR EXISTS(SubPlan 4)))",
+              "Plan Rows": 1,
+              "Actual Rows": 1.0,
+              "Actual Loops": 999,
+              "Actual Total Time": 0.002
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "Node Type": "Index Only Scan",
+              "Index Name": "idx_anchors_edge_src_type_order",
+              "Index Cond": "(src = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid)",
+              "Filter": "((((_t4.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+              "Plan Rows": 1,
+              "Actual Rows": 0,
+              "Actual Loops": 0,
+              "Actual Total Time": 0.0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "controlled_statistics": [
+    {
+      "config_id": "baseline850",
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-diagnostics-20261101/recapture-v2/cases/linked_list1000-baseline850-diagnostic/captures/ll1000-baseline850-recursive-pid3084247.json",
+        "sha256": "6edd5d76839f3bbd9c49a26b5d1b47a459665a486b5217c963fe7bfecc61181e"
+      },
+      "exact_bind_verified": true,
+      "indexes": [
+        [
+          "public",
+          "anchors",
+          "anchors_pkey",
+          "CREATE UNIQUE INDEX anchors_pkey ON public.anchors USING btree (id)"
+        ],
+        [
+          "public",
+          "anchors",
+          "idx_anchors_dst",
+          "CREATE INDEX idx_anchors_dst ON public.anchors USING btree (dst, arch_type) WHERE (dst IS NOT NULL)"
+        ],
+        [
+          "public",
+          "anchors",
+          "idx_anchors_edge_dst_type_order",
+          "CREATE INDEX idx_anchors_edge_dst_type_order ON public.anchors USING btree (dst, arch_type, seq, id) INCLUDE (src, undirected) WHERE ((kind = 'EdgeAnchor'::text) AND (src IS NOT NULL) AND (dst IS NOT NULL))"
+        ],
+        [
+          "public",
+          "anchors",
+          "idx_anchors_edge_src_type_order",
+          "CREATE INDEX idx_anchors_edge_src_type_order ON public.anchors USING btree (src, arch_type, seq, id) INCLUDE (dst, undirected) WHERE ((kind = 'EdgeAnchor'::text) AND (src IS NOT NULL) AND (dst IS NOT NULL))"
+        ],
+        [
+          "public",
+          "anchors",
+          "idx_anchors_kind_type",
+          "CREATE INDEX idx_anchors_kind_type ON public.anchors USING btree (kind, arch_type)"
+        ],
+        [
+          "public",
+          "anchors",
+          "idx_anchors_root",
+          "CREATE INDEX idx_anchors_root ON public.anchors USING btree (root_id) WHERE (root_id IS NOT NULL)"
+        ],
+        [
+          "public",
+          "anchors",
+          "idx_anchors_src",
+          "CREATE INDEX idx_anchors_src ON public.anchors USING btree (src, arch_type) WHERE (src IS NOT NULL)"
+        ],
+        [
+          "public",
+          "graph_types",
+          "graph_types_pkey",
+          "CREATE UNIQUE INDEX graph_types_pkey ON public.graph_types USING btree (type_name, ancestor)"
+        ]
+      ],
+      "constraints": [
+        [
+          "anchors",
+          "anchors_arch_module_not_null",
+          "n",
+          "NOT NULL arch_module"
+        ],
+        [
+          "anchors",
+          "anchors_arch_type_not_null",
+          "n",
+          "NOT NULL arch_type"
+        ],
+        [
+          "anchors",
+          "anchors_fingerprint_not_null",
+          "n",
+          "NOT NULL fingerprint"
+        ],
+        [
+          "anchors",
+          "anchors_format_version_not_null",
+          "n",
+          "NOT NULL format_version"
+        ],
+        [
+          "anchors",
+          "anchors_id_not_null",
+          "n",
+          "NOT NULL id"
+        ],
+        [
+          "anchors",
+          "anchors_kind_not_null",
+          "n",
+          "NOT NULL kind"
+        ],
+        [
+          "anchors",
+          "anchors_pkey",
+          "p",
+          "PRIMARY KEY (id)"
+        ],
+        [
+          "anchors",
+          "anchors_props_not_null",
+          "n",
+          "NOT NULL props"
+        ],
+        [
+          "anchors",
+          "anchors_seq_not_null",
+          "n",
+          "NOT NULL seq"
+        ],
+        [
+          "anchors",
+          "anchors_undirected_not_null",
+          "n",
+          "NOT NULL undirected"
+        ],
+        [
+          "anchors",
+          "anchors_updated_at_not_null",
+          "n",
+          "NOT NULL updated_at"
+        ],
+        [
+          "anchors",
+          "anchors_version_not_null",
+          "n",
+          "NOT NULL version"
+        ],
+        [
+          "graph_types",
+          "graph_types_ancestor_not_null",
+          "n",
+          "NOT NULL ancestor"
+        ],
+        [
+          "graph_types",
+          "graph_types_pkey",
+          "p",
+          "PRIMARY KEY (type_name, ancestor)"
+        ],
+        [
+          "graph_types",
+          "graph_types_type_name_not_null",
+          "n",
+          "NOT NULL type_name"
+        ]
+      ],
+      "settings": [
+        [
+          "client_encoding",
+          "UTF8"
+        ],
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "effective_cache_size",
+          "524288"
+        ],
+        [
+          "enable_bitmapscan",
+          "on"
+        ],
+        [
+          "enable_hashjoin",
+          "on"
+        ],
+        [
+          "enable_indexscan",
+          "on"
+        ],
+        [
+          "enable_mergejoin",
+          "on"
+        ],
+        [
+          "enable_nestloop",
+          "on"
+        ],
+        [
+          "enable_seqscan",
+          "on"
+        ],
+        [
+          "jit",
+          "on"
+        ],
+        [
+          "plan_cache_mode",
+          "auto"
+        ],
+        [
+          "random_page_cost",
+          "4"
+        ],
+        [
+          "row_security",
+          "on"
+        ],
+        [
+          "search_path",
+          "\"$user\", public"
+        ],
+        [
+          "server_version_num",
+          "180006"
+        ],
+        [
+          "standard_conforming_strings",
+          "on"
+        ],
+        [
+          "statement_timeout",
+          "0"
+        ],
+        [
+          "work_mem",
+          "4096"
+        ]
+      ],
+      "jit_settings": [
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "jit_above_cost",
+          "100000"
+        ],
+        [
+          "jit_inline_above_cost",
+          "500000"
+        ],
+        [
+          "jit_optimize_above_cost",
+          "500000"
+        ],
+        [
+          "jit_provider",
+          "llvmjit"
+        ]
+      ],
+      "database_dropped_after_zero_active": true,
+      "phases": [
+        {
+          "analyzed": false,
+          "relations": [
+            [
+              "anchors",
+              -1.0,
+              0,
+              0,
+              0,
+              null,
+              null,
+              0,
+              0,
+              0
+            ],
+            [
+              "graph_types",
+              -1.0,
+              0,
+              0,
+              0,
+              null,
+              null,
+              0,
+              0,
+              0
+            ]
+          ],
+          "statistics_rows": 0,
+          "ordered_result_verified": true,
+          "census_verified": true,
+          "plans": [
+            {
+              "repetition": 0,
+              "planning_ms": 0.611,
+              "execution_ms": 47.97,
+              "estimated_total_cost": 2741.84,
+              "jit": null,
+              "root_buffers": {
+                "Shared Hit Blocks": 20126,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              "operators": [
+                {
+                  "path": "Plan",
+                  "Node Type": "Limit",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 47.859
+                },
+                {
+                  "path": "Plan/Plans/0",
+                  "Node Type": "Recursive Union",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 23.039
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/0",
+                  "Node Type": "Result",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 3,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.023
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "WorkTable Scan",
+                  "Filter": "(depth < '2048'::bigint)",
+                  "Plan Rows": 3,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1",
+                  "Node Type": "Subquery Scan",
+                  "Filter": "((_t8.arch_type = 'Item'::text) AND (_t8.arch_module = 'server'::text))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.022
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.022
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.021
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Heap Scan",
+                  "Filter": "(((src = _t0_1.origin_id) OR (undirected AND (dst = _t0_1.origin_id))) AND ((arch_type = 'Next'::text) OR EXISTS(SubPlan 2)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.019
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "BitmapAnd",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.018
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_kind_type",
+                  "Index Cond": "(kind = 'EdgeAnchor'::text)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.016
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "BitmapOr",
+                  "Plan Rows": 37,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_src",
+                  "Index Cond": "(src = _t0_1.origin_id)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_dst",
+                  "Index Cond": "(dst = _t0_1.origin_id)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "graph_types_pkey",
+                  "Index Cond": "((type_name = _t9.arch_type) AND (ancestor = 'Next'::text))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Scan",
+                  "Index Name": "anchors_pkey",
+                  "Index Cond": "(id = CASE WHEN (_t9.src = _t0_1.origin_id) THEN _t9.dst ELSE _t9.src END)",
+                  "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '1e3d251e-9086-4fa4-a860-9774a8866abe'::text) OR EXISTS(SubPlan 1)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 999,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "idx_anchors_edge_src_type_order",
+                  "Index Cond": "(src = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid)",
+                  "Filter": "((((_t10.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/1",
+                  "Node Type": "Sort",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 47.813
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Left",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 47.542
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "CTE Scan",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 23.309
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.024
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.023
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "Sort",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.022
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.021
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Heap Scan",
+                  "Filter": "(((src = _t0.origin_id) OR (undirected AND (dst = _t0.origin_id))) AND ((arch_type = 'Next'::text) OR EXISTS(SubPlan 6)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.019
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "BitmapAnd",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.018
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_kind_type",
+                  "Index Cond": "(kind = 'EdgeAnchor'::text)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.016
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "BitmapOr",
+                  "Plan Rows": 37,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_src",
+                  "Index Cond": "(src = _t0.origin_id)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_dst",
+                  "Index Cond": "(dst = _t0.origin_id)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "graph_types_pkey",
+                  "Index Cond": "((type_name = _t3.arch_type) AND (ancestor = 'Next'::text))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Scan",
+                  "Index Name": "anchors_pkey",
+                  "Index Cond": "(id = CASE WHEN (_t3.src = _t0.origin_id) THEN _t3.dst ELSE _t3.src END)",
+                  "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '1e3d251e-9086-4fa4-a860-9774a8866abe'::text) OR EXISTS(SubPlan 5)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 999,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "idx_anchors_edge_src_type_order",
+                  "Index Cond": "(src = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid)",
+                  "Filter": "((((_t4.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                }
+              ]
+            },
+            {
+              "repetition": 1,
+              "planning_ms": 0.601,
+              "execution_ms": 48.328,
+              "estimated_total_cost": 2741.84,
+              "jit": null,
+              "root_buffers": {
+                "Shared Hit Blocks": 20126,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              "operators": [
+                {
+                  "path": "Plan",
+                  "Node Type": "Limit",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 48.251
+                },
+                {
+                  "path": "Plan/Plans/0",
+                  "Node Type": "Recursive Union",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 23.279
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/0",
+                  "Node Type": "Result",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 3,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.023
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "WorkTable Scan",
+                  "Filter": "(depth < '2048'::bigint)",
+                  "Plan Rows": 3,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1",
+                  "Node Type": "Subquery Scan",
+                  "Filter": "((_t8.arch_type = 'Item'::text) AND (_t8.arch_module = 'server'::text))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.022
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.022
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.021
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Heap Scan",
+                  "Filter": "(((src = _t0_1.origin_id) OR (undirected AND (dst = _t0_1.origin_id))) AND ((arch_type = 'Next'::text) OR EXISTS(SubPlan 2)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.019
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "BitmapAnd",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.018
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_kind_type",
+                  "Index Cond": "(kind = 'EdgeAnchor'::text)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.016
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "BitmapOr",
+                  "Plan Rows": 37,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_src",
+                  "Index Cond": "(src = _t0_1.origin_id)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_dst",
+                  "Index Cond": "(dst = _t0_1.origin_id)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "graph_types_pkey",
+                  "Index Cond": "((type_name = _t9.arch_type) AND (ancestor = 'Next'::text))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Scan",
+                  "Index Name": "anchors_pkey",
+                  "Index Cond": "(id = CASE WHEN (_t9.src = _t0_1.origin_id) THEN _t9.dst ELSE _t9.src END)",
+                  "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '1e3d251e-9086-4fa4-a860-9774a8866abe'::text) OR EXISTS(SubPlan 1)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 999,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "idx_anchors_edge_src_type_order",
+                  "Index Cond": "(src = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid)",
+                  "Filter": "((((_t10.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/1",
+                  "Node Type": "Sort",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 48.204
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Left",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 47.964
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "CTE Scan",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 23.553
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.024
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.023
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "Sort",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.023
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.022
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Heap Scan",
+                  "Filter": "(((src = _t0.origin_id) OR (undirected AND (dst = _t0.origin_id))) AND ((arch_type = 'Next'::text) OR EXISTS(SubPlan 6)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.02
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "BitmapAnd",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.018
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_kind_type",
+                  "Index Cond": "(kind = 'EdgeAnchor'::text)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.016
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "BitmapOr",
+                  "Plan Rows": 37,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_src",
+                  "Index Cond": "(src = _t0.origin_id)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_dst",
+                  "Index Cond": "(dst = _t0.origin_id)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "graph_types_pkey",
+                  "Index Cond": "((type_name = _t3.arch_type) AND (ancestor = 'Next'::text))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Scan",
+                  "Index Name": "anchors_pkey",
+                  "Index Cond": "(id = CASE WHEN (_t3.src = _t0.origin_id) THEN _t3.dst ELSE _t3.src END)",
+                  "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '1e3d251e-9086-4fa4-a860-9774a8866abe'::text) OR EXISTS(SubPlan 5)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 999,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "idx_anchors_edge_src_type_order",
+                  "Index Cond": "(src = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid)",
+                  "Filter": "((((_t4.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "analyzed": true,
+          "relations": [
+            [
+              "anchors",
+              2005.0,
+              126,
+              2005,
+              0,
+              "2026-11-01 01:43:34.078641-04",
+              null,
+              0,
+              1,
+              0
+            ],
+            [
+              "graph_types",
+              4.0,
+              1,
+              4,
+              0,
+              "2026-11-01 01:43:34.080849-04",
+              null,
+              0,
+              1,
+              0
+            ]
+          ],
+          "statistics_rows": 16,
+          "ordered_result_verified": true,
+          "census_verified": true,
+          "plans": [
+            {
+              "repetition": 0,
+              "planning_ms": 0.552,
+              "execution_ms": 13.386,
+              "estimated_total_cost": 2119.96,
+              "jit": null,
+              "root_buffers": {
+                "Shared Hit Blocks": 16126,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              "operators": [
+                {
+                  "path": "Plan",
+                  "Node Type": "Limit",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 13.31
+                },
+                {
+                  "path": "Plan/Plans/0",
+                  "Node Type": "Recursive Union",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 5.87
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/0",
+                  "Node Type": "Result",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 3,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.006
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "WorkTable Scan",
+                  "Filter": "(depth < '2048'::bigint)",
+                  "Plan Rows": 3,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1",
+                  "Node Type": "Subquery Scan",
+                  "Filter": "((_t8.arch_type = 'Item'::text) AND (_t8.arch_module = 'server'::text))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.005
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.005
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.004
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Heap Scan",
+                  "Filter": "((kind = 'EdgeAnchor'::text) AND ((src = _t0_1.origin_id) OR (undirected AND (dst = _t0_1.origin_id))) AND ((arch_type = 'Next'::text) OR (ANY (arch_type = (hashed SubPlan 3).col1))))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "BitmapOr",
+                  "Plan Rows": 2,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_src",
+                  "Index Cond": "(src = _t0_1.origin_id)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_dst",
+                  "Index Cond": "(dst = _t0_1.origin_id)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Seq Scan",
+                  "Filter": "(ancestor = 'Next'::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Scan",
+                  "Index Name": "anchors_pkey",
+                  "Index Cond": "(id = CASE WHEN (_t9.src = _t0_1.origin_id) THEN _t9.dst ELSE _t9.src END)",
+                  "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '1e3d251e-9086-4fa4-a860-9774a8866abe'::text) OR EXISTS(SubPlan 1)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 999,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "idx_anchors_edge_src_type_order",
+                  "Index Cond": "(src = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid)",
+                  "Filter": "((((_t10.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/1",
+                  "Node Type": "Sort",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 13.259
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Left",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 13.015
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "CTE Scan",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 6.116
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.007
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.006
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "Sort",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.005
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.004
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Heap Scan",
+                  "Filter": "((kind = 'EdgeAnchor'::text) AND ((src = _t0.origin_id) OR (undirected AND (dst = _t0.origin_id))) AND ((arch_type = 'Next'::text) OR (ANY (arch_type = (hashed SubPlan 7).col1))))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.003
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "BitmapOr",
+                  "Plan Rows": 2,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_src",
+                  "Index Cond": "(src = _t0.origin_id)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_dst",
+                  "Index Cond": "(dst = _t0.origin_id)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Seq Scan",
+                  "Filter": "(ancestor = 'Next'::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Scan",
+                  "Index Name": "anchors_pkey",
+                  "Index Cond": "(id = CASE WHEN (_t3.src = _t0.origin_id) THEN _t3.dst ELSE _t3.src END)",
+                  "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '1e3d251e-9086-4fa4-a860-9774a8866abe'::text) OR EXISTS(SubPlan 5)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 999,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "idx_anchors_edge_src_type_order",
+                  "Index Cond": "(src = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid)",
+                  "Filter": "((((_t4.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                }
+              ]
+            },
+            {
+              "repetition": 1,
+              "planning_ms": 0.572,
+              "execution_ms": 13.413,
+              "estimated_total_cost": 2119.96,
+              "jit": null,
+              "root_buffers": {
+                "Shared Hit Blocks": 16126,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              "operators": [
+                {
+                  "path": "Plan",
+                  "Node Type": "Limit",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 13.329
+                },
+                {
+                  "path": "Plan/Plans/0",
+                  "Node Type": "Recursive Union",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 5.843
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/0",
+                  "Node Type": "Result",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 3,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.006
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "WorkTable Scan",
+                  "Filter": "(depth < '2048'::bigint)",
+                  "Plan Rows": 3,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1",
+                  "Node Type": "Subquery Scan",
+                  "Filter": "((_t8.arch_type = 'Item'::text) AND (_t8.arch_module = 'server'::text))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.005
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.005
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.004
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Heap Scan",
+                  "Filter": "((kind = 'EdgeAnchor'::text) AND ((src = _t0_1.origin_id) OR (undirected AND (dst = _t0_1.origin_id))) AND ((arch_type = 'Next'::text) OR (ANY (arch_type = (hashed SubPlan 3).col1))))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "BitmapOr",
+                  "Plan Rows": 2,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_src",
+                  "Index Cond": "(src = _t0_1.origin_id)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_dst",
+                  "Index Cond": "(dst = _t0_1.origin_id)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Seq Scan",
+                  "Filter": "(ancestor = 'Next'::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Scan",
+                  "Index Name": "anchors_pkey",
+                  "Index Cond": "(id = CASE WHEN (_t9.src = _t0_1.origin_id) THEN _t9.dst ELSE _t9.src END)",
+                  "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '1e3d251e-9086-4fa4-a860-9774a8866abe'::text) OR EXISTS(SubPlan 1)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 999,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "idx_anchors_edge_src_type_order",
+                  "Index Cond": "(src = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid)",
+                  "Filter": "((((_t10.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/1",
+                  "Node Type": "Sort",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 13.282
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Left",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 13.028
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "CTE Scan",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 6.087
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.007
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.006
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "Sort",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.005
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.004
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Heap Scan",
+                  "Filter": "((kind = 'EdgeAnchor'::text) AND ((src = _t0.origin_id) OR (undirected AND (dst = _t0.origin_id))) AND ((arch_type = 'Next'::text) OR (ANY (arch_type = (hashed SubPlan 7).col1))))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.003
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "BitmapOr",
+                  "Plan Rows": 2,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_src",
+                  "Index Cond": "(src = _t0.origin_id)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_dst",
+                  "Index Cond": "(dst = _t0.origin_id)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Seq Scan",
+                  "Filter": "(ancestor = 'Next'::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Scan",
+                  "Index Name": "anchors_pkey",
+                  "Index Cond": "(id = CASE WHEN (_t3.src = _t0.origin_id) THEN _t3.dst ELSE _t3.src END)",
+                  "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '1e3d251e-9086-4fa4-a860-9774a8866abe'::text) OR EXISTS(SubPlan 5)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 999,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "idx_anchors_edge_src_type_order",
+                  "Index Cond": "(src = '1e3d251e-9086-4fa4-a860-9774a8866abe'::uuid)",
+                  "Filter": "((((_t4.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "config_id": "next",
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-diagnostics-20261101/recapture-v2/cases/linked_list1000-next-diagnostic/captures/ll1000-next-recursive-pid3099238.json",
+        "sha256": "0d041a31a5bf2753c7ee20d627887a50742c9a29a450e2f28a529253ac2d29d0"
+      },
+      "exact_bind_verified": true,
+      "indexes": [
+        [
+          "public",
+          "anchors",
+          "anchors_pkey",
+          "CREATE UNIQUE INDEX anchors_pkey ON public.anchors USING btree (id)"
+        ],
+        [
+          "public",
+          "anchors",
+          "idx_anchors_dst",
+          "CREATE INDEX idx_anchors_dst ON public.anchors USING btree (dst, arch_type) WHERE (dst IS NOT NULL)"
+        ],
+        [
+          "public",
+          "anchors",
+          "idx_anchors_edge_dst_type_order",
+          "CREATE INDEX idx_anchors_edge_dst_type_order ON public.anchors USING btree (dst, arch_type, seq, id) INCLUDE (src, undirected) WHERE ((kind = 'EdgeAnchor'::text) AND (src IS NOT NULL) AND (dst IS NOT NULL))"
+        ],
+        [
+          "public",
+          "anchors",
+          "idx_anchors_edge_src_type_order",
+          "CREATE INDEX idx_anchors_edge_src_type_order ON public.anchors USING btree (src, arch_type, seq, id) INCLUDE (dst, undirected) WHERE ((kind = 'EdgeAnchor'::text) AND (src IS NOT NULL) AND (dst IS NOT NULL))"
+        ],
+        [
+          "public",
+          "anchors",
+          "idx_anchors_kind_type",
+          "CREATE INDEX idx_anchors_kind_type ON public.anchors USING btree (kind, arch_type)"
+        ],
+        [
+          "public",
+          "anchors",
+          "idx_anchors_root",
+          "CREATE INDEX idx_anchors_root ON public.anchors USING btree (root_id) WHERE (root_id IS NOT NULL)"
+        ],
+        [
+          "public",
+          "anchors",
+          "idx_anchors_src",
+          "CREATE INDEX idx_anchors_src ON public.anchors USING btree (src, arch_type) WHERE (src IS NOT NULL)"
+        ],
+        [
+          "public",
+          "graph_types",
+          "graph_types_pkey",
+          "CREATE UNIQUE INDEX graph_types_pkey ON public.graph_types USING btree (type_name, ancestor)"
+        ]
+      ],
+      "constraints": [
+        [
+          "anchors",
+          "anchors_arch_module_not_null",
+          "n",
+          "NOT NULL arch_module"
+        ],
+        [
+          "anchors",
+          "anchors_arch_type_not_null",
+          "n",
+          "NOT NULL arch_type"
+        ],
+        [
+          "anchors",
+          "anchors_fingerprint_not_null",
+          "n",
+          "NOT NULL fingerprint"
+        ],
+        [
+          "anchors",
+          "anchors_format_version_not_null",
+          "n",
+          "NOT NULL format_version"
+        ],
+        [
+          "anchors",
+          "anchors_id_not_null",
+          "n",
+          "NOT NULL id"
+        ],
+        [
+          "anchors",
+          "anchors_kind_not_null",
+          "n",
+          "NOT NULL kind"
+        ],
+        [
+          "anchors",
+          "anchors_pkey",
+          "p",
+          "PRIMARY KEY (id)"
+        ],
+        [
+          "anchors",
+          "anchors_props_not_null",
+          "n",
+          "NOT NULL props"
+        ],
+        [
+          "anchors",
+          "anchors_seq_not_null",
+          "n",
+          "NOT NULL seq"
+        ],
+        [
+          "anchors",
+          "anchors_undirected_not_null",
+          "n",
+          "NOT NULL undirected"
+        ],
+        [
+          "anchors",
+          "anchors_updated_at_not_null",
+          "n",
+          "NOT NULL updated_at"
+        ],
+        [
+          "anchors",
+          "anchors_version_not_null",
+          "n",
+          "NOT NULL version"
+        ],
+        [
+          "graph_types",
+          "graph_types_ancestor_not_null",
+          "n",
+          "NOT NULL ancestor"
+        ],
+        [
+          "graph_types",
+          "graph_types_pkey",
+          "p",
+          "PRIMARY KEY (type_name, ancestor)"
+        ],
+        [
+          "graph_types",
+          "graph_types_type_name_not_null",
+          "n",
+          "NOT NULL type_name"
+        ]
+      ],
+      "settings": [
+        [
+          "client_encoding",
+          "UTF8"
+        ],
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "effective_cache_size",
+          "524288"
+        ],
+        [
+          "enable_bitmapscan",
+          "on"
+        ],
+        [
+          "enable_hashjoin",
+          "on"
+        ],
+        [
+          "enable_indexscan",
+          "on"
+        ],
+        [
+          "enable_mergejoin",
+          "on"
+        ],
+        [
+          "enable_nestloop",
+          "on"
+        ],
+        [
+          "enable_seqscan",
+          "on"
+        ],
+        [
+          "jit",
+          "on"
+        ],
+        [
+          "plan_cache_mode",
+          "auto"
+        ],
+        [
+          "random_page_cost",
+          "4"
+        ],
+        [
+          "row_security",
+          "on"
+        ],
+        [
+          "search_path",
+          "\"$user\", public"
+        ],
+        [
+          "server_version_num",
+          "180006"
+        ],
+        [
+          "standard_conforming_strings",
+          "on"
+        ],
+        [
+          "statement_timeout",
+          "0"
+        ],
+        [
+          "work_mem",
+          "4096"
+        ]
+      ],
+      "jit_settings": [
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "jit_above_cost",
+          "100000"
+        ],
+        [
+          "jit_inline_above_cost",
+          "500000"
+        ],
+        [
+          "jit_optimize_above_cost",
+          "500000"
+        ],
+        [
+          "jit_provider",
+          "llvmjit"
+        ]
+      ],
+      "database_dropped_after_zero_active": true,
+      "phases": [
+        {
+          "analyzed": false,
+          "relations": [
+            [
+              "anchors",
+              -1.0,
+              0,
+              0,
+              0,
+              null,
+              null,
+              0,
+              0,
+              0
+            ],
+            [
+              "graph_types",
+              -1.0,
+              0,
+              0,
+              0,
+              null,
+              null,
+              0,
+              0,
+              0
+            ]
+          ],
+          "statistics_rows": 0,
+          "ordered_result_verified": true,
+          "census_verified": true,
+          "plans": [
+            {
+              "repetition": 0,
+              "planning_ms": 0.632,
+              "execution_ms": 49.923,
+              "estimated_total_cost": 3525.24,
+              "jit": null,
+              "root_buffers": {
+                "Shared Hit Blocks": 20126,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              "operators": [
+                {
+                  "path": "Plan",
+                  "Node Type": "Limit",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 49.792
+                },
+                {
+                  "path": "Plan/Plans/0",
+                  "Node Type": "Recursive Union",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 23.797
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/0",
+                  "Node Type": "Result",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 3,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.024
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "WorkTable Scan",
+                  "Filter": "(depth < '2048'::bigint)",
+                  "Plan Rows": 3,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1",
+                  "Node Type": "Subquery Scan",
+                  "Filter": "((_t8.arch_type = 'Item'::text) AND (_t8.arch_module = 'server'::text))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.023
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.023
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.022
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Heap Scan",
+                  "Filter": "(((src = _t0_1.origin_id) OR (undirected AND (dst = _t0_1.origin_id))) AND ((arch_type = 'Next'::text) OR (ANY (arch_type = (hashed SubPlan 2).col1))))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.02
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "BitmapAnd",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.019
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_kind_type",
+                  "Index Cond": "(kind = 'EdgeAnchor'::text)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.016
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "BitmapOr",
+                  "Plan Rows": 37,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_src",
+                  "Index Cond": "(src = _t0_1.origin_id)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_dst",
+                  "Index Cond": "(dst = _t0_1.origin_id)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Seq Scan",
+                  "Filter": "(ancestor = 'Next'::text)",
+                  "Plan Rows": 4,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Scan",
+                  "Index Name": "anchors_pkey",
+                  "Index Cond": "(id = CASE WHEN (_t9.src = _t0_1.origin_id) THEN _t9.dst ELSE _t9.src END)",
+                  "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '8213aab5-7235-485d-b1d9-b188a914542a'::text) OR EXISTS(SubPlan 1)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 999,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "idx_anchors_edge_src_type_order",
+                  "Index Cond": "(src = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid)",
+                  "Filter": "((((_t10.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/1",
+                  "Node Type": "Sort",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 49.744
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Left",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 49.46
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "CTE Scan",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 24.079
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.025
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.024
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "Sort",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.023
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.022
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Heap Scan",
+                  "Filter": "(((src = _t0.origin_id) OR (undirected AND (dst = _t0.origin_id))) AND ((arch_type = 'Next'::text) OR (ANY (arch_type = (hashed SubPlan 5).col1))))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.02
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "BitmapAnd",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.019
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_kind_type",
+                  "Index Cond": "(kind = 'EdgeAnchor'::text)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.016
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "BitmapOr",
+                  "Plan Rows": 37,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_src",
+                  "Index Cond": "(src = _t0.origin_id)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_dst",
+                  "Index Cond": "(dst = _t0.origin_id)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Seq Scan",
+                  "Filter": "(ancestor = 'Next'::text)",
+                  "Plan Rows": 4,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Scan",
+                  "Index Name": "anchors_pkey",
+                  "Index Cond": "(id = CASE WHEN (_t3.src = _t0.origin_id) THEN _t3.dst ELSE _t3.src END)",
+                  "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '8213aab5-7235-485d-b1d9-b188a914542a'::text) OR EXISTS(SubPlan 4)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 999,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "idx_anchors_edge_src_type_order",
+                  "Index Cond": "(src = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid)",
+                  "Filter": "((((_t4.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                }
+              ]
+            },
+            {
+              "repetition": 1,
+              "planning_ms": 0.593,
+              "execution_ms": 49.434,
+              "estimated_total_cost": 3525.24,
+              "jit": null,
+              "root_buffers": {
+                "Shared Hit Blocks": 20126,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              "operators": [
+                {
+                  "path": "Plan",
+                  "Node Type": "Limit",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 49.351
+                },
+                {
+                  "path": "Plan/Plans/0",
+                  "Node Type": "Recursive Union",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 23.758
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/0",
+                  "Node Type": "Result",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 3,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.023
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "WorkTable Scan",
+                  "Filter": "(depth < '2048'::bigint)",
+                  "Plan Rows": 3,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1",
+                  "Node Type": "Subquery Scan",
+                  "Filter": "((_t8.arch_type = 'Item'::text) AND (_t8.arch_module = 'server'::text))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.023
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.023
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.022
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Heap Scan",
+                  "Filter": "(((src = _t0_1.origin_id) OR (undirected AND (dst = _t0_1.origin_id))) AND ((arch_type = 'Next'::text) OR (ANY (arch_type = (hashed SubPlan 2).col1))))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.02
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "BitmapAnd",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.019
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_kind_type",
+                  "Index Cond": "(kind = 'EdgeAnchor'::text)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.016
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "BitmapOr",
+                  "Plan Rows": 37,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_src",
+                  "Index Cond": "(src = _t0_1.origin_id)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_dst",
+                  "Index Cond": "(dst = _t0_1.origin_id)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Seq Scan",
+                  "Filter": "(ancestor = 'Next'::text)",
+                  "Plan Rows": 4,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Scan",
+                  "Index Name": "anchors_pkey",
+                  "Index Cond": "(id = CASE WHEN (_t9.src = _t0_1.origin_id) THEN _t9.dst ELSE _t9.src END)",
+                  "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '8213aab5-7235-485d-b1d9-b188a914542a'::text) OR EXISTS(SubPlan 1)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 999,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "idx_anchors_edge_src_type_order",
+                  "Index Cond": "(src = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid)",
+                  "Filter": "((((_t10.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/1",
+                  "Node Type": "Sort",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 49.304
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Left",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 49.039
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "CTE Scan",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 24.053
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.025
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.024
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "Sort",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.023
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.022
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Heap Scan",
+                  "Filter": "(((src = _t0.origin_id) OR (undirected AND (dst = _t0.origin_id))) AND ((arch_type = 'Next'::text) OR (ANY (arch_type = (hashed SubPlan 5).col1))))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.02
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "BitmapAnd",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.019
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_kind_type",
+                  "Index Cond": "(kind = 'EdgeAnchor'::text)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.016
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "BitmapOr",
+                  "Plan Rows": 37,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_src",
+                  "Index Cond": "(src = _t0.origin_id)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_dst",
+                  "Index Cond": "(dst = _t0.origin_id)",
+                  "Plan Rows": 18,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Seq Scan",
+                  "Filter": "(ancestor = 'Next'::text)",
+                  "Plan Rows": 4,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Scan",
+                  "Index Name": "anchors_pkey",
+                  "Index Cond": "(id = CASE WHEN (_t3.src = _t0.origin_id) THEN _t3.dst ELSE _t3.src END)",
+                  "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '8213aab5-7235-485d-b1d9-b188a914542a'::text) OR EXISTS(SubPlan 4)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 999,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "idx_anchors_edge_src_type_order",
+                  "Index Cond": "(src = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid)",
+                  "Filter": "((((_t4.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "analyzed": true,
+          "relations": [
+            [
+              "anchors",
+              2005.0,
+              126,
+              2005,
+              0,
+              "2026-11-01 01:43:34.859755-04",
+              null,
+              0,
+              1,
+              0
+            ],
+            [
+              "graph_types",
+              4.0,
+              1,
+              4,
+              0,
+              "2026-11-01 01:43:34.861618-04",
+              null,
+              0,
+              1,
+              0
+            ]
+          ],
+          "statistics_rows": 16,
+          "ordered_result_verified": true,
+          "census_verified": true,
+          "plans": [
+            {
+              "repetition": 0,
+              "planning_ms": 0.533,
+              "execution_ms": 13.721,
+              "estimated_total_cost": 2055.15,
+              "jit": null,
+              "root_buffers": {
+                "Shared Hit Blocks": 16126,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              "operators": [
+                {
+                  "path": "Plan",
+                  "Node Type": "Limit",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 13.644
+                },
+                {
+                  "path": "Plan/Plans/0",
+                  "Node Type": "Recursive Union",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 6.007
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/0",
+                  "Node Type": "Result",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 3,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.006
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "WorkTable Scan",
+                  "Filter": "(depth < '2048'::bigint)",
+                  "Plan Rows": 3,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1",
+                  "Node Type": "Subquery Scan",
+                  "Filter": "((_t8.arch_type = 'Item'::text) AND (_t8.arch_module = 'server'::text))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.005
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.005
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.004
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Heap Scan",
+                  "Filter": "((kind = 'EdgeAnchor'::text) AND ((src = _t0_1.origin_id) OR (undirected AND (dst = _t0_1.origin_id))) AND ((arch_type = 'Next'::text) OR (ANY (arch_type = (hashed SubPlan 2).col1))))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.003
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "BitmapOr",
+                  "Plan Rows": 2,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_src",
+                  "Index Cond": "(src = _t0_1.origin_id)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_dst",
+                  "Index Cond": "(dst = _t0_1.origin_id)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Seq Scan",
+                  "Filter": "(ancestor = 'Next'::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Scan",
+                  "Index Name": "anchors_pkey",
+                  "Index Cond": "(id = CASE WHEN (_t9.src = _t0_1.origin_id) THEN _t9.dst ELSE _t9.src END)",
+                  "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '8213aab5-7235-485d-b1d9-b188a914542a'::text) OR EXISTS(SubPlan 1)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 999,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "idx_anchors_edge_src_type_order",
+                  "Index Cond": "(src = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid)",
+                  "Filter": "((((_t10.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/1",
+                  "Node Type": "Sort",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 13.599
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Left",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 13.356
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "CTE Scan",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 6.246
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.007
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.006
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "Sort",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.005
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.004
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Heap Scan",
+                  "Filter": "((kind = 'EdgeAnchor'::text) AND ((src = _t0.origin_id) OR (undirected AND (dst = _t0.origin_id))) AND ((arch_type = 'Next'::text) OR (ANY (arch_type = (hashed SubPlan 5).col1))))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.003
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "BitmapOr",
+                  "Plan Rows": 2,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_src",
+                  "Index Cond": "(src = _t0.origin_id)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_dst",
+                  "Index Cond": "(dst = _t0.origin_id)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Seq Scan",
+                  "Filter": "(ancestor = 'Next'::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Scan",
+                  "Index Name": "anchors_pkey",
+                  "Index Cond": "(id = CASE WHEN (_t3.src = _t0.origin_id) THEN _t3.dst ELSE _t3.src END)",
+                  "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '8213aab5-7235-485d-b1d9-b188a914542a'::text) OR EXISTS(SubPlan 4)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 999,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "idx_anchors_edge_src_type_order",
+                  "Index Cond": "(src = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid)",
+                  "Filter": "((((_t4.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                }
+              ]
+            },
+            {
+              "repetition": 1,
+              "planning_ms": 0.53,
+              "execution_ms": 13.382,
+              "estimated_total_cost": 2055.15,
+              "jit": null,
+              "root_buffers": {
+                "Shared Hit Blocks": 16126,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              "operators": [
+                {
+                  "path": "Plan",
+                  "Node Type": "Limit",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 13.306
+                },
+                {
+                  "path": "Plan/Plans/0",
+                  "Node Type": "Recursive Union",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 5.864
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/0",
+                  "Node Type": "Result",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 3,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.006
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "WorkTable Scan",
+                  "Filter": "(depth < '2048'::bigint)",
+                  "Plan Rows": 3,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1",
+                  "Node Type": "Subquery Scan",
+                  "Filter": "((_t8.arch_type = 'Item'::text) AND (_t8.arch_module = 'server'::text))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.005
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.005
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.004
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Heap Scan",
+                  "Filter": "((kind = 'EdgeAnchor'::text) AND ((src = _t0_1.origin_id) OR (undirected AND (dst = _t0_1.origin_id))) AND ((arch_type = 'Next'::text) OR (ANY (arch_type = (hashed SubPlan 2).col1))))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "BitmapOr",
+                  "Plan Rows": 2,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_src",
+                  "Index Cond": "(src = _t0_1.origin_id)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_dst",
+                  "Index Cond": "(dst = _t0_1.origin_id)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Seq Scan",
+                  "Filter": "(ancestor = 'Next'::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Scan",
+                  "Index Name": "anchors_pkey",
+                  "Index Cond": "(id = CASE WHEN (_t9.src = _t0_1.origin_id) THEN _t9.dst ELSE _t9.src END)",
+                  "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '8213aab5-7235-485d-b1d9-b188a914542a'::text) OR EXISTS(SubPlan 1)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 999,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "idx_anchors_edge_src_type_order",
+                  "Index Cond": "(src = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid)",
+                  "Filter": "((((_t10.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/1",
+                  "Node Type": "Sort",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 13.261
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Left",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 13.037
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "CTE Scan",
+                  "Plan Rows": 31,
+                  "Actual Rows": 1000.0,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 6.119
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.007
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "WindowAgg",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.006
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+                  "Node Type": "Sort",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.005
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Nested Loop",
+                  "Join Type": "Inner",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.004
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Heap Scan",
+                  "Filter": "((kind = 'EdgeAnchor'::text) AND ((src = _t0.origin_id) OR (undirected AND (dst = _t0.origin_id))) AND ((arch_type = 'Next'::text) OR (ANY (arch_type = (hashed SubPlan 5).col1))))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.003
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "BitmapOr",
+                  "Plan Rows": 2,
+                  "Actual Rows": 0.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.002
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_src",
+                  "Index Cond": "(src = _t0.origin_id)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Bitmap Index Scan",
+                  "Index Name": "idx_anchors_dst",
+                  "Index Cond": "(dst = _t0.origin_id)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 1000,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Seq Scan",
+                  "Filter": "(ancestor = 'Next'::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+                  "Node Type": "Index Scan",
+                  "Index Name": "anchors_pkey",
+                  "Index Cond": "(id = CASE WHEN (_t3.src = _t0.origin_id) THEN _t3.dst ELSE _t3.src END)",
+                  "Filter": "((kind = 'NodeAnchor'::text) AND ((root_id = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? '8213aab5-7235-485d-b1d9-b188a914542a'::text) OR EXISTS(SubPlan 4)))",
+                  "Plan Rows": 1,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 999,
+                  "Actual Total Time": 0.001
+                },
+                {
+                  "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+                  "Node Type": "Index Only Scan",
+                  "Index Name": "idx_anchors_edge_src_type_order",
+                  "Index Cond": "(src = '8213aab5-7235-485d-b1d9-b188a914542a'::uuid)",
+                  "Filter": "((((_t4.props -> 'access'::text) -> 'groups'::text) -> 'anchors'::text) ? (dst)::text)",
+                  "Plan Rows": 1,
+                  "Actual Rows": 0,
+                  "Actual Loops": 0,
+                  "Actual Total Time": 0.0
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "refs": {
+    "recapture_result": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-diagnostics-20261101/recapture-v2/result.json",
+      "sha256": "7f2b38d7df0dea778039399cc62bf376ded869de0d21c8c1e004812e8c17d097"
+    },
+    "recapture_lifecycle": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-diagnostics-20261101/recapture-v2/lifecycle.json",
+      "sha256": "fe9c27dd90c81d9fab1baa4878bc4590aaa06665bc3252b81bf6a8f0eb4728c9"
+    },
+    "recapture_sources": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-diagnostics-20261101/recapture-v2/sources.json",
+      "sha256": "dfe25148e1675e404f0252e24102ae2ae1b54cc641e9deb8f3b4d5058b6ebe57"
+    },
+    "stats_result": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-diagnostics-20261101/stats-lab-v1/result.json",
+      "sha256": "3baac3ae568ec828c2833e382b91b91dcc092a97130d042cd4fe11cebed20219"
+    },
+    "stats_lifecycle": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-diagnostics-20261101/stats-lab-v1/lifecycle.json",
+      "sha256": "defbc92ca429203d6bd696f0bd75de1afb577fb783f20346d454f3a70d41b77e"
+    },
+    "stats_launch": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-diagnostics-20261101/stats-lab-v1/launch.json",
+      "sha256": "a51f8ece32594978e09d3aa94fcf378e0b3c7e7e855bf774b754753a55fc2b6f"
+    }
+  },
+  "interpretation": "In both restored fixtures, ANALYZE removes a repeated kind-only Bitmap Index Scan beneath BitmapAnd at two path-evaluation sites (1000 rows per loop,1000 loops each before). Endpoint BitmapOr remains; root shared hits fall20126->16126 and execution fallsabout48-50ms->13.4-13.7ms. This establishes controlled plan sensitivity for the captured SQL, not the statistics/autovacuum state of primary samples.",
+  "limitations": [
+    "Primary both versions have slow and fast samples; primary plans/statistics were not captured.",
+    "Same diagnostic Bind/captured anchors/types/indexes/settings and ordered result are verified. Original DDL defaults fill unused uncaptured columns; restored heap layout is not claimed byte-identical.",
+    "Census/result checks warm buffers; EXPLAIN adds instrumentation. No cold-cache or application-speedup claim.",
+    "Statistics views may lag; pre-ANALYZE cumulative table counters are observations, not synchronous modification counts.",
+    "JIT is absent in all12 retained plans; observed estimated costs are below observed jit_above_cost100000.",
+    "Root buffers are reported directly; inclusive parent/child counters are never summed."
+  ],
+  "littlex_mechanism": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-performance-20261101/littlex-mechanism-v1.json",
+    "sha256": "17a9f9850463022475dd8db9590c422619af63d495d4ea1b7250360a9d6dee7f"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-performance-20261101/correctness-v2/cases/knowledge_map-next-correctness-0/artifacts.json",
+    "sha256": "8b54187c2392f1b9ec3b25a5874f2efaa9d76d4dd14f0ba9c8ad6d50ad1f49ad",
+    "files_checked": 46
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_frozen_domain_scenario_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-performance-20261101/correctness-v2/cases/knowledge_map-next-correctness-0/artifacts.json",
+      "sha256": "8b54187c2392f1b9ec3b25a5874f2efaa9d76d4dd14f0ba9c8ad6d50ad1f49ad",
+      "files_checked": 46
+    },
+    "proof_sha256": "b38711f8755e81e9955447ec84ee646aec4c7b6054c63c20d2f3817b68f7a8a5",
+    "actual_operations_checked": 20,
+    "selected_oracle": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/additional_scenarios.py",
+      "sha256": "dc3184c70e2858d85f67afd714dc5ab66ee397d0e1a98476aaa789f772db367b"
+    },
+    "final_logical_state_sha256": "a20c2cff09d664a23bd71c4c0cfdf9302707593fe299b6305174e6961d45f4dc",
+    "full_response": {
+      "full_actions_sha256": "eafe5678c9b8acc21d80508e0eca6096c8798dccc81b50dd86ca85258fffe5e8",
+      "full_semantic_sha256": "0e3e9e17dbbdf1b0383b81a1f485d792e1fa2a0ef27974a6b0ce273788e140f3"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-performance-20261101/correctness-v2/cases/knowledge_map-next-correctness-0/plus-proof.json",
+    "sha256": "b38711f8755e81e9955447ec84ee646aec4c7b6054c63c20d2f3817b68f7a8a5"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-performance-20261101/correctness-v2/cases/knowledge_map-next-correctness-0/cleanup-target.json",
+    "sha256": "707f85135ba49950265ec310f59a1ef43dd31c3dd35b477c754c49aa0d550b8b"
+  },
+  "database_state": {
+    "database": "continuation_bad6108f5faf430d9ba58d8ccef9bdcc",
+    "cluster_owner": "3670c750-8f26-43ac-92eb-b60383cc140c",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "2ffb2dde45c9b9387e5081a69ee24a906f15aa87a1d59da6b1efa52bf289167e",
+    "actual_row_count": 24,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('Article','Revision','Review','Topic','HasRevision','HasReview','Tagged','LinksTo')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-performance-20261101/correctness-plan-v2/sources.json",
+    "sha256": "18fc9a390f887c8a7be59665fba42f64b3201bd1fa6e7db9bd8c12a8911d1076"
+  }
+}

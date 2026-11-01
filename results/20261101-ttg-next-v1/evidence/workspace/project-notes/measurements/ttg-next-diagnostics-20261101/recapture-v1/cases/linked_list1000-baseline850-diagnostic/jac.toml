@@ -1,0 +1,18 @@
+[project]
+name = "ttg-next-comparison"
+entry-point = "server.jac"
+[run]
+topology_index = true
+prefetch_limit = 2048
+prefetch_workers = 1
+cross_root_resolve = true
+async_prefetch = "process"
+ttg_prefetch_model = "always"
+prefetching = "ttg_dependency"
+ttg_fused_sql = true
+[serve]
+profile = false
+[scale.jwt]
+secret = "isolated-ttg-suite-development-secret"
+algorithm = "HS256"
+exp_delta_days = 1

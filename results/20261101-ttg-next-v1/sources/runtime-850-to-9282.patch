@@ -1,0 +1,2125 @@
+diff --git a/jac/jaclang/data/impl/query_planner.impl.jac b/jac/jaclang/data/impl/query_planner.impl.jac
+index 70b93a87d..89fd922ac 100644
+--- a/jac/jaclang/data/impl/query_planner.impl.jac
++++ b/jac/jaclang/data/impl/query_planner.impl.jac
+@@ -259,6 +259,16 @@ impl _sql_pairs(
+     }
+     mem.read_barrier();
+     acl_root = _acl_pushdown_root(q, upto, mem);
++    import from jaclang.runtime.ttg_templates { cache_key }
++    emitted_key = cache_key(q, origin_ids, acl_root);
++    if upto == len(q.hops)
++        and emitted_key is not None
++        and (not access_gated() or acl_root is not None) {
++        emitted = mem.query_cache_get(emitted_key);
++        if emitted is not None {
++            return (list(emitted[0]), list(emitted[1]));
++        }
++    }
+     bound = _effective_bound(q);
+     push = bound is not None and (acl_root is not None or _bound_pushable());
+     eff = q;
+diff --git a/jac/jaclang/data/ttg_acl.jac b/jac/jaclang/data/ttg_acl.jac
+index 8f44937b9..cefc3371d 100644
+--- a/jac/jaclang/data/ttg_acl.jac
++++ b/jac/jaclang/data/ttg_acl.jac
+@@ -74,7 +74,13 @@ def standard_catalog_access(mem: any) -> bool {
+                 for (name, module_name, node_type) in cached['types']
+             );
+         }
+-        compiled = compile_acl_type_catalog();
++        emitted = mem.query_cache_get(('ttg_compiled_catalog_v1', ));
++        if emitted is not None {
++            import from jaclang.runtime.ttg_templates { bind_template }
++            compiled = bind_template(emitted, {});
++        } else {
++            compiled = compile_acl_type_catalog();
++        }
+         rows = mem.store.rows(compiled.sql, compiled.params);
+         approved = True;
+         types: list = [];
+diff --git a/jac/jaclang/impl/sql.impl.jac b/jac/jaclang/impl/sql.impl.jac
+index 3bad4a55b..1b111fd65 100644
+--- a/jac/jaclang/impl/sql.impl.jac
++++ b/jac/jaclang/impl/sql.impl.jac
+@@ -452,6 +452,21 @@ impl scalar_one(query: Relation[R, ExactlyOne], key: Field[T]) -> ScalarExpr[T]
+     return ScalarExpr(ScalarNode(dtype=actual.dtype, query=q, require_one=True));
+ }
+ 
++impl in_query(
++    term: ScalarExpr[T], query: Relation[R, C], key: Field[T]
++) -> ScalarExpr[SqlBool] {
++    fields = query.ast.schema.fields;
++    if len(fields) != 1
++        or term.ast.dtype.nullable
++        or not same_type(query.ast.schema.find(key.name).dtype, key.dtype)
++        or not same_type(fields[0].dtype, term.ast.dtype) {
++        raise SqlError('IN query requires one matching non-null output column');
++    }
++    return ScalarExpr(
++        QueryMembershipNode(dtype=DataType('boolean'), term=term.ast, query=query.ast)
++    );
++}
++
+ impl exists(query: Relation[R, C]) -> ScalarExpr[SqlBool] {
+     return ScalarExpr(ExistsNode(dtype=DataType('boolean'), query=query.ast));
+ }
+@@ -583,6 +598,9 @@ impl QueryGraph.scan_expr(expr: ExprNode) -> None {
+     }
+     if isinstance(expr, ColumnNode) {
+         self.visit_source(expr.source);
++    } elif isinstance(expr, QueryMembershipNode) {
++        self.visit_expr(expr.term);
++        self.visit_query(expr.query);
+     } elif isinstance(expr, (ScalarNode, ExistsNode)) {
+         self.visit_query(expr.query);
+     } else {
+@@ -640,6 +658,9 @@ impl QueryGraph.scan_query(query: RelationNode) -> None {
+         ];
+     } elif isinstance(query, OrderedNode) {
+         self.visit_query(query.body);
++        if isinstance(query.limit, SlotNode) {
++            self.visit_expr(query.limit);
++        }
+     } elif isinstance(query, ValuesNode) {
+         for row in query.rows {
+             for e in row {
+@@ -964,6 +985,19 @@ impl QueryValidator.expr_uncached(
+         }
+         return Checked(free=q.external);
+     }
++    if isinstance(ast, QueryMembershipNode) {
++        facts = self.query(ast.query, scope, ctes);
++        fields = _compile_schema(ast.query, self.schemas).fields;
++        if len(fields) != 1
++            or ast.term.dtype.nullable
++            or not same_type(fields[0].dtype, ast.term.dtype)
++            or not same_type(ast.dtype, DataType('boolean')) {
++            raise SqlError('IN query requires matching non-null types and one column');
++        }
++        return _merge_checked(
++            [self.expr(ast.term, scope, local, ctes), Checked(free=facts.external)]
++        );
++    }
+     if isinstance(ast, ExistsNode) {
+         q = self.query(ast.query, scope, ctes);
+         if not same_type(ast.dtype, DataType('boolean')) {
+@@ -1068,7 +1102,13 @@ impl QueryValidator.query_body(
+         if ast.cardinality != 'many' {
+             raise SqlError('Invalid ordered-result cardinality');
+         }
+-        if ast.limit is not None and (type(ast.limit) is not int or ast.limit < 0) {
++        if isinstance(ast.limit, SlotNode) {
++            if ast.limit.dtype.name != 'bigint' or ast.limit.dtype.nullable {
++                raise SqlError('LIMIT slot requires a non-null bigint');
++            }
++            self.expr(ast.limit, [], [], ctes);
++        } elif ast.limit is not None
++            and (type(ast.limit) is not int or ast.limit < 0) {
+             raise SqlError('Invalid LIMIT');
+         }
+         for order in ast.ordering {
+@@ -1248,6 +1288,7 @@ impl PostgresRenderer.render(
+     self.params = {};
+     self.parameter_ids = {};
+     self.slot_types = dict(plan.slots);
++    self.nonnegative_slots = set();
+     self.aliases = plan.aliases;
+     self.cte_names = plan.cte_names;
+     self.local_orders = plan.local_orders;
+@@ -1268,6 +1309,7 @@ impl PostgresRenderer.render(
+                     + self.query(body)
+                     + ') AS "_with_scope"',
+                 params=dict(self.params),
++                nonnegative_slots=tuple(sorted(self.nonnegative_slots)),
+                 slots=tuple(
+                     (name, DataType(dtype.name, dtype.nullable))
+                     for (name, dtype) in plan.slots
+@@ -1281,6 +1323,7 @@ impl PostgresRenderer.render(
+     return CompiledSQL(
+         sql=prefix + self.query(body),
+         params=dict(self.params),
++        nonnegative_slots=tuple(sorted(self.nonnegative_slots)),
+         slots=tuple(
+             (name, DataType(dtype.name, dtype.nullable)) for (name, dtype) in plan.slots
+         )
+@@ -1362,6 +1405,9 @@ impl PostgresRenderer.expr(ast: ExprNode) -> str {
+     if isinstance(ast, ScalarNode) {
+         return '(' + self.query(ast.query) + ')';
+     }
++    if isinstance(ast, QueryMembershipNode) {
++        return '(' + self.expr(ast.term) + ' IN (' + self.query(ast.query) + '))';
++    }
+     if isinstance(ast, ExistsNode) {
+         return 'EXISTS (' + self.query(ast.query) + ')';
+     }
+@@ -1404,6 +1450,9 @@ impl PostgresRenderer.query(ast: RelationNode) -> str {
+             + ')';
+     }
+     if isinstance(ast, OrderedNode) {
++        if isinstance(ast.limit, SlotNode) {
++            self.nonnegative_slots.add(ast.limit.name);
++        }
+         return 'SELECT * FROM ('
+             + self.query(ast.body)
+             + ') AS "_set" ('
+@@ -1415,7 +1464,16 @@ impl PostgresRenderer.query(ast: RelationNode) -> str {
+             )
+             + ')'
+             + (' ORDER BY ' + self.ordering(ast.ordering) if ast.ordering else '')
+-            + (' LIMIT ' + str(ast.limit) if ast.limit is not None else '');
++            + (
++                ' LIMIT '
++                    + (
++                        self.expr(ast.limit)
++                            if isinstance(ast.limit, SlotNode)
++                            else str(ast.limit)
++                    )
++                    if ast.limit is not None
++                    else ''
++            );
+     }
+     if not isinstance(ast, SelectNode) {
+         raise SqlError('Unvalidated relation');
+@@ -1898,11 +1956,17 @@ impl output(key: Field[T]) -> ScalarExpr[T] {
+ }
+ 
+ impl ordered(
+-    query: Relation[R, C], order_by: list[Order], limit: int | None = None
++    query: Relation[R, C],
++    order_by: list[Order],
++    limit: int | ScalarExpr[SqlInt64] | None = None
+ ) -> Relation[R, Many] {
++    bound: any = limit.ast if isinstance(limit, ScalarExpr) else limit;
++    if isinstance(limit, ScalarExpr) and not isinstance(bound, SlotNode) {
++        raise SqlError('Dynamic ordered LIMIT requires a typed slot');
++    }
+     return Relation(
+         OrderedNode(
+-            cardinality='many', body=query.ast, ordering=tuple(order_by), limit=limit
++            cardinality='many', body=query.ast, ordering=tuple(order_by), limit=bound
+         )
+     );
+ }
+@@ -2037,6 +2101,9 @@ impl _children(expr: ExprNode) -> tuple[ExprNode, ...] {
+     if isinstance(expr, ArrayNode) {
+         return expr.items;
+     }
++    if isinstance(expr, QueryMembershipNode) {
++        return (expr.term, );
++    }
+     if isinstance(expr, MembershipNode) {
+         return (expr.term, ) + expr.items;
+     }
+@@ -2468,7 +2535,7 @@ impl _source_recursive_count(source: Source, ref: Cte) -> int {
+ }
+ 
+ impl _scan_recursive_expr(expr: ExprNode, ref: Cte) {
+-    if isinstance(expr, (ScalarNode, ExistsNode)) {
++    if isinstance(expr, (ScalarNode, ExistsNode, QueryMembershipNode)) {
+         if _recursive_count(expr.query, ref) {
+             raise SqlError('Recursive reference cannot occur in a scalar subquery');
+         }
+@@ -2581,6 +2648,9 @@ impl _expr_key(expr: ExprNode) -> tuple[any, ...] {
+     if isinstance(expr, OutputNode) {
+         return ('output', dtype, expr.name);
+     }
++    if isinstance(expr, QueryMembershipNode) {
++        return ('in_query', dtype, id(expr.query), _expr_key(expr.term));
++    }
+     if isinstance(expr, (ScalarNode, ExistsNode)) {
+         return (type(expr).__name__, dtype, id(expr.query));
+     }
+@@ -2782,6 +2852,9 @@ impl CompiledSQL.bind(
+     for (name, dtype) in self.slots {
+         value = values[name];
+         validate_value(dtype, value);
++        if name in self.nonnegative_slots and value < 0 {
++            raise SqlError('LIMIT slot cannot be negative');
++        }
+         params[name] = _freeze_sql_value(value);
+     }
+     return CompiledSQL(sql=self.sql, params=params);
+diff --git a/jac/jaclang/runtime/ttg_continuation.jac b/jac/jaclang/runtime/ttg_continuation.jac
+index f3a155349..67fa18ef7 100644
+--- a/jac/jaclang/runtime/ttg_continuation.jac
++++ b/jac/jaclang/runtime/ttg_continuation.jac
+@@ -165,7 +165,8 @@ def plan_continuation(
+     transition_trace: list | None = None,
+     resume_event: int | None = None,
+     resolve_state: bool = False,
+-    initial_unknown_ints: set[str] | None = None
++    initial_unknown_ints: set[str] | None = None,
++    queued_trigger_assumption: bool = False
+ ) -> dict {
+     result: dict = {
+         'nodes': [],
+@@ -286,6 +287,13 @@ def plan_continuation(
+         }
+         event = graph.events[cursor];
+         try {
++            if event.kind == 'cancel' and queued_trigger_assumption {
++                # Prediction may overfetch already queued entries. Native
++                # disengage and remaining statements are never executed here.
++                handler_index = len(handlers);
++                cursor = -1;
++                continue;
++            }
+             if event.kind in ('barrier', 'cancel') {
+                 result['stop'] = event.kind
+                     + ' at '
+diff --git a/jac/jaclang/runtime/ttg_dependencies.jac b/jac/jaclang/runtime/ttg_dependencies.jac
+index 79eccf2e1..bf63b3169 100644
+--- a/jac/jaclang/runtime/ttg_dependencies.jac
++++ b/jac/jaclang/runtime/ttg_dependencies.jac
+@@ -67,7 +67,8 @@ obj WalkerDependencyGraph {
+         edges: list[TraceDependency] = [],
+         entries: dict[str, int] = {},
+         handlers: dict[str, list[str]] = {},
+-        dispatch: dict[int, list[str]] = {};
++        dispatch: dict[int, list[str]] = {},
++        sql_templates: dict = {};
+ 
+     def dependencies(event_id: int) -> list[TraceDependency] {
+         return [
+@@ -1117,6 +1118,7 @@ def _trace_field_effects(
+ 
+ 
+ def compile_checkpoint_plan(arch: uni.Archetype) -> dict {
++    import from jaclang.runtime.ttg_templates { compile_templates }
+     graph = analyze_walker_ast(arch);
+     candidates = [
+         name
+@@ -1141,6 +1143,7 @@ def compile_checkpoint_plan(arch: uni.Archetype) -> dict {
+     ];
+     return {
+         'version': 2,
++        'sql_templates': compile_templates(graph.events),
+         'walker_name': graph.walker_name,
+         'entries': graph.entries,
+         'handlers': graph.handlers,
+@@ -1193,6 +1196,8 @@ def checkpoint_graph(spec: dict, walker_type: type) -> WalkerDependencyGraph {
+         graph.events.append(TraceEvent(**fields));
+     }
+     graph.edges = [TraceDependency(**item) for item in spec['edges']];
++    import from jaclang.runtime.ttg_templates { hydrate_templates }
++    graph.sql_templates = hydrate_templates(spec.get('sql_templates', {}));
+     graph.entries = dict(spec['entries']);
+     graph.handlers = dict(spec['handlers']);
+     graph.dispatch = {int(k): v for (k, v) in spec['dispatch'].items()};
+diff --git a/jac/jaclang/runtime/ttg_dependency_prefetch.jac b/jac/jaclang/runtime/ttg_dependency_prefetch.jac
+index 57085d175..ad5f7f22c 100644
+--- a/jac/jaclang/runtime/ttg_dependency_prefetch.jac
++++ b/jac/jaclang/runtime/ttg_dependency_prefetch.jac
+@@ -104,6 +104,9 @@ def dependency_prefetch(
+             else '',
+         'admission': 'AlwaysPrefetch only; shared batch costs are diagnostic and excluded from training',
+         'queries': 0,
++        'template_queries': 0,
++        'frontier_origins': 0,
++        'legacy_fusion_calls': 0,
+         'overflow': 0,
+         'cache_paths': 0,
+         'cache_empty_paths': 0,
+@@ -253,6 +256,8 @@ def prefetch_continuation(graph: any, scope: any, point: int) {
+     local_paths: dict = {};
+     fused_paths: dict = {};
+     attempted_regions: set = set();
++    frontier_demands: list = [];
++    frontier_attempted: list = [];
+     def resolve(active: dict, event: any) -> any {
+         origin = state.ctx.user_root if event.origin == 'root' else None;
+         origin_id = origin.id if origin is not None else active['id'];
+@@ -315,7 +320,32 @@ def prefetch_continuation(graph: any, scope: any, point: int) {
+         query = GraphQuery([], hops=hops).`visit();
+         rows: any = None;
+         if state.fused_sql {
+-            if key not in fused_paths and key not in attempted_regions {
++            if graph.sql_templates and not frontier_attempted {
++                state.fusion['sql_construction'] = 'compiler_emitted_templates';
++                frontier_attempted.append(True);
++                import from jaclang.runtime.ttg_frontier { resolve_frontier }
++                frontier = resolve_frontier(
++                    mem,
++                    scope.wlk,
++                    graph,
++                    active,
++                    event,
++                    active.get('transition_pending', []),
++                    state.ctx.user_root,
++                    state.max_length,
++                    state.fusion
++                );
++                if frontier is not None {
++                    fused_paths.update(frontier[0]);
++                    frontier_demands.extend(frontier[1]);
++                }
++            }
++            if not graph.sql_templates
++                and key not in fused_paths
++                and key not in attempted_regions {
++                state.fusion['sql_construction'] = 'legacy_runtime_builder';
++                state.fusion['fallback_reason'] = 'Legacy checkpoint artifact has no emitted SQL templates';
++                state.fusion['legacy_fusion_calls'] += 1;
+                 attempted_regions.add(key);
+                 import from jaclang.runtime.ttg_fusion { resolve_fused_region }
+                 fused = resolve_fused_region(
+@@ -396,6 +426,20 @@ def prefetch_continuation(graph: any, scope: any, point: int) {
+         state.errors.append(str(error));
+         raise;
+     }
++    # Complete payload demands for the queued prefix, even if native prediction
++    # stopped at disengage. Actual execution still follows the native queue.
++    for (future_active, future_event) in frontier_demands {
++        future_origin = state.ctx.user_root.id
++            if future_event.origin == 'root' and state.ctx.user_root is not None
++            else future_active['id'];
++        if (future_origin, tuple(future_event.hop_chain)) in fused_paths {
++            for target in resolve(future_active, future_event) or [] {
++                if not any(n['id'] == target['id'] for n in outcome['nodes']) {
++                    outcome['nodes'].append(target);
++                }
++            }
++        }
++    }
+     state.continuations.append(
+         {
+             'point': point,
+diff --git a/jac/jaclang/runtime/ttg_frontier.jac b/jac/jaclang/runtime/ttg_frontier.jac
+new file mode 100644
+index 000000000..28e932b00
+--- /dev/null
++++ b/jac/jaclang/runtime/ttg_frontier.jac
+@@ -0,0 +1,265 @@
++"""Prediction-only queued-prefix batching; native FIFO execution remains untouched."""
++import from uuid { UUID }
++import from jaclang.runtime.ttg_continuation { plan_continuation, continuation_type }
++
++
++def collect_frontier(
++    graph: any, current: dict, event: any, pending: list, max_nodes: int
++) -> tuple[dict, list] {
++    demands: list = [];
++    def collect(active: dict, future_event: any) -> any {
++        demands.append((dict(active), future_event));
++        return [];
++    }
++    result = plan_continuation(
++        graph,
++        current,
++        event.id,
++        current['transition_state'],
++        pending,
++        collect,
++        max_nodes,
++        32768,
++        resume_event=event.id,
++        initial_unknown_ints=current.get('transition_unknown_integers'),
++        queued_trigger_assumption=True
++    );
++    return (result, demands);
++}
++
++
++def template_type_matches(resolved: any, token: any) -> bool {
++    if resolved is None {
++        return token is None;
++    }
++    name_reader: any = type.__getattribute__;
++    return type(resolved) is type and name_reader(resolved, '__name__') == token;
++}
++
++
++def resolve_frontier(
++    mem: any,
++    wlk: any,
++    graph: any,
++    current: dict,
++    event: any,
++    pending: list,
++    user_root: any,
++    max_nodes: int,
++    metrics: dict
++) -> any {
++    import from jaclang.runtime.ttg_fusion { certify_fused_region }
++    import from jaclang.runtime.ttg_templates {
++        select_template,
++        bind_template,
++        publish_paths
++    }
++    import from jaclang.runtime.graph_query { GraphQuery, QHop }
++    import from jaclang.runtime.graph_walk { access_gated }
++    import from jaclang.data.query_planner { _acl_pushdown_root }
++    bundle = graph.sql_templates;
++    if bundle.get('version') != 1 or not bundle.get('sites') {
++        metrics['fallback_reason'] = 'No emitted SQL template for this walker';
++        return None;
++    }
++    if 'transition_state' not in current {
++        return None;
++    }
++    (prediction, demands) = collect_frontier(graph, current, event, pending, max_nodes);
++    if not demands {
++        return None;
++    }
++    kind = 'batch';
++    contract: dict = {};
++    if not pending {
++        contract = certify_fused_region(
++            graph,
++            current,
++            event.id,
++            current['transition_state'],
++            [],
++            max_nodes,
++            32768,
++            resume_event=event.id
++        );
++        if contract['kind'] == 'linear' {
++            kind = 'linear';
++        }
++    }
++    sites = bundle['sites']
++        if kind == 'batch'
++        else [
++            next(
++                s
++                for s in bundle['sites']
++                if s['event'] == event.id
++            )
++        ];
++    by_event = {s['event']: i for (i, s) in enumerate(sites)};
++    arrays: list = [[] for s in sites];
++    queries: list = [];
++    witnesses: list = [];
++    actor: any = None;
++    with mem._lock {
++        mem.read_barrier();
++        if 'catalog' in bundle {
++            mem.query_cache_put(('ttg_compiled_catalog_v1', ), bundle['catalog']);
++        }
++        for site in sites {
++            hops: list = [];
++            for (edge, node, direction) in site['hops'] {
++                et = continuation_type(wlk, str(edge)) if edge is not None else None;
++                nt = continuation_type(wlk, str(node)) if node is not None else None;
++                if (edge is not None and et is None)
++                    or (node is not None and nt is None) {
++                    metrics['fallback_reason'] = 'Unresolved emitted path type';
++                    return None;
++                }
++                if not template_type_matches(et, edge)
++                    or not template_type_matches(nt, node) {
++                    metrics['fallback_reason'] = 'Emitted type token is an alias or custom metaclass';
++                    return None;
++                }
++                hops.append(QHop(dir=int(direction), `edge=et, nd=nt));
++            }
++            queries.append(GraphQuery([], hops=hops).`visit());
++        }
++        selected: list = [];
++        for (active, future_event) in demands {
++            if future_event.id not in by_event {
++                metrics['fallback_reason'] = 'Visit absent from emitted site inventory';
++                return None;
++            }
++            slot = by_event[future_event.id];
++            origin = user_root.id
++                if future_event.origin == 'root' and user_root is not None
++                else active['id'];
++            if future_event.origin == 'root' and user_root is None {
++                return None;
++            }
++            uid = UUID(str(origin));
++            visibility = _acl_pushdown_root(
++                queries[slot], len(queries[slot].hops), mem
++            );
++            if access_gated() and visibility is None {
++                metrics['fallback_reason'] = 'ACL pushdown is unproved for dynamic or custom access';
++                return None;
++            }
++            if selected and visibility != actor {
++                return None;
++            }
++            actor = visibility;
++            # Duplicate sites/activations remain in the witness; identical fetches can share cache.
++            arrays[slot].append(uid);
++            selected.append((active, future_event));
++            witnesses.append(
++                {
++                    'event': future_event.id,
++                    'origin': str(uid),
++                    'activation': str(active['id']),
++                    'slot': slot
++                }
++            );
++        }
++        descriptor = select_template(bundle, kind, actor is not None, event.id);
++        if descriptor is None {
++            return None;
++        }
++        values: dict = {'row_limit': max_nodes + 1};
++        if kind == 'linear' {
++            values.update(
++                {
++                    'origin': arrays[0][0],
++                    'source_type': contract['source_type'],
++                    'source_module': contract['source_module'],
++                    'max_depth': contract['max_origins'] - 1
++                }
++            );
++        } else {
++            for (slot, origins) in enumerate(arrays) {
++                values['origins_' + str(slot)] = tuple(origins);
++            }
++        }
++        if actor is not None {
++            values.update({'actor_uuid': UUID(actor), 'actor_text': actor});
++        }
++        compiled = bind_template(descriptor, values);
++        rows = mem.store.rows(compiled.sql, compiled.params);
++        metrics['queries'] += 1;
++        if len(rows) > max_nodes {
++            metrics['overflow'] += 1;
++            metrics['fallback_reason'] = 'Compiled frontier row budget exceeded';
++            return None;
++        }
++        groups: dict = {};
++        arities: dict = {};
++        for row in rows {
++            slot = int(row[0]);
++            depth = int(row[1]);
++            uid = UUID(str(row[2]));
++            if slot < 0 or slot >= len(sites) or depth < 0 {
++                raise ValueError('Invalid compiled frontier slot/depth');
++            }
++            if kind == 'batch'
++                and (depth >= len(arrays[slot]) or arrays[slot][depth] != uid) {
++                raise ValueError('Compiled frontier origin does not match bound slot');
++            }
++            key = (slot, depth, uid);
++            group = groups.setdefault(key, []);
++            if row[3] is None {
++                if any(v is not None for v in row[4:]) or group {
++                    raise ValueError('Invalid compiled empty path marker');
++                }
++            } else {
++                arity = int(row[8]);
++                if arity <= 0
++                    or int(row[7]) != len(group) + 1
++                    or arities.get(key, arity) != arity {
++                    raise ValueError('Invalid compiled path order/cardinality');
++                }
++                arities[key] = arity;
++                group.append((UUID(str(row[3])), UUID(str(row[4])), row[5], row[6]));
++            }
++        }
++        if kind == 'batch' and len(groups) != sum(len(a) for a in arrays) {
++            raise ValueError('Missing compiled origin/empty marker');
++        }
++        paths: dict = {};
++        staged: list = [];
++        for ((slot, depth, uid), resolved) in groups.items() {
++            if len(resolved) != arities.get((slot, depth, uid), 0) {
++                raise ValueError('Incomplete compiled frontier path');
++            }
++            key = (uid, tuple(tuple(h) for h in sites[slot]['hops']));
++            if key in paths and paths[key] != resolved {
++                raise ValueError('Inconsistent duplicate compiled paths');
++            }
++            paths[key] = resolved;
++            native = select_template(
++                bundle, 'native', actor is not None, sites[slot]['event']
++            );
++            staged.append((queries[slot], uid, resolved, native));
++        }
++        if not publish_paths(mem, staged) {
++            return None;
++        }
++        metrics['cache_paths'] += len(paths);
++        metrics['cache_empty_paths'] += sum(
++            1
++            for p in paths.values()
++            if not p
++        );
++        metrics['template_queries'] = metrics.get('template_queries', 0) + 1;
++        metrics['frontier_origins'] = metrics.get('frontier_origins', 0) + len(demands);
++        metrics['regions'].append(
++            {
++                'kind': kind,
++                'compiled': True,
++                'demands': witnesses,
++                'stop': prediction['stop'],
++                'queued_trigger_assumption': True
++            }
++        );
++        return (paths, selected);
++    }
++}
+diff --git a/jac/jaclang/runtime/ttg_fusion.jac b/jac/jaclang/runtime/ttg_fusion.jac
+index 0cfa33ef8..c2d1e55c3 100644
+--- a/jac/jaclang/runtime/ttg_fusion.jac
++++ b/jac/jaclang/runtime/ttg_fusion.jac
+@@ -184,6 +184,12 @@ def resolve_fused_region(
+                 or (hop[1] is not None and node_type is None) {
+                 return None;
+             }
++            import from jaclang.runtime.ttg_frontier { template_type_matches }
++            if not template_type_matches(edge_type, hop[0])
++                or not template_type_matches(node_type, hop[1]) {
++                metrics['fallback_reason'] = 'Legacy fused type token is an alias or custom metaclass';
++                return None;
++            }
+             hops.append(QHop(dir=int(hop[2]), `edge=edge_type, nd=node_type));
+         }
+         query = GraphQuery([], hops=hops).`visit();
+diff --git a/jac/jaclang/runtime/ttg_fusion_sql.jac b/jac/jaclang/runtime/ttg_fusion_sql.jac
+index 213836bb5..9b71e00b1 100644
+--- a/jac/jaclang/runtime/ttg_fusion_sql.jac
++++ b/jac/jaclang/runtime/ttg_fusion_sql.jac
+@@ -31,10 +31,14 @@ def _native_anchors -> any {
+ }
+ 
+ 
+-def _visibility(cols: _BuildColumns, node_source: any, actor: str | None) -> any {
++def _visibility(cols: _BuildColumns, node_source: any, actor: any) -> any {
+     if actor is None {
+         return q.boolean(True);
+     }
++    actor_uuid = actor['uuid']
++        if type(actor) is dict
++        else q.param(q.uuid_type(), UUID(actor));
++    actor_text = actor['text'] if type(actor) is dict else q.text(actor);
+     props = cols.col(node_source, 'props');
+     access = q.json_get(props, q.text('access'));
+     roots = q.json_get(q.json_get(access, q.text('roots')), q.text('anchors'));
+@@ -46,7 +50,7 @@ def _visibility(cols: _BuildColumns, node_source: any, actor: str | None) -> any
+         predicate=_all(
+             [
+                 _cmp(cols.col(group_edge, 'kind'), q.text('EdgeAnchor')),
+-                _cmp(cols.col(group_edge, 'src'), q.param(q.uuid_type(), UUID(actor))),
++                _cmp(cols.col(group_edge, 'src'), actor_uuid),
+                 q.json_has_key(
+                     groups,
+                     q.cast(cols.col(group_edge, 'dst'), q.nullable(q.text_type()))
+@@ -56,21 +60,47 @@ def _visibility(cols: _BuildColumns, node_source: any, actor: str | None) -> any
+     );
+     return _either(
+         [
+-            _cmp(cols.col(node_source, 'root_id'), q.param(q.uuid_type(), UUID(actor))),
++            _cmp(cols.col(node_source, 'root_id'), actor_uuid),
+             _cmp(
+                 q.cast(q.json_text(access, q.text('all')), q.nullable(q.int64_type())),
+                 q.int64(-1),
+                 '>'
+             ),
+-            q.json_has_key(roots, q.text(actor)),
++            q.json_has_key(roots, actor_text),
+             q.exists(member)
+         ]
+     );
+ }
+ 
+ 
++def _fusion_match(
++    cols: _BuildColumns, arch_type: any, expected: any, template: bool
++) -> any {
++    if not template {
++        return _match(cols, arch_type, _expected(expected));
++    }
++    expected_expr = _expected(expected);
++    ancestry = q.table(
++        'graph_types',
++        [q.field('type_name', q.text_type()), q.field('ancestor', q.text_type())]
++    );
++    inherited = _select(
++        ancestry,
++        [('type_name', cols.col(ancestry, 'type_name'))],
++        predicate=_cmp(cols.col(ancestry, 'ancestor'), expected_expr)
++    );
++    return _either(
++        [
++            q.is_null(expected_expr),
++            _cmp(arch_type, expected_expr),
++            q.in_query(arch_type, inherited, q.field('type_name', q.text_type()))
++        ]
++    );
++}
++
++
+ def _native_path(
+-    cols: _BuildColumns, origin: any, hops: tuple, actor: str | None
++    cols: _BuildColumns, origin: any, hops: tuple, actor: any, template: bool = False
+ ) -> any {
+     joins: list = [];
+     predicates: list = [];
+@@ -104,7 +134,9 @@ def _native_path(
+             [
+                 _cmp(cols.col(edge_source, 'kind'), q.text('EdgeAnchor')),
+                 direction_test,
+-                _match(cols, cols.col(edge_source, 'arch_type'), _expected(hop[0]))
++                _fusion_match(
++                    cols, cols.col(edge_source, 'arch_type'), hop[0], template
++                )
+             ]
+         );
+         if first is None {
+@@ -123,8 +155,8 @@ def _native_path(
+                     [
+                         _cmp(cols.col(node_source, 'id'), other),
+                         _cmp(cols.col(node_source, 'kind'), q.text('NodeAnchor')),
+-                        _match(
+-                            cols, cols.col(node_source, 'arch_type'), _expected(hop[1])
++                        _fusion_match(
++                            cols, cols.col(node_source, 'arch_type'), hop[1], template
+                         ),
+                         _visibility(cols, node_source, actor)
+                     ]
+@@ -166,9 +198,10 @@ def _path_output(
+     depth: any,
+     hops: tuple,
+     slot: int,
+-    actor: str | None
++    actor: any,
++    template: bool = False
+ ) -> any {
+-    matches = q.optional_source(_native_path(cols, origin, hops, actor));
++    matches = q.optional_source(_native_path(cols, origin, hops, actor, template));
+     return _select(
+         source,
+         [('slot', q.int64(slot)), ('depth', depth), ('origin_id', origin)]
+@@ -182,7 +215,7 @@ def _path_output(
+ 
+ 
+ def compile_fused_region(
+-    contract: dict, origins: list, actor: str | None, max_rows: int
++    contract: dict, origins: list, actor: any, max_rows: int, template: bool = False
+ ) -> any {
+     origins = [
+         value if isinstance(value, UUID) else UUID(str(value)) for value in origins
+@@ -199,9 +232,19 @@ def compile_fused_region(
+         );
+         anchor = _select(
+             None,
+-            [('origin_id', q.param(q.uuid_type(), origins[0])), ('depth', q.int64(0))]
++            [
++                (
++                    'origin_id',
++                    q.slot('origin', q.uuid_type())
++                        if template
++                        else q.param(q.uuid_type(), origins[0])
++                ),
++                ('depth', q.int64(0))
++            ]
++        );
++        matches = _native_path(
++            cols, cols.col(walk, 'origin_id'), rule['hops'], actor, template
+         );
+-        matches = _native_path(cols, cols.col(walk, 'origin_id'), rule['hops'], actor);
+         step = _select(
+             walk,
+             [
+@@ -213,15 +256,22 @@ def compile_fused_region(
+                 [
+                     _cmp(cols.col(matches, 'arity'), q.int64(1)),
+                     _cmp(
+-                        cols.col(matches, 'arch_type'), q.text(contract['source_type'])
++                        cols.col(matches, 'arch_type'),
++                        q.slot('source_type', q.text_type())
++                            if template
++                            else q.text(contract['source_type'])
+                     ),
+                     _cmp(
+                         cols.col(matches, 'arch_module'),
+-                        q.text(contract['source_module'])
++                        q.slot('source_module', q.text_type())
++                            if template
++                            else q.text(contract['source_module'])
+                     ),
+                     _cmp(
+                         cols.col(walk, 'depth'),
+-                        q.int64(contract['max_origins'] - 1),
++                        q.slot('max_depth', q.int64_type())
++                            if template
++                            else q.int64(contract['max_origins'] - 1),
+                         '<'
+                     )
+                 ]
+@@ -235,24 +285,34 @@ def compile_fused_region(
+             cols.col(walk, 'depth'),
+             rule['hops'],
+             0,
+-            actor
++            actor,
++            template
+         );
+     } else {
+         bodies: list = [];
+         for (index, rule) in enumerate(rules) {
+-            seed = q.values(
+-                [q.field('origin_id', q.uuid_type())],
+-                [[q.param(q.uuid_type(), origins[index])]]
+-            ).as_source();
++            seed = q.unnest(
++                q.slot('origins_' + str(index), q.array_type(q.uuid_type())),
++                q.field('origin_id', q.uuid_type()),
++                q.field('origin_order', q.int64_type())
++            )
++                if template
++                else q.values(
++                    [q.field('origin_id', q.uuid_type())],
++                    [[q.param(q.uuid_type(), origins[index])]]
++                ).as_source();
+             bodies.append(
+                 _path_output(
+                     cols,
+                     seed,
+                     cols.col(seed, 'origin_id'),
+-                    q.int64(0),
++                    q.sub(cols.col(seed, 'origin_order'), q.int64(1))
++                        if template
++                        else q.int64(0),
+                     rule['hops'],
+                     index,
+-                    actor
++                    actor,
++                    template
+                 )
+             );
+         }
+@@ -265,7 +325,7 @@ def compile_fused_region(
+             q.asc(q.output(q.field('depth', q.int64_type()))),
+             q.asc(q.output(q.field('ord', q.nullable(q.int64_type()))))
+         ],
+-        limit=max_rows + 1
++        limit=q.slot('row_limit', q.int64_type()) if template else max_rows + 1
+     );
+     return q.compile_sql(ordered);
+ }
+diff --git a/jac/jaclang/runtime/ttg_templates.jac b/jac/jaclang/runtime/ttg_templates.jac
+new file mode 100644
+index 000000000..5b284b6ce
+--- /dev/null
++++ b/jac/jaclang/runtime/ttg_templates.jac
+@@ -0,0 +1,296 @@
++"""Compiler-emitted SQL descriptors. Runtime selection and binding build no SQL AST."""
++import jaclang.sql as q;
++import from uuid { UUID }
++import from time { perf_counter_ns, thread_time_ns }
++
++glob _metrics: dict = {},
++     _profile: dict = {'enabled': False};
++
++
++def template_metrics(reset: bool = False, enabled: bool | None = None) -> dict {
++    if enabled is not None {
++        _profile['enabled'] = enabled;
++    }
++    result = dict(_metrics);
++    if reset {
++        _metrics.clear();
++    }
++    return result;
++}
++
++
++def _record(name: str, wall: int, cpu: int) -> None {
++    if not _profile['enabled'] {
++        return;
++    }
++    _metrics[name + '_calls'] = _metrics.get(name + '_calls', 0) + 1;
++    _metrics[name + '_wall_ns'] = _metrics.get(name + '_wall_ns', 0) + perf_counter_ns()
++        - wall;
++    _metrics[name + '_thread_cpu_ns'] = _metrics.get(name + '_thread_cpu_ns', 0)
++        + thread_time_ns()
++        - cpu;
++}
++
++
++def sql_descriptor(compiled: q.CompiledSQL) -> dict {
++    return {
++        'sql': compiled.sql,
++        'params': dict(compiled.params),
++        'slots': [
++            [name, dtype.name, dtype.nullable] for (name, dtype) in compiled.slots
++        ],
++        'nonnegative_slots': list(compiled.nonnegative_slots)
++    };
++}
++
++
++def hydrate_descriptor(descriptor: dict) -> any {
++    compiled = q.CompiledSQL(
++        sql=descriptor['sql'],
++        params=dict(descriptor['params']),
++        slots=tuple(
++            (name, q.DataType(dtype, nullable))
++            for (name, dtype, nullable) in descriptor['slots']
++        ),
++        nonnegative_slots=tuple(descriptor.get('nonnegative_slots', []))
++    );
++    descriptor['_compiled'] = compiled;
++    return compiled;
++}
++
++
++def hydrate_templates(value: any) -> any {
++    if type(value) is dict {
++        result = {key: hydrate_templates(item) for (key, item) in value.items()};
++        if 'sql' in result and 'slots' in result {
++            hydrate_descriptor(result);
++        }
++        return result;
++    }
++    if type(value) is list {
++        return [hydrate_templates(item) for item in value];
++    }
++    return value;
++}
++
++
++def bind_template(descriptor: dict, values: dict) -> any {
++    wall = perf_counter_ns() if _profile['enabled'] else 0;
++    cpu = thread_time_ns() if _profile['enabled'] else 0;
++    try {
++        compiled = descriptor.get('_compiled');
++        if compiled is None {
++            compiled = hydrate_descriptor(descriptor);
++        }
++        return compiled.bind(values);
++    } finally {
++        _record('bind', wall, cpu);
++    }
++}
++
++
++def select_template(bundle: dict, kind: str, gated: bool, event: int = -1) -> any {
++    wall = perf_counter_ns() if _profile['enabled'] else 0;
++    cpu = thread_time_ns() if _profile['enabled'] else 0;
++    try {
++        mode = 'gated' if gated else 'open';
++        if kind == 'batch' {
++            return bundle.get('batch', {}).get(mode);
++        }
++        return bundle.get(kind, {}).get(str(event), {}).get(mode);
++    } finally {
++        _record('select', wall, cpu);
++    }
++}
++
++
++def compile_templates(events: list) -> dict {
++    # Called by compile_checkpoint_plan, before serialized checkpoint emission.
++    import json;
++    import from jaclang.runtime.ttg_fusion_sql { compile_fused_region }
++    import from jaclang.runtime.ttg_sql { compile_acl_type_catalog }
++    import from jaclang.runtime.graph_query { GraphQuery, QHop }
++    import from jaclang.data.sqlcompile { compile_query }
++    wall = perf_counter_ns() if _profile['enabled'] else 0;
++    cpu = thread_time_ns() if _profile['enabled'] else 0;
++    try {
++        sites = [
++            {'event': e.id, 'hops': e.hop_chain, 'origin': e.origin}
++            for e in events
++            if e.kind == 'visit'
++                and e.hop_chain
++                and e.origin in ('here', 'root')
++                and all(h[2] in (1, 2, 3) for h in e.hop_chain)
++        ];
++        bundle: dict = {
++            'version': 1,
++            'sites': sites,
++            'batch': {},
++            'linear': {},
++            'native': {}
++        };
++        if not sites {
++            return bundle;
++        }
++        bundle['catalog'] = sql_descriptor(compile_acl_type_catalog());
++        for gated in (False, True) {
++            mode = 'gated' if gated else 'open';
++            actor = {
++                'uuid': q.slot('actor_uuid', q.uuid_type()),
++                'text': q.slot('actor_text', q.text_type())
++            }
++                if gated
++                else None;
++            batch = compile_fused_region(
++                {'kind': 'batch', 'rules': sites}, [], actor, 1, template=True
++            );
++            bundle['batch'][mode] = sql_descriptor(batch);
++            for site in sites {
++                event = str(site['event']);
++                if len(site['hops']) == 1 and site['origin'] == 'here' {
++                    linear = compile_fused_region(
++                        {'kind': 'linear', 'rules': [site]}, [], actor, 1, template=True
++                    );
++                    bundle['linear'].setdefault(event, {})[mode] = sql_descriptor(
++                        linear
++                    );
++                }
++                hops = [
++                    QHop(
++                        dir=h[2],
++                        `edge=type(h[0], (object, ), {}) if h[0] is not None else None,
++                        nd=type(h[1], (object, ), {}) if h[1] is not None else None
++                    ) for h in site['hops']
++                ];
++                native: dict = {};
++                for typed in (False, True) {
++                    cq = compile_query(
++                        GraphQuery([], hops=hops).`visit(),
++                        len(hops),
++                        acl_root=str(UUID(int=1)) if gated else None,
++                        include_type=typed
++                    );
++                    params = dict(cq.params);
++                    params.pop('origin');
++                    slots: list = [['origin', 'text[]', False]];
++                    for name in list(params) {
++                        if name.endswith('amu') or name.endswith('amt') {
++                            params.pop(name);
++                            slots.append([name, 'text', False]);
++                        }
++                    }
++                    native['typed' if typed else 'pairs'] = {
++                        'sql': cq.sql,
++                        'params': params,
++                        'slots': slots,
++                        'nonnegative_slots': []
++                    };
++                }
++                bundle['native'].setdefault(event, {})[mode] = native;
++            }
++        }
++        encoded = json.dumps(bundle, separators=(',', ':'));
++        _metrics['emitted_artifact_bytes'] = _metrics.get('emitted_artifact_bytes', 0)
++            + len(encoded.encode());
++        _metrics['emitted_sql_bytes'] = _metrics.get('emitted_sql_bytes', 0)
++            + sum(len(d['sql'].encode()) for d in bundle['batch'].values())
++            + sum(
++                len(d['sql'].encode()) for modes in bundle['linear'].values()
++                for d in modes.values()
++            )
++            + sum(
++                len(d['sql'].encode()) for modes in bundle['native'].values()
++                for pair in modes.values() for d in pair.values()
++            )
++            + len(bundle['catalog']['sql'].encode());
++        return bundle;
++    } finally {
++        _record('generation', wall, cpu);
++    }
++}
++
++
++def native_shape(query: any, upto: int) -> any {
++    if not query.from_visit
++        or upto != len(query.hops)
++        or query.edges_only
++        or query.slc is not None
++        or query.order
++        or query.limit is not None
++        or query.offset
++        or query.level != 'default' {
++        return None;
++    }
++    shape: list = [];
++    for hop in query.hops {
++        if hop.preds
++            or hop.epreds
++            or hop.only is not None
++            or isinstance(hop.nd, tuple) {
++            return None;
++        }
++        shape.append((hop.`edge, hop.nd, hop.dir));
++    }
++    return tuple(shape);
++}
++
++
++def cache_key(query: any, origin_ids: list, actor: any) -> any {
++    shape = native_shape(query, len(query.hops));
++    if shape is None {
++        return None;
++    }
++    return ('ttg_compiled_pairs_v1', tuple(origin_ids), shape, actor);
++}
++
++
++def publish_paths(mem: any, staged: list) -> bool {
++    # Atomic publication into the same transaction epoch as native consumers.
++    import from jaclang.data.query_planner { _acl_pushdown_root, _query_cache_key }
++    import from jaclang.runtime.graph_walk { access_gated }
++    puts: list = [];
++    for (query, origin_id, rows, descriptors) in staged {
++        actor = _acl_pushdown_root(query, len(query.hops), mem);
++        if access_gated() and actor is None {
++            return False;
++        }
++        key = cache_key(query, [origin_id], actor);
++        if key is None {
++            return False;
++        }
++        pairs = tuple(
++            (UUID(str(row[0])), UUID(str(row[1])) if row[1] is not None else None)
++            for row in rows
++        );
++        for name in ('typed', 'pairs') {
++            desc = descriptors[name];
++            values: dict = {'origin': (str(origin_id), )};
++            for (slot, dtype, nullable) in desc['slots'] {
++                if slot != 'origin' {
++                    values[slot] = actor;
++                }
++            }
++            compiled = bind_template(desc, values);
++            # Native legacy keys use lists; the cache freezer canonicalizes both.
++            legacy = _query_cache_key(
++                'ttg_path' if name == 'typed' else 'pairs',
++                compiled.sql,
++                compiled.params,
++                len(query.hops)
++            );
++            puts.append(
++                (
++                    legacy,
++                    tuple(tuple(row) for row in rows)
++                        if name == 'typed'
++                        else (pairs, ())
++                )
++            );
++        }
++        puts.append((key, (pairs, ())));
++    }
++    for (key, value) in puts {
++        mem.query_cache_put(key, value);
++    }
++    return True;
++}
+diff --git a/jac/jaclang/sql.jac b/jac/jaclang/sql.jac
+index 078ed2212..25e751e9c 100644
+--- a/jac/jaclang/sql.jac
++++ b/jac/jaclang/sql.jac
+@@ -205,6 +205,11 @@ obj ScalarNode(ExprNode) {
+         require_one: bool;
+ }
+ 
++obj QueryMembershipNode(ExprNode) {
++    has term: ExprNode,
++        query: RelationNode;
++}
++
+ obj ExistsNode(ExprNode) {
+     has query: RelationNode;
+ }
+@@ -288,7 +293,8 @@ obj CompiledSQL {
+                     | tuple[bool | int | float | str | UUID | Decimal | None, ...]
+                     | None
+             ],
+-        slots: tuple[tuple[str, DataType], ...] = ();
++        slots: tuple[tuple[str, DataType], ...] = (),
++        nonnegative_slots: tuple[str, ...] = ();
+ 
+     def bind(
+         values:
+@@ -434,6 +440,10 @@ def scalar_one[R, T](query: Relation[R, ExactlyOne], key: Field[T]) -> ScalarExp
+ 
+ def exists[R, C](query: Relation[R, C]) -> ScalarExpr[SqlBool];
+ 
++def in_query[R, C, T](
++    term: ScalarExpr[T], query: Relation[R, C], key: Field[T]
++) -> ScalarExpr[SqlBool];
++
+ def union_all[R, C, D](
+     left: Relation[R, C], right: Relation[R, D]
+ ) -> Relation[R, Many];
+@@ -588,6 +598,7 @@ obj PostgresRenderer {
+                     | None
+             ] = {},
+         slot_types: dict[str, DataType] = {},
++        nonnegative_slots: set[str] = set(),
+         parameter_ids: dict[int, str] = {},
+         aliases: dict[int, str] = {},
+         cte_names: dict[int, str] = {},
+@@ -718,7 +729,7 @@ obj WithNode(RelationNode) {
+ obj OrderedNode(RelationNode) {
+     has body: RelationNode,
+         ordering: tuple[Order, ...],
+-        limit: int | None;
++        limit: int | SlotNode | None;
+ 
+     has schema: Schema {
+         getter {
+@@ -845,7 +856,9 @@ def intersect[R, C, D](
+ 
+ def output[T](key: Field[T]) -> ScalarExpr[T];
+ def ordered[R, C](
+-    query: Relation[R, C], order_by: list[Order], limit: int | None = None
++    query: Relation[R, C],
++    order_by: list[Order],
++    limit: int | ScalarExpr[SqlInt64] | None = None
+ ) -> Relation[R, Many];
+ 
+ def with_ctes[R, C](query: Relation[R, C], bindings: list[Cte]) -> Relation[R, C];
+diff --git a/jac/tests/runtimelib/fixtures/ttg_frontier_alias_walkers.jac b/jac/tests/runtimelib/fixtures/ttg_frontier_alias_walkers.jac
+new file mode 100644
+index 000000000..d8c99b83d
+--- /dev/null
++++ b/jac/tests/runtimelib/fixtures/ttg_frontier_alias_walkers.jac
+@@ -0,0 +1,16 @@
++"""Alias spellings are not persisted archetype names."""
++import from .ttg_frontier_walkers {
++    FrontierBranch,
++    FrontierRight as LinkAlias,
++    FrontierLeaf as TargetAlias
++}
++
++walker FrontierAlias {
++    can branch with FrontierBranch entry {
++        visit [->:LinkAlias:->[?:TargetAlias]];
++    }
++
++    can leaf with TargetAlias entry {
++        report here.value;
++    }
++}
+diff --git a/jac/tests/runtimelib/fixtures/ttg_frontier_walkers.jac b/jac/tests/runtimelib/fixtures/ttg_frontier_walkers.jac
+new file mode 100644
+index 000000000..ed136a46b
+--- /dev/null
++++ b/jac/tests/runtimelib/fixtures/ttg_frontier_walkers.jac
+@@ -0,0 +1,91 @@
++"""Queue fixtures with state-dependent paths and an opaque source ability."""
++node FrontierStart {}
++node FrontierBranch {
++    has value: int = 0;
++}
++
++node FrontierLeaf {
++    has value: int = 0;
++}
++
++node FrontierDerivedLeaf(FrontierLeaf) {}
++
++edge FrontierQueue {}
++edge FrontierLeft {}
++edge FrontierRight {}
++
++walker FrontierWalk {
++    has i: int = 0;
++
++    def reset_counter -> None {
++        self.i = 0;
++    }
++
++    can start with FrontierStart entry {
++        visit [->:FrontierQueue:->[?:FrontierBranch]];
++        self.reset_counter();
++    }
++
++    can branch with FrontierBranch entry {
++        self.i += 1;
++        if self.i == 1 {
++            visit [->:FrontierLeft:->[?:FrontierLeaf]];
++        } else {
++            visit [->:FrontierRight:->[?:FrontierLeaf]];
++        }
++    }
++
++    can leaf with FrontierLeaf entry {
++        report here.value;
++    }
++}
++
++walker FrontierCancel {
++    has entered: list[int] = [];
++
++    can start with FrontierStart entry {
++        visit [->:FrontierQueue:->[?:FrontierBranch]];
++    }
++
++    can branch with FrontierBranch entry {
++        self.entered.append(here.value);
++        if here.value == 1 {
++            disengage;
++        }
++        visit [->:FrontierRight:->[?:FrontierLeaf]];
++    }
++
++    can leaf with FrontierLeaf entry {
++        report here.value;
++    }
++}
++
++walker FrontierDuplicate {
++    can branch with FrontierBranch entry {
++        visit [->:FrontierRight:->[?:FrontierLeaf]];
++        visit [->:FrontierRight:->[?:FrontierLeaf]];
++    }
++
++    can leaf with FrontierLeaf entry {
++        report here.value;
++    }
++}
++
++walker FrontierNoVisit {
++    has i: int = 0;
++
++    can start with FrontierStart entry {
++        self.i += 1;
++    }
++
++    can branch with FrontierBranch entry {
++        self.i += 1;
++        if self.i == 2 {
++            visit [->:FrontierLeft:->[?:FrontierLeaf]];
++        } else {
++            visit [->:FrontierRight:->[?:FrontierLeaf]];
++        }
++    }
++
++    can leaf with FrontierLeaf entry { }
++}
+diff --git a/jac/tests/runtimelib/test_ttg_authenticated_acl.jac b/jac/tests/runtimelib/test_ttg_authenticated_acl.jac
+index df91c3932..5a2088324 100644
+--- a/jac/tests/runtimelib/test_ttg_authenticated_acl.jac
++++ b/jac/tests/runtimelib/test_ttg_authenticated_acl.jac
+@@ -1,5 +1,9 @@
+ """Authenticated untyped paths use one shared, snapshot-scoped ACL proof."""
+ import from pathlib { Path }
++import from contextlib { ExitStack }
++import jaclang.data.query_planner as planner;
++import jaclang.runtime.ttg_fusion_sql as fusion_sql;
++import jaclang.runtime.ttg_sql as ttg_sql;
+ import json;
+ import os;
+ import from uuid { UUID }
+@@ -131,10 +135,42 @@ test "Authenticated heterogeneous untyped paths activate both modes with shared
+                     'cache_identity': id(ctx.mem._query_cache)
+                 };
+                 with patch.object(store, 'rows', wraps=store.rows) as rows {
+-                    with dependency_prefetch(
+-                        ctx, max_length=2048, mode='process', fused_sql=enabled
+-                    ) as run {
+-                        origin spawn wlk;
++                    with ExitStack() as compiled_guards {
++                        install_guard: any = compiled_guards.enter_context;
++                        if enabled {
++                            install_guard(
++                                patch.object(
++                                    planner,
++                                    'compile_query',
++                                    side_effect=AssertionError(
++                                        'runtime native path builder'
++                                    )
++                                )
++                            );
++                            install_guard(
++                                patch.object(
++                                    fusion_sql,
++                                    'compile_fused_region',
++                                    side_effect=AssertionError(
++                                        'runtime fused SQL AST builder'
++                                    )
++                                )
++                            );
++                            install_guard(
++                                patch.object(
++                                    ttg_sql,
++                                    'compile_acl_type_catalog',
++                                    side_effect=AssertionError(
++                                        'runtime ACL catalog AST builder'
++                                    )
++                                )
++                            );
++                        }
++                        with dependency_prefetch(
++                            ctx, max_length=2048, mode='process', fused_sql=enabled
++                        ) as run {
++                            origin spawn wlk;
++                        }
+                     }
+                     assert wlk.reports == [0, 1, 2, 3, 4, 5] and wlk.visited == 6;
+                     assert len(run.submitted) == 5 , str(run.summary());
+diff --git a/jac/tests/runtimelib/test_ttg_frontier_native.jac b/jac/tests/runtimelib/test_ttg_frontier_native.jac
+new file mode 100644
+index 000000000..ce4aab22b
+--- /dev/null
++++ b/jac/tests/runtimelib/test_ttg_frontier_native.jac
+@@ -0,0 +1,260 @@
++"""Persistent queued frontier integration beyond a homogeneous chain."""
++import from pathlib { Path }
++import json;
++import os;
++import from hashlib { sha256 }
++import from tempfile { mkdtemp }
++import from unittest.mock { patch }
++import from uuid { UUID }
++import from jaclang.runtime.context { ExecutionContext }
++import from jaclang.runtime.runtime { JacRuntime }
++import from jaclang.runtime.ttg_dependency_prefetch { dependency_prefetch }
++import from .fixtures.ttg_frontier_alias_walkers { FrontierAlias }
++import from .fixtures.ttg_frontier_walkers {
++    FrontierStart,
++    FrontierBranch,
++    FrontierLeaf,
++    FrontierDerivedLeaf,
++    FrontierQueue,
++    FrontierLeft,
++    FrontierRight,
++    FrontierWalk,
++    FrontierDuplicate,
++    FrontierCancel
++}
++
++
++def frontier_context(project: str) -> any {
++    ctx = ExecutionContext(
++        base_path_dir=project, full_target_path=str(Path(project, 'frontier.jac'))
++    );
++    JacRuntime.exec_ctx = ctx;
++    return ctx;
++}
++
++
++def frontier_seed -> tuple {
++    parent = Path('/tmp/ttg-next-native-v1/fixtures');
++    parent.mkdir(parents=True, exist_ok=True);
++    project = mkdtemp(prefix='case-', dir=str(parent));
++    ctx = frontier_context(project);
++    try {
++        start = FrontierStart();
++        root ++> start;
++        branches = [FrontierBranch(value=i) for i in range(4)];
++        for (index, branch) in enumerate(branches) {
++            start +>:FrontierQueue:+> branch;
++            branch +>:FrontierLeft:+> FrontierLeaf(value=index * 10 + 1);
++            leaf = FrontierDerivedLeaf(value=index * 10 + 2)
++                if index == 2
++                else FrontierLeaf(value=index * 10 + 2);
++            branch +>:FrontierRight:+> leaf;
++        }
++        return (project, start.__jac__.id, [b.__jac__.id for b in branches]);
++    } finally {
++        ctx.close();
++    }
++}
++
++
++def frontier_run(project: str, uid: UUID, wlk: any, enabled: bool) -> tuple {
++    ctx = frontier_context(project);
++    try {
++        origin = ctx.mem.get(uid).archetype;
++        store: any = ctx.mem.store;
++        original: any = store.rows;
++        calls: list = [];
++        def capture(sql: str, params: dict) -> list {
++            rows = original(sql, params);
++            calls.append(
++                {
++                    'sql': sql,
++                    'sha256': sha256(sql.encode()).hexdigest(),
++                    'params': params,
++                    'rows': len(rows)
++                }
++            );
++            return rows;
++        }
++        with patch.object(store, 'rows', side_effect=capture) {
++            with dependency_prefetch(
++                ctx, max_length=2048, mode='process', workers=1, fused_sql=enabled
++            ) as run {
++                origin spawn wlk;
++            }
++        }
++        summary = run.summary();
++        evidence = os.environ.get('TTG_NEXT_NATIVE_EVIDENCE');
++        if evidence {
++            with open(evidence, 'a') as output {
++                output.write(
++                    json.dumps(
++                        {
++                            'walker': type(wlk).__name__,
++                            'project': project,
++                            'origin': str(uid),
++                            'enabled': enabled,
++                            'reports': wlk.reports,
++                            'native_i': getattr(wlk, 'i', None),
++                            'native_entered': getattr(wlk, 'entered', None),
++                            'sql_calls': calls,
++                            'summary': summary
++                        },
++                        **{'default': str}
++                    )
++                        + '\n'
++                );
++            }
++        }
++        assert not run.errors , str(run.errors);
++        return (wlk.reports, summary);
++    } finally {
++        ctx.close();
++    }
++}
++
++test "A opaque reset prevents proof then B batches B C D E using sequential state" {
++    old = JacRuntime.exec_ctx;
++    try {
++        (project, uid, branches) = frontier_seed();
++        baseline = frontier_run(project, uid, FrontierWalk(), False);
++        compiled = frontier_run(project, uid, FrontierWalk(), True);
++        assert baseline[0] == [1, 12, 22, 32];
++        assert compiled[0] == baseline[0];
++        regions = [
++            r
++            for r in compiled[1]['fusion']['regions']
++            if r.get('compiled')
++        ];
++        assert any(len({d['origin'] for d in r['demands']}) == 4 for r in regions) , str(
++            regions
++        );
++        demands = next(
++            r['demands']
++            for r in regions
++            if len({d['origin'] for d in r['demands']}) == 4
++        );
++        assert [d['activation'] for d in demands] == [str(b) for b in branches];
++        assert demands[0]['event'] != demands[1]['event'];
++        assert demands[1]['event'] == demands[2]['event'] == demands[3]['event'];
++        assert compiled[1]['fusion']['template_queries'] >= 1;
++    } finally {
++        JacRuntime.exec_ctx = old;
++    }
++}
++
++test "Native duplicate visits and disengage outputs remain unchanged" {
++    old = JacRuntime.exec_ctx;
++    try {
++        (project, uid, branches) = frontier_seed();
++        for enabled in (False, True) {
++            alias = frontier_run(project, branches[0], FrontierAlias(), enabled);
++            assert alias[0] == [2] , str(alias);
++            if enabled {
++                assert alias[1]['fusion']['queries'] == 0;
++                assert 'alias' in alias[1]['fusion']['fallback_reason'];
++            }
++            duplicate = frontier_run(
++                project, branches[0], FrontierDuplicate(), enabled
++            );
++            assert duplicate[0] == [2, 2] , str(duplicate);
++            wlk = FrontierCancel();
++            cancelled = frontier_run(project, uid, wlk, enabled);
++            assert cancelled[0] == [] , str(cancelled);
++            assert wlk.entered == [0, 1] , str(wlk.entered);
++            if enabled {
++                assert cancelled[1]['fusion']['template_queries'] >= 1;
++                assert cancelled[1]['submitted_ids'];
++            }
++        }
++    } finally {
++        JacRuntime.exec_ctx = old;
++    }
++}
++
++test "Authenticated compiled full path cache cannot replace a shorter prefix" {
++    import from jaclang.runtime.archetype { Root, AccessLevel }
++    import from jaclang.runtime.graph_query { GraphQuery, QHop }
++    import from jaclang.runtime.graph_walk { access_gated }
++    import from jaclang.runtime.ttg_dependencies { TraceEvent }
++    import from jaclang.runtime.ttg_templates {
++        compile_templates,
++        hydrate_templates,
++        select_template,
++        publish_paths
++    }
++    import from jaclang.data.query_planner { resolve_query_prefix, resolve_ttg_path }
++    import jaclang.data.query_planner as planner;
++    old = JacRuntime.exec_ctx;
++    try {
++        parent = Path('/tmp/ttg-next-native-v1/fixtures');
++        parent.mkdir(parents=True, exist_ok=True);
++        project = mkdtemp(prefix='prefix-', dir=str(parent));
++        ctx = frontier_context(project);
++        try {
++            reader: any = Root().__jac__;
++            reader.persistent = True;
++            setattr(reader, 'root', reader.id);
++            ctx.mem.put(reader);
++            a = FrontierBranch(value=0);
++            b = FrontierBranch(value=1);
++            c = FrontierLeaf(value=2);
++            for arch in [a, b, c] {
++                anchor: any = arch.__jac__;
++                anchor.persistent = True;
++                setattr(anchor, 'root', reader.id);
++                anchor.own_access().all = AccessLevel.NO_ACCESS;
++                ctx.mem.put(anchor);
++            }
++            a +>:FrontierRight:+> b;
++            b +>:FrontierRight:+> c;
++            reader_id = reader.id;
++            ids = [a.__jac__.id, b.__jac__.id, c.__jac__.id];
++        } finally {
++            ctx.close();
++        }
++        ctx = frontier_context(project);
++        try {
++            ctx.set_user_root(str(reader_id));
++            assert access_gated();
++            origin: any = ctx.mem.get(ids[0]).archetype;
++            query = GraphQuery(
++                origin,
++                hops=[
++                    QHop(dir=2, `edge=FrontierRight, nd=FrontierBranch),
++                    QHop(dir=2, `edge=FrontierRight, nd=FrontierLeaf)
++                ]
++            ).`visit();
++            rows = resolve_ttg_path(ctx.mem, query, ids[0], 20);
++            assert rows is not None and [UUID(str(r[0])) for r in rows] == [ids[2]];
++            event = TraceEvent(
++                id=0,
++                kind='visit',
++                ability='branch',
++                line=0,
++                hop_chain=(
++                    ('FrontierRight', 'FrontierBranch', 2),
++                    ('FrontierRight', 'FrontierLeaf', 2)
++                )
++            );
++            bundle = hydrate_templates(compile_templates([event]));
++            assert publish_paths(
++                ctx.mem,
++                [(query, ids[0], rows, select_template(bundle, 'native', True, 0))]
++            );
++            store: any = ctx.mem.store;
++            with patch.object(store, 'rows', wraps=store.rows) as calls, patch.object(
++                planner, '_topology_node_ids', return_value=None
++            ) {
++                assert resolve_query_prefix(ctx.mem, query, 2) == [ids[2]];
++                assert calls.call_count == 0;
++                assert resolve_query_prefix(ctx.mem, query, 1) == [ids[1]];
++                assert calls.call_count == 1 , str(calls.call_args_list);
++            }
++        } finally {
++            ctx.close();
++        }
++    } finally {
++        JacRuntime.exec_ctx = old;
++    }
++}
+diff --git a/jac/tests/runtimelib/test_ttg_templates.jac b/jac/tests/runtimelib/test_ttg_templates.jac
+new file mode 100644
+index 000000000..daedddc50
+--- /dev/null
++++ b/jac/tests/runtimelib/test_ttg_templates.jac
+@@ -0,0 +1,350 @@
++"""DB-free emitted SQL, bind contracts and sequential queued-state tests."""
++import json;
++import from unittest.mock { patch }
++import from uuid { UUID }
++import jaclang.sql as q;
++import from jaclang.runtime.ttg_templates {
++    compile_templates,
++    hydrate_templates,
++    bind_template,
++    select_template,
++    template_metrics
++}
++import from jaclang.runtime.ttg_dependencies {
++    analyze_walker_dependencies,
++    TraceEvent,
++    compile_checkpoint_plan,
++    checkpoint_graph
++}
++import from jaclang.runtime.ttg_frontier { collect_frontier }
++import from .fixtures.ttg_frontier_walkers {
++    FrontierWalk,
++    FrontierBranch,
++    FrontierDuplicate,
++    FrontierCancel
++}
++
++
++def entry_current(graph: any, ability: str, uid: str = 'b') -> tuple {
++    event = TraceEvent(
++        id=len(graph.events),
++        kind='entry',
++        ability=ability,
++        line=0,
++        next_id=graph.entries[ability]
++    );
++    graph.events.append(event);
++    current = {
++        'id': uid,
++        'node_type': FrontierBranch,
++        'facts': {'value': 0},
++        'transition_state': {'self.i': 0}
++    };
++    return (event, current);
++}
++
++test "Queued prefix evolves scalar state once in FIFO order" {
++    graph = analyze_walker_dependencies(FrontierWalk);
++    (event, current) = entry_current(graph, 'branch');
++    pending = [
++        {'id': 'c', 'node_type': FrontierBranch},
++        {'id': 'd', 'node_type': FrontierBranch}
++    ];
++    (prediction, demands) = collect_frontier(graph, current, event, pending, 20);
++    assert [a['id'] for (a, e) in demands] == ['b', 'c', 'd'] , str(prediction);
++    assert [e.hop_chain[0][0] for (a, e) in demands]
++        == ['FrontierLeft', 'FrontierRight', 'FrontierRight'];
++    assert [a['id'] for a in pending] == ['c', 'd'];
++    assert current['transition_state'] == {'self.i': 0};
++}
++
++test "Repeated path visits keep distinct site IDs and activations" {
++    graph = analyze_walker_dependencies(FrontierDuplicate);
++    (event, current) = entry_current(graph, 'branch');
++    (prediction, demands) = collect_frontier(
++        graph, current, event, [{'id': 'c', 'node_type': FrontierBranch}], 20
++    );
++    assert [a['id'] for (a, e) in demands] == ['b', 'b', 'c', 'c'];
++    assert demands[0][1].id != demands[1][1].id;
++    assert demands[0][1].hop_chain == demands[1][1].hop_chain;
++}
++
++test "Typed LIMIT binds zero or positive int and rejects bool negative and missing" {
++    relation = q.values([q.field('x', q.int64_type())], [[q.int64(1)]]);
++    compiled = q.compile_sql(
++        q.ordered(relation, [], limit=q.slot('cap', q.int64_type()))
++    );
++    assert compiled.bind({'cap': 0}).params['cap'] == 0;
++    for values in [{'cap': -1}, {'cap': True}, {}, {'cap': 1.2}] {
++        rejected = False;
++        try {
++            compiled.bind(values);
++        } except q.SqlError {
++            rejected = True;
++        }
++        assert rejected , str(values);
++    }
++}
++
++test "Actual compiler checkpoint includes deterministic SQL descriptors" {
++    import from jaclang.runtime.ttg { JacTTGGenerator }
++    arch = JacTTGGenerator._find_walker_ast_node(FrontierWalk);
++    assert arch is not None;
++    first = compile_checkpoint_plan(arch);
++    second = compile_checkpoint_plan(arch);
++    assert first == second;
++    assert first['sql_templates']['version'] == 1;
++    restored = checkpoint_graph(json.loads(json.dumps(first)), FrontierWalk);
++    assert restored.sql_templates['batch']['gated']['_compiled'].sql
++        == first['sql_templates']['batch']['gated']['sql'];
++    assert 'unnest(' in first['sql_templates']['batch']['open']['sql'];
++}
++
++test "Selected hydrated compiled paths bind cold and warm with no SQL AST construction" {
++    graph = analyze_walker_dependencies(FrontierWalk);
++    template_metrics(True, True);
++    emitted = compile_templates(graph.events);
++    metrics = template_metrics();
++    assert metrics['generation_calls'] == 1;
++    assert metrics['emitted_artifact_bytes'] > metrics['emitted_sql_bytes'] > 0;
++    bundle = hydrate_templates(json.loads(json.dumps(emitted)));
++    template_metrics(True, False);
++    with patch.object(q, 'table', side_effect=AssertionError('runtime AST table')) {
++        with patch.object(
++            q, 'compile_sql', side_effect=AssertionError('runtime SQL renderer')
++        ) {
++            for warm in (False, True) {
++                descriptor = select_template(bundle, 'batch', True);
++                values: dict = {
++                    'actor_uuid': UUID(int=3),
++                    'actor_text': str(UUID(int=3)),
++                    'row_limit': 21
++                };
++                for (slot, site) in enumerate(bundle['sites']) {
++                    values['origins_' + str(slot)] = (UUID(int=slot + 1), );
++                }
++                bound = bind_template(descriptor, values);
++                assert bound.sql == descriptor['sql'];
++                assert bound.params['row_limit'] == 21;
++            }
++        }
++    }
++}
++
++test "Disengage overfetch assumption preserves later queued origin prediction only" {
++    graph = analyze_walker_dependencies(FrontierCancel);
++    (event, current) = entry_current(graph, 'branch');
++    current['facts'] = {'value': 1};
++    current['transition_state'] = {'branch::here.value': 1, 'self.entered::list': True};
++    pending = [{'id': 'c', 'node_type': FrontierBranch, 'facts': {'value': 0}}];
++    (prediction, demands) = collect_frontier(graph, current, event, pending, 20);
++    assert [a['id'] for (a, e) in demands] == ['c'] , str(prediction);
++}
++
++test "Unknown queued branch state stops before inventing visits" {
++    graph = analyze_walker_dependencies(FrontierCancel);
++    (event, current) = entry_current(graph, 'branch');
++    current['facts'] = {'value': 0};
++    current['transition_state'] = {'branch::here.value': 0, 'self.entered::list': True};
++    (prediction, demands) = collect_frontier(
++        graph, current, event, [{'id': 'unknown', 'node_type': FrontierBranch}], 20
++    );
++    assert [a['id'] for (a, e) in demands] == ['b'];
++    assert not prediction['complete'];
++}
++
++test "Compiled cache publication and native consumption do not build SQL and preserve duplicate rows" {
++    import from threading { RLock }
++    import from unittest.mock { MagicMock }
++    import from jaclang.runtime.ttg_templates { publish_paths }
++    import from jaclang.runtime.graph_query { GraphQuery, QHop }
++    import from jaclang.data.query_planner { _sql_pairs }
++    import jaclang.data.query_planner as planner;
++    import jaclang.runtime.graph_walk as walk;
++    import from .fixtures.ttg_frontier_walkers { FrontierRight, FrontierLeaf }
++    graph = analyze_walker_dependencies(FrontierDuplicate);
++    bundle = hydrate_templates(compile_templates(graph.events));
++    event = next(
++        e
++        for e in graph.events
++        if e.kind == 'visit'
++    );
++    query = GraphQuery(
++        [], hops=[QHop(dir=2, `edge=FrontierRight, nd=FrontierLeaf)]
++    ).`visit();
++    cache: dict = {};
++    mem: any = MagicMock();
++    mem._lock = RLock();
++    mem.query_cache_get.side_effect = cache.get;
++    mem.query_cache_put.side_effect = cache.__setitem__;
++    origin = UUID(int=1);
++    rows = [
++        (UUID(int=2), UUID(int=3), 'FrontierLeaf', FrontierLeaf.__module__),
++        (UUID(int=2), UUID(int=4), 'FrontierLeaf', FrontierLeaf.__module__)
++    ];
++    descriptors = select_template(bundle, 'native', False, event.id);
++    with patch.object(planner, '_acl_pushdown_root', return_value=None), patch.object(
++        planner, 'access_gated', return_value=False
++    ), patch.object(walk, 'access_gated', return_value=False) {
++        with patch.object(q, 'table', side_effect=AssertionError('runtime AST')) {
++            with patch.object(
++                q, 'compile_sql', side_effect=AssertionError('runtime renderer')
++            ) {
++                with patch.object(
++                    planner,
++                    'compile_query',
++                    side_effect=AssertionError('runtime native builder')
++                ) {
++                    assert publish_paths(mem, [(query, origin, rows, descriptors)]);
++                    (pairs, tail) = _sql_pairs(mem, [origin], query, 1);
++                    assert pairs
++                        == [(UUID(int=2), UUID(int=3)), (UUID(int=2), UUID(int=4))];
++                    assert tail == [];
++                    assert publish_paths(mem, [(query, UUID(int=9), [], descriptors)]);
++                    assert _sql_pairs(mem, [UUID(int=9)], query, 1) == ([], []);
++                    assert mem.store.rows.call_count == 0;
++                }
++            }
++        }
++    }
++}
++
++test "First future visit after current no-visit ability does not replay queued B" {
++    import from .fixtures.ttg_frontier_walkers { FrontierNoVisit, FrontierStart }
++    import from jaclang.runtime.ttg_continuation { plan_continuation }
++    graph = analyze_walker_dependencies(FrontierNoVisit);
++    point = next(
++        e.id
++        for e in graph.events
++        if e.ability == 'start' and e.kind == 'scalar_update'
++    );
++    pending = [
++        {'id': 'b', 'node_type': FrontierBranch},
++        {'id': 'c', 'node_type': FrontierBranch}
++    ];
++    captured: list = [];
++    def resolve(active: dict, event: any) -> any {
++        if not captured {
++            (prediction, demands) = collect_frontier(
++                graph, active, event, active['transition_pending'], 20
++            );
++            captured.extend((a['id'], e.hop_chain[0][0]) for (a, e) in demands);
++        }
++        return [];
++    }
++    plan_continuation(
++        graph,
++        {'id': 'a', 'node_type': FrontierStart},
++        point,
++        {'self.i': 1},
++        pending,
++        resolve,
++        20,
++        resolve_state=True
++    );
++    assert captured == [('b', 'FrontierLeft'), ('c', 'FrontierRight')] , str(captured);
++}
++
++test "Full two-hop compiled cache cannot satisfy a one-hop native prefix" {
++    import from threading { RLock }
++    import from types { SimpleNamespace }
++    import from unittest.mock { MagicMock }
++    import from jaclang.runtime.ttg_templates { publish_paths }
++    import from jaclang.runtime.graph_query { GraphQuery, QHop }
++    import from jaclang.data.query_planner { _sql_pairs }
++    import jaclang.data.query_planner as planner;
++    import jaclang.runtime.graph_walk as walk;
++    import from .fixtures.ttg_frontier_walkers { FrontierRight, FrontierLeaf }
++    event = TraceEvent(
++        id=0,
++        kind='visit',
++        ability='branch',
++        line=0,
++        hop_chain=(
++            ('FrontierRight', 'FrontierLeaf', 2),
++            ('FrontierRight', 'FrontierLeaf', 2)
++        )
++    );
++    bundle = hydrate_templates(compile_templates([event]));
++    query = GraphQuery(
++        [],
++        hops=[
++            QHop(dir=2, `edge=FrontierRight, nd=FrontierLeaf),
++            QHop(dir=2, `edge=FrontierRight, nd=FrontierLeaf)
++        ]
++    ).`visit();
++    cache: dict = {};
++    mem: any = MagicMock();
++    mem._lock = RLock();
++    mem.query_cache_get.side_effect = cache.get;
++    mem.query_cache_put.side_effect = cache.__setitem__;
++    mem.store.rows.return_value = [(UUID(int=2), UUID(int=12))];
++    origin = UUID(int=1);
++    rows = [(UUID(int=3), UUID(int=23), 'FrontierLeaf', FrontierLeaf.__module__)];
++    with patch.object(planner, '_acl_pushdown_root', return_value=None), patch.object(
++        planner, 'access_gated', return_value=False
++    ), patch.object(walk, 'access_gated', return_value=False) {
++        assert publish_paths(
++            mem, [(query, origin, rows, select_template(bundle, 'native', False, 0))]
++        );
++        assert _sql_pairs(mem, [origin], query, 2)[0] == [(UUID(int=3), UUID(int=23))];
++        with patch.object(
++            planner,
++            'compile_query',
++            return_value=SimpleNamespace(sql='prefix-one-hop', params={}, residual={})
++        ) as build {
++            assert _sql_pairs(mem, [origin], query, 1)[0]
++                == [(UUID(int=2), UUID(int=12))];
++            assert build.call_count == 1;
++            assert mem.store.rows.call_count == 1;
++        }
++    }
++}
++
++test "Compiled frontier overflow publishes no partial native cache" {
++    import from threading { RLock }
++    import from unittest.mock { MagicMock }
++    import from jaclang.runtime.ttg_frontier { resolve_frontier }
++    import jaclang.data.query_planner as planner;
++    import jaclang.runtime.graph_walk as walk;
++    graph = analyze_walker_dependencies(FrontierDuplicate);
++    graph.sql_templates = hydrate_templates(compile_templates(graph.events));
++    (event, current) = entry_current(graph, 'branch', str(UUID(int=1)));
++    cache: dict = {};
++    mem: any = MagicMock();
++    mem._lock = RLock();
++    mem.query_cache_get.side_effect = cache.get;
++    mem.query_cache_put.side_effect = cache.__setitem__;
++    mem.store.rows.return_value = [('truncated-row', ), ('truncated-row', )];
++    metrics = {
++        'queries': 0,
++        'overflow': 0,
++        'cache_paths': 0,
++        'cache_empty_paths': 0,
++        'regions': []
++    };
++    with patch.object(planner, '_acl_pushdown_root', return_value=None), patch.object(
++        walk, 'access_gated', return_value=False
++    ) {
++        assert resolve_frontier(
++            mem, FrontierDuplicate(), graph, current, event, [], None, 1, metrics
++        )
++            is None;
++    }
++    assert metrics['overflow'] == 1;
++    assert not any(
++        key[0] in ('pairs', 'ttg_path', 'ttg_compiled_pairs_v1') for key in cache
++    );
++}
++
++test "Emitted type token proof rejects alias spelling before query selection" {
++    import from jaclang.runtime.ttg_frontier { template_type_matches }
++    import from .fixtures.ttg_frontier_walkers { FrontierRight, FrontierLeaf }
++    assert template_type_matches(FrontierRight, 'FrontierRight');
++    assert template_type_matches(FrontierLeaf, 'FrontierLeaf');
++    assert not template_type_matches(FrontierRight, 'LinkAlias');
++    assert not template_type_matches(FrontierLeaf, 'TargetAlias');
++    assert template_type_matches(None, None);
++    assert not template_type_matches(None, 'FrontierLeaf');
++    assert not template_type_matches(1, 'FrontierLeaf');
++}
+diff --git a/jac/tests/sql/test_in_query.jac b/jac/tests/sql/test_in_query.jac
+new file mode 100644
+index 000000000..7d94cbb61
+--- /dev/null
++++ b/jac/tests/sql/test_in_query.jac
+@@ -0,0 +1,52 @@
++"""Non-null typed subquery membership, including duplicates and empty results."""
++import jaclang.sql as q;
++import sqlite3;
++
++
++def members(nullable: bool = False) -> any {
++    return q.table(
++        'members',
++        [q.field('value', q.nullable(q.int64_type()) if nullable else q.int64_type())]
++    );
++}
++
++
++test "IN query accepts many rows and preserves empty and duplicate membership semantics" {
++    db = sqlite3.connect(':memory:');
++    try {
++        db.execute('CREATE TABLE members (value INTEGER NOT NULL)');
++        db.executemany('INSERT INTO members VALUES (?)', [(2, ), (2, ), (3, )]);
++        source = members();
++        field = q.field('value', q.int64_type());
++        subquery = q.select([q.named('value', source.col(field))], source=source);
++        expression = q.in_query(q.int64(2), subquery, field);
++        compiled = q.compile_sql(q.select([q.named('member', expression)]));
++        assert ' IN (SELECT ' in compiled.sql;
++        assert db.execute(compiled.sql, compiled.params).fetchall() == [(1, )];
++        db.execute('DELETE FROM members');
++        assert db.execute(compiled.sql, compiled.params).fetchall() == [(0, )];
++    } finally {
++        db.close();
++    }
++}
++
++test "IN query rejects nullable mismatched or multiple output columns" {
++    source = members(True);
++    field = q.field('value', q.nullable(q.int64_type()));
++    subquery = q.select([q.named('value', source.col(field))], source=source);
++    rejected = False;
++    try {
++        q.in_query(q.int64(2), subquery, q.field('value', q.int64_type()));
++    } except q.SqlError {
++        rejected = True;
++    }
++    assert rejected;
++    rejected = False;
++    try {
++        multi = q.select([q.named('one', q.int64(1)), q.named('two', q.int64(2))]);
++        q.in_query(q.int64(2), multi, q.field('one', q.int64_type()));
++    } except q.SqlError {
++        rejected = True;
++    }
++    assert rejected;
++}

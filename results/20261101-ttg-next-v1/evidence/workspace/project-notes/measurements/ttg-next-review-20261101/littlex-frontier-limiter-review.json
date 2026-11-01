@@ -1,0 +1,136 @@
+{
+  "passed": true,
+  "scope": "Bounded source/event/accepted-derivative explanation, not new runtime change or timed probe",
+  "artifact": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-performance-20261101/littlex-mechanism-v1.json",
+    "sha256": "17a9f9850463022475dd8db9590c422619af63d495d4ea1b7250360a9d6dee7f"
+  },
+  "attribution": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-performance-20261101/attribution-v1/results.json",
+    "sha256": "e40b3a78feeaec8c05e015062de6be84c78a1256255b6c47391a809a2478d2f5"
+  },
+  "emitted": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-performance-20261101/cpu-compile-next-littlex-v1/emitted-checkpoint-plans.json",
+    "sha256": "d2a592e3185d5446c21134d2a897c019aa4a2c0fd0061a52db856423d3fc184e"
+  },
+  "native_source": {
+    "path": "/home/baichuan/jaseci/reproduction/ttg-next-performance/runtime-clean-9282-v1/jac/jaclang/runtime/ttg_dependency_prefetch.jac",
+    "sha256": "a8bc9d51b82d7b378b618cec9e47e0b1b0201ff2b0bf7c9acc2aef4ffa6e9e7f"
+  },
+  "compiled_events": {
+    "root": 1,
+    "collect": [
+      4,
+      5
+    ],
+    "gather_barrier": 8,
+    "gather_line": 277
+  },
+  "observations": [
+    {
+      "trial": "littlex-baseline850-measured-0",
+      "ref": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-review-20261101/formal72-raw-audit/littlex-baseline850-measured-0.json",
+        "sha256": "458ac3af09523a576a01c1abc17e8db06c589a3e71775849a9e70a322fb95165"
+      },
+      "feed_count": 4,
+      "SQL_per_feed": 15,
+      "categories": {
+        "identity": 1,
+        "control": 8,
+        "payload": 4,
+        "fused_path": 2
+      }
+    },
+    {
+      "trial": "littlex-next-measured-0",
+      "ref": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-review-20261101/formal72-raw-audit/littlex-next-measured-0.json",
+        "sha256": "78823cb8ca93a0100c27a41bbe00b13280c8a33bae1e3ab775b3551457978690"
+      },
+      "feed_count": 4,
+      "SQL_per_feed": 16,
+      "categories": {
+        "identity": 1,
+        "control": 8,
+        "payload": 4,
+        "fused_path": 1,
+        "ordinary_path": 2
+      }
+    },
+    {
+      "trial": "littlex-baseline850-measured-1",
+      "ref": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-review-20261101/formal72-raw-audit/littlex-baseline850-measured-1.json",
+        "sha256": "ca1df3d59ff2769c5edad9737735da072b54b8b951a6fc92e42294add6e94ca9"
+      },
+      "feed_count": 4,
+      "SQL_per_feed": 15,
+      "categories": {
+        "identity": 1,
+        "control": 8,
+        "payload": 4,
+        "fused_path": 2
+      }
+    },
+    {
+      "trial": "littlex-next-measured-1",
+      "ref": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-review-20261101/formal72-raw-audit/littlex-next-measured-1.json",
+        "sha256": "23b0e2796e9832c8f83e6c723e8a1237535052df23b171911edc80c4e593fbb1"
+      },
+      "feed_count": 4,
+      "SQL_per_feed": 16,
+      "categories": {
+        "identity": 1,
+        "control": 8,
+        "payload": 4,
+        "fused_path": 1,
+        "ordinary_path": 2
+      }
+    },
+    {
+      "trial": "littlex-baseline850-measured-2",
+      "ref": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-review-20261101/formal72-raw-audit/littlex-baseline850-measured-2.json",
+        "sha256": "aaa6d037a9ea4c8117cb26bbb5b3f8359a5bc1acff5d183f51cbe4cf2243429c"
+      },
+      "feed_count": 4,
+      "SQL_per_feed": 15,
+      "categories": {
+        "identity": 1,
+        "control": 8,
+        "payload": 4,
+        "fused_path": 2
+      }
+    },
+    {
+      "trial": "littlex-next-measured-2",
+      "ref": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-next-review-20261101/formal72-raw-audit/littlex-next-measured-2.json",
+        "sha256": "e089c81d74ca81c9300bd361069e06bc0939ebd02b55e2b3a6fc9bd07e70eaab"
+      },
+      "feed_count": 4,
+      "SQL_per_feed": 16,
+      "categories": {
+        "identity": 1,
+        "control": 8,
+        "payload": 4,
+        "fused_path": 1,
+        "ordinary_path": 2
+      }
+    }
+  ],
+  "interpretation": [
+    "Collector intentionally defers newly discovered tail activations by returning[]. Root region therefore has only known Root->Profile demand; actual returned Profile does not match Root linear homogeneous type guard.",
+    "Outer continuation resolves actual Profile and reaches both collect paths. Invocation-wide frontier_attempted list was already set by root; it suppresses a second emitted frontier attempt for collect. Both paths use per-path resolver and cache their results.",
+    "Later native Profile hooks have a new local attempt flag but return early from persistent scope/path reuse before reaching frontier logic, so the two paths remain cached individually.",
+    "Gather277 is a real later traversal barrier. It follows both unconditional collect visits in the emitted graph and therefore is not sufficient to explain their failure to batch.",
+    "Four load_feed requests per measured workflow each add one ordinary-path dispatch in place of one batched query: baseline2fused vs next1fused+2ordinary. This accounts for147->151 workflowSQL across all three measured repeats."
+  ],
+  "evidence_limit": "No dedicated skipped-frontier event was emitted; the branch/early-cache explanation is source-backed interpretation consistent with actual counters and16SQL sequence, not a directly logged decision event.",
+  "next_step": "Untested candidate: per-region/activation attempted set with result reuse/dedup. Must retain state/queue/guard/ACL/complete-cache semantics and validate actual LittleX root+collect mechanism and unchanged outputs before claiming improvement. No fix applied or extra release gate imposed here.",
+  "actual_module_seal_sha256": "e51fa4689bdcda353b175182707bf906e97ec4e99733b028e990ffdbd2ec500d",
+  "cpu_module_sha256": "e51fa4689bdcda353b175182707bf906e97ec4e99733b028e990ffdbd2ec500d",
+  "execution": "Read only small frozen source, emitted metadata and already audited derivatives; no raw SQL/event reread, tests, DB or heavy timing work."
+}

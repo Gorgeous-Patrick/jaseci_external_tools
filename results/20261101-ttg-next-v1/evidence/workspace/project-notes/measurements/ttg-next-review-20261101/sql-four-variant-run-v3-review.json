@@ -1,0 +1,2090 @@
+{
+  "status": "bounded controlled diagnostic PASS; no production rewrite recommended",
+  "refs": {
+    "project-notes/measurements/ttg-next-sql-research-20261101/run-v3/lab.py": "157ebc46498f750cf853cd013aec33bdb5fcfc6946a86338aed756f1de0c12b2",
+    "project-notes/measurements/ttg-next-sql-research-20261101/run-v3/variants.py": "62af3c3cd34d9bfa1cd4a465c991b41c50786d9e41e5aaacbb754d40fbfe6c3d",
+    "project-notes/measurements/ttg-next-sql-research-20261101/run-v3/batch/results.json": "ef087d7c979cf732f061b6f7cb252363e34a3beb58176d64c200054231cc1f3c",
+    "project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1/littlex-ttg_plus/captures/fused-batch-pid2442533.json": "432bb223b0e4cff71b719a264059bf2bdda14be1a558367f28d0394c0d288814",
+    "project-notes/measurements/ttg-next-sql-research-20261101/run-v3/root/results.json": "97e17e00f74bf93bdc24044d3a018af3dfee24d0e2ba11bd5682edb0d24989b1",
+    "project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1/littlex-ttg_plus/captures/fused-root-pid2442533.json": "13fb819a8ba29ba108402cd96256fc1f38637a14d719f2d3596eeb553f24aaa9",
+    "project-notes/measurements/ttg-next-sql-research-20261101/run-v3/stopped.json": "cc4f1a309edc753ab3b2a0b7f55e7de96f695e2ee676cebe9ec6f9cf0d41cb19"
+  },
+  "plans_checked": 192,
+  "results": [
+    {
+      "target": "batch",
+      "plans": 96,
+      "summaries": [
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "n": 9,
+          "planning_ms_median": 1.092,
+          "execution_ms_median": 0.392,
+          "shared_hits": [
+            318,
+            318,
+            318,
+            318,
+            318,
+            318,
+            318,
+            318,
+            318
+          ]
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "n": 9,
+          "planning_ms_median": 1.023,
+          "execution_ms_median": 0.288,
+          "shared_hits": [
+            85,
+            85,
+            85,
+            85,
+            85,
+            85,
+            85,
+            85,
+            85
+          ]
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "n": 9,
+          "planning_ms_median": 1.061,
+          "execution_ms_median": 0.211,
+          "shared_hits": [
+            110,
+            110,
+            110,
+            110,
+            110,
+            110,
+            110,
+            110,
+            110
+          ]
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "n": 9,
+          "planning_ms_median": 0.981,
+          "execution_ms_median": 0.204,
+          "shared_hits": [
+            67,
+            67,
+            67,
+            67,
+            67,
+            67,
+            67,
+            67,
+            67
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "n": 9,
+          "planning_ms_median": 1.159,
+          "execution_ms_median": 0.194,
+          "shared_hits": [
+            52,
+            52,
+            52,
+            52,
+            52,
+            52,
+            52,
+            52,
+            52
+          ]
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "n": 9,
+          "planning_ms_median": 1.076,
+          "execution_ms_median": 0.194,
+          "shared_hits": [
+            54,
+            54,
+            54,
+            54,
+            54,
+            54,
+            54,
+            54,
+            54
+          ]
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "n": 9,
+          "planning_ms_median": 1.098,
+          "execution_ms_median": 0.269,
+          "shared_hits": [
+            108,
+            108,
+            108,
+            108,
+            108,
+            108,
+            108,
+            108,
+            108
+          ]
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "n": 9,
+          "planning_ms_median": 1.021,
+          "execution_ms_median": 0.275,
+          "shared_hits": [
+            111,
+            111,
+            111,
+            111,
+            111,
+            111,
+            111,
+            111,
+            111
+          ]
+        }
+      ],
+      "endpoint_substitutions": 3,
+      "measured_plan_access": [
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 3,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 3,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 3,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 3,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 4,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 4,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 4,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 4,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 5,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 5,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 5,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 5,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 6,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 6,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 6,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 6,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 7,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 7,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 7,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 7,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 8,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 8,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 8,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 8,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 9,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 9,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 9,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 9,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 10,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 10,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 10,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 10,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 11,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 11,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 11,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 11,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 3,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 3,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 3,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 3,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 4,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 4,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 4,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 4,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 5,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 5,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 5,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 5,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 6,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 6,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 6,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 6,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 7,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 7,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 7,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 7,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 8,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 8,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 8,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 8,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 9,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 9,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 9,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 9,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 10,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 10,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 10,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 10,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 11,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 11,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 11,
+          "pk_loops": [
+            4,
+            2,
+            8
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 11,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup",
+              "loops": 4,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_1",
+              "loops": 2,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup_2",
+              "loops": 8,
+              "rows_removed": 83
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "target": "root",
+      "plans": 96,
+      "summaries": [
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "n": 9,
+          "planning_ms_median": 0.543,
+          "execution_ms_median": 0.094,
+          "shared_hits": [
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22
+          ]
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "n": 9,
+          "planning_ms_median": 0.518,
+          "execution_ms_median": 0.094,
+          "shared_hits": [
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22
+          ]
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "n": 9,
+          "planning_ms_median": 0.513,
+          "execution_ms_median": 0.101,
+          "shared_hits": [
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22
+          ]
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "n": 9,
+          "planning_ms_median": 0.488,
+          "execution_ms_median": 0.103,
+          "shared_hits": [
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "n": 9,
+          "planning_ms_median": 0.564,
+          "execution_ms_median": 0.104,
+          "shared_hits": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ]
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "n": 9,
+          "planning_ms_median": 0.54,
+          "execution_ms_median": 0.104,
+          "shared_hits": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ]
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "n": 9,
+          "planning_ms_median": 0.523,
+          "execution_ms_median": 0.113,
+          "shared_hits": [
+            24,
+            24,
+            24,
+            24,
+            24,
+            24,
+            24,
+            24,
+            24
+          ]
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "n": 9,
+          "planning_ms_median": 0.498,
+          "execution_ms_median": 0.112,
+          "shared_hits": [
+            24,
+            24,
+            24,
+            24,
+            24,
+            24,
+            24,
+            24,
+            24
+          ]
+        }
+      ],
+      "endpoint_substitutions": 2,
+      "measured_plan_access": [
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 3,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 3,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 3,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 3,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 4,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 4,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 4,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 4,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 5,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 5,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 5,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 5,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 6,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 6,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 6,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 6,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 7,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 7,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 7,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 7,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 8,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 8,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 8,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 8,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 9,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 9,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 9,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 9,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 10,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 10,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 10,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 10,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 11,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "repeat": 11,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "repeat": 11,
+          "pk_loops": [],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": false,
+          "repeat": 11,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 3,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 3,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 3,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 3,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 4,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 4,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 4,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 4,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 5,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 5,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 5,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 5,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 6,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 6,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 6,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 6,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 7,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 7,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 7,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 7,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 8,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 8,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 8,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 8,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 9,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 9,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 9,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 9,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 10,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 10,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 10,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 10,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "membership_and_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 11,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "repeat": 11,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "repeat": 11,
+          "pk_loops": [
+            1,
+            1
+          ],
+          "lookup_seq_scans": []
+        },
+        {
+          "variant": "lateral_endpoint_lookup",
+          "analyzed": true,
+          "repeat": 11,
+          "pk_loops": [],
+          "lookup_seq_scans": [
+            {
+              "alias": "_lookup_1",
+              "loops": 1,
+              "rows_removed": 83
+            },
+            {
+              "alias": "_lookup",
+              "loops": 1,
+              "rows_removed": 83
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "ordered_result_scope": "Archived completed lab asserts exact ordered result equality before every one of192 EXPLAINs; plan rows also match12batch/1root. No raw result arrays are stored and no DB replay was performed by reviewer.",
+  "findings": [
+    {
+      "kind": "claim precision",
+      "observation": "OFFSET0 establishes a lateral endpoint subquery boundary; it does not mandate index access. In all nine measured batch repetitions per relevant group: unstatted forced variants use anchors_pkey loops4/2/8, whereas after ANALYZE original/IN use anchors_pkey4/2/8 and lateral variants use Seq Scan loops4/2/8 removing83rows each."
+    },
+    {
+      "kind": "measured regression retained",
+      "observation": "Batch execution .392->.211ms lateral/.204combined before explicit ANALYZE, but .194original vs .269lateral/.275combined after ANALYZE, root slightly worse/unchanged. No robust universal SQL improvement demonstrated."
+    }
+  ],
+  "limitations": [
+    "Isolated warmed192plan diagnostic, not appbenchmark or primary protocol timing.",
+    "No statistics census excludes automatic analysis in the regime named unanalyzed; source performs no explicit ANALYZE until second regime.",
+    "No primary traces, runtime re-audit, DB or new measurement."
+  ],
+  "lifecycle": {
+    "pg_status": 3,
+    "has_pidfile": false,
+    "stop_returncode": 0,
+    "stop_output": "waiting for server to shut down.... done\nserver stopped\n",
+    "finished_ns": 1793503791600522995
+  }
+}

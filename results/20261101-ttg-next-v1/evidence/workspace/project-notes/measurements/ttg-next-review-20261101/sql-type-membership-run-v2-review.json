@@ -1,0 +1,190 @@
+{
+  "status": "bounded diagnostic numeric/source PASS",
+  "refs": {
+    "project-notes/measurements/ttg-next-sql-research-20261101/run-v2/lab.py": "08b58cbbfea9c5f2f422653eaa6225558f388c4df766150c97b012ed00ffe321",
+    "project-notes/measurements/ttg-next-review-20261101/sql-type-membership-helper-review-v1.json": "53073379eba7feb48605cb425501257e74f048cc4672de1623b5ab98833ad2de",
+    "project-notes/measurements/ttg-next-sql-research-20261101/run-v2/batch/results.json": "d73705c322af9b50dd4d073ec00fbbbcb9e20b4d5f9961028139e334ee165d54",
+    "project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1/littlex-ttg_plus/captures/fused-batch-pid2442533.json": "432bb223b0e4cff71b719a264059bf2bdda14be1a558367f28d0394c0d288814",
+    "project-notes/measurements/ttg-next-sql-research-20261101/run-v2/root/results.json": "d6a273a814c79c1e2b58fe9f0d526a723f89976948a9a827c984fe5e6a47bc10",
+    "project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1/littlex-ttg_plus/captures/fused-root-pid2442533.json": "13fb819a8ba29ba108402cd96256fc1f38637a14d719f2d3596eeb553f24aaa9",
+    "project-notes/measurements/ttg-next-sql-research-20261101/run-v2/stopped.json": "92d1935855b3c5b9a6e35791a26ce720ff15b2a3e01a1d71456f9268f112ca17"
+  },
+  "samples_checked": 96,
+  "results": [
+    {
+      "target": "batch",
+      "samples": 48,
+      "expected_rows": 12,
+      "summary": [
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "n": 9,
+          "planning_ms_median": 1.093,
+          "execution_ms_median": 0.396,
+          "shared_hits": [
+            318,
+            318,
+            318,
+            318,
+            318,
+            318,
+            318,
+            318,
+            318
+          ]
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "n": 9,
+          "planning_ms_median": 1.022,
+          "execution_ms_median": 0.286,
+          "shared_hits": [
+            85,
+            85,
+            85,
+            85,
+            85,
+            85,
+            85,
+            85,
+            85
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "n": 9,
+          "planning_ms_median": 1.156,
+          "execution_ms_median": 0.19,
+          "shared_hits": [
+            52,
+            52,
+            52,
+            52,
+            52,
+            52,
+            52,
+            52,
+            52
+          ]
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "n": 9,
+          "planning_ms_median": 1.075,
+          "execution_ms_median": 0.196,
+          "shared_hits": [
+            54,
+            54,
+            54,
+            54,
+            54,
+            54,
+            54,
+            54,
+            54
+          ]
+        }
+      ],
+      "relevant_indexes_equal_capture": true
+    },
+    {
+      "target": "root",
+      "samples": 48,
+      "expected_rows": 1,
+      "summary": [
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": false,
+          "n": 9,
+          "planning_ms_median": 0.534,
+          "execution_ms_median": 0.093,
+          "shared_hits": [
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22
+          ]
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": false,
+          "n": 9,
+          "planning_ms_median": 0.51,
+          "execution_ms_median": 0.095,
+          "shared_hits": [
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22,
+            22
+          ]
+        },
+        {
+          "variant": "original_correlated_exists",
+          "analyzed": true,
+          "n": 9,
+          "planning_ms_median": 0.554,
+          "execution_ms_median": 0.102,
+          "shared_hits": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ]
+        },
+        {
+          "variant": "uncorrelated_type_membership",
+          "analyzed": true,
+          "n": 9,
+          "planning_ms_median": 0.53,
+          "execution_ms_median": 0.102,
+          "shared_hits": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ]
+        }
+      ],
+      "relevant_indexes_equal_capture": true
+    }
+  ],
+  "source_drift": "Live variants.py now contains additional endpoint_lookup hypothesis. Reviewed type-membership-only prefix independently reconstructed to exact recorded SHA; preserved under reviewer ownership. Run-v2 archived lab.py matches both recorded executed source hashes. No claim on newer hypothesis execution.",
+  "ordered_result_scope": "Completed archived source executes exact ordered actual==expected assertions for each of96 samples; raw result rows are not stored, so this review verifies successful assertion path and plan result cardinalities rather than replaying database outputs.",
+  "interpretation": "Unanalyzed batch EXISTS->IN execution median .396->.286ms/hits318->85; after ANALYZE .190->.196ms/hits52->54. Root essentially unchanged. No robust production-win claim; statistics regime materially changes comparison.",
+  "limits": [
+    "Warmed EXPLAIN server timings; not primary client/workflow timing or CPU attribution.",
+    "Unanalyzed describes no explicit ANALYZE; no pg_statistic census recorded to independently exclude autoanalysis.",
+    "No database access, primary trace reads or runtime audit."
+  ],
+  "lifecycle": {
+    "pg_status": 3,
+    "has_pidfile": false,
+    "stop_returncode": 0,
+    "stop_output": "waiting for server to shut down.... done\nserver stopped\n",
+    "finished_ns": 1793503702242599906
+  }
+}
