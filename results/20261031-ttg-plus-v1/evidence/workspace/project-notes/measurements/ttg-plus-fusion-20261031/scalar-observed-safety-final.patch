@@ -1,0 +1,260 @@
+--- a/jac/jaclang/runtime/ttg_continuation.jac
++++ b/jac/jaclang/runtime/ttg_continuation.jac
+@@ -1,11 +1,6 @@
+-"""Execute a bounded abstract continuation in the walker's FIFO entry order.
+-
+-The resolver returns ordered, concrete node identities and runtime types. It
+-does not execute abilities. Unknown effects stop the proven prefix; payload
+-deduplication never deduplicates executions or walker state transitions.
+-"""
+ import from jaclang.runtime.ttg_dependencies {
+     _trace_snapshot,
++    _trace_safe_storage,
+     _trace_eval,
+     _trace_entry_handlers,
+     _trace_node_effects,
+@@ -17,9 +12,10 @@
+ import from jaclang.runtime.archetype { NodeArchetype }
+ import sys;
+ 
+-# Primitive declarations supply type facts for unresolved payload fields.
+-# Descriptor fields are excluded because reading them can execute user code.
+ def _plain_scalar_field(node_type: type, name: str, types: tuple) -> bool {
++    if not _trace_safe_storage(node_type) {
++        return False;
++    }
+     if any(
+         name in vars(base)
+             and any(
+@@ -44,6 +40,9 @@
+         if isinstance(expr_node, (pyast.Name, pyast.Attribute)) {
+             name = _trace_attribute(expr_node);
+             key = _trace_key(name, ability);
++            if values.get(key + '::unsafe', False) {
++                return False;
++            }
+             if key in values {
+                 return type(values[key]) is int;
+             }
+@@ -70,19 +69,21 @@
+     if type(arch).__getattribute__ is not NodeArchetype.__getattribute__ {
+         return {};
+     }
+-    if any(
+-        isinstance(vars(base).get('__dict__'), property) for base in type(arch).__mro__
+-    ) {
++    if not _trace_safe_storage(type(arch)) {
+         return {};
+     }
+     result: dict = {};
+     for (name, value) in vars(arch).items() {
+-        if type(value) in (bool, int, float, str, type(None))
+-            and not any(
+-                isinstance(vars(base).get(name), property)
+-                for base in type(arch).__mro__
+-            ) {
++        descriptor = any(
++            name in vars(base)
++                and any(
++                    '__get__' in vars(owner) for owner in type(vars(base)[name]).__mro__
++                ) for base in type(arch).__mro__
++        );
++        if not descriptor and type(value) in (bool, int, float, str, type(None)) {
+             result[name] = value;
++        } else {
++            result[name + '::unsafe'] = True;
+         }
+     }
+     return result;
+@@ -110,6 +111,9 @@
+ }
+ 
+ def _append_argument_known(event: any, values: dict, node_type: type) -> bool {
++    if any(values.get(key + '::unsafe', False) for key in event.reads) {
++        return False;
++    }
+     try {
+         _trace_eval(event.expression, values, event.ability);
+         return True;
+@@ -128,8 +132,11 @@
+             return False;
+         }
+         return not any(
+-            isinstance(vars(base).get(tree.attr), property)
+-            for base in node_type.__mro__
++            tree.attr in vars(base)
++                and any(
++                    '__get__' in vars(owner)
++                    for owner in type(vars(base)[tree.attr]).__mro__
++                ) for base in node_type.__mro__
+         );
+     }
+ }
+@@ -180,14 +187,14 @@
+         return result;
+     }
+     queue = list(pending);
+-    # Missing values retain a proven integer type through total arithmetic.
+-    # Their consumers decide whether a concrete value is needed for control.
++
+     unknown_ints: set[str] = set();
+     demanded: set[str] = set();
+     exit_types = list(current.get('ancestor_types', [current['node_type']]));
+     head = 0;
+     active = current;
+     if not issubclass(active['node_type'], NodeArchetype)
++        or not _trace_safe_storage(active['node_type'])
+         or active['node_type'].__getattribute__ is not NodeArchetype.__getattribute__ {
+         result['stop'] = 'Custom node attribute access is unresolved';
+         return result;
+@@ -241,6 +248,7 @@
+             }
+             active = queue[head];
+             if not issubclass(active['node_type'], NodeArchetype)
++                or not _trace_safe_storage(active['node_type'])
+                 or active['node_type'].__getattribute__
+                     is not NodeArchetype.__getattribute__ {
+                 result['stop'] = 'Custom node attribute access is unresolved';
+@@ -308,6 +316,10 @@
+                 values.pop(event.writes + '::list', None);
+             } elif event.kind == 'output' {
+                 for key in event.reads {
++                    if values.get(key + '::unsafe', False) {
++                        result['stop'] = 'Output value has observed unsafe effects';
++                        return result;
++                    }
+                     if key in unknown_ints {
+                         continue;
+                     }
+@@ -344,8 +356,6 @@
+                     result['stop'] = 'Visit origin or path is unresolved';
+                     return result;
+                 }
+-                # Native visit realizes every endpoint payload before enqueueing.
+-                # Later ability barriers stop dispatch prediction, not this demand.
+                 targets = resolve(active, event);
+                 if targets is None {
+                     result['stop'] = 'Path resolution declined';
+--- a/jac/jaclang/runtime/ttg_dependencies.jac
++++ b/jac/jaclang/runtime/ttg_dependencies.jac
+@@ -422,7 +422,11 @@
+         return ast_node.value;
+     }
+     if isinstance(ast_node, (pa.Name, pa.Attribute)) {
+-        return values[_trace_key(_trace_attribute(ast_node), ability)];
++        key = _trace_key(_trace_attribute(ast_node), ability);
++        if values.get(key + '::unsafe', False) {
++            raise ValueError('Observed unsafe scalar field: ' + key);
++        }
++        return values[key];
+     }
+     if isinstance(ast_node, pa.BinOp) {
+         functions = {
+@@ -549,7 +553,6 @@
+         env: dict[str, int],
+         controls: list[tuple[int, str]]
+     ) -> tuple[int, int, dict[str, int]] {
+-        # Verify builtin receiver/argument facts in the continuation interpreter.
+         try {
+             call = pa.parse(
+                 _trace_text(ast_node).strip().rstrip(';'), mode='eval'
+@@ -613,8 +616,7 @@
+         if isinstance(ast_node, uni.ReportStmt) {
+             try {
+                 (text, reads) = _trace_expr(ast_node.expr, ability);
+-                # Only primitive leaf outputs can be passed without evaluating
+-                # arithmetic, serializers, calls or user-defined operators.
++
+                 leaf = pa.parse(text, mode='eval').body;
+                 if not isinstance(leaf, (pa.Constant, pa.Name, pa.Attribute)) {
+                     raise ValueError('Output expression requires evaluation');
+@@ -876,6 +878,23 @@
+ }
+ 
+ 
++def _trace_safe_storage(arch_type: type) -> bool {
++    import from types { GetSetDescriptorType, MemberDescriptorType }
++    for base in arch_type.__mro__ {
++        descriptor = vars(base).get('__dict__');
++        if descriptor is None {
++            continue;
++        }
++        if type(descriptor) not in (GetSetDescriptorType, MemberDescriptorType) {
++            return False;
++        }
++        if descriptor.__name__ != '__dict__' {
++            return False;
++        }
++    }
++    return True;
++}
++
+ def _trace_snapshot(snapshot: dict[str, any]) -> dict[str, any] {
+     values: dict[str, any] = {};
+     for (key, value) in snapshot.items() {
+@@ -933,8 +952,7 @@
+             and event.kind in ('assign', 'scalar_update') {
+             result.writes.add(event.writes);
+         }
+-        # Queue summaries lack the active node's field schema. The concrete
+-        # continuation interpreter proves primitive output safety per activation.
++
+         if event.kind in ('barrier', 'append', 'output') {
+             result.unknown = True;
+         }
+@@ -1030,13 +1048,19 @@
+     graph: WalkerDependencyGraph, point: int, target_index: int, ability: str
+ ) -> QueueTraceDecision {
+     import from jaclang.runtime.osp_kernel { _current_scope }
+-    import from jaclang.runtime.archetype { NodeAnchor }
++    import from jaclang.runtime.archetype { NodeAnchor, Archetype }
+     scope = _current_scope();
+     if scope is None or not scope.path or not isinstance(scope.path[-1], NodeAnchor) {
+         raise ValueError('Checkpoint requires an active node handler');
+     }
+     if type(scope.wlk) is not graph.runtime_walker {
+         raise ValueError('Dependency graph does not match the running walker');
++    }
++    if type(scope.wlk).__getattribute__ is not Archetype.__getattribute__
++        or not _trace_safe_storage(type(scope.wlk)) {
++        return QueueTraceDecision(
++            reasons=['Walker dictionary storage has unknown effects']
++        );
+     }
+     values: dict[str, any] = {};
+     for (name, value) in vars(scope.wlk).items() {
+@@ -1068,6 +1092,9 @@
+         effects.unknown = True;
+         return;
+     }
++    if not _trace_safe_storage(graph.runtime_walker) {
++        effects.unknown = True;
++    }
+     if getattr(graph.runtime_walker, '__setattr__') is not Archetype.__setattr__ {
+         effects.unknown = True;
+     }
+@@ -1081,7 +1108,7 @@
+         }
+         for base in graph.runtime_walker.__mro__ {
+             descriptor = vars(base).get(key[5:]);
+-            if isinstance(descriptor, property) {
++            if any('__get__' in vars(owner) for owner in type(descriptor).__mro__) {
+                 effects.unknown = True;
+             }
+         }
+--- a/jac/jaclang/runtime/ttg_dependency_prefetch.jac
++++ b/jac/jaclang/runtime/ttg_dependency_prefetch.jac
+@@ -194,11 +194,9 @@
+     }
+     scope_snapshot['path_count'] = len(scope.path);
+     values: dict = {};
++    import from jaclang.runtime.ttg_dependencies { _trace_safe_storage }
+     if type(scope.wlk).__getattribute__ is not Archetype.__getattribute__
+-        or any(
+-            isinstance(vars(base).get('__dict__'), property)
+-            for base in type(scope.wlk).__mro__
+-        ) {
++        or not _trace_safe_storage(type(scope.wlk)) {
+         return;
+     }
+     for (name, value) in vars(scope.wlk).items() {

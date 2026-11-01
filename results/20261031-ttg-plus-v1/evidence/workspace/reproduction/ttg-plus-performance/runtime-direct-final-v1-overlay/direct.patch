@@ -1,0 +1,165 @@
+--- a/jac/jaclang/data/impl/pgwire.impl.jac
++++ b/jac/jaclang/data/impl/pgwire.impl.jac
+@@ -1,3 +1,6 @@
++import time as _perf_clock;
++import threading as _perf_threading;
++import continuation_probe as _perf_sink;
+ import threading;
+ 
+ glob _INT32 = '!i',
+@@ -464,6 +467,7 @@
+             code = struct.unpack(_INT32, payload[:4])[0];
+             self._authenticate(code, payload);
+         } elif mtype == 'K' {
++            _perf_sink.connected(self, struct.unpack('!I', payload[:4])[0]);
+             continue;
+         } elif mtype == 'E' {
+             raise PgWireError(_parse_error_fields(payload));
+@@ -608,6 +612,18 @@
+ 
+ 
+ impl PgWireConnection.run(sql: str, **params: any) -> list {
++    _perf_driver_start = _perf_clock.perf_counter_ns();
++    _perf_origin = _perf_sink.binding();
++    _perf_thread_id = _perf_threading.get_ident();
++    _perf_c = 0;
++    _perf_d = 0;
++    _perf_d_bytes = 0;
++    _perf_errors = 0;
++    _perf_ready_count = 0;
++    _perf_send_ns: any = None;
++    _perf_ready_ns: any = None;
++    _perf_frame: any = None;
++    _perf_sent = False;
+     assert not self._closed , 'connection is closed';
+     log_sql = _sql_log_state[0] is not False;
+     log_selep = _selep_trace_state[0] is not False;
+@@ -636,7 +652,7 @@
+         }
+         bind += struct.pack(_INT16, 0);
+         sock: any = self._sock;
+-        sock.sendall(
++        _perf_frame = (
+             _frame(
+                 'P',
+                 b'\x00'
+@@ -650,6 +666,10 @@
+                 + _frame('S', b'')
+         );
+ 
++        _perf_send_ns = _perf_clock.perf_counter_ns();
++        sock.sendall(_perf_frame);
++        _perf_sent = True;
++
+         oids: list[int] = [];
+         err: (dict | None) = None;
+         while True {
+@@ -658,6 +678,7 @@
+                 continue;
+             }
+             if mtype in ('1', '2', '3', 'C', 'n', 's') {
++                if mtype == 'C' { _perf_c += 1; }
+                 continue;
+             }
+             if mtype == 'T' {
+@@ -673,6 +694,8 @@
+                 continue;
+             }
+             if mtype == 'D' {
++                _perf_d += 1;
++                _perf_d_bytes += len(payload);
+                 ncols = struct.unpack(_INT16, payload[:2])[0];
+                 pos = 2;
+                 row: list = [];
+@@ -692,10 +715,13 @@
+                 continue;
+             }
+             if mtype == 'E' {
++                _perf_errors += 1;
+                 err = _parse_error_fields(payload);
+                 continue;
+             }
+             if mtype == 'Z' {
++                _perf_ready_ns = _perf_clock.perf_counter_ns();
++                _perf_ready_count += 1;
+                 if err is not None {
+                     raise PgWireError(err);
+                 }
+@@ -723,6 +749,13 @@
+                         );
+                     }
+                 }
++                _perf_driver_end = _perf_clock.perf_counter_ns();
++                _perf_sink.record_boundary(
++                    self, pos_sql, sql, _perf_origin, _perf_thread_id,
++                    _perf_driver_start, _perf_send_ns, _perf_ready_ns, _perf_driver_end,
++                    _perf_c, _perf_d, _perf_d_bytes, _perf_errors, _perf_ready_count,
++                    len(rows), None, _perf_frame, _perf_sent
++                );
+                 return rows;
+             }
+         }
+@@ -754,6 +787,13 @@
+                 );
+             }
+         }
++        _perf_driver_end = _perf_clock.perf_counter_ns();
++        _perf_sink.record_boundary(
++            self, pos_sql, sql, _perf_origin, _perf_thread_id,
++            _perf_driver_start, _perf_send_ns, _perf_ready_ns, _perf_driver_end,
++            _perf_c, _perf_d, _perf_d_bytes, _perf_errors, _perf_ready_count,
++            len(rows), f"{type(e).__name__}: {e}", _perf_frame, _perf_sent
++        );
+         raise;
+     }
+ }
+--- a/jac/jaclang/runtime/prefetch.jac
++++ b/jac/jaclang/runtime/prefetch.jac
+@@ -1,3 +1,4 @@
++import continuation_probe as _perf_sink;
+ import logging;
+ import os;
+ import sys as _sys;
+@@ -142,6 +143,7 @@
+                 args=(ctx.mem, shard, readers[index % len(readers)], observer),
+                 daemon=True
+             );
++            _perf_sink.bind_worker_thread(thread, 'ipc_parent_thread');
+             thread.start();
+             threads.append(thread);
+         }
+@@ -165,6 +167,7 @@
+             t = threading.Thread(
+                 target=_prefetch_worker, args=(ctx.mem, shard, observer), daemon=True,
+             );
++            _perf_sink.bind_worker_thread(t, 'thread');
+             t.start();
+             threads.append(t);
+         }
+@@ -194,6 +197,7 @@
+     threads: list = [];
+     for shard in shards {
+         t = threading.Thread(target=_prefetch_worker, args=(ctx.mem, shard, observer));
++        _perf_sink.bind_worker_thread(t, 'thread');
+         t.start();
+         threads.append(t);
+     }
+--- a/jac/jaclang/runtime/ttg_process_reader.jac
++++ b/jac/jaclang/runtime/ttg_process_reader.jac
+@@ -1,4 +1,6 @@
+ """Independent Python/DB processes; parent threads only transfer raw rows."""
++import continuation_probe as _perf_sink;
++
+ import json;
+ import os;
+ import subprocess;
+@@ -57,7 +59,8 @@
+             stdin=subprocess.PIPE,
+             stdout=subprocess.PIPE,
+             text=True,
+-            bufsize=1
++            bufsize=1,
++            env=_perf_sink.child_environment()
+         );
+         config = {
+             'connection': vars(store.conninfo),

@@ -1,0 +1,196 @@
+{
+  "scope": "Functional path SQL and payload-dispatch counts; driver total SQL and performance are measured separately",
+  "runs": [
+    {
+      "executor": "synchronous",
+      "fused": false,
+      "visited": 4,
+      "reports": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "path_store_rows_calls": 3,
+      "returned_rows": [
+        1,
+        1,
+        1
+      ],
+      "payload_dispatches": 3
+    },
+    {
+      "executor": "synchronous",
+      "fused": true,
+      "visited": 4,
+      "reports": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "path_store_rows_calls": 1,
+      "returned_rows": [
+        3
+      ],
+      "payload_dispatches": 1
+    },
+    {
+      "executor": "thread",
+      "fused": false,
+      "visited": 4,
+      "reports": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "path_store_rows_calls": 3,
+      "returned_rows": [
+        1,
+        1,
+        1
+      ],
+      "payload_dispatches": 3
+    },
+    {
+      "executor": "thread",
+      "fused": true,
+      "visited": 4,
+      "reports": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "path_store_rows_calls": 1,
+      "returned_rows": [
+        3
+      ],
+      "payload_dispatches": 1
+    },
+    {
+      "executor": "process",
+      "fused": false,
+      "visited": 4,
+      "reports": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "path_store_rows_calls": 3,
+      "returned_rows": [
+        1,
+        1,
+        1
+      ],
+      "payload_dispatches": 3
+    },
+    {
+      "executor": "process",
+      "fused": true,
+      "visited": 4,
+      "reports": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "path_store_rows_calls": 1,
+      "returned_rows": [
+        3
+      ],
+      "payload_dispatches": 1
+    },
+    {
+      "executor": "synchronous",
+      "fused": true,
+      "visited": 1,
+      "reports": [
+        0
+      ],
+      "path_store_rows_calls": 1,
+      "returned_rows": [
+        1
+      ],
+      "payload_dispatches": 0
+    },
+    {
+      "executor": "synchronous",
+      "fused": false,
+      "visited": 3,
+      "reports": [
+        0,
+        1,
+        2
+      ],
+      "path_store_rows_calls": 2,
+      "returned_rows": [
+        2,
+        1
+      ],
+      "payload_dispatches": 1
+    },
+    {
+      "executor": "synchronous",
+      "fused": true,
+      "visited": 3,
+      "reports": [
+        0,
+        1,
+        2
+      ],
+      "path_store_rows_calls": 2,
+      "returned_rows": [
+        2,
+        1
+      ],
+      "payload_dispatches": 1
+    },
+    {
+      "executor": "synchronous",
+      "fused": false,
+      "visited": 5,
+      "reports": [
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      "path_store_rows_calls": 2,
+      "returned_rows": [
+        1,
+        1
+      ],
+      "payload_dispatches": 1
+    },
+    {
+      "executor": "synchronous",
+      "fused": true,
+      "visited": 5,
+      "reports": [
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      "path_store_rows_calls": 1,
+      "returned_rows": [
+        4
+      ],
+      "payload_dispatches": 1
+    }
+  ],
+  "transaction_cache_proof": {
+    "kind": "transaction_boundary_cache_proof",
+    "direct_rows_transaction_active": false,
+    "native_boundary_requeries": 1,
+    "captured_missed_sql": "SELECT n2.id, e2.id FROM unnest(CAST(:origin AS uuid[])) WITH ORDINALITY AS f0(id, ord) LEFT JOIN anchors s1 ON s1.id = f0.id JOIN anchors e1 ON e1.kind = 'EdgeAnchor' AND (e1.src = f0.id OR (e1.undirected AND e1.dst = f0.id)) AND (e1.arch_type = :h1et OR e1.arch_type IN (SELECT type_name FROM graph_types WHERE ancestor = :h1et)) JOIN anchors n1 ON n1.id = CASE WHEN e1.src = f0.id THEN e1.dst ELSE e1.src END AND n1.kind = 'NodeAnchor' AND (n1.arch_type = :h1n0t OR n1.arch_type IN (SELECT type_name FROM graph_types WHERE ancestor = :h1n0t)) JOIN anchors e2 ON e2.kind = 'EdgeAnchor' AND (e2.src = n1.id OR (e2.undirected AND e2.dst = n1.id)) AND (e2.arch_type = :h2et OR e2.arch_type IN (SELECT type_name FROM graph_types WHERE ancestor = :h2et)) JOIN anchors n2 ON n2.id = CASE WHEN e2.src = n1.id THEN e2.dst ELSE e2.src END AND n2.kind = 'NodeAnchor' AND (n2.arch_type = :h2n0t OR n2.arch_type IN (SELECT type_name FROM graph_types WHERE ancestor = :h2n0t)) ORDER BY f0.ord, e1.seq, e1.id, e2.seq, e2.id",
+    "same_transaction_cache_requeries": 0,
+    "ordered_pair_rows": 4,
+    "distinct_nodes": 2
+  }
+}

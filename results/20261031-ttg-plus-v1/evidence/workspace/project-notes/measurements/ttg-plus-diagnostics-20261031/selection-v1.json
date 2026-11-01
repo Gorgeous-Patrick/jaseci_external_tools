@@ -1,0 +1,105 @@
+{
+  "purpose": "matched_littlex_read_only_diagnostic",
+  "runtime_commit": "85026d486de8e16d4b894aa5a5664c7873893e89",
+  "context_refs": {
+    "runtime": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-plus-performance/runtime-clean-final-v2-manifest/manifest.json",
+      "sha256": "228b2a7e104482ba41f46a354f50e63565578addc5aad52d73c59a1eb1af27fb"
+    },
+    "overlay": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-plus-performance/runtime-direct-final-v2-overlay/manifest.json",
+      "sha256": "7a5b6e792410afa764aedcde34b2aad4701c58e88aa281b6125a448759758a87"
+    },
+    "app_snapshot": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/snapshot.json",
+      "sha256": "ef180e4e3548780779ca6e894a9a3c564d81dbace299ede6c25710ae6456aea7"
+    }
+  },
+  "attribution": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-performance-20261031/littlex-attribution-v1/results.json",
+    "sha256": "4acc4f96cfe9aa67798b5a509fdf94044ecdae5cbbbe7dfe1e0b3e882b544e61"
+  },
+  "native_source": {
+    "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/originals/littlex/server.jac",
+    "sha256": "806b475b5168d7f2f35d340358a00d5368feaa53edf34f298dbea23478926357"
+  },
+  "targets": [
+    {
+      "target_id": "native-root",
+      "config_id": "off",
+      "request": "2:20",
+      "generation": 2,
+      "role": "foreground",
+      "fingerprint": "6dc81f61e5e5e184a722b1a91b7e84c649cb440c5e4bb1327286f4b289b7e7ae",
+      "occurrence": 1,
+      "expected_rows": 1,
+      "semantic_region": "root_profile",
+      "read_only_source_reviewed": true
+    },
+    {
+      "target_id": "native-post",
+      "config_id": "off",
+      "request": "2:20",
+      "generation": 2,
+      "role": "foreground",
+      "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+      "occurrence": 1,
+      "expected_rows": 4,
+      "semantic_region": "collect_post",
+      "read_only_source_reviewed": true
+    },
+    {
+      "target_id": "native-follow",
+      "config_id": "off",
+      "request": "2:20",
+      "generation": 2,
+      "role": "foreground",
+      "fingerprint": "33d1c6d4f6d118eb7721655740633285b8a1c001269264992ceee6b853fb1ab8",
+      "occurrence": 1,
+      "expected_rows": 8,
+      "semantic_region": "collect_follow",
+      "read_only_source_reviewed": true
+    },
+    {
+      "target_id": "fused-root",
+      "config_id": "ttg_plus",
+      "request": "2:20",
+      "generation": 2,
+      "role": "foreground",
+      "fingerprint": "d106730720c848bc3c3244c8bc13dfcd5c9d8848db39db0e593580644993a4bc",
+      "occurrence": 1,
+      "expected_rows": 1,
+      "semantic_region": "root_profile",
+      "read_only_source_reviewed": true
+    },
+    {
+      "target_id": "fused-batch",
+      "config_id": "ttg_plus",
+      "request": "2:20",
+      "generation": 2,
+      "role": "foreground",
+      "fingerprint": "3166e1168d5af494a52220b6fb86be01ce9fcf6212432459dbd28ee88d631efa",
+      "occurrence": 1,
+      "expected_rows": 12,
+      "semantic_region": "collect_post_and_follow",
+      "read_only_source_reviewed": true
+    }
+  ],
+  "comparisons": [
+    {
+      "region": "root_profile",
+      "native": [
+        "native-root"
+      ],
+      "fused": "fused-root"
+    },
+    {
+      "region": "collect",
+      "native": [
+        "native-post",
+        "native-follow"
+      ],
+      "fused": "fused-batch"
+    }
+  ]
+}

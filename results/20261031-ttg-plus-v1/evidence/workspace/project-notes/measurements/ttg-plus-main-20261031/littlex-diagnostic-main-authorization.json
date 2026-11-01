@@ -1,0 +1,42 @@
+{
+  "authorized": true,
+  "purpose": "Two bounded matched LittleX diagnostic recaptures",
+  "reviewed_candidate": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-diagnostics-20261031/candidate-v2.json",
+    "sha256": "c887c79c93d79876a57b4bd1cef7da46c561ac9460d21ff316acef057dbc04ff"
+  },
+  "source_files": {
+    "reproduction/ttg-plus-diagnostics/capture.py": "9dd389c6620034a34ceb2f9cb7f346b9e215340a31bd7f5b38d33809c50ec162",
+    "reproduction/ttg-plus-diagnostics/explain.py": "463366702fa4d734505d941363816b659cfefeb31375cc962f63239645dd31dc",
+    "reproduction/ttg-plus-diagnostics/overlay.py": "0ff3f8c9aef1fc06b117c6ee802bf8c2be3817867c37f14dd485065e41fe3622",
+    "reproduction/ttg-plus-diagnostics/runner.py": "ffd7e1997821278b11adb5d393caba763910b8a98ee8ef1ea9273cd4b269a540",
+    "reproduction/ttg-plus-diagnostics/test_helpers.py": "57fd0e63852065bfee2273b271115b64578928091abe1b5bf96dc46d7b81ca76"
+  },
+  "selection": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-diagnostics-20261031/selection-v1.json",
+    "sha256": "8eee4ba43a0aa4fb49bf7b02e217e0995078d36d46e087bff9726d1ae6624238"
+  },
+  "command": [
+    "python3",
+    "-B",
+    "reproduction/ttg-plus-diagnostics/runner.py",
+    "--plan",
+    "project-notes/measurements/ttg-plus-performance-20261031/formal-review-ready-v1/plan.json",
+    "--selection",
+    "project-notes/measurements/ttg-plus-diagnostics-20261031/selection-v1.json",
+    "--output",
+    "project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1",
+    "--cluster",
+    "reproduction/ttg-plus-diagnostics/pg-recapture-v1",
+    "--runtime",
+    "reproduction/ttg-plus-diagnostics/runtime-recapture-v1"
+  ],
+  "conditions": [
+    "Constructor-v2 PASS replaces sandbox-denied constructor-v1 reference in new metadata",
+    "P8 heavy raw audit is complete and quiet; no competing diagnostic/render/compression jobs",
+    "Five selected original queries with two same-connection inline EXPLAIN executions each",
+    "Actual original-query completion and full original semantic/restart/physical checks before accepting plans",
+    "First failure retained with stopped owned services; primary sources and evidence unchanged"
+  ],
+  "primary_measurement": false
+}

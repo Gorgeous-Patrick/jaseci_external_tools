@@ -1,0 +1,45 @@
+--- a/jac/jaclang/runtime/ttg_continuation.jac
++++ b/jac/jaclang/runtime/ttg_continuation.jac
+@@ -154,7 +154,7 @@
+     pending: list[dict],
+     resolve: any,
+     max_nodes: int = 200,
+-    max_steps: int = 2000
++    max_steps: int = 32768
+ ) -> dict {
+     result: dict = {
+         'nodes': [],
+--- a/jac/jaclang/runtime/ttg.jac
++++ b/jac/jaclang/runtime/ttg.jac
+@@ -17,7 +17,7 @@
+         pending: list[dict],
+         resolve: any,
+         max_nodes: int = 200,
+-        max_steps: int = 2000
++        max_steps: int = 32768
+     ) -> dict;
+ 
+     @classmethod
+--- a/jac/jaclang/runtime/impl/ttg.impl.jac
++++ b/jac/jaclang/runtime/impl/ttg.impl.jac
+@@ -1275,7 +1275,7 @@
+     pending: list[dict],
+     resolve: any,
+     max_nodes: int = 200,
+-    max_steps: int = 2000
++    max_steps: int = 32768
+ ) -> dict {
+     import from jaclang.runtime.ttg_continuation { plan_continuation }
+     return plan_continuation(
+--- a/jac/jaclang/runtime/ttg_dependency_prefetch.jac
++++ b/jac/jaclang/runtime/ttg_dependency_prefetch.jac
+@@ -336,7 +336,8 @@
+             values,
+             pending,
+             resolve,
+-            state.max_length
++            state.max_length,
++            max_steps=32768
+         );
+     } except Exception as error {
+         state.errors.append(str(error));

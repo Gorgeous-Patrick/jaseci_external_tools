@@ -1,0 +1,4577 @@
+{
+  "passed": true,
+  "kind": "bounded_matched_littlex_explain",
+  "accepted_recaptures": [
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1/littlex-off/diagnostic-acceptance.json",
+      "sha256": "ef4320c66d315127eed98f8273616c77cd4c8beb0e725098f4e5b224a00cef60"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1/littlex-ttg_plus/diagnostic-acceptance.json",
+      "sha256": "a867b24012237894b661752d3321e327bbe34ca3057b04b8b175bb1f88c13bbb"
+    }
+  ],
+  "selection": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-diagnostics-20261031/selection-v1.json",
+    "sha256": "8eee4ba43a0aa4fb49bf7b02e217e0995078d36d46e087bff9726d1ae6624238"
+  },
+  "source_binding": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1/sources.json",
+    "sha256": "b1cfc268580974f4c427d02821e9ccd32e742ae1f3396c96a31a5b21eacadd96"
+  },
+  "summarizer": {
+    "path": "/home/baichuan/jaseci/reproduction/ttg-plus-diagnostics/summarize.py",
+    "sha256": "6c511bb83a35d8f3fc3acfb6c438dbf35751c93040678aafdacfe6eb7046143d"
+  },
+  "primary_measurement": false,
+  "plans": [
+    {
+      "target_id": "native-follow",
+      "semantic_region": "collect_follow",
+      "repetition": 0,
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1/littlex-off/captures/native-follow-pid2441839.json",
+        "sha256": "ba34279ff3153c4f77d07bfaef05022d374098a376841e3e86398cd4b15fb8e8"
+      },
+      "actual_selected_rows": 8,
+      "planning_ms": 0.663,
+      "execution_ms": 0.207,
+      "server_plan_plus_execution_ms": 0.87,
+      "root_node": "Incremental Sort",
+      "root_actual_rows": 8.0,
+      "root_buffers": {
+        "Shared Hit Blocks": 39,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      },
+      "executed_nodes": [
+        {
+          "Node Type": "Incremental Sort",
+          "Actual Rows": 8.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.109,
+          "Actual Total Time": 0.111,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan",
+          "buffers": {
+            "Shared Hit Blocks": 39,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 8.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.067,
+          "Actual Total Time": 0.102,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 39,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 2.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.036,
+          "Actual Total Time": 0.046,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 12,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 2.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.025,
+          "Actual Total Time": 0.034,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 8,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Function Scan",
+          "Alias": "f0",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.004,
+          "Actual Total Time": 0.004,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Seq Scan",
+          "Relation Name": "anchors",
+          "Alias": "e1",
+          "Filter": "((kind = 'EdgeAnchor'::text) AND ((arch_type = 'Follow'::text) OR (ANY (arch_type = (hashed SubPlan 1).col1))))",
+          "Rows Removed by Filter": 70,
+          "Actual Rows": 14.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.02,
+          "Actual Total Time": 0.026,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 8,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Seq Scan",
+          "Relation Name": "graph_types",
+          "Alias": "graph_types",
+          "Filter": "(ancestor = 'Follow'::text)",
+          "Rows Removed by Filter": 5,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.003,
+          "Actual Total Time": 0.003,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 1,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "anchors_pkey",
+          "Relation Name": "anchors",
+          "Alias": "n1",
+          "Index Cond": "(id = CASE WHEN (e1.src = f0.id) THEN e1.dst ELSE e1.src END)",
+          "Filter": "((kind = 'NodeAnchor'::text) AND ((arch_type = 'Profile'::text) OR (ANY (arch_type = (hashed SubPlan 2).col1))) AND ((root_id = 'fc32a14e-f4f3-4f5e-b603-8fe13ba26450'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::integer > '-1'::integer) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'fc32a14e-f4f3-4f5e-b603-8fe13ba26450'::text) OR EXISTS(SubPlan 3)))",
+          "Rows Removed by Filter": 0,
+          "Actual Rows": 1.0,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.005,
+          "Actual Total Time": 0.005,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 4,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 4.0,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.02,
+          "Actual Total Time": 0.026,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 27,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Bitmap Heap Scan",
+          "Relation Name": "anchors",
+          "Alias": "e2",
+          "Filter": "((kind = 'EdgeAnchor'::text) AND ((arch_type = 'Post'::text) OR (ANY (arch_type = (hashed SubPlan 4).col1))) AND ((src = n1.id) OR (undirected AND (dst = n1.id))))",
+          "Rows Removed by Filter": 6,
+          "Actual Rows": 4.0,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.015,
+          "Actual Total Time": 0.016,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Exact Heap Blocks": 6,
+            "Lossy Heap Blocks": 0,
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "BitmapOr",
+          "Actual Rows": 0.0,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.006,
+          "Actual Total Time": 0.006,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/1/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 4,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Bitmap Index Scan",
+          "Index Name": "idx_anchors_src",
+          "Index Cond": "(src = n1.id)",
+          "Actual Rows": 6.0,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.002,
+          "Actual Total Time": 0.002,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Bitmap Index Scan",
+          "Index Name": "idx_anchors_dst",
+          "Index Cond": "(dst = n1.id)",
+          "Actual Rows": 3.5,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.003,
+          "Actual Total Time": 0.003,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/1/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Seq Scan",
+          "Relation Name": "graph_types",
+          "Alias": "graph_types_2",
+          "Filter": "(ancestor = 'Post'::text)",
+          "Rows Removed by Filter": 5,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.002,
+          "Actual Total Time": 0.003,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/1/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 1,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "anchors_pkey",
+          "Relation Name": "anchors",
+          "Alias": "n2",
+          "Index Cond": "(id = CASE WHEN (e2.src = n1.id) THEN e2.dst ELSE e2.src END)",
+          "Filter": "((kind = 'NodeAnchor'::text) AND ((arch_type = 'Tweet'::text) OR (ANY (arch_type = (hashed SubPlan 5).col1))) AND ((root_id = 'fc32a14e-f4f3-4f5e-b603-8fe13ba26450'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::integer > '-1'::integer) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'fc32a14e-f4f3-4f5e-b603-8fe13ba26450'::text) OR EXISTS(SubPlan 6)))",
+          "Rows Removed by Filter": 0,
+          "Actual Rows": 1.0,
+          "Actual Loops": 8,
+          "Actual Startup Time": 0.002,
+          "Actual Total Time": 0.002,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/1/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 16,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        }
+      ],
+      "context": [
+        [
+          "continuation_a7ad2593802e490db9b2e5ee329b6eb5",
+          "ttgperf",
+          2442089,
+          "serializable",
+          "off",
+          "802:802:"
+        ]
+      ],
+      "settings": [
+        [
+          "client_encoding",
+          "UTF8"
+        ],
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "effective_cache_size",
+          "524288"
+        ],
+        [
+          "enable_bitmapscan",
+          "on"
+        ],
+        [
+          "enable_hashjoin",
+          "on"
+        ],
+        [
+          "enable_indexscan",
+          "on"
+        ],
+        [
+          "enable_mergejoin",
+          "on"
+        ],
+        [
+          "enable_nestloop",
+          "on"
+        ],
+        [
+          "enable_seqscan",
+          "on"
+        ],
+        [
+          "jit",
+          "on"
+        ],
+        [
+          "plan_cache_mode",
+          "auto"
+        ],
+        [
+          "random_page_cost",
+          "4"
+        ],
+        [
+          "row_security",
+          "on"
+        ],
+        [
+          "search_path",
+          "\"$user\", public"
+        ],
+        [
+          "server_version_num",
+          "180006"
+        ],
+        [
+          "standard_conforming_strings",
+          "on"
+        ],
+        [
+          "statement_timeout",
+          "0"
+        ],
+        [
+          "work_mem",
+          "4096"
+        ]
+      ]
+    },
+    {
+      "target_id": "native-follow",
+      "semantic_region": "collect_follow",
+      "repetition": 1,
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1/littlex-off/captures/native-follow-pid2441839.json",
+        "sha256": "ba34279ff3153c4f77d07bfaef05022d374098a376841e3e86398cd4b15fb8e8"
+      },
+      "actual_selected_rows": 8,
+      "planning_ms": 0.701,
+      "execution_ms": 0.119,
+      "server_plan_plus_execution_ms": 0.82,
+      "root_node": "Incremental Sort",
+      "root_actual_rows": 8.0,
+      "root_buffers": {
+        "Shared Hit Blocks": 39,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      },
+      "executed_nodes": [
+        {
+          "Node Type": "Incremental Sort",
+          "Actual Rows": 8.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.073,
+          "Actual Total Time": 0.075,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan",
+          "buffers": {
+            "Shared Hit Blocks": 39,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 8.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.039,
+          "Actual Total Time": 0.07,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 39,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 2.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.023,
+          "Actual Total Time": 0.033,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 12,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 2.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.017,
+          "Actual Total Time": 0.025,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 8,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Function Scan",
+          "Alias": "f0",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.002,
+          "Actual Total Time": 0.002,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Seq Scan",
+          "Relation Name": "anchors",
+          "Alias": "e1",
+          "Filter": "((kind = 'EdgeAnchor'::text) AND ((arch_type = 'Follow'::text) OR (ANY (arch_type = (hashed SubPlan 1).col1))))",
+          "Rows Removed by Filter": 70,
+          "Actual Rows": 14.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.014,
+          "Actual Total Time": 0.02,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 8,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Seq Scan",
+          "Relation Name": "graph_types",
+          "Alias": "graph_types",
+          "Filter": "(ancestor = 'Follow'::text)",
+          "Rows Removed by Filter": 5,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.002,
+          "Actual Total Time": 0.002,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 1,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "anchors_pkey",
+          "Relation Name": "anchors",
+          "Alias": "n1",
+          "Index Cond": "(id = CASE WHEN (e1.src = f0.id) THEN e1.dst ELSE e1.src END)",
+          "Filter": "((kind = 'NodeAnchor'::text) AND ((arch_type = 'Profile'::text) OR (ANY (arch_type = (hashed SubPlan 2).col1))) AND ((root_id = 'fc32a14e-f4f3-4f5e-b603-8fe13ba26450'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::integer > '-1'::integer) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'fc32a14e-f4f3-4f5e-b603-8fe13ba26450'::text) OR EXISTS(SubPlan 3)))",
+          "Rows Removed by Filter": 0,
+          "Actual Rows": 1.0,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.003,
+          "Actual Total Time": 0.003,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 4,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 4.0,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.011,
+          "Actual Total Time": 0.017,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 27,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Bitmap Heap Scan",
+          "Relation Name": "anchors",
+          "Alias": "e2",
+          "Filter": "((kind = 'EdgeAnchor'::text) AND ((arch_type = 'Post'::text) OR (ANY (arch_type = (hashed SubPlan 4).col1))) AND ((src = n1.id) OR (undirected AND (dst = n1.id))))",
+          "Rows Removed by Filter": 6,
+          "Actual Rows": 4.0,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.008,
+          "Actual Total Time": 0.009,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Exact Heap Blocks": 6,
+            "Lossy Heap Blocks": 0,
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "BitmapOr",
+          "Actual Rows": 0.0,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.003,
+          "Actual Total Time": 0.003,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/1/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 4,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Bitmap Index Scan",
+          "Index Name": "idx_anchors_src",
+          "Index Cond": "(src = n1.id)",
+          "Actual Rows": 6.0,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.002,
+          "Actual Total Time": 0.002,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Bitmap Index Scan",
+          "Index Name": "idx_anchors_dst",
+          "Index Cond": "(dst = n1.id)",
+          "Actual Rows": 3.5,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.001,
+          "Actual Total Time": 0.001,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/1/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Seq Scan",
+          "Relation Name": "graph_types",
+          "Alias": "graph_types_2",
+          "Filter": "(ancestor = 'Post'::text)",
+          "Rows Removed by Filter": 5,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.001,
+          "Actual Total Time": 0.002,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/1/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 1,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "anchors_pkey",
+          "Relation Name": "anchors",
+          "Alias": "n2",
+          "Index Cond": "(id = CASE WHEN (e2.src = n1.id) THEN e2.dst ELSE e2.src END)",
+          "Filter": "((kind = 'NodeAnchor'::text) AND ((arch_type = 'Tweet'::text) OR (ANY (arch_type = (hashed SubPlan 5).col1))) AND ((root_id = 'fc32a14e-f4f3-4f5e-b603-8fe13ba26450'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::integer > '-1'::integer) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'fc32a14e-f4f3-4f5e-b603-8fe13ba26450'::text) OR EXISTS(SubPlan 6)))",
+          "Rows Removed by Filter": 0,
+          "Actual Rows": 1.0,
+          "Actual Loops": 8,
+          "Actual Startup Time": 0.001,
+          "Actual Total Time": 0.001,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/1/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 16,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        }
+      ],
+      "context": [
+        [
+          "continuation_a7ad2593802e490db9b2e5ee329b6eb5",
+          "ttgperf",
+          2442089,
+          "serializable",
+          "off",
+          "802:802:"
+        ]
+      ],
+      "settings": [
+        [
+          "client_encoding",
+          "UTF8"
+        ],
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "effective_cache_size",
+          "524288"
+        ],
+        [
+          "enable_bitmapscan",
+          "on"
+        ],
+        [
+          "enable_hashjoin",
+          "on"
+        ],
+        [
+          "enable_indexscan",
+          "on"
+        ],
+        [
+          "enable_mergejoin",
+          "on"
+        ],
+        [
+          "enable_nestloop",
+          "on"
+        ],
+        [
+          "enable_seqscan",
+          "on"
+        ],
+        [
+          "jit",
+          "on"
+        ],
+        [
+          "plan_cache_mode",
+          "auto"
+        ],
+        [
+          "random_page_cost",
+          "4"
+        ],
+        [
+          "row_security",
+          "on"
+        ],
+        [
+          "search_path",
+          "\"$user\", public"
+        ],
+        [
+          "server_version_num",
+          "180006"
+        ],
+        [
+          "standard_conforming_strings",
+          "on"
+        ],
+        [
+          "statement_timeout",
+          "0"
+        ],
+        [
+          "work_mem",
+          "4096"
+        ]
+      ]
+    },
+    {
+      "target_id": "native-post",
+      "semantic_region": "collect_post",
+      "repetition": 0,
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1/littlex-off/captures/native-post-pid2441839.json",
+        "sha256": "fcd288138a3560ad6e9a942e055948aecbd82944d43aad3cec501b3f365bebd6"
+      },
+      "actual_selected_rows": 4,
+      "planning_ms": 0.28,
+      "execution_ms": 0.071,
+      "server_plan_plus_execution_ms": 0.351,
+      "root_node": "Incremental Sort",
+      "root_actual_rows": 4.0,
+      "root_buffers": {
+        "Shared Hit Blocks": 16,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      },
+      "executed_nodes": [
+        {
+          "Node Type": "Incremental Sort",
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.046,
+          "Actual Total Time": 0.046,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan",
+          "buffers": {
+            "Shared Hit Blocks": 16,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.03,
+          "Actual Total Time": 0.043,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 16,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.024,
+          "Actual Total Time": 0.033,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 8,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Function Scan",
+          "Alias": "f0",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.002,
+          "Actual Total Time": 0.002,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Seq Scan",
+          "Relation Name": "anchors",
+          "Alias": "e1",
+          "Filter": "((kind = 'EdgeAnchor'::text) AND ((arch_type = 'Post'::text) OR (ANY (arch_type = (hashed SubPlan 1).col1))))",
+          "Rows Removed by Filter": 60,
+          "Actual Rows": 24.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.021,
+          "Actual Total Time": 0.027,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 8,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Seq Scan",
+          "Relation Name": "graph_types",
+          "Alias": "graph_types",
+          "Filter": "(ancestor = 'Post'::text)",
+          "Rows Removed by Filter": 5,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.009,
+          "Actual Total Time": 0.009,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 1,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "anchors_pkey",
+          "Relation Name": "anchors",
+          "Alias": "n1",
+          "Index Cond": "(id = CASE WHEN (e1.src = f0.id) THEN e1.dst ELSE e1.src END)",
+          "Filter": "((kind = 'NodeAnchor'::text) AND ((arch_type = 'Tweet'::text) OR (ANY (arch_type = (hashed SubPlan 2).col1))) AND ((root_id = 'fc32a14e-f4f3-4f5e-b603-8fe13ba26450'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::integer > '-1'::integer) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'fc32a14e-f4f3-4f5e-b603-8fe13ba26450'::text) OR EXISTS(SubPlan 3)))",
+          "Rows Removed by Filter": 0,
+          "Actual Rows": 1.0,
+          "Actual Loops": 4,
+          "Actual Startup Time": 0.002,
+          "Actual Total Time": 0.002,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 8,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        }
+      ],
+      "context": [
+        [
+          "continuation_a7ad2593802e490db9b2e5ee329b6eb5",
+          "ttgperf",
+          2442089,
+          "serializable",
+          "off",
+          "802:802:"
+        ]
+      ],
+      "settings": [
+        [
+          "client_encoding",
+          "UTF8"
+        ],
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "effective_cache_size",
+          "524288"
+        ],
+        [
+          "enable_bitmapscan",
+          "on"
+        ],
+        [
+          "enable_hashjoin",
+          "on"
+        ],
+        [
+          "enable_indexscan",
+          "on"
+        ],
+        [
+          "enable_mergejoin",
+          "on"
+        ],
+        [
+          "enable_nestloop",
+          "on"
+        ],
+        [
+          "enable_seqscan",
+          "on"
+        ],
+        [
+          "jit",
+          "on"
+        ],
+        [
+          "plan_cache_mode",
+          "auto"
+        ],
+        [
+          "random_page_cost",
+          "4"
+        ],
+        [
+          "row_security",
+          "on"
+        ],
+        [
+          "search_path",
+          "\"$user\", public"
+        ],
+        [
+          "server_version_num",
+          "180006"
+        ],
+        [
+          "standard_conforming_strings",
+          "on"
+        ],
+        [
+          "statement_timeout",
+          "0"
+        ],
+        [
+          "work_mem",
+          "4096"
+        ]
+      ]
+    },
+    {
+      "target_id": "native-post",
+      "semantic_region": "collect_post",
+      "repetition": 1,
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1/littlex-off/captures/native-post-pid2441839.json",
+        "sha256": "fcd288138a3560ad6e9a942e055948aecbd82944d43aad3cec501b3f365bebd6"
+      },
+      "actual_selected_rows": 4,
+      "planning_ms": 0.263,
+      "execution_ms": 0.061,
+      "server_plan_plus_execution_ms": 0.324,
+      "root_node": "Incremental Sort",
+      "root_actual_rows": 4.0,
+      "root_buffers": {
+        "Shared Hit Blocks": 16,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      },
+      "executed_nodes": [
+        {
+          "Node Type": "Incremental Sort",
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.036,
+          "Actual Total Time": 0.037,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan",
+          "buffers": {
+            "Shared Hit Blocks": 16,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.021,
+          "Actual Total Time": 0.034,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 16,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.016,
+          "Actual Total Time": 0.024,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 8,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Function Scan",
+          "Alias": "f0",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.002,
+          "Actual Total Time": 0.002,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Seq Scan",
+          "Relation Name": "anchors",
+          "Alias": "e1",
+          "Filter": "((kind = 'EdgeAnchor'::text) AND ((arch_type = 'Post'::text) OR (ANY (arch_type = (hashed SubPlan 1).col1))))",
+          "Rows Removed by Filter": 60,
+          "Actual Rows": 24.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.013,
+          "Actual Total Time": 0.018,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 8,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Seq Scan",
+          "Relation Name": "graph_types",
+          "Alias": "graph_types",
+          "Filter": "(ancestor = 'Post'::text)",
+          "Rows Removed by Filter": 5,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.002,
+          "Actual Total Time": 0.002,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 1,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "anchors_pkey",
+          "Relation Name": "anchors",
+          "Alias": "n1",
+          "Index Cond": "(id = CASE WHEN (e1.src = f0.id) THEN e1.dst ELSE e1.src END)",
+          "Filter": "((kind = 'NodeAnchor'::text) AND ((arch_type = 'Tweet'::text) OR (ANY (arch_type = (hashed SubPlan 2).col1))) AND ((root_id = 'fc32a14e-f4f3-4f5e-b603-8fe13ba26450'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::integer > '-1'::integer) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'fc32a14e-f4f3-4f5e-b603-8fe13ba26450'::text) OR EXISTS(SubPlan 3)))",
+          "Rows Removed by Filter": 0,
+          "Actual Rows": 1.0,
+          "Actual Loops": 4,
+          "Actual Startup Time": 0.002,
+          "Actual Total Time": 0.002,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 8,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        }
+      ],
+      "context": [
+        [
+          "continuation_a7ad2593802e490db9b2e5ee329b6eb5",
+          "ttgperf",
+          2442089,
+          "serializable",
+          "off",
+          "802:802:"
+        ]
+      ],
+      "settings": [
+        [
+          "client_encoding",
+          "UTF8"
+        ],
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "effective_cache_size",
+          "524288"
+        ],
+        [
+          "enable_bitmapscan",
+          "on"
+        ],
+        [
+          "enable_hashjoin",
+          "on"
+        ],
+        [
+          "enable_indexscan",
+          "on"
+        ],
+        [
+          "enable_mergejoin",
+          "on"
+        ],
+        [
+          "enable_nestloop",
+          "on"
+        ],
+        [
+          "enable_seqscan",
+          "on"
+        ],
+        [
+          "jit",
+          "on"
+        ],
+        [
+          "plan_cache_mode",
+          "auto"
+        ],
+        [
+          "random_page_cost",
+          "4"
+        ],
+        [
+          "row_security",
+          "on"
+        ],
+        [
+          "search_path",
+          "\"$user\", public"
+        ],
+        [
+          "server_version_num",
+          "180006"
+        ],
+        [
+          "standard_conforming_strings",
+          "on"
+        ],
+        [
+          "statement_timeout",
+          "0"
+        ],
+        [
+          "work_mem",
+          "4096"
+        ]
+      ]
+    },
+    {
+      "target_id": "native-root",
+      "semantic_region": "root_profile",
+      "repetition": 0,
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1/littlex-off/captures/native-root-pid2441839.json",
+        "sha256": "c5ac24498d095350ed656a399fce97b8a2a3d4e1601029bc7b5a0e5269ecbc21"
+      },
+      "actual_selected_rows": 1,
+      "planning_ms": 0.315,
+      "execution_ms": 0.092,
+      "server_plan_plus_execution_ms": 0.407,
+      "root_node": "Incremental Sort",
+      "root_actual_rows": 1.0,
+      "root_buffers": {
+        "Shared Hit Blocks": 12,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      },
+      "executed_nodes": [
+        {
+          "Node Type": "Incremental Sort",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.052,
+          "Actual Total Time": 0.053,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan",
+          "buffers": {
+            "Shared Hit Blocks": 12,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.032,
+          "Actual Total Time": 0.044,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 9,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.021,
+          "Actual Total Time": 0.032,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 7,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Function Scan",
+          "Alias": "f0",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.005,
+          "Actual Total Time": 0.005,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Seq Scan",
+          "Relation Name": "anchors",
+          "Alias": "e1",
+          "Filter": "(kind = 'EdgeAnchor'::text)",
+          "Rows Removed by Filter": 40,
+          "Actual Rows": 44.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.015,
+          "Actual Total Time": 0.021,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 7,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Memoize",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.01,
+          "Actual Total Time": 0.011,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "anchors_pkey",
+          "Relation Name": "anchors",
+          "Alias": "n1",
+          "Index Cond": "(id = CASE WHEN (e1.src = f0.id) THEN e1.dst ELSE e1.src END)",
+          "Filter": "((kind = 'NodeAnchor'::text) AND ((arch_type = 'Profile'::text) OR (ANY (arch_type = (hashed SubPlan 1).col1))) AND ((root_id = 'fc32a14e-f4f3-4f5e-b603-8fe13ba26450'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::integer > '-1'::integer) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'fc32a14e-f4f3-4f5e-b603-8fe13ba26450'::text) OR EXISTS(SubPlan 2)))",
+          "Rows Removed by Filter": 0,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.008,
+          "Actual Total Time": 0.008,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        }
+      ],
+      "context": [
+        [
+          "continuation_a7ad2593802e490db9b2e5ee329b6eb5",
+          "ttgperf",
+          2442089,
+          "serializable",
+          "off",
+          "802:802:"
+        ]
+      ],
+      "settings": [
+        [
+          "client_encoding",
+          "UTF8"
+        ],
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "effective_cache_size",
+          "524288"
+        ],
+        [
+          "enable_bitmapscan",
+          "on"
+        ],
+        [
+          "enable_hashjoin",
+          "on"
+        ],
+        [
+          "enable_indexscan",
+          "on"
+        ],
+        [
+          "enable_mergejoin",
+          "on"
+        ],
+        [
+          "enable_nestloop",
+          "on"
+        ],
+        [
+          "enable_seqscan",
+          "on"
+        ],
+        [
+          "jit",
+          "on"
+        ],
+        [
+          "plan_cache_mode",
+          "auto"
+        ],
+        [
+          "random_page_cost",
+          "4"
+        ],
+        [
+          "row_security",
+          "on"
+        ],
+        [
+          "search_path",
+          "\"$user\", public"
+        ],
+        [
+          "server_version_num",
+          "180006"
+        ],
+        [
+          "standard_conforming_strings",
+          "on"
+        ],
+        [
+          "statement_timeout",
+          "0"
+        ],
+        [
+          "work_mem",
+          "4096"
+        ]
+      ]
+    },
+    {
+      "target_id": "native-root",
+      "semantic_region": "root_profile",
+      "repetition": 1,
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1/littlex-off/captures/native-root-pid2441839.json",
+        "sha256": "c5ac24498d095350ed656a399fce97b8a2a3d4e1601029bc7b5a0e5269ecbc21"
+      },
+      "actual_selected_rows": 1,
+      "planning_ms": 0.244,
+      "execution_ms": 0.07,
+      "server_plan_plus_execution_ms": 0.314,
+      "root_node": "Incremental Sort",
+      "root_actual_rows": 1.0,
+      "root_buffers": {
+        "Shared Hit Blocks": 9,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      },
+      "executed_nodes": [
+        {
+          "Node Type": "Incremental Sort",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.044,
+          "Actual Total Time": 0.044,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan",
+          "buffers": {
+            "Shared Hit Blocks": 9,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.028,
+          "Actual Total Time": 0.041,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 9,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.019,
+          "Actual Total Time": 0.032,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 7,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Function Scan",
+          "Alias": "f0",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.006,
+          "Actual Total Time": 0.006,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Seq Scan",
+          "Relation Name": "anchors",
+          "Alias": "e1",
+          "Filter": "(kind = 'EdgeAnchor'::text)",
+          "Rows Removed by Filter": 40,
+          "Actual Rows": 44.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.011,
+          "Actual Total Time": 0.019,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 7,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Memoize",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.008,
+          "Actual Total Time": 0.008,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "anchors_pkey",
+          "Relation Name": "anchors",
+          "Alias": "n1",
+          "Index Cond": "(id = CASE WHEN (e1.src = f0.id) THEN e1.dst ELSE e1.src END)",
+          "Filter": "((kind = 'NodeAnchor'::text) AND ((arch_type = 'Profile'::text) OR (ANY (arch_type = (hashed SubPlan 1).col1))) AND ((root_id = 'fc32a14e-f4f3-4f5e-b603-8fe13ba26450'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::integer > '-1'::integer) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'fc32a14e-f4f3-4f5e-b603-8fe13ba26450'::text) OR EXISTS(SubPlan 2)))",
+          "Rows Removed by Filter": 0,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.006,
+          "Actual Total Time": 0.006,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        }
+      ],
+      "context": [
+        [
+          "continuation_a7ad2593802e490db9b2e5ee329b6eb5",
+          "ttgperf",
+          2442089,
+          "serializable",
+          "off",
+          "802:802:"
+        ]
+      ],
+      "settings": [
+        [
+          "client_encoding",
+          "UTF8"
+        ],
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "effective_cache_size",
+          "524288"
+        ],
+        [
+          "enable_bitmapscan",
+          "on"
+        ],
+        [
+          "enable_hashjoin",
+          "on"
+        ],
+        [
+          "enable_indexscan",
+          "on"
+        ],
+        [
+          "enable_mergejoin",
+          "on"
+        ],
+        [
+          "enable_nestloop",
+          "on"
+        ],
+        [
+          "enable_seqscan",
+          "on"
+        ],
+        [
+          "jit",
+          "on"
+        ],
+        [
+          "plan_cache_mode",
+          "auto"
+        ],
+        [
+          "random_page_cost",
+          "4"
+        ],
+        [
+          "row_security",
+          "on"
+        ],
+        [
+          "search_path",
+          "\"$user\", public"
+        ],
+        [
+          "server_version_num",
+          "180006"
+        ],
+        [
+          "standard_conforming_strings",
+          "on"
+        ],
+        [
+          "statement_timeout",
+          "0"
+        ],
+        [
+          "work_mem",
+          "4096"
+        ]
+      ]
+    },
+    {
+      "target_id": "fused-batch",
+      "semantic_region": "collect_post_and_follow",
+      "repetition": 0,
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1/littlex-ttg_plus/captures/fused-batch-pid2442533.json",
+        "sha256": "432bb223b0e4cff71b719a264059bf2bdda14be1a558367f28d0394c0d288814"
+      },
+      "actual_selected_rows": 12,
+      "planning_ms": 1.203,
+      "execution_ms": 0.535,
+      "server_plan_plus_execution_ms": 1.738,
+      "root_node": "Limit",
+      "root_actual_rows": 12.0,
+      "root_buffers": {
+        "Shared Hit Blocks": 320,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      },
+      "executed_nodes": [
+        {
+          "Node Type": "Limit",
+          "Actual Rows": 12.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.408,
+          "Actual Total Time": 0.411,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan",
+          "buffers": {
+            "Shared Hit Blocks": 320,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Sort",
+          "Actual Rows": 12.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.407,
+          "Actual Total Time": 0.41,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 320,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Append",
+          "Actual Rows": 12.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.113,
+          "Actual Total Time": 0.402,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 320,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.112,
+          "Actual Total Time": 0.115,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 87,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Result",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.0,
+          "Actual Total Time": 0.0,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "WindowAgg",
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.111,
+          "Actual Total Time": 0.113,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 87,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "WindowAgg",
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.106,
+          "Actual Total Time": 0.108,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 87,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Sort",
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.101,
+          "Actual Total Time": 0.102,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 87,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.045,
+          "Actual Total Time": 0.097,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 87,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t3",
+          "Index Cond": "(kind = 'EdgeAnchor'::text)",
+          "Filter": "(((src = '40041441-80c0-4c6a-a7cc-696c6d0c00c3'::uuid) OR (undirected AND (dst = '40041441-80c0-4c6a-a7cc-696c6d0c00c3'::uuid))) AND ((arch_type = 'Post'::text) OR EXISTS(SubPlan 4)))",
+          "Rows Removed by Filter": 40,
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.021,
+          "Actual Total Time": 0.026,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Only Scan",
+          "Index Name": "graph_types_pkey",
+          "Relation Name": "graph_types",
+          "Alias": "_t7",
+          "Index Cond": "((type_name = _t3.arch_type) AND (ancestor = 'Post'::text))",
+          "Actual Rows": 0.0,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.003,
+          "Actual Total Time": 0.003,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t4",
+          "Index Cond": "(kind = 'NodeAnchor'::text)",
+          "Filter": "(((arch_type = 'Tweet'::text) OR EXISTS(SubPlan 1)) AND ((root_id = 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::text) OR EXISTS(SubPlan 3)))",
+          "Rows Removed by Filter": 16,
+          "Actual Rows": 2.5,
+          "Actual Loops": 4,
+          "Actual Startup Time": 0.017,
+          "Actual Total Time": 0.017,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 76,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Only Scan",
+          "Index Name": "graph_types_pkey",
+          "Relation Name": "graph_types",
+          "Alias": "_t5",
+          "Index Cond": "((type_name = _t4.arch_type) AND (ancestor = 'Tweet'::text))",
+          "Actual Rows": 0.0,
+          "Actual Loops": 64,
+          "Actual Startup Time": 0.001,
+          "Actual Total Time": 0.001,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 64,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 8.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.283,
+          "Actual Total Time": 0.286,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 233,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Result",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.0,
+          "Actual Total Time": 0.0,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "WindowAgg",
+          "Actual Rows": 8.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.282,
+          "Actual Total Time": 0.284,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 233,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "WindowAgg",
+          "Actual Rows": 8.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.276,
+          "Actual Total Time": 0.279,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 233,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Sort",
+          "Actual Rows": 8.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.272,
+          "Actual Total Time": 0.274,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 233,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 8.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.066,
+          "Actual Total Time": 0.266,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 233,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 8.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.042,
+          "Actual Total Time": 0.093,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 75,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 2.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.013,
+          "Actual Total Time": 0.033,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 17,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t11",
+          "Index Cond": "(kind = 'EdgeAnchor'::text)",
+          "Filter": "(((src = '40041441-80c0-4c6a-a7cc-696c6d0c00c3'::uuid) OR (undirected AND (dst = '40041441-80c0-4c6a-a7cc-696c6d0c00c3'::uuid))) AND ((arch_type = 'Follow'::text) OR EXISTS(SubPlan 14)))",
+          "Rows Removed by Filter": 42,
+          "Actual Rows": 2.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.005,
+          "Actual Total Time": 0.02,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 13,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Only Scan",
+          "Index Name": "graph_types_pkey",
+          "Relation Name": "graph_types",
+          "Alias": "_t20",
+          "Index Cond": "((type_name = _t11.arch_type) AND (ancestor = 'Follow'::text))",
+          "Actual Rows": 0.0,
+          "Actual Loops": 4,
+          "Actual Startup Time": 0.002,
+          "Actual Total Time": 0.002,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 4,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t12",
+          "Index Cond": "(kind = 'NodeAnchor'::text)",
+          "Filter": "(((arch_type = 'Profile'::text) OR EXISTS(SubPlan 6)) AND ((root_id = 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::text) OR EXISTS(SubPlan 8)))",
+          "Rows Removed by Filter": 0,
+          "Actual Rows": 4.0,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.004,
+          "Actual Total Time": 0.005,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 4,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t15",
+          "Index Cond": "(kind = 'EdgeAnchor'::text)",
+          "Filter": "((arch_type = 'Post'::text) OR EXISTS(SubPlan 9))",
+          "Rows Removed by Filter": 20,
+          "Actual Rows": 24.0,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.022,
+          "Actual Total Time": 0.027,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 58,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Only Scan",
+          "Index Name": "graph_types_pkey",
+          "Relation Name": "graph_types",
+          "Alias": "_t16",
+          "Index Cond": "((type_name = _t15.arch_type) AND (ancestor = 'Post'::text))",
+          "Actual Rows": 0.0,
+          "Actual Loops": 40,
+          "Actual Startup Time": 0.001,
+          "Actual Total Time": 0.001,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 40,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t17",
+          "Index Cond": "(kind = 'NodeAnchor'::text)",
+          "Filter": "(((arch_type = 'Tweet'::text) OR EXISTS(SubPlan 11)) AND ((root_id = 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::text) OR EXISTS(SubPlan 13)))",
+          "Rows Removed by Filter": 16,
+          "Actual Rows": 14.5,
+          "Actual Loops": 8,
+          "Actual Startup Time": 0.016,
+          "Actual Total Time": 0.021,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 158,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Only Scan",
+          "Index Name": "graph_types_pkey",
+          "Relation Name": "graph_types",
+          "Alias": "_t18",
+          "Index Cond": "((type_name = _t17.arch_type) AND (ancestor = 'Tweet'::text))",
+          "Actual Rows": 0.0,
+          "Actual Loops": 128,
+          "Actual Startup Time": 0.0,
+          "Actual Total Time": 0.0,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 128,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        }
+      ],
+      "context": [
+        [
+          "continuation_fb532e0c39fd4729955951fc45d16e27",
+          "ttgperf",
+          2442676,
+          "serializable",
+          "off",
+          "867:867:"
+        ]
+      ],
+      "settings": [
+        [
+          "client_encoding",
+          "UTF8"
+        ],
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "effective_cache_size",
+          "524288"
+        ],
+        [
+          "enable_bitmapscan",
+          "on"
+        ],
+        [
+          "enable_hashjoin",
+          "on"
+        ],
+        [
+          "enable_indexscan",
+          "on"
+        ],
+        [
+          "enable_mergejoin",
+          "on"
+        ],
+        [
+          "enable_nestloop",
+          "on"
+        ],
+        [
+          "enable_seqscan",
+          "on"
+        ],
+        [
+          "jit",
+          "on"
+        ],
+        [
+          "plan_cache_mode",
+          "auto"
+        ],
+        [
+          "random_page_cost",
+          "4"
+        ],
+        [
+          "row_security",
+          "on"
+        ],
+        [
+          "search_path",
+          "\"$user\", public"
+        ],
+        [
+          "server_version_num",
+          "180006"
+        ],
+        [
+          "standard_conforming_strings",
+          "on"
+        ],
+        [
+          "statement_timeout",
+          "0"
+        ],
+        [
+          "work_mem",
+          "4096"
+        ]
+      ]
+    },
+    {
+      "target_id": "fused-batch",
+      "semantic_region": "collect_post_and_follow",
+      "repetition": 1,
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1/littlex-ttg_plus/captures/fused-batch-pid2442533.json",
+        "sha256": "432bb223b0e4cff71b719a264059bf2bdda14be1a558367f28d0394c0d288814"
+      },
+      "actual_selected_rows": 12,
+      "planning_ms": 1.181,
+      "execution_ms": 0.423,
+      "server_plan_plus_execution_ms": 1.604,
+      "root_node": "Limit",
+      "root_actual_rows": 12.0,
+      "root_buffers": {
+        "Shared Hit Blocks": 320,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      },
+      "executed_nodes": [
+        {
+          "Node Type": "Limit",
+          "Actual Rows": 12.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.356,
+          "Actual Total Time": 0.36,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan",
+          "buffers": {
+            "Shared Hit Blocks": 320,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Sort",
+          "Actual Rows": 12.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.356,
+          "Actual Total Time": 0.358,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 320,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Append",
+          "Actual Rows": 12.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.093,
+          "Actual Total Time": 0.353,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 320,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.093,
+          "Actual Total Time": 0.095,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 87,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Result",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.0,
+          "Actual Total Time": 0.0,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "WindowAgg",
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.091,
+          "Actual Total Time": 0.093,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 87,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "WindowAgg",
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.088,
+          "Actual Total Time": 0.09,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 87,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Sort",
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.086,
+          "Actual Total Time": 0.087,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 87,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.033,
+          "Actual Total Time": 0.084,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 87,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t3",
+          "Index Cond": "(kind = 'EdgeAnchor'::text)",
+          "Filter": "(((src = '40041441-80c0-4c6a-a7cc-696c6d0c00c3'::uuid) OR (undirected AND (dst = '40041441-80c0-4c6a-a7cc-696c6d0c00c3'::uuid))) AND ((arch_type = 'Post'::text) OR EXISTS(SubPlan 4)))",
+          "Rows Removed by Filter": 40,
+          "Actual Rows": 4.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.015,
+          "Actual Total Time": 0.02,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Only Scan",
+          "Index Name": "graph_types_pkey",
+          "Relation Name": "graph_types",
+          "Alias": "_t7",
+          "Index Cond": "((type_name = _t3.arch_type) AND (ancestor = 'Post'::text))",
+          "Actual Rows": 0.0,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.001,
+          "Actual Total Time": 0.001,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t4",
+          "Index Cond": "(kind = 'NodeAnchor'::text)",
+          "Filter": "(((arch_type = 'Tweet'::text) OR EXISTS(SubPlan 1)) AND ((root_id = 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::text) OR EXISTS(SubPlan 3)))",
+          "Rows Removed by Filter": 16,
+          "Actual Rows": 2.5,
+          "Actual Loops": 4,
+          "Actual Startup Time": 0.015,
+          "Actual Total Time": 0.015,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 76,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Only Scan",
+          "Index Name": "graph_types_pkey",
+          "Relation Name": "graph_types",
+          "Alias": "_t5",
+          "Index Cond": "((type_name = _t4.arch_type) AND (ancestor = 'Tweet'::text))",
+          "Actual Rows": 0.0,
+          "Actual Loops": 64,
+          "Actual Startup Time": 0.0,
+          "Actual Total Time": 0.0,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 64,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 8.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.254,
+          "Actual Total Time": 0.257,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 233,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Result",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.0,
+          "Actual Total Time": 0.0,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "WindowAgg",
+          "Actual Rows": 8.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.253,
+          "Actual Total Time": 0.255,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 233,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "WindowAgg",
+          "Actual Rows": 8.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.248,
+          "Actual Total Time": 0.251,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 233,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Sort",
+          "Actual Rows": 8.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.247,
+          "Actual Total Time": 0.248,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 233,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 8.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.048,
+          "Actual Total Time": 0.244,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 233,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 8.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.03,
+          "Actual Total Time": 0.076,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 75,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 2.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.008,
+          "Actual Total Time": 0.025,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 17,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t11",
+          "Index Cond": "(kind = 'EdgeAnchor'::text)",
+          "Filter": "(((src = '40041441-80c0-4c6a-a7cc-696c6d0c00c3'::uuid) OR (undirected AND (dst = '40041441-80c0-4c6a-a7cc-696c6d0c00c3'::uuid))) AND ((arch_type = 'Follow'::text) OR EXISTS(SubPlan 14)))",
+          "Rows Removed by Filter": 42,
+          "Actual Rows": 2.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.003,
+          "Actual Total Time": 0.015,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 13,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Only Scan",
+          "Index Name": "graph_types_pkey",
+          "Relation Name": "graph_types",
+          "Alias": "_t20",
+          "Index Cond": "((type_name = _t11.arch_type) AND (ancestor = 'Follow'::text))",
+          "Actual Rows": 0.0,
+          "Actual Loops": 4,
+          "Actual Startup Time": 0.001,
+          "Actual Total Time": 0.001,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 4,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t12",
+          "Index Cond": "(kind = 'NodeAnchor'::text)",
+          "Filter": "(((arch_type = 'Profile'::text) OR EXISTS(SubPlan 6)) AND ((root_id = 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::text) OR EXISTS(SubPlan 8)))",
+          "Rows Removed by Filter": 0,
+          "Actual Rows": 4.0,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.002,
+          "Actual Total Time": 0.004,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 4,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t15",
+          "Index Cond": "(kind = 'EdgeAnchor'::text)",
+          "Filter": "((arch_type = 'Post'::text) OR EXISTS(SubPlan 9))",
+          "Rows Removed by Filter": 20,
+          "Actual Rows": 24.0,
+          "Actual Loops": 2,
+          "Actual Startup Time": 0.018,
+          "Actual Total Time": 0.023,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 58,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Only Scan",
+          "Index Name": "graph_types_pkey",
+          "Relation Name": "graph_types",
+          "Alias": "_t16",
+          "Index Cond": "((type_name = _t15.arch_type) AND (ancestor = 'Post'::text))",
+          "Actual Rows": 0.0,
+          "Actual Loops": 40,
+          "Actual Startup Time": 0.001,
+          "Actual Total Time": 0.001,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 40,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t17",
+          "Index Cond": "(kind = 'NodeAnchor'::text)",
+          "Filter": "(((arch_type = 'Tweet'::text) OR EXISTS(SubPlan 11)) AND ((root_id = 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::text) OR EXISTS(SubPlan 13)))",
+          "Rows Removed by Filter": 16,
+          "Actual Rows": 14.5,
+          "Actual Loops": 8,
+          "Actual Startup Time": 0.015,
+          "Actual Total Time": 0.02,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 158,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Only Scan",
+          "Index Name": "graph_types_pkey",
+          "Relation Name": "graph_types",
+          "Alias": "_t18",
+          "Index Cond": "((type_name = _t17.arch_type) AND (ancestor = 'Tweet'::text))",
+          "Actual Rows": 0.0,
+          "Actual Loops": 128,
+          "Actual Startup Time": 0.0,
+          "Actual Total Time": 0.0,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 128,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        }
+      ],
+      "context": [
+        [
+          "continuation_fb532e0c39fd4729955951fc45d16e27",
+          "ttgperf",
+          2442676,
+          "serializable",
+          "off",
+          "867:867:"
+        ]
+      ],
+      "settings": [
+        [
+          "client_encoding",
+          "UTF8"
+        ],
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "effective_cache_size",
+          "524288"
+        ],
+        [
+          "enable_bitmapscan",
+          "on"
+        ],
+        [
+          "enable_hashjoin",
+          "on"
+        ],
+        [
+          "enable_indexscan",
+          "on"
+        ],
+        [
+          "enable_mergejoin",
+          "on"
+        ],
+        [
+          "enable_nestloop",
+          "on"
+        ],
+        [
+          "enable_seqscan",
+          "on"
+        ],
+        [
+          "jit",
+          "on"
+        ],
+        [
+          "plan_cache_mode",
+          "auto"
+        ],
+        [
+          "random_page_cost",
+          "4"
+        ],
+        [
+          "row_security",
+          "on"
+        ],
+        [
+          "search_path",
+          "\"$user\", public"
+        ],
+        [
+          "server_version_num",
+          "180006"
+        ],
+        [
+          "standard_conforming_strings",
+          "on"
+        ],
+        [
+          "statement_timeout",
+          "0"
+        ],
+        [
+          "work_mem",
+          "4096"
+        ]
+      ]
+    },
+    {
+      "target_id": "fused-root",
+      "semantic_region": "root_profile",
+      "repetition": 0,
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1/littlex-ttg_plus/captures/fused-root-pid2442533.json",
+        "sha256": "13fb819a8ba29ba108402cd96256fc1f38637a14d719f2d3596eeb553f24aaa9"
+      },
+      "actual_selected_rows": 1,
+      "planning_ms": 0.742,
+      "execution_ms": 0.184,
+      "server_plan_plus_execution_ms": 0.926,
+      "root_node": "Limit",
+      "root_actual_rows": 1.0,
+      "root_buffers": {
+        "Shared Hit Blocks": 22,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      },
+      "executed_nodes": [
+        {
+          "Node Type": "Limit",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.082,
+          "Actual Total Time": 0.084,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan",
+          "buffers": {
+            "Shared Hit Blocks": 22,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Recursive Union",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.001,
+          "Actual Total Time": 0.029,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Result",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.0,
+          "Actual Total Time": 0.001,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 0.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.027,
+          "Actual Total Time": 0.027,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "WorkTable Scan",
+          "Alias": "_t0_1",
+          "Filter": "(depth < '2048'::bigint)",
+          "Rows Removed by Filter": 0,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.001,
+          "Actual Total Time": 0.001,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Subquery Scan",
+          "Alias": "_t8",
+          "Filter": "((_t8.arch_type = 'Root'::text) AND (_t8.arch_module = 'jaclang.runtime.archetype'::text))",
+          "Rows Removed by Filter": 1,
+          "Actual Rows": 0.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.025,
+          "Actual Total Time": 0.026,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/1/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "WindowAgg",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.025,
+          "Actual Total Time": 0.025,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.014,
+          "Actual Total Time": 0.019,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t9",
+          "Index Cond": "(kind = 'EdgeAnchor'::text)",
+          "Filter": "((src = _t0_1.origin_id) OR (undirected AND (dst = _t0_1.origin_id)))",
+          "Rows Removed by Filter": 43,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.008,
+          "Actual Total Time": 0.013,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 9,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t10",
+          "Index Cond": "(kind = 'NodeAnchor'::text)",
+          "Filter": "(((arch_type = 'Profile'::text) OR EXISTS(SubPlan 1)) AND ((root_id = 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::text) OR EXISTS(SubPlan 3)))",
+          "Rows Removed by Filter": 0,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.005,
+          "Actual Total Time": 0.005,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Sort",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.081,
+          "Actual Total Time": 0.082,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 22,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.049,
+          "Actual Total Time": 0.077,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 22,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "CTE Scan",
+          "Alias": "_t0",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.002,
+          "Actual Total Time": 0.029,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/1/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "WindowAgg",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.045,
+          "Actual Total Time": 0.046,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/1/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "WindowAgg",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.04,
+          "Actual Total Time": 0.041,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Sort",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.036,
+          "Actual Total Time": 0.037,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.024,
+          "Actual Total Time": 0.031,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t3",
+          "Index Cond": "(kind = 'EdgeAnchor'::text)",
+          "Filter": "((src = _t0.origin_id) OR (undirected AND (dst = _t0.origin_id)))",
+          "Rows Removed by Filter": 43,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.015,
+          "Actual Total Time": 0.022,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 9,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t4",
+          "Index Cond": "(kind = 'NodeAnchor'::text)",
+          "Filter": "(((arch_type = 'Profile'::text) OR EXISTS(SubPlan 5)) AND ((root_id = 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::text) OR EXISTS(SubPlan 7)))",
+          "Rows Removed by Filter": 0,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.008,
+          "Actual Total Time": 0.008,
+          "plan_pointer": "/explain/repetitions/0/full_plan/0/Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        }
+      ],
+      "context": [
+        [
+          "continuation_fb532e0c39fd4729955951fc45d16e27",
+          "ttgperf",
+          2442676,
+          "serializable",
+          "off",
+          "867:867:"
+        ]
+      ],
+      "settings": [
+        [
+          "client_encoding",
+          "UTF8"
+        ],
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "effective_cache_size",
+          "524288"
+        ],
+        [
+          "enable_bitmapscan",
+          "on"
+        ],
+        [
+          "enable_hashjoin",
+          "on"
+        ],
+        [
+          "enable_indexscan",
+          "on"
+        ],
+        [
+          "enable_mergejoin",
+          "on"
+        ],
+        [
+          "enable_nestloop",
+          "on"
+        ],
+        [
+          "enable_seqscan",
+          "on"
+        ],
+        [
+          "jit",
+          "on"
+        ],
+        [
+          "plan_cache_mode",
+          "auto"
+        ],
+        [
+          "random_page_cost",
+          "4"
+        ],
+        [
+          "row_security",
+          "on"
+        ],
+        [
+          "search_path",
+          "\"$user\", public"
+        ],
+        [
+          "server_version_num",
+          "180006"
+        ],
+        [
+          "standard_conforming_strings",
+          "on"
+        ],
+        [
+          "statement_timeout",
+          "0"
+        ],
+        [
+          "work_mem",
+          "4096"
+        ]
+      ]
+    },
+    {
+      "target_id": "fused-root",
+      "semantic_region": "root_profile",
+      "repetition": 1,
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-diagnostics-20261031/recapture-v1/littlex-ttg_plus/captures/fused-root-pid2442533.json",
+        "sha256": "13fb819a8ba29ba108402cd96256fc1f38637a14d719f2d3596eeb553f24aaa9"
+      },
+      "actual_selected_rows": 1,
+      "planning_ms": 0.617,
+      "execution_ms": 0.094,
+      "server_plan_plus_execution_ms": 0.711,
+      "root_node": "Limit",
+      "root_actual_rows": 1.0,
+      "root_buffers": {
+        "Shared Hit Blocks": 22,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      },
+      "executed_nodes": [
+        {
+          "Node Type": "Limit",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.047,
+          "Actual Total Time": 0.049,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan",
+          "buffers": {
+            "Shared Hit Blocks": 22,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Recursive Union",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.001,
+          "Actual Total Time": 0.02,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Result",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.0,
+          "Actual Total Time": 0.001,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 0.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.018,
+          "Actual Total Time": 0.018,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "WorkTable Scan",
+          "Alias": "_t0_1",
+          "Filter": "(depth < '2048'::bigint)",
+          "Rows Removed by Filter": 0,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.001,
+          "Actual Total Time": 0.001,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Subquery Scan",
+          "Alias": "_t8",
+          "Filter": "((_t8.arch_type = 'Root'::text) AND (_t8.arch_module = 'jaclang.runtime.archetype'::text))",
+          "Rows Removed by Filter": 1,
+          "Actual Rows": 0.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.017,
+          "Actual Total Time": 0.017,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/1/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "WindowAgg",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.016,
+          "Actual Total Time": 0.016,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.009,
+          "Actual Total Time": 0.015,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t9",
+          "Index Cond": "(kind = 'EdgeAnchor'::text)",
+          "Filter": "((src = _t0_1.origin_id) OR (undirected AND (dst = _t0_1.origin_id)))",
+          "Rows Removed by Filter": 43,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.006,
+          "Actual Total Time": 0.011,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 9,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t10",
+          "Index Cond": "(kind = 'NodeAnchor'::text)",
+          "Filter": "(((arch_type = 'Profile'::text) OR EXISTS(SubPlan 1)) AND ((root_id = 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::text) OR EXISTS(SubPlan 3)))",
+          "Rows Removed by Filter": 0,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.003,
+          "Actual Total Time": 0.003,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Sort",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.047,
+          "Actual Total Time": 0.048,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 22,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.027,
+          "Actual Total Time": 0.046,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 22,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "CTE Scan",
+          "Alias": "_t0",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.001,
+          "Actual Total Time": 0.019,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/1/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "WindowAgg",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.025,
+          "Actual Total Time": 0.026,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/1/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "WindowAgg",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.023,
+          "Actual Total Time": 0.024,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Sort",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.022,
+          "Actual Total Time": 0.022,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Nested Loop",
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.015,
+          "Actual Total Time": 0.02,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 11,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t3",
+          "Index Cond": "(kind = 'EdgeAnchor'::text)",
+          "Filter": "((src = _t0.origin_id) OR (undirected AND (dst = _t0.origin_id)))",
+          "Rows Removed by Filter": 43,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.009,
+          "Actual Total Time": 0.015,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+          "buffers": {
+            "Shared Hit Blocks": 9,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        },
+        {
+          "Node Type": "Index Scan",
+          "Index Name": "idx_anchors_kind_type",
+          "Relation Name": "anchors",
+          "Alias": "_t4",
+          "Index Cond": "(kind = 'NodeAnchor'::text)",
+          "Filter": "(((arch_type = 'Profile'::text) OR EXISTS(SubPlan 5)) AND ((root_id = 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::uuid) OR ((((props -> 'access'::text) ->> 'all'::text))::bigint > '-1'::bigint) OR ((((props -> 'access'::text) -> 'roots'::text) -> 'anchors'::text) ? 'a7bc0e9b-fad4-49a9-8a55-72bfaca3e3cb'::text) OR EXISTS(SubPlan 7)))",
+          "Rows Removed by Filter": 0,
+          "Actual Rows": 1.0,
+          "Actual Loops": 1,
+          "Actual Startup Time": 0.004,
+          "Actual Total Time": 0.004,
+          "plan_pointer": "/explain/repetitions/1/full_plan/0/Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+          "buffers": {
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        }
+      ],
+      "context": [
+        [
+          "continuation_fb532e0c39fd4729955951fc45d16e27",
+          "ttgperf",
+          2442676,
+          "serializable",
+          "off",
+          "867:867:"
+        ]
+      ],
+      "settings": [
+        [
+          "client_encoding",
+          "UTF8"
+        ],
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "effective_cache_size",
+          "524288"
+        ],
+        [
+          "enable_bitmapscan",
+          "on"
+        ],
+        [
+          "enable_hashjoin",
+          "on"
+        ],
+        [
+          "enable_indexscan",
+          "on"
+        ],
+        [
+          "enable_mergejoin",
+          "on"
+        ],
+        [
+          "enable_nestloop",
+          "on"
+        ],
+        [
+          "enable_seqscan",
+          "on"
+        ],
+        [
+          "jit",
+          "on"
+        ],
+        [
+          "plan_cache_mode",
+          "auto"
+        ],
+        [
+          "random_page_cost",
+          "4"
+        ],
+        [
+          "row_security",
+          "on"
+        ],
+        [
+          "search_path",
+          "\"$user\", public"
+        ],
+        [
+          "server_version_num",
+          "180006"
+        ],
+        [
+          "standard_conforming_strings",
+          "on"
+        ],
+        [
+          "statement_timeout",
+          "0"
+        ],
+        [
+          "work_mem",
+          "4096"
+        ]
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "region": "root_profile",
+      "repetition": 0,
+      "native_targets": [
+        "native-root"
+      ],
+      "fused_target": "fused-root",
+      "native_planning_ms": 0.315,
+      "fused_planning_ms": 0.742,
+      "native_execution_ms": 0.092,
+      "fused_execution_ms": 0.184,
+      "native_rows": 1.0,
+      "fused_rows": 1.0,
+      "native_root_shared_hits": 12,
+      "fused_root_shared_hits": 22,
+      "native_root_shared_reads": 0,
+      "fused_root_shared_reads": 0
+    },
+    {
+      "region": "collect",
+      "repetition": 0,
+      "native_targets": [
+        "native-post",
+        "native-follow"
+      ],
+      "fused_target": "fused-batch",
+      "native_planning_ms": 0.943,
+      "fused_planning_ms": 1.203,
+      "native_execution_ms": 0.278,
+      "fused_execution_ms": 0.535,
+      "native_rows": 12.0,
+      "fused_rows": 12.0,
+      "native_root_shared_hits": 55,
+      "fused_root_shared_hits": 320,
+      "native_root_shared_reads": 0,
+      "fused_root_shared_reads": 0
+    },
+    {
+      "region": "root_profile",
+      "repetition": 1,
+      "native_targets": [
+        "native-root"
+      ],
+      "fused_target": "fused-root",
+      "native_planning_ms": 0.244,
+      "fused_planning_ms": 0.617,
+      "native_execution_ms": 0.07,
+      "fused_execution_ms": 0.094,
+      "native_rows": 1.0,
+      "fused_rows": 1.0,
+      "native_root_shared_hits": 9,
+      "fused_root_shared_hits": 22,
+      "native_root_shared_reads": 0,
+      "fused_root_shared_reads": 0
+    },
+    {
+      "region": "collect",
+      "repetition": 1,
+      "native_targets": [
+        "native-post",
+        "native-follow"
+      ],
+      "fused_target": "fused-batch",
+      "native_planning_ms": 0.964,
+      "fused_planning_ms": 1.181,
+      "native_execution_ms": 0.18,
+      "fused_execution_ms": 0.423,
+      "native_rows": 12.0,
+      "fused_rows": 12.0,
+      "native_root_shared_hits": 55,
+      "fused_root_shared_hits": 320,
+      "native_root_shared_reads": 0,
+      "fused_root_shared_reads": 0
+    }
+  ],
+  "definitions": {
+    "times": "Server-reported EXPLAIN planning/execution milliseconds; first and repeated shown separately",
+    "buffers": "Root counters inclusive; only independent native statement roots are added",
+    "regime": "Same recapture connection/transaction, isolation captured; controlled unchanged graph; census/EXPLAIN warmed",
+    "limitation": "One matched diagnostic instance per configuration; does not decompose primary n3 wall time or measure server CPU"
+  }
+}

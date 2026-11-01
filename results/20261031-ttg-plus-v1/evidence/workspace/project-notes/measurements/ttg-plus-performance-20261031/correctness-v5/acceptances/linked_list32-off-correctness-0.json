@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-performance-20261031/correctness-v5/cases/linked_list32-off-correctness-0/artifacts.json",
+    "sha256": "3ec88df95fa1d559ca092a82b96282ca99b14e1f7bd4208a7d4d15c9e514f79e",
+    "files_checked": 35
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_native_semantic_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-performance-20261031/correctness-v5/cases/linked_list32-off-correctness-0/artifacts.json",
+      "sha256": "3ec88df95fa1d559ca092a82b96282ca99b14e1f7bd4208a7d4d15c9e514f79e",
+      "files_checked": 35
+    },
+    "proof_sha256": "09a61a6dfb5d98da547fd3af752dc2555b3e1b4c8eda417f52ea78188953bc99",
+    "actual_operations_checked": 6,
+    "final_logical_state_sha256": "93d1654ed648cc014a965b64c591592ae17e2849027b2418d297f9a339f6acc6",
+    "verifier_sources": {
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/native.py": "f44bf3905bd248df2f7c2fe10db3c926a847d170c963e889bffac94d51435228",
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/datasets/ttg/build.py": "a617dd95626a60babcf56dc10fba0ed3dc4a5c24ceca3033fea0b97401c129b9"
+    },
+    "full_response": {
+      "full_actions_sha256": "4f825a8d1632e37e656727439e3a751e8cc967d0837c7f8a8915eba196d3fed0",
+      "full_semantic_sha256": "1e0b8b4bca499365c96171a3538fc45d5bd246e705f1eacccaae85339579916f"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-performance-20261031/correctness-v5/cases/linked_list32-off-correctness-0/plus-proof.json",
+    "sha256": "09a61a6dfb5d98da547fd3af752dc2555b3e1b4c8eda417f52ea78188953bc99"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-performance-20261031/correctness-v5/cases/linked_list32-off-correctness-0/cleanup-target.json",
+    "sha256": "e575a8554caabb2f85d1e7fa65da66dad73d07715a30d3a4749b00a72a2cb748"
+  },
+  "database_state": {
+    "database": "continuation_2263d817ae15477ca3b1f291ed15b941",
+    "cluster_owner": "8a443ae3-da69-40f4-bb6c-08c45d79a7f8",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "48bbf4f60f79ff2603c2b9f92810bf754f1465f0fd1cd8bb4db2b995d4c7a5b6",
+    "actual_row_count": 64,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('Item','Next')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-plus-performance-20261031/runner-candidate-v5/sources.json",
+    "sha256": "47a3ea5c5850c79b23f75502a12fce96f434010290ba2495a7271526253c9a50"
+  }
+}
