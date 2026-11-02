@@ -1,12 +1,22 @@
-## TTG+ · interability SQL regions
+## Interability Dependency Graphs
 
-TTG+ · interability SQL regions
-Compile typed ability summaries; select, bind and validate at the existing entry hook.
-Concrete A→B→C guards compose into one SQL region while native abilities still run.
-LL1,000: interpreter work falls; median HTTP response drops from 30.84s to 0.726s.
-DB cost is separate: both optimized versions use 15 SQL calls, but the new query is slower.
-LL32, A→B→C and LittleX retain measurable process-readiness costs.
-Four fixed fixtures · three modes ·48 fresh workflows · all 12 measured cells n=3.
+Interability Dependency Graphs
+Research method first: focus on regions without sibling-dependent future access.
+1. New method: compose ability dependency graphs and identify SQL-compilable regions.
+2. Cost model: briefly explain how a prefetch decision estimates benefit and cost.
+3. Benchmark set: the full 30-app + 61-operation inventory, followed by the small validation
+results.
+4. Sibling dependency: what changes future access, what can be proved, and what remains
+outside the first kernel.
+
+## 1 · From local dependencies to an interability region
+
+1 · From local dependencies to an interability region
+Initial analysis target: future accesses do not depend on earlier siblings’ mutable state.
+Dependencies include values, predicates, visit targets and effects. Output-only state may stay
+native when it cannot affect later access.
+Implemented kernel: compile-time composition of known typed dispatch; runtime binds origin/actor and validates
+graph results. General runtime graph composition and arbitrary latest-dependency placement remain research work.
 
 ## A concrete typed A→B→C traversal
 
@@ -97,6 +107,149 @@ Execute the selected SQL, validate the complete result, then publish typed nativ
 Guard true: cache A→B and B→C; B entry reuses its published path.
 Guard false: cache A→B only; native B runs and does not visit C.
 Opaque helpers, writes, cancellation and unsupported guards form conservative boundaries.
+
+## 2 · Existing replaceable admission model
+
+2 · Existing replaceable admission model
+These mechanism comparisons fix Always/process admission.
+p × min(payload, opportunity) − resolve
+− (1−p) × payload × unused_weight − margin
+p=(demanded+1)/(opportunities+2); feature estimate → decision → observation interface.
+Payload is dispatch-to-ready wall; opportunity is launch-to-demand, distinct from observed SQL overlap.
+Fused feedback is training_observed=false. Branch frequency is collected rather than used directly in this
+score.
+Future admission must include cold process readiness when launching a new reader. Prepared-plan reuse
+remains deferred.
+
+## 3 · Benchmark set: 30 apps · 1–15
+
+3 · Benchmark set: 30 apps · 1–15
+Source-audit inventory, one registered reader per app; current timing subset is separate.
+approval_desk
+ExpenseBoard
+NO under effect summaries
+asset_care
+AssetBoard
+NO under effect summaries
+budget_ledger
+BudgetBoard
+NO under effect summaries
+build_release
+ReleaseBoard
+NO under effect summaries
+clinic_queue
+ClinicSchedule
+NO under effect summaries
+course_path
+LearningDashboard
+NO under effect summaries
+delivery_route
+RouteBoard
+NO under effect summaries
+event_seats
+EventCatalog
+NO under effect summaries
+garden_plan
+GardenBoard
+NO under effect summaries
+grant_review
+ReviewBoard
+NO under effect summaries
+help_queue
+DeskBoard
+NO under effect summaries
+hiring_pipeline
+HiringBoard
+NO under effect summaries
+incident_room
+IncidentBoard
+NO under effect summaries
+issue_desk
+ProjectBoard
+NO under effect summaries
+jacord
+load_channel
+NO under effect summaries
+Application
+Registered reader
+Future-access sibling result
+
+## 3 · Benchmark set: 30 apps · 16–30
+
+3 · Benchmark set: 30 apps · 16–30
+Source-audit inventory, one registered reader per app; current timing subset is separate.
+jdrive
+VisibleFolderTree
+NO under effect summaries
+knowledge_map
+KnowledgeBoard
+NO under effect summaries
+lab_samples
+LabBoard
+NO under effect summaries
+library_loans
+LibraryCatalog
+NO under effect summaries
+linked_list
+Traverse
+MAY: total-count cancellation
+littlex
+load_feed
+NO under effect summaries
+poll_assembly
+AssemblyBoard
+NO under effect summaries
+recipe_pantry
+PantryBoard
+NO under effect summaries
+return_counter
+ReturnBoard
+NO under effect summaries
+sales_pipeline
+SalesBoard
+NO under effect summaries
+stock_room
+Inventory
+NO under effect summaries
+tournament
+BracketBoard
+NO under effect summaries
+trip_board
+Itinerary
+NO under effect summaries
+utility_meter
+MeterBoard
+NO under effect summaries
+volunteer_shift
+VolunteerBoard
+NO under effect summaries
+Application
+Registered reader
+Future-access sibling result
+
+## The additional 61 paper-operation identities
+
+The additional 61 paper-operation identities
+Existing selected inventory:22 TPC-H +29 SNB +5 TPC-C +5 Wikipedia.
+These 91 source-audit identities are not91 measured performance cells. This round tests four fixtures /12 n3 cells.
+TPCH
+22
+Q1, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Q17, Q18, Q19, Q2, Q20, Q21, Q22, Q3, Q4, Q5,
+Q6, Q7, Q8, Q9
+SNB
+29
+IC1, IC10, IC11, IC12, IC13, IC14, IC2, IC3, IC4, IC5, IC6, IC7, IC8, IC9, IS1, IS2, IS3, IS4,
+IS5, IS6, IS7, U1, U2, U3, U4, U5, U6, U7, U8
+TPCC
+5
+Delivery, NewOrder, OrderStatus, Payment, StockLevel
+WIKIPEDIA
+5
+AddWatchList, GetPageAnonymous, GetPageAuthenticated, RemoveWatchList,
+UpdatePage
+Family
+Count
+Exact selected operation IDs
 
 ## Finite LinkedList: a disclosed source variant
 
@@ -372,180 +525,6 @@ Quantity / structure
 9282
 Interability
 
-## Existing replaceable admission model
-
-Existing replaceable admission model
-These mechanism comparisons fix Always/process admission.
-p × min(payload, opportunity) − resolve
-− (1−p) × payload × unused_weight − margin
-p=(demanded+1)/(opportunities+2); feature estimate → decision → observation interface.
-Payload is dispatch-to-ready wall; opportunity is launch-to-demand, distinct from observed SQL overlap.
-Fused feedback is training_observed=false. Branch frequency is collected rather than used directly in this
-score.
-Future admission must include cold process readiness when launching a new reader. Prepared-plan reuse
-remains deferred.
-
-## Complete 30-app source inventory · 1–15
-
-Complete 30-app source inventory · 1–15
-Source-audit inventory, one registered reader per app; current timing subset is separate.
-approval_desk
-ExpenseBoard
-NO under effect summaries
-asset_care
-AssetBoard
-NO under effect summaries
-budget_ledger
-BudgetBoard
-NO under effect summaries
-build_release
-ReleaseBoard
-NO under effect summaries
-clinic_queue
-ClinicSchedule
-NO under effect summaries
-course_path
-LearningDashboard
-NO under effect summaries
-delivery_route
-RouteBoard
-NO under effect summaries
-event_seats
-EventCatalog
-NO under effect summaries
-garden_plan
-GardenBoard
-NO under effect summaries
-grant_review
-ReviewBoard
-NO under effect summaries
-help_queue
-DeskBoard
-NO under effect summaries
-hiring_pipeline
-HiringBoard
-NO under effect summaries
-incident_room
-IncidentBoard
-NO under effect summaries
-issue_desk
-ProjectBoard
-NO under effect summaries
-jacord
-load_channel
-NO under effect summaries
-Application
-Registered reader
-Future-access sibling result
-
-## Complete 30-app source inventory · 16–30
-
-Complete 30-app source inventory · 16–30
-Source-audit inventory, one registered reader per app; current timing subset is separate.
-jdrive
-VisibleFolderTree
-NO under effect summaries
-knowledge_map
-KnowledgeBoard
-NO under effect summaries
-lab_samples
-LabBoard
-NO under effect summaries
-library_loans
-LibraryCatalog
-NO under effect summaries
-linked_list
-Traverse
-MAY: total-count cancellation
-littlex
-load_feed
-NO under effect summaries
-poll_assembly
-AssemblyBoard
-NO under effect summaries
-recipe_pantry
-PantryBoard
-NO under effect summaries
-return_counter
-ReturnBoard
-NO under effect summaries
-sales_pipeline
-SalesBoard
-NO under effect summaries
-stock_room
-Inventory
-NO under effect summaries
-tournament
-BracketBoard
-NO under effect summaries
-trip_board
-Itinerary
-NO under effect summaries
-utility_meter
-MeterBoard
-NO under effect summaries
-volunteer_shift
-VolunteerBoard
-NO under effect summaries
-Application
-Registered reader
-Future-access sibling result
-
-## The additional 61 paper-operation identities
-
-The additional 61 paper-operation identities
-Existing selected inventory:22 TPC-H +29 SNB +5 TPC-C +5 Wikipedia.
-These 91 source-audit identities are not91 measured performance cells. This round tests four fixtures /12 n3 cells.
-TPCH
-22
-Q1, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Q17, Q18, Q19, Q2, Q20, Q21, Q22, Q3, Q4, Q5,
-Q6, Q7, Q8, Q9
-SNB
-29
-IC1, IC10, IC11, IC12, IC13, IC14, IC2, IC3, IC4, IC5, IC6, IC7, IC8, IC9, IS1, IS2, IS3, IS4,
-IS5, IS6, IS7, U1, U2, U3, U4, U5, U6, U7, U8
-TPCC
-5
-Delivery, NewOrder, OrderStatus, Payment, StockLevel
-WIKIPEDIA
-5
-AddWatchList, GetPageAnonymous, GetPageAuthenticated, RemoveWatchList,
-UpdatePage
-Family
-Count
-Exact selected operation IDs
-
-## Sibling dependence means dependence of future access
-
-Sibling dependence means dependence of future access
-Shared output does not automatically imply interference between sibling visits.
-self.total += here.value; visit fixed Next
-Output-only reduction if total is never read to choose
-access
-if self.visited>=limit { disengage; }
-MAY dependence: an earlier sibling can cancel later
-queued work; count is total, not depth
-seen guard before visit /graph read
-MAY dependence: earlier visits can suppress a later access
-Opaque external helper /storage side effect
-Requires an effect contract; unknown is not a theorem of
-impossibility
-Witness
-Static interpretation
-
-## What the 91-source audit establishes
-
-What the 91-source audit establishes
-Closed-world ordinary-field/effect reasoning; not an implemented universal analyzer.
-Registered readers:29 NO under explicit summaries; original cutoff-bearing LinkedList exposes MAY
-cancellation.
-Additional helpers/business walkers have their own seen guards, writes, queue and phase boundaries.
-TPC-H whole-operation view:16 NO,5 phase MAY, and Q20 conditional materialization dependence.
-Within a fixed TPC-H sibling stage, immutable join maps differ from feedback; phase/reduction
-dependencies can be relationally lowerable.
-Current unsupported syntax is separate from semantic dependence and from whether a static summary
-can prove it.
-
 ## Next improvements and larger-stage follow-up
 
 Next improvements and larger-stage follow-up
@@ -569,4 +548,64 @@ Compact native counters retain abstract work and startup observations without qu
 serialization.
 Editable renderer, figure inputs, source/analysis manifests and completed/excluded inventory accompany
 the PDF.
+
+## 4 · Sibling dependence of future access
+
+4 · Sibling dependence of future access
+Shared output does not automatically imply interference between sibling visits.
+self.total += here.value; visit fixed Next
+Output-only reduction if total is never read to choose
+access
+if self.visited>=limit { disengage; }
+MAY dependence: an earlier sibling can cancel later
+queued work; count is total, not depth
+seen guard before visit /graph read
+MAY dependence: earlier visits can suppress a later access
+Opaque external helper /storage side effect
+Requires an effect contract; unknown is not a theorem of
+impossibility
+Witness
+Static interpretation
+
+## A sibling write can change the later access
+
+A sibling write can change the later access
+Conceptual A→{B,C} example, with B scheduled before C.
+The write in B is a dependency of C’s future visit. Keep this boundary until the required state
+transition and ordering can be represented soundly.
+
+## What the 91-source audit establishes
+
+What the 91-source audit establishes
+Closed-world ordinary-field/effect reasoning; not an implemented universal analyzer.
+Registered readers:29 NO under explicit summaries; original cutoff-bearing LinkedList exposes MAY
+cancellation.
+Additional helpers/business walkers have their own seen guards, writes, queue and phase boundaries.
+TPC-H whole-operation view:16 NO,5 phase MAY, and Q20 conditional materialization dependence.
+Within a fixed TPC-H sibling stage, immutable join maps differ from feedback; phase/reduction
+dependencies can be relationally lowerable.
+Current unsupported syntax is separate from semantic dependence and from whether a static summary
+can prove it.
+
+## Start with sibling-independent future access
+
+Start with sibling-independent future access
+First analyze and compose regions with proved sibling-independent future access.
+The small chain and guarded A→B→C validate the first typed kernel. The wider source audit guides extensions; it is not evidence of
+implementation coverage for all 91 cases.
+Proved NO sibling feedback
+Compose supported regions; keep original native queue/output
+semantics.
+MAY: shared state reaches a visit, guard or
+cancellation
+Retain an explicit boundary. Later SQL lowering needs the correct
+state and ordering semantics.
+Unknown helper, descriptor or side effect
+Require a bounded effect summary or fall back; unknown does not
+mean impossible.
+Output-only reduction
+Allow it only after proving it cannot feed future accesses. Total
+visited is not recursion depth.
+Analysis outcome
+Initial treatment
 
