@@ -1,0 +1,29 @@
+{
+  "kind": "bounded_preparation_forecast_not_release",
+  "free_bytes": 1284210688,
+  "current9282": {
+    "clean": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-next-performance/runtime-clean-9282-v1-manifest/manifest.json",
+      "sha256": "5fd1d912479083dde61ae2f7905c78eb7299aa05e4022bbae31cda95b92c1715"
+    },
+    "direct": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-next-performance/runtime-direct-9282-v1-overlay/manifest.json",
+      "sha256": "2799a9f6adc5ffed3ebe6548ac7bb4cc5567840693150346535f96b0e4ddf3ed"
+    }
+  },
+  "existing_roots_present": true,
+  "forecast_bytes": {
+    "snapshot_delta_reserve": 33554432,
+    "owned_cluster_WAL32_64_reserve": 167772160,
+    "compiler_incremental_reserve": 134217728,
+    "correctness_evidence_reserve": 50331648,
+    "transient_case_reserve": 67108864
+  },
+  "proposed_floors": {
+    "startup": 805306368,
+    "between_cases": 671088640,
+    "owned_stop": 536870912
+  },
+  "policy": "No arbitrary3GiB gate; final actual free and12+guard correctness bytes determine48 release. One owned cluster/freshDB sequentially, WAL32/64. Success DROP only after accepted seals/independent semantic+physical oracle and active0; failures retained. No deletions/scans/archives by this worker.",
+  "snapshot": "Reuse current9282; future clean+DIRECT immutable hardlinks with temp+os.replace only. Never hardlink live core or overwrite linked inode. No snapshot copy now; P6 retains first native window."
+}

@@ -1,0 +1,177 @@
+{
+  "scope": "Source-only audit of all 5 TPC-C and 5 Wikipedia selected operation identities. No DB/compiler/tests or benchmark edits. No native acceptance or performance claim.",
+  "definition": "Sibling access interference means one queued activation can modify state/graph/control that changes another queued activation future DB access or cancellation. Ordinary loop/transaction dependence is reported separately. Output-only shared state still retains native output semantics.",
+  "assumptions": [
+    "Single walker/request analysis with standard Jac plain field and graph-operation semantics; external concurrent transactions retain database isolation rules.",
+    "Known local helper bodies may be summarized. This is a source-derived feasibility assessment, not an implemented or machine-verified static analyzer."
+  ],
+  "sources": [
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-continuation-benchmarks/tpcc/server.jac",
+      "sha256": "3a9cd12ae25f068c88bb6c5d186f4ea4acce697409c49df7de6bc46e866836f7",
+      "matches_freeze_v2": true
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-continuation-benchmarks/wikipedia/server.jac",
+      "sha256": "6b77d21888023c82f95198a7cb814be897188491d8781c9f4eb3b7cfe02a2172",
+      "matches_freeze_v2": true
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-continuation-benchmarks/wikipedia/fixture_loader.py",
+      "sha256": "1404c1cd7a9f3d9344c0691c2a1c5305be0bf982d995390b6841362925752d95",
+      "matches_freeze_v2": true
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-continuation-benchmarks/supported_testcases.json",
+      "sha256": "be6952d08d323d5a21b42de8028a200918b897399f142aeb2fa422ff8c8348ec",
+      "matches_freeze_v2": true
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "tpcc/NewOrder",
+      "walker": "new_order",
+      "source": "tpcc/server.jac",
+      "lines": [
+        136,
+        208
+      ],
+      "sibling_class": "no_visit_sibling_dispatch",
+      "dependencies": "Single Root ability. Repeated item/stock input IDs can alias the same Stock: quantity read-modify-write and replenishment branch form loop-carried dependence; exceptions must roll back preceding writes. District order-ID update precedes Order insertion.",
+      "static_requirement": "The absence of visit dispatch is syntactic. A may-alias storage-effect summary detects the sequential Stock effect; no unconditional distinct-stock proof is justified from arbitrary input lines.",
+      "simplification": "No benchmark edit is required merely to identify this dependency category.",
+      "SQL_boundary": "Read-only target discovery may be isolated from transactional mutations; do not delete validation/replenishment or replace rollback with validate-first and call it equivalent."
+    },
+    {
+      "case_id": "tpcc/Payment",
+      "walker": "payment",
+      "source": "tpcc/server.jac",
+      "lines": [
+        214,
+        280
+      ],
+      "sibling_class": "no_visit_sibling_dispatch",
+      "dependencies": "Single Root ability; input branch selects ID or name/median customer; balance/credit/history updates and timestamp call have visible effects.",
+      "static_requirement": "Control/data dependencies are explicit; transaction effects require memory/storage summaries.",
+      "simplification": "No benchmark edit is required merely to identify this dependency category.",
+      "SQL_boundary": "Separate customer lookup from mutations; business validation and credit semantics stay."
+    },
+    {
+      "case_id": "tpcc/OrderStatus",
+      "walker": "order_status",
+      "source": "tpcc/server.jac",
+      "lines": [
+        366,
+        391
+      ],
+      "sibling_class": "no_visit_sibling_dispatch",
+      "dependencies": "Single Root ability; customer selection and sorted order selection determine subsequent OrderLine read. No persisted mutations.",
+      "static_requirement": "Read-comprehension, sorting/selection, and may-raise summaries expose dependent relational reads.",
+      "simplification": "No benchmark edit is required merely to identify this dependency category.",
+      "SQL_boundary": "A relational selection/join region is possible in principle; no OSP sibling proof or implemented SQL support is claimed."
+    },
+    {
+      "case_id": "tpcc/Delivery",
+      "walker": "delivery",
+      "source": "tpcc/server.jac",
+      "lines": [
+        392,
+        418
+      ],
+      "sibling_class": "no_visit_sibling_dispatch",
+      "dependencies": "Single Root ability loops over districts; queries minimum pending Order, changes new_order/carrier/lines/customer totals. Under arbitrary shared topology an earlier write may affect another district iteration.",
+      "static_requirement": "Need may-alias graph/storage effects or declared district ownership/uniqueness invariant for loop independence.",
+      "simplification": "No benchmark edit is required merely to identify this dependency category.",
+      "SQL_boundary": "Preserve oldest-order selection, mutation order, owner checks and rollback; no guard removal recommended."
+    },
+    {
+      "case_id": "tpcc/StockLevel",
+      "walker": "stock_level",
+      "source": "tpcc/server.jac",
+      "lines": [
+        419,
+        436
+      ],
+      "sibling_class": "no_visit_sibling_dispatch",
+      "dependencies": "Single Root ability. Recent-order line scan builds item_ids used in a later stock membership filter. Output deduplication/reduction, no persistence writes.",
+      "static_requirement": "The data dependence is visible through the dictionary membership summary.",
+      "simplification": "No benchmark edit is required merely to identify this dependency category.",
+      "SQL_boundary": "Relational semijoin/distinct lowering can represent this phase dependence; not a sibling-dispatch issue."
+    },
+    {
+      "case_id": "wikipedia/GetPageAnonymous",
+      "walker": "GetPageAnonymous",
+      "source": "wikipedia/server.jac",
+      "lines": [
+        48,
+        81
+      ],
+      "sibling_class": "provable_no_sibling_access_interference",
+      "dependencies": "Every visit schedules exactly one selected object: pages[0], revisions[0], texts[0]. page_id/latest_id/text_id are parent-to-child query parameters. Article and user_text are output state.",
+      "static_requirement": "Use visit singleton cardinality and plain field/read summaries; preserve error branches and ordered first selection.",
+      "simplification": "No benchmark edit is required merely to identify this dependency category.",
+      "SQL_boundary": "No simplification required. Eligible parameterized lookup chains can be considered for lowering; result/error semantics remain native unless supported."
+    },
+    {
+      "case_id": "wikipedia/GetPageAuthenticated",
+      "walker": "GetPageAuthenticated",
+      "source": "wikipedia/server.jac",
+      "lines": [
+        83,
+        123
+      ],
+      "sibling_class": "provable_no_sibling_access_interference",
+      "dependencies": "Same singleton Page/Revision/Text chain; user/group/block checks precede visits, outputs use selected user text.",
+      "static_requirement": "Same singleton and read summary; user validation/exception is a control boundary, not sibling mutation.",
+      "simplification": "No benchmark edit is required merely to identify this dependency category.",
+      "SQL_boundary": "No simplification required; retain user validation, group and block behavior."
+    },
+    {
+      "case_id": "wikipedia/AddWatchList",
+      "walker": "AddWatchList",
+      "source": "wikipedia/server.jac",
+      "lines": [
+        124,
+        139
+      ],
+      "sibling_class": "no_visit_sibling_dispatch",
+      "dependencies": "Single Root ability loops main/talk namespaces; duplicate checks, insertion, and user timestamp updates; duplicate second operation may roll back first.",
+      "static_requirement": "Loop/effect/exception summaries expose transaction dependencies; namespaces are explicitly distinct but this does not remove rollback semantics.",
+      "simplification": "No benchmark edit is required merely to identify this dependency category.",
+      "SQL_boundary": "Do not delete duplicate guards or change partial-write rollback test."
+    },
+    {
+      "case_id": "wikipedia/RemoveWatchList",
+      "walker": "RemoveWatchList",
+      "source": "wikipedia/server.jac",
+      "lines": [
+        140,
+        152
+      ],
+      "sibling_class": "no_visit_sibling_dispatch",
+      "dependencies": "Single Root ability; scoped Watch lookup/destruction and user timestamp. remove_node calls Jac.destroy.",
+      "static_requirement": "Interprocedural summary for the available remove_node helper marks storage deletion; _now is an external time input.",
+      "simplification": "No benchmark edit is required merely to identify this dependency category.",
+      "SQL_boundary": "Read target regions may be separate; deletion/timestamp are business effects."
+    },
+    {
+      "case_id": "wikipedia/UpdatePage",
+      "walker": "UpdatePage",
+      "source": "wikipedia/server.jac",
+      "lines": [
+        153,
+        195
+      ],
+      "sibling_class": "no_visit_sibling_dispatch",
+      "dependencies": "Single Root ability; ID maxima, inserts, revision/page links, latest revision updates, watcher reads and notification updates, log/user writes.",
+      "static_requirement": "Ordinary value and storage dependencies are explicit; need transactional ordering and ID allocation assumptions, not a sibling queue model.",
+      "simplification": "No benchmark edit is required merely to identify this dependency category.",
+      "SQL_boundary": "Full update lowering requires transaction/effect semantics. No semantics-preserving deletion of these operations proposed."
+    }
+  ],
+  "counts": {
+    "provable_no_sibling_access_interference": 2,
+    "no_visit_sibling_dispatch": 8
+  },
+  "universal_impossibility_claim": false
+}

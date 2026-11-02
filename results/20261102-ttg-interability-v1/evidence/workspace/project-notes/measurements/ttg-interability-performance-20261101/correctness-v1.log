@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "/home/baichuan/jaseci/reproduction/ttg-interability-performance/ia_runner.py", line 133, in <module>
+    run(args.stage,args.plan,args.output,args.cluster)
+  File "/home/baichuan/jaseci/reproduction/ttg-interability-performance/ia_runner.py", line 93, in run
+    with OwnedPostgres(cluster,admin,output,source_guard,
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-interability-performance/ia_postgres.py", line 22, in __init__
+    self.port=free_port();self.owner=str(uuid.uuid4());self.started=False
+              ^^^^^^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/owned_postgres.py", line 19, in free_port
+    with socket.socket() as sock:
+         ^^^^^^^^^^^^^^^
+  File "/home/baichuan/.pyenv/versions/3.12.11/lib/python3.12/socket.py", line 233, in __init__
+    _socket.socket.__init__(self, family, type, proto, fileno)
+PermissionError: [Errno 1] Operation not permitted

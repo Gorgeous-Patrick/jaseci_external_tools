@@ -1,0 +1,109 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/correctness-v2/cases/guard_chain_false-interability-guard_correctness-0/artifacts.json",
+    "sha256": "ddd385e76662fc14d9cceec86a595e597d9892a214e1118f440e5a8901378502",
+    "files_checked": 40
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_owned_finite_fixture_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/correctness-v2/cases/guard_chain_false-interability-guard_correctness-0/artifacts.json",
+      "sha256": "ddd385e76662fc14d9cceec86a595e597d9892a214e1118f440e5a8901378502",
+      "files_checked": 40
+    },
+    "proof_sha256": "403b7b240ef38dfac2a5818cf63d0bae89487b02515f0a5e4c6a2435b6e3322b",
+    "actual_operations_checked": 1,
+    "source_oracle": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-interability-performance/ia_fixtures.py",
+      "sha256": "70d4b1adbebf115ed02af35f7eaf8f97f6a6a7bd20ee576ecedaa2a8cf6de676"
+    },
+    "graph_state": {
+      "nodes": {
+        "item:0": {
+          "id": "item:0",
+          "type": "A",
+          "fields": {
+            "value": 10
+          }
+        },
+        "item:1": {
+          "id": "item:1",
+          "type": "B",
+          "fields": {
+            "value": 20,
+            "active": false
+          }
+        },
+        "item:2": {
+          "id": "item:2",
+          "type": "C",
+          "fields": {
+            "value": 30
+          }
+        }
+      },
+      "edges": [
+        {
+          "source": "item:0",
+          "type": "AB",
+          "target": "item:1"
+        },
+        {
+          "source": "item:1",
+          "type": "BC",
+          "target": "item:2"
+        }
+      ]
+    },
+    "shape_proof": {
+      "passed": true,
+      "acyclic": true,
+      "successors": {
+        "item:0": [
+          "item:1"
+        ],
+        "item:1": [
+          "item:2"
+        ],
+        "item:2": []
+      },
+      "guard_type": "bool",
+      "guard": false,
+      "expected_entered": [
+        "A",
+        "B"
+      ]
+    },
+    "native_reports": [
+      10,
+      20
+    ],
+    "native_visited": 2,
+    "full_response": {
+      "full_actions_sha256": "aaa7d2b5f7ca05fefac732c9d34051e89dabe17abba476529665cc5d1ec809c8",
+      "full_semantic_sha256": "8186d9b888466244c11d9935ec113653456a68dd97c707899e385b33b3bc10a2"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/correctness-v2/cases/guard_chain_false-interability-guard_correctness-0/plus-proof.json",
+    "sha256": "403b7b240ef38dfac2a5818cf63d0bae89487b02515f0a5e4c6a2435b6e3322b"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/correctness-v2/cases/guard_chain_false-interability-guard_correctness-0/cleanup-target.json",
+    "sha256": "829c4d618b6689866f93ace9442190bcb87a3a9da64528beba5ae45a42b6b6d6"
+  },
+  "database_state": {
+    "database": "continuation_f9ff9661aefe49f49ece5b2325d95ff6",
+    "cluster_owner": "97d88a25-c5f6-4b38-a123-c8172ac3cb05",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "bdc7b5bad7b5adad64fca4075a5784c8e6cc8290518da297f01983090d12e02d",
+    "actual_row_count": 6,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('A','B','C','AB','BC')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/correctness-plan-v1/sources.json",
+    "sha256": "01b767482fd928f4e81b5d4a10be7da16bbca5f7c27b5e4f5a987f5e1a654d20"
+  }
+}

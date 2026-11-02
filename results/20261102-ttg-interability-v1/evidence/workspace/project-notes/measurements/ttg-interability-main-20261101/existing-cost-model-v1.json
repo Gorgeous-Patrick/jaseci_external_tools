@@ -1,0 +1,39 @@
+{
+  "baseline": "9282e246d708aff69e21cb52b9d0cc4893fc5f0f",
+  "kind": "source_based_existing_cost_model_description",
+  "source_refs": [
+    {
+      "path": "/home/baichuan/jaseci/jac-ttg/jac/jaclang/runtime/ttg_prefetch_model.jac",
+      "sha256": "5e9bfe676b7c9cda4ff7aad8cd87ac81f7fca4f64af71375655ce1f74dbc70c6"
+    },
+    {
+      "path": "/home/baichuan/jaseci/jac-ttg/jac/jaclang/runtime/ttg_prefetch_profile.jac",
+      "sha256": "6c5897aaf2d05281a79ad348e3c42470a3f726db80f63d211319054b9ffa7190"
+    },
+    {
+      "path": "/home/baichuan/jaseci/jac-ttg/jac/jaclang/runtime/ttg_dependency_prefetch.jac",
+      "sha256": "a8bc9d51b82d7b378b618cec9e47e0b1b0201ff2b0bf7c9acc2aef4ffa6e9e7f"
+    }
+  ],
+  "interface": [
+    "FeatureProvider.estimate",
+    "PrefetchDecisionModel.decide",
+    "observe feedback"
+  ],
+  "formula": "score_ms = p * min(payload_ms, overlap_ms) - resolution_ms_if_resolve_phase - (1-p) * payload_ms * unused_weight - margin_ms; admit iff score_ms > 0",
+  "probability": "(demanded + 1) / (opportunities + 2)",
+  "profile": "Site-specific arithmetic means and minimum of timing sample counts; per-ability visit frequency is collected but not directly used in ExpectedBenefit score",
+  "defaults": {
+    "min_samples": 3,
+    "margin_ms": 0,
+    "unused_weight": 1,
+    "cold_start_prefetch": true,
+    "probe_every": 20
+  },
+  "qualification": [
+    "payload_ms is dispatch-to-observed-ready wall time, not pure PG execution time",
+    "overlap_ms is a launch/candidate-to-demand opportunity window, not measured foreground/background SQL interval overlap",
+    "Current fused SQL feedback is marked training_observed=false; the fused mechanism path uses Always admission. Do not claim the new method is already optimized by learned cost estimates.",
+    "This round fixes admission to isolate mechanism comparison; no model implementation change or adaptive-performance claim."
+  ]
+}

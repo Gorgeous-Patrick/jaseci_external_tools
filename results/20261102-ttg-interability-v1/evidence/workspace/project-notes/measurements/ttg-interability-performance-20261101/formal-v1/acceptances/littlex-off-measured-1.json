@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/littlex-off-measured-1/artifacts.json",
+    "sha256": "0315fca95bc2d23ff8522847397f682f73557aff4947d910aa97b8a2b0ad1f72",
+    "files_checked": 38
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_native_semantic_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/littlex-off-measured-1/artifacts.json",
+      "sha256": "0315fca95bc2d23ff8522847397f682f73557aff4947d910aa97b8a2b0ad1f72",
+      "files_checked": 38
+    },
+    "proof_sha256": "07fafb8ab22e7abad858564c0f6b709237e4a8b7929d81b9552ceff5b6a9dea7",
+    "actual_operations_checked": 15,
+    "final_logical_state_sha256": "cb8f3e913ad1875c23a4cf8abaa27ed4e409d5734acfc28b754e7abd59282056",
+    "verifier_sources": {
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/native.py": "f44bf3905bd248df2f7c2fe10db3c926a847d170c963e889bffac94d51435228",
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/datasets/ttg/build.py": "a617dd95626a60babcf56dc10fba0ed3dc4a5c24ceca3033fea0b97401c129b9"
+    },
+    "full_response": {
+      "full_actions_sha256": "6631c577db0bee4381fd1461d52b91cda06af4e1a97d82d61cf7bf723c6186c4",
+      "full_semantic_sha256": "34bd515ceccd842494e1795eb9e9410f4c72e4355fc02b51b28ce865bc136dc9"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/littlex-off-measured-1/plus-proof.json",
+    "sha256": "07fafb8ab22e7abad858564c0f6b709237e4a8b7929d81b9552ceff5b6a9dea7"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/littlex-off-measured-1/cleanup-target.json",
+    "sha256": "9a4f3745c328b40a65e29ceead3efd6c6f6873effb12c044d42fe2e45b5ea96d"
+  },
+  "database_state": {
+    "database": "continuation_b7acc24dc12f4a9bb968b44a67af7143",
+    "cluster_owner": "53cb0161-8a1a-43aa-bac2-8170e3f10051",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "dfebea3c612f73eb4fc040d6058577a5063a4e82e44a3edc02d096c11498294f",
+    "actual_row_count": 77,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('Profile','Tweet','Follow','Post')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/correctness-plan-v1/sources.json",
+    "sha256": "01b767482fd928f4e81b5d4a10be7da16bbca5f7c27b5e4f5a987f5e1a654d20"
+  }
+}

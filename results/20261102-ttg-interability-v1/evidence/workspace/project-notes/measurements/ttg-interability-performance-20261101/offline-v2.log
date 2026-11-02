@@ -1,0 +1,25 @@
+E..E....
+======================================================================
+ERROR: test_actual_post_stats_boundary_all_modes (__main__.Preparation.test_actual_post_stats_boundary_all_modes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/baichuan/jaseci/reproduction/ttg-interability-performance/test_offline.py", line 84, in test_actual_post_stats_boundary_all_modes
+    trial.run(case,mode,directory,pg,overlay,overlay)
+  File "/home/baichuan/jaseci/reproduction/ttg-interability-performance/ia_trial.py", line 82, in run
+    runtime,case['phase'],seed=42,scale=scale if app in self.native.SOURCES else 'smoke',steady_reads=3)
+                                                        ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'types.SimpleNamespace' object has no attribute 'SOURCES'
+
+======================================================================
+ERROR: test_observer_reason_counts_only (__main__.Preparation.test_observer_reason_counts_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/baichuan/jaseci/reproduction/ttg-interability-performance/test_offline.py", line 38, in test_observer_reason_counts_only
+    out=project_state(state);self.assertEqual(out['fusion']['region_fallback_reasons'],{'fanout':2})
+                                              ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'region_fallback_reasons'
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.044s
+
+FAILED (errors=2)

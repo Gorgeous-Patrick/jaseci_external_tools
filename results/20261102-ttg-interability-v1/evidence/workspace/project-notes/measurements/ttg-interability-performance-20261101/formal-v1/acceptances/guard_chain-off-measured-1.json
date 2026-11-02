@@ -1,0 +1,111 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-off-measured-1/artifacts.json",
+    "sha256": "cb1b22e23259d725f02b336d481d398abb1b4530b2a76d3487beed481bb99b26",
+    "files_checked": 38
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_owned_finite_fixture_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-off-measured-1/artifacts.json",
+      "sha256": "cb1b22e23259d725f02b336d481d398abb1b4530b2a76d3487beed481bb99b26",
+      "files_checked": 38
+    },
+    "proof_sha256": "00a96d402dbbd8568a9031e41f17882e7dbb7c3d2894ffcf010223e3a45921f6",
+    "actual_operations_checked": 1,
+    "source_oracle": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-interability-performance/ia_fixtures.py",
+      "sha256": "70d4b1adbebf115ed02af35f7eaf8f97f6a6a7bd20ee576ecedaa2a8cf6de676"
+    },
+    "graph_state": {
+      "nodes": {
+        "item:0": {
+          "id": "item:0",
+          "type": "A",
+          "fields": {
+            "value": 10
+          }
+        },
+        "item:1": {
+          "id": "item:1",
+          "type": "B",
+          "fields": {
+            "value": 20,
+            "active": true
+          }
+        },
+        "item:2": {
+          "id": "item:2",
+          "type": "C",
+          "fields": {
+            "value": 30
+          }
+        }
+      },
+      "edges": [
+        {
+          "source": "item:0",
+          "type": "AB",
+          "target": "item:1"
+        },
+        {
+          "source": "item:1",
+          "type": "BC",
+          "target": "item:2"
+        }
+      ]
+    },
+    "shape_proof": {
+      "passed": true,
+      "acyclic": true,
+      "successors": {
+        "item:0": [
+          "item:1"
+        ],
+        "item:1": [
+          "item:2"
+        ],
+        "item:2": []
+      },
+      "guard_type": "bool",
+      "guard": true,
+      "expected_entered": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    "native_reports": [
+      10,
+      20,
+      30
+    ],
+    "native_visited": 3,
+    "full_response": {
+      "full_actions_sha256": "aaa7d2b5f7ca05fefac732c9d34051e89dabe17abba476529665cc5d1ec809c8",
+      "full_semantic_sha256": "c15e00780f37c6e7e36e78f3e9bd88161a0530dda7f5da349579d0937dd0beb1"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-off-measured-1/plus-proof.json",
+    "sha256": "00a96d402dbbd8568a9031e41f17882e7dbb7c3d2894ffcf010223e3a45921f6"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-off-measured-1/cleanup-target.json",
+    "sha256": "16f9e247c7e357608bd8af3496f09c97d07e14a4eb871a1fbf862f561b040f6d"
+  },
+  "database_state": {
+    "database": "continuation_2c489e866ee3430c8ad1d38688030914",
+    "cluster_owner": "53cb0161-8a1a-43aa-bac2-8170e3f10051",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "e0c309cbd520e2c9c9a16261d4b904990eb71f230c987bd4d50fe855a86a8a81",
+    "actual_row_count": 6,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('A','B','C','AB','BC')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/correctness-plan-v1/sources.json",
+    "sha256": "01b767482fd928f4e81b5d4a10be7da16bbca5f7c27b5e4f5a987f5e1a654d20"
+  }
+}

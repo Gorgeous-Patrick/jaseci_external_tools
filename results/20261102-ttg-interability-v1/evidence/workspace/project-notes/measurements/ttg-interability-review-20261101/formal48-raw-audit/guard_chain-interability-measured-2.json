@@ -1,0 +1,1469 @@
+{
+  "case_id": "guard_chain",
+  "config_id": "interability",
+  "phase": "measured",
+  "repeat": 2,
+  "trial_id": "guard_chain-interability-measured-2",
+  "refs": {
+    "acceptance": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/acceptances/guard_chain-interability-measured-2.json",
+      "sha256": "88e3d716dfb210011db39b3202b18770c44767a298aec5538e32a961a0f72ef4"
+    },
+    "metrics": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/guard_chain-interability-measured-2.json",
+      "sha256": "c4938df991be8a95f89508d5cf895ba375963ce3b3de5d23b22ea64f394732b7"
+    },
+    "raw": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/artifacts.json",
+      "sha256": "3c4e8ab51c3e3904d480080efc23f2a3ef7e36a41f3d907b019c5e4f9af0c0e3"
+    },
+    "proof": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/plus-proof.json",
+      "sha256": "82a813fa4ed0ddab9c4f8a065e84ab810b0767ea109ce0ea2d4d96c83eaf3c54"
+    }
+  },
+  "database": "continuation_7dd85fd5491c441da27ed1fe2e341c76",
+  "primary": {
+    "driver_calls": 15,
+    "sql_dispatches": 15,
+    "sql_data": 7,
+    "sql_control": 8,
+    "sql_other": 0,
+    "command_complete": 15,
+    "protocol_cycles": 15,
+    "server_error_messages": 0,
+    "pre_send_driver_errors": 0,
+    "data_rows": 9,
+    "data_row_payload_bytes": 3720,
+    "driver_sum_ns": 10984910,
+    "driver_union_ns": 10984910,
+    "protocol_sum_ns": 8756965,
+    "protocol_union_ns": 8756965,
+    "roles": {
+      "foreground": {
+        "sql_dispatches": 13,
+        "protocol_sum_ns": 7334399,
+        "protocol_union_ns": 7334399
+      },
+      "background_prefetch": {
+        "sql_dispatches": 2,
+        "protocol_sum_ns": 1422566,
+        "protocol_union_ns": 1422566
+      },
+      "background_continuation": {
+        "sql_dispatches": 0,
+        "protocol_sum_ns": 0,
+        "protocol_union_ns": 0
+      }
+    }
+  },
+  "late_background_calls": 0,
+  "RPCs": [
+    {
+      "HTTP": {
+        "request": "2:5",
+        "server_generation": 2,
+        "phase": "workflow",
+        "path": "/walker/RegionChain/9b33bf85870d4cd2a3166ae685c88933",
+        "http_status": 200,
+        "start_ns": 2135085867656213,
+        "end_ns": 2135086114544659,
+        "wall_start": 1793598715.7819467,
+        "wall_end": 1793598716.0288363,
+        "http_e2e_ms": 246.888446,
+        "post_response_drain": {
+          "origin_request_id": "2:5",
+          "start_ns": 2135086115022623,
+          "end_ns": 2135086115059184,
+          "observed_threads": 1,
+          "pending": 0,
+          "flush": {
+            "calls": 13,
+            "events": 4,
+            "client_process_pid": 2189129
+          }
+        },
+        "native_dispatch_timestamps": {
+          "timestamp_ns": 2135086114259279,
+          "start_ns": 2135085868305691,
+          "end_ns": 2135086114257393
+        }
+      },
+      "SQL_fingerprints": [
+        {
+          "fingerprint": "7c031ced90a8996d01c59b32767e278e58f7dc3f5f52cfba746b97de050b59a3",
+          "kind": "data",
+          "role": "foreground",
+          "sql": "SELECT doc FROM identity_users WHERE user_id = $1",
+          "category": "identity",
+          "driver_calls": 1,
+          "sql_dispatches": 1,
+          "sql_data": 1,
+          "sql_control": 0,
+          "sql_other": 0,
+          "command_complete": 1,
+          "protocol_cycles": 1,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 1,
+          "data_row_payload_bytes": 578,
+          "driver_sum_ns": 281870,
+          "driver_union_ns": 281870,
+          "protocol_sum_ns": 257463,
+          "protocol_union_ns": 257463,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 1,
+              "protocol_sum_ns": 257463,
+              "protocol_union_ns": 257463
+            },
+            "background_prefetch": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        },
+        {
+          "fingerprint": "884b307eaf68c26c0ee2c95bfebc014c633d0d00e03a5e60391e7b2efc4dcd48",
+          "kind": "control",
+          "role": "foreground",
+          "sql": "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY",
+          "category": "control",
+          "driver_calls": 1,
+          "sql_dispatches": 1,
+          "sql_data": 0,
+          "sql_control": 1,
+          "sql_other": 0,
+          "command_complete": 1,
+          "protocol_cycles": 1,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 0,
+          "data_row_payload_bytes": 0,
+          "driver_sum_ns": 171486,
+          "driver_union_ns": 171486,
+          "protocol_sum_ns": 154663,
+          "protocol_union_ns": 154663,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 1,
+              "protocol_sum_ns": 154663,
+              "protocol_union_ns": 154663
+            },
+            "background_prefetch": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        },
+        {
+          "fingerprint": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+          "kind": "control",
+          "role": "foreground",
+          "sql": "SET LOCAL lock_timeout = '10s'",
+          "category": "control",
+          "driver_calls": 2,
+          "sql_dispatches": 2,
+          "sql_data": 0,
+          "sql_control": 2,
+          "sql_other": 0,
+          "command_complete": 2,
+          "protocol_cycles": 2,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 0,
+          "data_row_payload_bytes": 0,
+          "driver_sum_ns": 226328,
+          "driver_union_ns": 226328,
+          "protocol_sum_ns": 203273,
+          "protocol_union_ns": 203273,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 2,
+              "protocol_sum_ns": 203273,
+              "protocol_union_ns": 203273
+            },
+            "background_prefetch": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        },
+        {
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "kind": "data",
+          "role": "foreground",
+          "sql": "\n        SELECT a.id, a.kind, a.arch_type, a.arch_module, a.fingerprint,\n               a.root_id, a.src, a.dst, a.undirected, a.props, a.version,\n               CASE WHEN a.kind = 'NodeAnchor' THEN\n                   (SELECT string_agg(e.id::text, ',' ORDER BY e.seq, e.id)\n                      FROM anchors e WHERE e.src = a.id OR e.dst = a.id)\n               END\n        FROM anchors a WHERE a.id = ANY(CAST($1 AS uuid[]))\n        ",
+          "category": "payload",
+          "driver_calls": 4,
+          "sql_dispatches": 4,
+          "sql_data": 4,
+          "sql_control": 0,
+          "sql_other": 0,
+          "command_complete": 4,
+          "protocol_cycles": 4,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 4,
+          "data_row_payload_bytes": 1784,
+          "driver_sum_ns": 2199130,
+          "driver_union_ns": 2199130,
+          "protocol_sum_ns": 1921695,
+          "protocol_union_ns": 1921695,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 4,
+              "protocol_sum_ns": 1921695,
+              "protocol_union_ns": 1921695
+            },
+            "background_prefetch": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        },
+        {
+          "fingerprint": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+          "kind": "control",
+          "role": "foreground",
+          "sql": "COMMIT",
+          "category": "control",
+          "driver_calls": 2,
+          "sql_dispatches": 2,
+          "sql_data": 0,
+          "sql_control": 2,
+          "sql_other": 0,
+          "command_complete": 2,
+          "protocol_cycles": 2,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 0,
+          "data_row_payload_bytes": 0,
+          "driver_sum_ns": 321307,
+          "driver_union_ns": 321307,
+          "protocol_sum_ns": 299581,
+          "protocol_union_ns": 299581,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 2,
+              "protocol_sum_ns": 299581,
+              "protocol_union_ns": 299581
+            },
+            "background_prefetch": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        },
+        {
+          "fingerprint": "547004d6c33e887b6fe478e1d23004ef14c3fa1c8c4756ec52aea4a3933e7fb0",
+          "kind": "control",
+          "role": "foreground",
+          "sql": "BEGIN ISOLATION LEVEL SERIALIZABLE",
+          "category": "control",
+          "driver_calls": 1,
+          "sql_dispatches": 1,
+          "sql_data": 0,
+          "sql_control": 1,
+          "sql_other": 0,
+          "command_complete": 1,
+          "protocol_cycles": 1,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 0,
+          "data_row_payload_bytes": 0,
+          "driver_sum_ns": 119808,
+          "driver_union_ns": 119808,
+          "protocol_sum_ns": 105652,
+          "protocol_union_ns": 105652,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 1,
+              "protocol_sum_ns": 105652,
+              "protocol_union_ns": 105652
+            },
+            "background_prefetch": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        },
+        {
+          "fingerprint": "fd1c50885162ab478a94c288d5c86c77faf8c6b5a35624268ceb7ff93428eb67",
+          "kind": "data",
+          "role": "foreground",
+          "sql": "WITH \"_cte0\" (\"origin_id\", \"phase\", \"depth\", \"seen\") AS (SELECT CAST($1 AS uuid) AS \"origin_id\", CAST($2 AS bigint) AS \"phase\", CAST($3 AS bigint) AS \"depth\", CAST(ARRAY[CAST($1 AS uuid)] AS uuid[]) AS \"seen\"), \"_cte1\" (\"origin_id\", \"phase\", \"depth\", \"seen\") AS (SELECT COALESCE(\"_t22\".\"target_id\", \"_t0\".\"origin_id\") AS \"origin_id\", \"_t22\".\"next_phase\" AS \"phase\", (\"_t0\".\"depth\" + CAST($4 AS bigint)) AS \"depth\", (\"_t0\".\"seen\" || COALESCE(\"_t22\".\"target_id\", \"_t0\".\"origin_id\")) AS \"seen\" FROM \"_cte0\" AS \"_t0\" CROSS JOIN LATERAL (SELECT CAST($5 AS bigint) AS \"slot\", \"_t0\".\"depth\" AS \"depth\", \"_t0\".\"origin_id\" AS \"origin_id\", \"_t24\".\"target_id\" AS \"target_id\", \"_t24\".\"edge_id\" AS \"edge_id\", \"_t24\".\"arch_type\" AS \"arch_type\", \"_t24\".\"arch_module\" AS \"arch_module\", \"_t24\".\"ord\" AS \"ord\", \"_t24\".\"arity\" AS \"arity\", COALESCE((CAST($6 AS boolean) AND ((\"_t24\".\"target_id\" IS NULL) OR ((\"_t24\".\"arch_type\" = CAST($7 AS text)) AND (\"_t24\".\"arch_module\" = CAST($8 AS text))))), CAST($9 AS boolean)) AS \"valid\", CAST($10 AS boolean) AS \"enabled\", COALESCE((\"_t24\".\"target_id\" = ANY(\"_t0\".\"seen\")), CAST($11 AS boolean)) AS \"cycle\", CAST($12 AS bigint) AS \"next_phase\" FROM \"anchors\" AS \"_t23\" LEFT JOIN LATERAL (SELECT \"_t26\".\"target_id\" AS \"target_id\", \"_t26\".\"edge_id\" AS \"edge_id\", \"_t26\".\"arch_type\" AS \"arch_type\", \"_t26\".\"arch_module\" AS \"arch_module\", \"_t26\".\"ord\" AS \"ord\", \"_t26\".\"arity\" AS \"arity\" FROM LATERAL (SELECT \"_t28\".\"id\" AS \"target_id\", \"_t27\".\"id\" AS \"edge_id\", \"_t28\".\"arch_type\" AS \"arch_type\", \"_t28\".\"arch_module\" AS \"arch_module\", ROW_NUMBER() OVER (ORDER BY \"_t27\".\"seq\" ASC, \"_t27\".\"id\" ASC) AS \"ord\", COUNT(*) OVER () AS \"arity\" FROM \"anchors\" AS \"_t27\" INNER JOIN \"anchors\" AS \"_t28\" ON ((\"_t28\".\"id\" = (CASE WHEN (\"_t27\".\"src\" = \"_t0\".\"origin_id\") THEN \"_t27\".\"dst\" ELSE \"_t27\".\"src\" END)) AND (\"_t28\".\"kind\" = CAST($13 AS text)) AND ((CAST($14 AS text) IS NULL) OR (\"_t28\".\"arch_type\" = CAST($14 AS text)) OR (\"_t28\".\"arch_type\" IN (SELECT \"_t29\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t29\" WHERE (\"_t29\".\"ancestor\" = CAST($14 AS text))))) AND ((\"_t28\".\"root_id\" = CAST($15 AS uuid)) OR (CAST(((\"_t28\".\"props\" -> CAST($16 AS text)) ->> CAST($17 AS text)) AS bigint) > CAST($18 AS bigint)) OR ((((\"_t28\".\"props\" -> CAST($16 AS text)) -> CAST($19 AS text)) -> CAST($20 AS text)) ? CAST($21 AS text)) OR EXISTS (SELECT CAST($22 AS bigint) AS \"one\" FROM \"anchors\" AS \"_t30\" WHERE ((\"_t30\".\"kind\" = CAST($23 AS text)) AND (\"_t30\".\"src\" = CAST($15 AS uuid)) AND ((((\"_t28\".\"props\" -> CAST($16 AS text)) -> CAST($24 AS text)) -> CAST($25 AS text)) ? CAST(\"_t30\".\"dst\" AS text)))))) WHERE (((\"_t27\".\"kind\" = CAST($26 AS text)) AND ((\"_t27\".\"src\" = \"_t0\".\"origin_id\") OR (\"_t27\".\"undirected\" AND (\"_t27\".\"dst\" = \"_t0\".\"origin_id\"))) AND ((CAST($27 AS text) IS NULL) OR (\"_t27\".\"arch_type\" = CAST($27 AS text)) OR (\"_t27\".\"arch_type\" IN (SELECT \"_t31\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t31\" WHERE (\"_t31\".\"ancestor\" = CAST($27 AS text)))))))) AS \"_t26\" WHERE CAST($10 AS boolean)) AS \"_t24\" ON CAST($28 AS boolean) WHERE ((\"_t0\".\"phase\" = CAST($29 AS bigint)) AND (\"_t23\".\"id\" = \"_t0\".\"origin_id\") AND (\"_t23\".\"kind\" = CAST($30 AS text)) AND (\"_t23\".\"arch_type\" = CAST($31 AS text)) AND (\"_t23\".\"arch_module\" = CAST($32 AS text)))) AS \"_t22\" WHERE (\"_t22\".\"valid\" AND \"_t22\".\"enabled\" AND (NOT \"_t22\".\"cycle\") AND (\"_t22\".\"arity\" = CAST($33 AS bigint)) AND (\"_t22\".\"next_phase\" >= CAST($34 AS bigint)) AND (\"_t0\".\"depth\" < CAST($35 AS bigint)))) SELECT * FROM (SELECT * FROM (SELECT \"_t1\".\"slot\" AS \"slot\", \"_t1\".\"depth\" AS \"depth\", \"_t1\".\"origin_id\" AS \"origin_id\", \"_t1\".\"target_id\" AS \"target_id\", \"_t1\".\"edge_id\" AS \"edge_id\", \"_t1\".\"arch_type\" AS \"arch_type\", \"_t1\".\"arch_module\" AS \"arch_module\", \"_t1\".\"ord\" AS \"ord\", \"_t1\".\"arity\" AS \"arity\", \"_t1\".\"valid\" AS \"valid\", \"_t1\".\"enabled\" AS \"enabled\", \"_t1\".\"cycle\" AS \"cycle\", \"_t1\".\"next_phase\" AS \"next_phase\" FROM \"_cte0\" AS \"_t0\" CROSS JOIN LATERAL (SELECT CAST($36 AS bigint) AS \"slot\", \"_t0\".\"depth\" AS \"depth\", \"_t0\".\"origin_id\" AS \"origin_id\", \"_t3\".\"target_id\" AS \"target_id\", \"_t3\".\"edge_id\" AS \"edge_id\", \"_t3\".\"arch_type\" AS \"arch_type\", \"_t3\".\"arch_module\" AS \"arch_module\", \"_t3\".\"ord\" AS \"ord\", \"_t3\".\"arity\" AS \"arity\", COALESCE((CAST($37 AS boolean) AND ((\"_t3\".\"target_id\" IS NULL) OR ((\"_t3\".\"arch_type\" = CAST($38 AS text)) AND (\"_t3\".\"arch_module\" = CAST($8 AS text))))), CAST($39 AS boolean)) AS \"valid\", CAST($40 AS boolean) AS \"enabled\", COALESCE((\"_t3\".\"target_id\" = ANY(\"_t0\".\"seen\")), CAST($41 AS boolean)) AS \"cycle\", CAST($42 AS bigint) AS \"next_phase\" FROM \"anchors\" AS \"_t2\" LEFT JOIN LATERAL (SELECT \"_t5\".\"target_id\" AS \"target_id\", \"_t5\".\"edge_id\" AS \"edge_id\", \"_t5\".\"arch_type\" AS \"arch_type\", \"_t5\".\"arch_module\" AS \"arch_module\", \"_t5\".\"ord\" AS \"ord\", \"_t5\".\"arity\" AS \"arity\" FROM LATERAL (SELECT \"_t7\".\"id\" AS \"target_id\", \"_t6\".\"id\" AS \"edge_id\", \"_t7\".\"arch_type\" AS \"arch_type\", \"_t7\".\"arch_module\" AS \"arch_module\", ROW_NUMBER() OVER (ORDER BY \"_t6\".\"seq\" ASC, \"_t6\".\"id\" ASC) AS \"ord\", COUNT(*) OVER () AS \"arity\" FROM \"anchors\" AS \"_t6\" INNER JOIN \"anchors\" AS \"_t7\" ON ((\"_t7\".\"id\" = (CASE WHEN (\"_t6\".\"src\" = \"_t0\".\"origin_id\") THEN \"_t6\".\"dst\" ELSE \"_t6\".\"src\" END)) AND (\"_t7\".\"kind\" = CAST($43 AS text)) AND ((CAST($44 AS text) IS NULL) OR (\"_t7\".\"arch_type\" = CAST($44 AS text)) OR (\"_t7\".\"arch_type\" IN (SELECT \"_t8\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t8\" WHERE (\"_t8\".\"ancestor\" = CAST($44 AS text))))) AND ((\"_t7\".\"root_id\" = CAST($15 AS uuid)) OR (CAST(((\"_t7\".\"props\" -> CAST($45 AS text)) ->> CAST($46 AS text)) AS bigint) > CAST($47 AS bigint)) OR ((((\"_t7\".\"props\" -> CAST($45 AS text)) -> CAST($48 AS text)) -> CAST($49 AS text)) ? CAST($21 AS text)) OR EXISTS (SELECT CAST($50 AS bigint) AS \"one\" FROM \"anchors\" AS \"_t9\" WHERE ((\"_t9\".\"kind\" = CAST($51 AS text)) AND (\"_t9\".\"src\" = CAST($15 AS uuid)) AND ((((\"_t7\".\"props\" -> CAST($45 AS text)) -> CAST($52 AS text)) -> CAST($53 AS text)) ? CAST(\"_t9\".\"dst\" AS text)))))) WHERE (((\"_t6\".\"kind\" = CAST($54 AS text)) AND ((\"_t6\".\"src\" = \"_t0\".\"origin_id\") OR (\"_t6\".\"undirected\" AND (\"_t6\".\"dst\" = \"_t0\".\"origin_id\"))) AND ((CAST($55 AS text) IS NULL) OR (\"_t6\".\"arch_type\" = CAST($55 AS text)) OR (\"_t6\".\"arch_type\" IN (SELECT \"_t10\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t10\" WHERE (\"_t10\".\"ancestor\" = CAST($55 AS text)))))))) AS \"_t5\" WHERE CAST($40 AS boolean)) AS \"_t3\" ON CAST($56 AS boolean) WHERE ((\"_t0\".\"phase\" = CAST($57 AS bigint)) AND (\"_t2\".\"id\" = \"_t0\".\"origin_id\") AND (\"_t2\".\"kind\" = CAST($58 AS text)) AND (\"_t2\".\"arch_type\" = CAST($59 AS text)) AND (\"_t2\".\"arch_module\" = CAST($32 AS text)))) AS \"_t1\") AS \"_union_l\" UNION ALL SELECT * FROM (SELECT \"_t12\".\"slot\" AS \"slot\", \"_t12\".\"depth\" AS \"depth\", \"_t12\".\"origin_id\" AS \"origin_id\", \"_t12\".\"target_id\" AS \"target_id\", \"_t12\".\"edge_id\" AS \"edge_id\", \"_t12\".\"arch_type\" AS \"arch_type\", \"_t12\".\"arch_module\" AS \"arch_module\", \"_t12\".\"ord\" AS \"ord\", \"_t12\".\"arity\" AS \"arity\", \"_t12\".\"valid\" AS \"valid\", \"_t12\".\"enabled\" AS \"enabled\", \"_t12\".\"cycle\" AS \"cycle\", \"_t12\".\"next_phase\" AS \"next_phase\" FROM \"_cte1\" AS \"_t11\" CROSS JOIN LATERAL (SELECT CAST($60 AS bigint) AS \"slot\", \"_t11\".\"depth\" AS \"depth\", \"_t11\".\"origin_id\" AS \"origin_id\", \"_t14\".\"target_id\" AS \"target_id\", \"_t14\".\"edge_id\" AS \"edge_id\", \"_t14\".\"arch_type\" AS \"arch_type\", \"_t14\".\"arch_module\" AS \"arch_module\", \"_t14\".\"ord\" AS \"ord\", \"_t14\".\"arity\" AS \"arity\", COALESCE((((jsonb_typeof(((\"_t13\".\"props\" -> CAST($61 AS text)) -> CAST($62 AS text))) = CAST($63 AS text))) AND ((\"_t14\".\"target_id\" IS NULL) OR ((\"_t14\".\"arch_type\" = CAST($64 AS text)) AND (\"_t14\".\"arch_module\" = CAST($65 AS text))))), CAST($66 AS boolean)) AS \"valid\", COALESCE(((((\"_t13\".\"props\" -> CAST($61 AS text)) ->> CAST($67 AS text)) = CAST($68 AS text))), CAST($69 AS boolean)) AS \"enabled\", COALESCE((\"_t14\".\"target_id\" = ANY(\"_t11\".\"seen\")), CAST($70 AS boolean)) AS \"cycle\", CAST($71 AS bigint) AS \"next_phase\" FROM \"anchors\" AS \"_t13\" LEFT JOIN LATERAL (SELECT \"_t16\".\"target_id\" AS \"target_id\", \"_t16\".\"edge_id\" AS \"edge_id\", \"_t16\".\"arch_type\" AS \"arch_type\", \"_t16\".\"arch_module\" AS \"arch_module\", \"_t16\".\"ord\" AS \"ord\", \"_t16\".\"arity\" AS \"arity\" FROM LATERAL (SELECT \"_t18\".\"id\" AS \"target_id\", \"_t17\".\"id\" AS \"edge_id\", \"_t18\".\"arch_type\" AS \"arch_type\", \"_t18\".\"arch_module\" AS \"arch_module\", ROW_NUMBER() OVER (ORDER BY \"_t17\".\"seq\" ASC, \"_t17\".\"id\" ASC) AS \"ord\", COUNT(*) OVER () AS \"arity\" FROM \"anchors\" AS \"_t17\" INNER JOIN \"anchors\" AS \"_t18\" ON ((\"_t18\".\"id\" = (CASE WHEN (\"_t17\".\"src\" = \"_t11\".\"origin_id\") THEN \"_t17\".\"dst\" ELSE \"_t17\".\"src\" END)) AND (\"_t18\".\"kind\" = CAST($72 AS text)) AND ((CAST($73 AS text) IS NULL) OR (\"_t18\".\"arch_type\" = CAST($73 AS text)) OR (\"_t18\".\"arch_type\" IN (SELECT \"_t19\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t19\" WHERE (\"_t19\".\"ancestor\" = CAST($73 AS text))))) AND ((\"_t18\".\"root_id\" = CAST($15 AS uuid)) OR (CAST(((\"_t18\".\"props\" -> CAST($74 AS text)) ->> CAST($75 AS text)) AS bigint) > CAST($76 AS bigint)) OR ((((\"_t18\".\"props\" -> CAST($74 AS text)) -> CAST($77 AS text)) -> CAST($78 AS text)) ? CAST($21 AS text)) OR EXISTS (SELECT CAST($79 AS bigint) AS \"one\" FROM \"anchors\" AS \"_t20\" WHERE ((\"_t20\".\"kind\" = CAST($80 AS text)) AND (\"_t20\".\"src\" = CAST($15 AS uuid)) AND ((((\"_t18\".\"props\" -> CAST($74 AS text)) -> CAST($81 AS text)) -> CAST($82 AS text)) ? CAST(\"_t20\".\"dst\" AS text)))))) WHERE (((\"_t17\".\"kind\" = CAST($83 AS text)) AND ((\"_t17\".\"src\" = \"_t11\".\"origin_id\") OR (\"_t17\".\"undirected\" AND (\"_t17\".\"dst\" = \"_t11\".\"origin_id\"))) AND ((CAST($84 AS text) IS NULL) OR (\"_t17\".\"arch_type\" = CAST($84 AS text)) OR (\"_t17\".\"arch_type\" IN (SELECT \"_t21\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t21\" WHERE (\"_t21\".\"ancestor\" = CAST($84 AS text)))))))) AS \"_t16\" WHERE COALESCE(((((\"_t13\".\"props\" -> CAST($61 AS text)) ->> CAST($67 AS text)) = CAST($68 AS text))), CAST($69 AS boolean))) AS \"_t14\" ON CAST($85 AS boolean) WHERE ((\"_t11\".\"phase\" = CAST($86 AS bigint)) AND (\"_t13\".\"id\" = \"_t11\".\"origin_id\") AND (\"_t13\".\"kind\" = CAST($87 AS text)) AND (\"_t13\".\"arch_type\" = CAST($88 AS text)) AND (\"_t13\".\"arch_module\" = CAST($89 AS text)))) AS \"_t12\") AS \"_union_r\") AS \"_set\" (\"slot\", \"depth\", \"origin_id\", \"target_id\", \"edge_id\", \"arch_type\", \"arch_module\", \"ord\", \"arity\", \"valid\", \"enabled\", \"cycle\", \"next_phase\") ORDER BY \"depth\" ASC, \"ord\" ASC LIMIT CAST($90 AS bigint)",
+          "category": "static_interability_finite",
+          "driver_calls": 1,
+          "sql_dispatches": 1,
+          "sql_data": 1,
+          "sql_control": 0,
+          "sql_other": 0,
+          "command_complete": 1,
+          "protocol_cycles": 1,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 2,
+          "data_row_payload_bytes": 355,
+          "driver_sum_ns": 5580349,
+          "driver_union_ns": 5580349,
+          "protocol_sum_ns": 4207066,
+          "protocol_union_ns": 4207066,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 1,
+              "protocol_sum_ns": 4207066,
+              "protocol_union_ns": 4207066
+            },
+            "background_prefetch": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        },
+        {
+          "fingerprint": "98f36323c6bcf3d04d4b423d63caa325d692376ef457a4c1b41c27023a19ebf4",
+          "kind": "control",
+          "role": "foreground",
+          "sql": "DISCARD ALL",
+          "category": "control",
+          "driver_calls": 1,
+          "sql_dispatches": 1,
+          "sql_data": 0,
+          "sql_control": 1,
+          "sql_other": 0,
+          "command_complete": 1,
+          "protocol_cycles": 1,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 0,
+          "data_row_payload_bytes": 0,
+          "driver_sum_ns": 199617,
+          "driver_union_ns": 199617,
+          "protocol_sum_ns": 185006,
+          "protocol_union_ns": 185006,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 1,
+              "protocol_sum_ns": 185006,
+              "protocol_union_ns": 185006
+            },
+            "background_prefetch": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        },
+        {
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "kind": "data",
+          "role": "background_prefetch",
+          "sql": "\n        SELECT a.id, a.kind, a.arch_type, a.arch_module, a.fingerprint,\n               a.root_id, a.src, a.dst, a.undirected, a.props, a.version,\n               CASE WHEN a.kind = 'NodeAnchor' THEN\n                   (SELECT string_agg(e.id::text, ',' ORDER BY e.seq, e.id)\n                      FROM anchors e WHERE e.src = a.id OR e.dst = a.id)\n               END\n        FROM anchors a WHERE a.id = ANY(CAST($1 AS uuid[]))\n        ",
+          "category": "payload",
+          "driver_calls": 1,
+          "sql_dispatches": 1,
+          "sql_data": 1,
+          "sql_control": 0,
+          "sql_other": 0,
+          "command_complete": 1,
+          "protocol_cycles": 1,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 2,
+          "data_row_payload_bytes": 1003,
+          "driver_sum_ns": 1722851,
+          "driver_union_ns": 1722851,
+          "protocol_sum_ns": 1270682,
+          "protocol_union_ns": 1270682,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_prefetch": {
+              "sql_dispatches": 1,
+              "protocol_sum_ns": 1270682,
+              "protocol_union_ns": 1270682
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        },
+        {
+          "fingerprint": "98f36323c6bcf3d04d4b423d63caa325d692376ef457a4c1b41c27023a19ebf4",
+          "kind": "control",
+          "role": "background_prefetch",
+          "sql": "DISCARD ALL",
+          "category": "control",
+          "driver_calls": 1,
+          "sql_dispatches": 1,
+          "sql_data": 0,
+          "sql_control": 1,
+          "sql_other": 0,
+          "command_complete": 1,
+          "protocol_cycles": 1,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 0,
+          "data_row_payload_bytes": 0,
+          "driver_sum_ns": 162164,
+          "driver_union_ns": 162164,
+          "protocol_sum_ns": 151884,
+          "protocol_union_ns": 151884,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_prefetch": {
+              "sql_dispatches": 1,
+              "protocol_sum_ns": 151884,
+              "protocol_union_ns": 151884
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        }
+      ],
+      "SQL_intervals": [
+        {
+          "driver_start_ns": 2135085868409763,
+          "driver_end_ns": 2135085868691633,
+          "send_ns": 2135085868433667,
+          "ready_ns": 2135085868691130,
+          "role": "foreground",
+          "client_process_pid": 2189129,
+          "parent_process_pid": 2189129,
+          "backend_pid": 2189138,
+          "connection": 133950927400272,
+          "sql_sha256": "7c031ced90a8996d01c59b32767e278e58f7dc3f5f52cfba746b97de050b59a3",
+          "fingerprint": "7c031ced90a8996d01c59b32767e278e58f7dc3f5f52cfba746b97de050b59a3",
+          "category": "identity",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/server-2-process-2189129.calls.jsonl.gz",
+            "sha256": "8ed586d16d1c9ea7152f68105cadfc837a410a758da5934f54a6f988ba49acee",
+            "line": 35,
+            "record_sha256": "91cf0d41c160898cfd49c61ae126f4a8dcc52c22e0df9381d18f7bbdae573613"
+          }
+        },
+        {
+          "driver_start_ns": 2135085869165431,
+          "driver_end_ns": 2135085869336917,
+          "send_ns": 2135085869181926,
+          "ready_ns": 2135085869336589,
+          "role": "foreground",
+          "client_process_pid": 2189129,
+          "parent_process_pid": 2189129,
+          "backend_pid": 2189168,
+          "connection": 133950771836752,
+          "sql_sha256": "884b307eaf68c26c0ee2c95bfebc014c633d0d00e03a5e60391e7b2efc4dcd48",
+          "fingerprint": "884b307eaf68c26c0ee2c95bfebc014c633d0d00e03a5e60391e7b2efc4dcd48",
+          "category": "control",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/server-2-process-2189129.calls.jsonl.gz",
+            "sha256": "8ed586d16d1c9ea7152f68105cadfc837a410a758da5934f54a6f988ba49acee",
+            "line": 36,
+            "record_sha256": "433d1a7a49fdd251ddcefee3a9255e0a2b304f744b1115986e26bfccad6f0063"
+          }
+        },
+        {
+          "driver_start_ns": 2135085869344045,
+          "driver_end_ns": 2135085869461978,
+          "send_ns": 2135085869355725,
+          "ready_ns": 2135085869461717,
+          "role": "foreground",
+          "client_process_pid": 2189129,
+          "parent_process_pid": 2189129,
+          "backend_pid": 2189168,
+          "connection": 133950771836752,
+          "sql_sha256": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+          "fingerprint": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+          "category": "control",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/server-2-process-2189129.calls.jsonl.gz",
+            "sha256": "8ed586d16d1c9ea7152f68105cadfc837a410a758da5934f54a6f988ba49acee",
+            "line": 37,
+            "record_sha256": "014c95d96ab5c37f4616a9c9b8fa7a129df82cf759909a3ad337add4c6a3d357"
+          }
+        },
+        {
+          "driver_start_ns": 2135085869482875,
+          "driver_end_ns": 2135085870254006,
+          "send_ns": 2135085869551247,
+          "ready_ns": 2135085870253693,
+          "role": "foreground",
+          "client_process_pid": 2189129,
+          "parent_process_pid": 2189129,
+          "backend_pid": 2189168,
+          "connection": 133950771836752,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/server-2-process-2189129.calls.jsonl.gz",
+            "sha256": "8ed586d16d1c9ea7152f68105cadfc837a410a758da5934f54a6f988ba49acee",
+            "line": 38,
+            "record_sha256": "6583c0d71b10c8836ad0d6eae6a1c6252466eaa990eacddc2037a858ee869c73"
+          }
+        },
+        {
+          "driver_start_ns": 2135085870495687,
+          "driver_end_ns": 2135085870961722,
+          "send_ns": 2135085870562984,
+          "ready_ns": 2135085870961393,
+          "role": "foreground",
+          "client_process_pid": 2189129,
+          "parent_process_pid": 2189129,
+          "backend_pid": 2189168,
+          "connection": 133950771836752,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/server-2-process-2189129.calls.jsonl.gz",
+            "sha256": "8ed586d16d1c9ea7152f68105cadfc837a410a758da5934f54a6f988ba49acee",
+            "line": 39,
+            "record_sha256": "8241b93228f96875d170358e14cd264e1769c296c9302ad3985ac6dc9d42f30d"
+          }
+        },
+        {
+          "driver_start_ns": 2135085871159382,
+          "driver_end_ns": 2135085871285168,
+          "send_ns": 2135085871169804,
+          "ready_ns": 2135085871284919,
+          "role": "foreground",
+          "client_process_pid": 2189129,
+          "parent_process_pid": 2189129,
+          "backend_pid": 2189168,
+          "connection": 133950771836752,
+          "sql_sha256": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+          "fingerprint": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+          "category": "control",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/server-2-process-2189129.calls.jsonl.gz",
+            "sha256": "8ed586d16d1c9ea7152f68105cadfc837a410a758da5934f54a6f988ba49acee",
+            "line": 40,
+            "record_sha256": "949b2bc7c63d54a71ab980d63ec8582e1c4995288da8cd63fb7a21a2678e09b5"
+          }
+        },
+        {
+          "driver_start_ns": 2135085871682934,
+          "driver_end_ns": 2135085871802742,
+          "send_ns": 2135085871696759,
+          "ready_ns": 2135085871802411,
+          "role": "foreground",
+          "client_process_pid": 2189129,
+          "parent_process_pid": 2189129,
+          "backend_pid": 2189168,
+          "connection": 133950771836752,
+          "sql_sha256": "547004d6c33e887b6fe478e1d23004ef14c3fa1c8c4756ec52aea4a3933e7fb0",
+          "fingerprint": "547004d6c33e887b6fe478e1d23004ef14c3fa1c8c4756ec52aea4a3933e7fb0",
+          "category": "control",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/server-2-process-2189129.calls.jsonl.gz",
+            "sha256": "8ed586d16d1c9ea7152f68105cadfc837a410a758da5934f54a6f988ba49acee",
+            "line": 41,
+            "record_sha256": "360e654b2db83e165af16e384719b14f2fb4a979449b12332d76f2fa13a4c92d"
+          }
+        },
+        {
+          "driver_start_ns": 2135085871810142,
+          "driver_end_ns": 2135085871918537,
+          "send_ns": 2135085871821003,
+          "ready_ns": 2135085871918284,
+          "role": "foreground",
+          "client_process_pid": 2189129,
+          "parent_process_pid": 2189129,
+          "backend_pid": 2189168,
+          "connection": 133950771836752,
+          "sql_sha256": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+          "fingerprint": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+          "category": "control",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/server-2-process-2189129.calls.jsonl.gz",
+            "sha256": "8ed586d16d1c9ea7152f68105cadfc837a410a758da5934f54a6f988ba49acee",
+            "line": 42,
+            "record_sha256": "9d3918ec4522e84f7d613d3229d7d704e05dccf8bc965eeba7fa0744082a84a4"
+          }
+        },
+        {
+          "driver_start_ns": 2135085871934797,
+          "driver_end_ns": 2135085872414505,
+          "send_ns": 2135085872007653,
+          "ready_ns": 2135085872414253,
+          "role": "foreground",
+          "client_process_pid": 2189129,
+          "parent_process_pid": 2189129,
+          "backend_pid": 2189168,
+          "connection": 133950771836752,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/server-2-process-2189129.calls.jsonl.gz",
+            "sha256": "8ed586d16d1c9ea7152f68105cadfc837a410a758da5934f54a6f988ba49acee",
+            "line": 43,
+            "record_sha256": "40d115a8d5dfc691df6a1229262fdf74a30b07fb1d4806a91e00e775e0b97d86"
+          }
+        },
+        {
+          "driver_start_ns": 2135085872688745,
+          "driver_end_ns": 2135085873171001,
+          "send_ns": 2135085872756376,
+          "ready_ns": 2135085873170616,
+          "role": "foreground",
+          "client_process_pid": 2189129,
+          "parent_process_pid": 2189129,
+          "backend_pid": 2189168,
+          "connection": 133950771836752,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/server-2-process-2189129.calls.jsonl.gz",
+            "sha256": "8ed586d16d1c9ea7152f68105cadfc837a410a758da5934f54a6f988ba49acee",
+            "line": 44,
+            "record_sha256": "e31387f8799b4c4b42f01b1a331e8dd2763a018e80ec75f25b60e3d88371e4d6"
+          }
+        },
+        {
+          "driver_start_ns": 2135085877630787,
+          "driver_end_ns": 2135085883211136,
+          "send_ns": 2135085879003829,
+          "ready_ns": 2135085883210895,
+          "role": "foreground",
+          "client_process_pid": 2189129,
+          "parent_process_pid": 2189129,
+          "backend_pid": 2189168,
+          "connection": 133950771836752,
+          "sql_sha256": "fd1c50885162ab478a94c288d5c86c77faf8c6b5a35624268ceb7ff93428eb67",
+          "fingerprint": "fd1c50885162ab478a94c288d5c86c77faf8c6b5a35624268ceb7ff93428eb67",
+          "category": "static_interability_finite",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/server-2-process-2189129.calls.jsonl.gz",
+            "sha256": "8ed586d16d1c9ea7152f68105cadfc837a410a758da5934f54a6f988ba49acee",
+            "line": 45,
+            "record_sha256": "c055e6d7d959c7316d9f4d26c4c685a0bd2d710d7738b5bc9b9bcd8c1a34706f"
+          }
+        },
+        {
+          "driver_start_ns": 2135086081638564,
+          "driver_end_ns": 2135086081834085,
+          "send_ns": 2135086081649242,
+          "ready_ns": 2135086081833708,
+          "role": "foreground",
+          "client_process_pid": 2189129,
+          "parent_process_pid": 2189129,
+          "backend_pid": 2189168,
+          "connection": 133950771836752,
+          "sql_sha256": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+          "fingerprint": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+          "category": "control",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/server-2-process-2189129.calls.jsonl.gz",
+            "sha256": "8ed586d16d1c9ea7152f68105cadfc837a410a758da5934f54a6f988ba49acee",
+            "line": 46,
+            "record_sha256": "265a3d20ec0fb911ac495afe15da257440f1123574fed9d6f665d724849d2999"
+          }
+        },
+        {
+          "driver_start_ns": 2135086113995668,
+          "driver_end_ns": 2135086114195285,
+          "send_ns": 2135086114009863,
+          "ready_ns": 2135086114194869,
+          "role": "foreground",
+          "client_process_pid": 2189129,
+          "parent_process_pid": 2189129,
+          "backend_pid": 2189168,
+          "connection": 133950771836752,
+          "sql_sha256": "98f36323c6bcf3d04d4b423d63caa325d692376ef457a4c1b41c27023a19ebf4",
+          "fingerprint": "98f36323c6bcf3d04d4b423d63caa325d692376ef457a4c1b41c27023a19ebf4",
+          "category": "control",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/server-2-process-2189129.calls.jsonl.gz",
+            "sha256": "8ed586d16d1c9ea7152f68105cadfc837a410a758da5934f54a6f988ba49acee",
+            "line": 47,
+            "record_sha256": "98beb302791f05188cef284e0ebb3ea9d910b4cfbfc5a4f5da2bedd5ff12e7fa"
+          }
+        },
+        {
+          "driver_start_ns": 2135086078578115,
+          "driver_end_ns": 2135086080300966,
+          "send_ns": 2135086078627481,
+          "ready_ns": 2135086079898163,
+          "role": "background_prefetch",
+          "client_process_pid": 2189173,
+          "parent_process_pid": 2189129,
+          "backend_pid": 2189177,
+          "connection": 129737428881088,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/server-2-process-2189173.calls.jsonl.gz",
+            "sha256": "4da267c669d531c0dd84ef2f9b7006b8e2749029038ea0607d5399ef138a76af",
+            "line": 1,
+            "record_sha256": "4122a7bbfa56d136671045519e7d81bce795a494294862ddb496e84f221c5030"
+          }
+        },
+        {
+          "driver_start_ns": 2135086081924140,
+          "driver_end_ns": 2135086082086304,
+          "send_ns": 2135086081934055,
+          "ready_ns": 2135086082085939,
+          "role": "background_prefetch",
+          "client_process_pid": 2189173,
+          "parent_process_pid": 2189129,
+          "backend_pid": 2189177,
+          "connection": 129737428881088,
+          "sql_sha256": "98f36323c6bcf3d04d4b423d63caa325d692376ef457a4c1b41c27023a19ebf4",
+          "fingerprint": "98f36323c6bcf3d04d4b423d63caa325d692376ef457a4c1b41c27023a19ebf4",
+          "category": "control",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/server-2-process-2189173.calls.jsonl.gz",
+            "sha256": "4da267c669d531c0dd84ef2f9b7006b8e2749029038ea0607d5399ef138a76af",
+            "line": 2,
+            "record_sha256": "241ec03651b25e1af4b0d1916d21c9099d485ed951370dcdc16262fd990ac24e"
+          }
+        }
+      ],
+      "FG_BG_protocol_overlap_ns": 0,
+      "ordinal": 0,
+      "walker": "RegionChain",
+      "path": "/walker/RegionChain/9b33bf85870d4cd2a3166ae685c88933",
+      "request": "2:5",
+      "server_generation": 2,
+      "HTTP_e2e_ns": 246888446,
+      "categories": {
+        "identity": 1,
+        "control": 8,
+        "payload": 5,
+        "static_interability_finite": 1
+      },
+      "driver_calls": 15,
+      "sql_dispatches": 15,
+      "sql_data": 7,
+      "sql_control": 8,
+      "sql_other": 0,
+      "command_complete": 15,
+      "protocol_cycles": 15,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 9,
+      "data_row_payload_bytes": 3720,
+      "driver_sum_ns": 10984910,
+      "driver_union_ns": 10984910,
+      "protocol_sum_ns": 8756965,
+      "protocol_union_ns": 8756965,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 13,
+          "protocol_sum_ns": 7334399,
+          "protocol_union_ns": 7334399
+        },
+        "background_prefetch": {
+          "sql_dispatches": 2,
+          "protocol_sum_ns": 1422566,
+          "protocol_union_ns": 1422566
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    }
+  ],
+  "SQL_fingerprints": [
+    {
+      "fingerprint": "7c031ced90a8996d01c59b32767e278e58f7dc3f5f52cfba746b97de050b59a3",
+      "kind": "data",
+      "role": "foreground",
+      "sql": "SELECT doc FROM identity_users WHERE user_id = $1",
+      "category": "identity",
+      "driver_calls": 1,
+      "sql_dispatches": 1,
+      "sql_data": 1,
+      "sql_control": 0,
+      "sql_other": 0,
+      "command_complete": 1,
+      "protocol_cycles": 1,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 1,
+      "data_row_payload_bytes": 578,
+      "driver_sum_ns": 281870,
+      "driver_union_ns": 281870,
+      "protocol_sum_ns": 257463,
+      "protocol_union_ns": 257463,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 1,
+          "protocol_sum_ns": 257463,
+          "protocol_union_ns": 257463
+        },
+        "background_prefetch": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    },
+    {
+      "fingerprint": "884b307eaf68c26c0ee2c95bfebc014c633d0d00e03a5e60391e7b2efc4dcd48",
+      "kind": "control",
+      "role": "foreground",
+      "sql": "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY",
+      "category": "control",
+      "driver_calls": 1,
+      "sql_dispatches": 1,
+      "sql_data": 0,
+      "sql_control": 1,
+      "sql_other": 0,
+      "command_complete": 1,
+      "protocol_cycles": 1,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 0,
+      "data_row_payload_bytes": 0,
+      "driver_sum_ns": 171486,
+      "driver_union_ns": 171486,
+      "protocol_sum_ns": 154663,
+      "protocol_union_ns": 154663,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 1,
+          "protocol_sum_ns": 154663,
+          "protocol_union_ns": 154663
+        },
+        "background_prefetch": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    },
+    {
+      "fingerprint": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+      "kind": "control",
+      "role": "foreground",
+      "sql": "SET LOCAL lock_timeout = '10s'",
+      "category": "control",
+      "driver_calls": 2,
+      "sql_dispatches": 2,
+      "sql_data": 0,
+      "sql_control": 2,
+      "sql_other": 0,
+      "command_complete": 2,
+      "protocol_cycles": 2,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 0,
+      "data_row_payload_bytes": 0,
+      "driver_sum_ns": 226328,
+      "driver_union_ns": 226328,
+      "protocol_sum_ns": 203273,
+      "protocol_union_ns": 203273,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 2,
+          "protocol_sum_ns": 203273,
+          "protocol_union_ns": 203273
+        },
+        "background_prefetch": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    },
+    {
+      "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+      "kind": "data",
+      "role": "foreground",
+      "sql": "\n        SELECT a.id, a.kind, a.arch_type, a.arch_module, a.fingerprint,\n               a.root_id, a.src, a.dst, a.undirected, a.props, a.version,\n               CASE WHEN a.kind = 'NodeAnchor' THEN\n                   (SELECT string_agg(e.id::text, ',' ORDER BY e.seq, e.id)\n                      FROM anchors e WHERE e.src = a.id OR e.dst = a.id)\n               END\n        FROM anchors a WHERE a.id = ANY(CAST($1 AS uuid[]))\n        ",
+      "category": "payload",
+      "driver_calls": 4,
+      "sql_dispatches": 4,
+      "sql_data": 4,
+      "sql_control": 0,
+      "sql_other": 0,
+      "command_complete": 4,
+      "protocol_cycles": 4,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 4,
+      "data_row_payload_bytes": 1784,
+      "driver_sum_ns": 2199130,
+      "driver_union_ns": 2199130,
+      "protocol_sum_ns": 1921695,
+      "protocol_union_ns": 1921695,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 4,
+          "protocol_sum_ns": 1921695,
+          "protocol_union_ns": 1921695
+        },
+        "background_prefetch": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    },
+    {
+      "fingerprint": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+      "kind": "control",
+      "role": "foreground",
+      "sql": "COMMIT",
+      "category": "control",
+      "driver_calls": 2,
+      "sql_dispatches": 2,
+      "sql_data": 0,
+      "sql_control": 2,
+      "sql_other": 0,
+      "command_complete": 2,
+      "protocol_cycles": 2,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 0,
+      "data_row_payload_bytes": 0,
+      "driver_sum_ns": 321307,
+      "driver_union_ns": 321307,
+      "protocol_sum_ns": 299581,
+      "protocol_union_ns": 299581,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 2,
+          "protocol_sum_ns": 299581,
+          "protocol_union_ns": 299581
+        },
+        "background_prefetch": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    },
+    {
+      "fingerprint": "547004d6c33e887b6fe478e1d23004ef14c3fa1c8c4756ec52aea4a3933e7fb0",
+      "kind": "control",
+      "role": "foreground",
+      "sql": "BEGIN ISOLATION LEVEL SERIALIZABLE",
+      "category": "control",
+      "driver_calls": 1,
+      "sql_dispatches": 1,
+      "sql_data": 0,
+      "sql_control": 1,
+      "sql_other": 0,
+      "command_complete": 1,
+      "protocol_cycles": 1,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 0,
+      "data_row_payload_bytes": 0,
+      "driver_sum_ns": 119808,
+      "driver_union_ns": 119808,
+      "protocol_sum_ns": 105652,
+      "protocol_union_ns": 105652,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 1,
+          "protocol_sum_ns": 105652,
+          "protocol_union_ns": 105652
+        },
+        "background_prefetch": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    },
+    {
+      "fingerprint": "fd1c50885162ab478a94c288d5c86c77faf8c6b5a35624268ceb7ff93428eb67",
+      "kind": "data",
+      "role": "foreground",
+      "sql": "WITH \"_cte0\" (\"origin_id\", \"phase\", \"depth\", \"seen\") AS (SELECT CAST($1 AS uuid) AS \"origin_id\", CAST($2 AS bigint) AS \"phase\", CAST($3 AS bigint) AS \"depth\", CAST(ARRAY[CAST($1 AS uuid)] AS uuid[]) AS \"seen\"), \"_cte1\" (\"origin_id\", \"phase\", \"depth\", \"seen\") AS (SELECT COALESCE(\"_t22\".\"target_id\", \"_t0\".\"origin_id\") AS \"origin_id\", \"_t22\".\"next_phase\" AS \"phase\", (\"_t0\".\"depth\" + CAST($4 AS bigint)) AS \"depth\", (\"_t0\".\"seen\" || COALESCE(\"_t22\".\"target_id\", \"_t0\".\"origin_id\")) AS \"seen\" FROM \"_cte0\" AS \"_t0\" CROSS JOIN LATERAL (SELECT CAST($5 AS bigint) AS \"slot\", \"_t0\".\"depth\" AS \"depth\", \"_t0\".\"origin_id\" AS \"origin_id\", \"_t24\".\"target_id\" AS \"target_id\", \"_t24\".\"edge_id\" AS \"edge_id\", \"_t24\".\"arch_type\" AS \"arch_type\", \"_t24\".\"arch_module\" AS \"arch_module\", \"_t24\".\"ord\" AS \"ord\", \"_t24\".\"arity\" AS \"arity\", COALESCE((CAST($6 AS boolean) AND ((\"_t24\".\"target_id\" IS NULL) OR ((\"_t24\".\"arch_type\" = CAST($7 AS text)) AND (\"_t24\".\"arch_module\" = CAST($8 AS text))))), CAST($9 AS boolean)) AS \"valid\", CAST($10 AS boolean) AS \"enabled\", COALESCE((\"_t24\".\"target_id\" = ANY(\"_t0\".\"seen\")), CAST($11 AS boolean)) AS \"cycle\", CAST($12 AS bigint) AS \"next_phase\" FROM \"anchors\" AS \"_t23\" LEFT JOIN LATERAL (SELECT \"_t26\".\"target_id\" AS \"target_id\", \"_t26\".\"edge_id\" AS \"edge_id\", \"_t26\".\"arch_type\" AS \"arch_type\", \"_t26\".\"arch_module\" AS \"arch_module\", \"_t26\".\"ord\" AS \"ord\", \"_t26\".\"arity\" AS \"arity\" FROM LATERAL (SELECT \"_t28\".\"id\" AS \"target_id\", \"_t27\".\"id\" AS \"edge_id\", \"_t28\".\"arch_type\" AS \"arch_type\", \"_t28\".\"arch_module\" AS \"arch_module\", ROW_NUMBER() OVER (ORDER BY \"_t27\".\"seq\" ASC, \"_t27\".\"id\" ASC) AS \"ord\", COUNT(*) OVER () AS \"arity\" FROM \"anchors\" AS \"_t27\" INNER JOIN \"anchors\" AS \"_t28\" ON ((\"_t28\".\"id\" = (CASE WHEN (\"_t27\".\"src\" = \"_t0\".\"origin_id\") THEN \"_t27\".\"dst\" ELSE \"_t27\".\"src\" END)) AND (\"_t28\".\"kind\" = CAST($13 AS text)) AND ((CAST($14 AS text) IS NULL) OR (\"_t28\".\"arch_type\" = CAST($14 AS text)) OR (\"_t28\".\"arch_type\" IN (SELECT \"_t29\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t29\" WHERE (\"_t29\".\"ancestor\" = CAST($14 AS text))))) AND ((\"_t28\".\"root_id\" = CAST($15 AS uuid)) OR (CAST(((\"_t28\".\"props\" -> CAST($16 AS text)) ->> CAST($17 AS text)) AS bigint) > CAST($18 AS bigint)) OR ((((\"_t28\".\"props\" -> CAST($16 AS text)) -> CAST($19 AS text)) -> CAST($20 AS text)) ? CAST($21 AS text)) OR EXISTS (SELECT CAST($22 AS bigint) AS \"one\" FROM \"anchors\" AS \"_t30\" WHERE ((\"_t30\".\"kind\" = CAST($23 AS text)) AND (\"_t30\".\"src\" = CAST($15 AS uuid)) AND ((((\"_t28\".\"props\" -> CAST($16 AS text)) -> CAST($24 AS text)) -> CAST($25 AS text)) ? CAST(\"_t30\".\"dst\" AS text)))))) WHERE (((\"_t27\".\"kind\" = CAST($26 AS text)) AND ((\"_t27\".\"src\" = \"_t0\".\"origin_id\") OR (\"_t27\".\"undirected\" AND (\"_t27\".\"dst\" = \"_t0\".\"origin_id\"))) AND ((CAST($27 AS text) IS NULL) OR (\"_t27\".\"arch_type\" = CAST($27 AS text)) OR (\"_t27\".\"arch_type\" IN (SELECT \"_t31\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t31\" WHERE (\"_t31\".\"ancestor\" = CAST($27 AS text)))))))) AS \"_t26\" WHERE CAST($10 AS boolean)) AS \"_t24\" ON CAST($28 AS boolean) WHERE ((\"_t0\".\"phase\" = CAST($29 AS bigint)) AND (\"_t23\".\"id\" = \"_t0\".\"origin_id\") AND (\"_t23\".\"kind\" = CAST($30 AS text)) AND (\"_t23\".\"arch_type\" = CAST($31 AS text)) AND (\"_t23\".\"arch_module\" = CAST($32 AS text)))) AS \"_t22\" WHERE (\"_t22\".\"valid\" AND \"_t22\".\"enabled\" AND (NOT \"_t22\".\"cycle\") AND (\"_t22\".\"arity\" = CAST($33 AS bigint)) AND (\"_t22\".\"next_phase\" >= CAST($34 AS bigint)) AND (\"_t0\".\"depth\" < CAST($35 AS bigint)))) SELECT * FROM (SELECT * FROM (SELECT \"_t1\".\"slot\" AS \"slot\", \"_t1\".\"depth\" AS \"depth\", \"_t1\".\"origin_id\" AS \"origin_id\", \"_t1\".\"target_id\" AS \"target_id\", \"_t1\".\"edge_id\" AS \"edge_id\", \"_t1\".\"arch_type\" AS \"arch_type\", \"_t1\".\"arch_module\" AS \"arch_module\", \"_t1\".\"ord\" AS \"ord\", \"_t1\".\"arity\" AS \"arity\", \"_t1\".\"valid\" AS \"valid\", \"_t1\".\"enabled\" AS \"enabled\", \"_t1\".\"cycle\" AS \"cycle\", \"_t1\".\"next_phase\" AS \"next_phase\" FROM \"_cte0\" AS \"_t0\" CROSS JOIN LATERAL (SELECT CAST($36 AS bigint) AS \"slot\", \"_t0\".\"depth\" AS \"depth\", \"_t0\".\"origin_id\" AS \"origin_id\", \"_t3\".\"target_id\" AS \"target_id\", \"_t3\".\"edge_id\" AS \"edge_id\", \"_t3\".\"arch_type\" AS \"arch_type\", \"_t3\".\"arch_module\" AS \"arch_module\", \"_t3\".\"ord\" AS \"ord\", \"_t3\".\"arity\" AS \"arity\", COALESCE((CAST($37 AS boolean) AND ((\"_t3\".\"target_id\" IS NULL) OR ((\"_t3\".\"arch_type\" = CAST($38 AS text)) AND (\"_t3\".\"arch_module\" = CAST($8 AS text))))), CAST($39 AS boolean)) AS \"valid\", CAST($40 AS boolean) AS \"enabled\", COALESCE((\"_t3\".\"target_id\" = ANY(\"_t0\".\"seen\")), CAST($41 AS boolean)) AS \"cycle\", CAST($42 AS bigint) AS \"next_phase\" FROM \"anchors\" AS \"_t2\" LEFT JOIN LATERAL (SELECT \"_t5\".\"target_id\" AS \"target_id\", \"_t5\".\"edge_id\" AS \"edge_id\", \"_t5\".\"arch_type\" AS \"arch_type\", \"_t5\".\"arch_module\" AS \"arch_module\", \"_t5\".\"ord\" AS \"ord\", \"_t5\".\"arity\" AS \"arity\" FROM LATERAL (SELECT \"_t7\".\"id\" AS \"target_id\", \"_t6\".\"id\" AS \"edge_id\", \"_t7\".\"arch_type\" AS \"arch_type\", \"_t7\".\"arch_module\" AS \"arch_module\", ROW_NUMBER() OVER (ORDER BY \"_t6\".\"seq\" ASC, \"_t6\".\"id\" ASC) AS \"ord\", COUNT(*) OVER () AS \"arity\" FROM \"anchors\" AS \"_t6\" INNER JOIN \"anchors\" AS \"_t7\" ON ((\"_t7\".\"id\" = (CASE WHEN (\"_t6\".\"src\" = \"_t0\".\"origin_id\") THEN \"_t6\".\"dst\" ELSE \"_t6\".\"src\" END)) AND (\"_t7\".\"kind\" = CAST($43 AS text)) AND ((CAST($44 AS text) IS NULL) OR (\"_t7\".\"arch_type\" = CAST($44 AS text)) OR (\"_t7\".\"arch_type\" IN (SELECT \"_t8\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t8\" WHERE (\"_t8\".\"ancestor\" = CAST($44 AS text))))) AND ((\"_t7\".\"root_id\" = CAST($15 AS uuid)) OR (CAST(((\"_t7\".\"props\" -> CAST($45 AS text)) ->> CAST($46 AS text)) AS bigint) > CAST($47 AS bigint)) OR ((((\"_t7\".\"props\" -> CAST($45 AS text)) -> CAST($48 AS text)) -> CAST($49 AS text)) ? CAST($21 AS text)) OR EXISTS (SELECT CAST($50 AS bigint) AS \"one\" FROM \"anchors\" AS \"_t9\" WHERE ((\"_t9\".\"kind\" = CAST($51 AS text)) AND (\"_t9\".\"src\" = CAST($15 AS uuid)) AND ((((\"_t7\".\"props\" -> CAST($45 AS text)) -> CAST($52 AS text)) -> CAST($53 AS text)) ? CAST(\"_t9\".\"dst\" AS text)))))) WHERE (((\"_t6\".\"kind\" = CAST($54 AS text)) AND ((\"_t6\".\"src\" = \"_t0\".\"origin_id\") OR (\"_t6\".\"undirected\" AND (\"_t6\".\"dst\" = \"_t0\".\"origin_id\"))) AND ((CAST($55 AS text) IS NULL) OR (\"_t6\".\"arch_type\" = CAST($55 AS text)) OR (\"_t6\".\"arch_type\" IN (SELECT \"_t10\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t10\" WHERE (\"_t10\".\"ancestor\" = CAST($55 AS text)))))))) AS \"_t5\" WHERE CAST($40 AS boolean)) AS \"_t3\" ON CAST($56 AS boolean) WHERE ((\"_t0\".\"phase\" = CAST($57 AS bigint)) AND (\"_t2\".\"id\" = \"_t0\".\"origin_id\") AND (\"_t2\".\"kind\" = CAST($58 AS text)) AND (\"_t2\".\"arch_type\" = CAST($59 AS text)) AND (\"_t2\".\"arch_module\" = CAST($32 AS text)))) AS \"_t1\") AS \"_union_l\" UNION ALL SELECT * FROM (SELECT \"_t12\".\"slot\" AS \"slot\", \"_t12\".\"depth\" AS \"depth\", \"_t12\".\"origin_id\" AS \"origin_id\", \"_t12\".\"target_id\" AS \"target_id\", \"_t12\".\"edge_id\" AS \"edge_id\", \"_t12\".\"arch_type\" AS \"arch_type\", \"_t12\".\"arch_module\" AS \"arch_module\", \"_t12\".\"ord\" AS \"ord\", \"_t12\".\"arity\" AS \"arity\", \"_t12\".\"valid\" AS \"valid\", \"_t12\".\"enabled\" AS \"enabled\", \"_t12\".\"cycle\" AS \"cycle\", \"_t12\".\"next_phase\" AS \"next_phase\" FROM \"_cte1\" AS \"_t11\" CROSS JOIN LATERAL (SELECT CAST($60 AS bigint) AS \"slot\", \"_t11\".\"depth\" AS \"depth\", \"_t11\".\"origin_id\" AS \"origin_id\", \"_t14\".\"target_id\" AS \"target_id\", \"_t14\".\"edge_id\" AS \"edge_id\", \"_t14\".\"arch_type\" AS \"arch_type\", \"_t14\".\"arch_module\" AS \"arch_module\", \"_t14\".\"ord\" AS \"ord\", \"_t14\".\"arity\" AS \"arity\", COALESCE((((jsonb_typeof(((\"_t13\".\"props\" -> CAST($61 AS text)) -> CAST($62 AS text))) = CAST($63 AS text))) AND ((\"_t14\".\"target_id\" IS NULL) OR ((\"_t14\".\"arch_type\" = CAST($64 AS text)) AND (\"_t14\".\"arch_module\" = CAST($65 AS text))))), CAST($66 AS boolean)) AS \"valid\", COALESCE(((((\"_t13\".\"props\" -> CAST($61 AS text)) ->> CAST($67 AS text)) = CAST($68 AS text))), CAST($69 AS boolean)) AS \"enabled\", COALESCE((\"_t14\".\"target_id\" = ANY(\"_t11\".\"seen\")), CAST($70 AS boolean)) AS \"cycle\", CAST($71 AS bigint) AS \"next_phase\" FROM \"anchors\" AS \"_t13\" LEFT JOIN LATERAL (SELECT \"_t16\".\"target_id\" AS \"target_id\", \"_t16\".\"edge_id\" AS \"edge_id\", \"_t16\".\"arch_type\" AS \"arch_type\", \"_t16\".\"arch_module\" AS \"arch_module\", \"_t16\".\"ord\" AS \"ord\", \"_t16\".\"arity\" AS \"arity\" FROM LATERAL (SELECT \"_t18\".\"id\" AS \"target_id\", \"_t17\".\"id\" AS \"edge_id\", \"_t18\".\"arch_type\" AS \"arch_type\", \"_t18\".\"arch_module\" AS \"arch_module\", ROW_NUMBER() OVER (ORDER BY \"_t17\".\"seq\" ASC, \"_t17\".\"id\" ASC) AS \"ord\", COUNT(*) OVER () AS \"arity\" FROM \"anchors\" AS \"_t17\" INNER JOIN \"anchors\" AS \"_t18\" ON ((\"_t18\".\"id\" = (CASE WHEN (\"_t17\".\"src\" = \"_t11\".\"origin_id\") THEN \"_t17\".\"dst\" ELSE \"_t17\".\"src\" END)) AND (\"_t18\".\"kind\" = CAST($72 AS text)) AND ((CAST($73 AS text) IS NULL) OR (\"_t18\".\"arch_type\" = CAST($73 AS text)) OR (\"_t18\".\"arch_type\" IN (SELECT \"_t19\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t19\" WHERE (\"_t19\".\"ancestor\" = CAST($73 AS text))))) AND ((\"_t18\".\"root_id\" = CAST($15 AS uuid)) OR (CAST(((\"_t18\".\"props\" -> CAST($74 AS text)) ->> CAST($75 AS text)) AS bigint) > CAST($76 AS bigint)) OR ((((\"_t18\".\"props\" -> CAST($74 AS text)) -> CAST($77 AS text)) -> CAST($78 AS text)) ? CAST($21 AS text)) OR EXISTS (SELECT CAST($79 AS bigint) AS \"one\" FROM \"anchors\" AS \"_t20\" WHERE ((\"_t20\".\"kind\" = CAST($80 AS text)) AND (\"_t20\".\"src\" = CAST($15 AS uuid)) AND ((((\"_t18\".\"props\" -> CAST($74 AS text)) -> CAST($81 AS text)) -> CAST($82 AS text)) ? CAST(\"_t20\".\"dst\" AS text)))))) WHERE (((\"_t17\".\"kind\" = CAST($83 AS text)) AND ((\"_t17\".\"src\" = \"_t11\".\"origin_id\") OR (\"_t17\".\"undirected\" AND (\"_t17\".\"dst\" = \"_t11\".\"origin_id\"))) AND ((CAST($84 AS text) IS NULL) OR (\"_t17\".\"arch_type\" = CAST($84 AS text)) OR (\"_t17\".\"arch_type\" IN (SELECT \"_t21\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t21\" WHERE (\"_t21\".\"ancestor\" = CAST($84 AS text)))))))) AS \"_t16\" WHERE COALESCE(((((\"_t13\".\"props\" -> CAST($61 AS text)) ->> CAST($67 AS text)) = CAST($68 AS text))), CAST($69 AS boolean))) AS \"_t14\" ON CAST($85 AS boolean) WHERE ((\"_t11\".\"phase\" = CAST($86 AS bigint)) AND (\"_t13\".\"id\" = \"_t11\".\"origin_id\") AND (\"_t13\".\"kind\" = CAST($87 AS text)) AND (\"_t13\".\"arch_type\" = CAST($88 AS text)) AND (\"_t13\".\"arch_module\" = CAST($89 AS text)))) AS \"_t12\") AS \"_union_r\") AS \"_set\" (\"slot\", \"depth\", \"origin_id\", \"target_id\", \"edge_id\", \"arch_type\", \"arch_module\", \"ord\", \"arity\", \"valid\", \"enabled\", \"cycle\", \"next_phase\") ORDER BY \"depth\" ASC, \"ord\" ASC LIMIT CAST($90 AS bigint)",
+      "category": "static_interability_finite",
+      "driver_calls": 1,
+      "sql_dispatches": 1,
+      "sql_data": 1,
+      "sql_control": 0,
+      "sql_other": 0,
+      "command_complete": 1,
+      "protocol_cycles": 1,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 2,
+      "data_row_payload_bytes": 355,
+      "driver_sum_ns": 5580349,
+      "driver_union_ns": 5580349,
+      "protocol_sum_ns": 4207066,
+      "protocol_union_ns": 4207066,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 1,
+          "protocol_sum_ns": 4207066,
+          "protocol_union_ns": 4207066
+        },
+        "background_prefetch": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    },
+    {
+      "fingerprint": "98f36323c6bcf3d04d4b423d63caa325d692376ef457a4c1b41c27023a19ebf4",
+      "kind": "control",
+      "role": "foreground",
+      "sql": "DISCARD ALL",
+      "category": "control",
+      "driver_calls": 1,
+      "sql_dispatches": 1,
+      "sql_data": 0,
+      "sql_control": 1,
+      "sql_other": 0,
+      "command_complete": 1,
+      "protocol_cycles": 1,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 0,
+      "data_row_payload_bytes": 0,
+      "driver_sum_ns": 199617,
+      "driver_union_ns": 199617,
+      "protocol_sum_ns": 185006,
+      "protocol_union_ns": 185006,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 1,
+          "protocol_sum_ns": 185006,
+          "protocol_union_ns": 185006
+        },
+        "background_prefetch": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    },
+    {
+      "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+      "kind": "data",
+      "role": "background_prefetch",
+      "sql": "\n        SELECT a.id, a.kind, a.arch_type, a.arch_module, a.fingerprint,\n               a.root_id, a.src, a.dst, a.undirected, a.props, a.version,\n               CASE WHEN a.kind = 'NodeAnchor' THEN\n                   (SELECT string_agg(e.id::text, ',' ORDER BY e.seq, e.id)\n                      FROM anchors e WHERE e.src = a.id OR e.dst = a.id)\n               END\n        FROM anchors a WHERE a.id = ANY(CAST($1 AS uuid[]))\n        ",
+      "category": "payload",
+      "driver_calls": 1,
+      "sql_dispatches": 1,
+      "sql_data": 1,
+      "sql_control": 0,
+      "sql_other": 0,
+      "command_complete": 1,
+      "protocol_cycles": 1,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 2,
+      "data_row_payload_bytes": 1003,
+      "driver_sum_ns": 1722851,
+      "driver_union_ns": 1722851,
+      "protocol_sum_ns": 1270682,
+      "protocol_union_ns": 1270682,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_prefetch": {
+          "sql_dispatches": 1,
+          "protocol_sum_ns": 1270682,
+          "protocol_union_ns": 1270682
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    },
+    {
+      "fingerprint": "98f36323c6bcf3d04d4b423d63caa325d692376ef457a4c1b41c27023a19ebf4",
+      "kind": "control",
+      "role": "background_prefetch",
+      "sql": "DISCARD ALL",
+      "category": "control",
+      "driver_calls": 1,
+      "sql_dispatches": 1,
+      "sql_data": 0,
+      "sql_control": 1,
+      "sql_other": 0,
+      "command_complete": 1,
+      "protocol_cycles": 1,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 0,
+      "data_row_payload_bytes": 0,
+      "driver_sum_ns": 162164,
+      "driver_union_ns": 162164,
+      "protocol_sum_ns": 151884,
+      "protocol_union_ns": 151884,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_prefetch": {
+          "sql_dispatches": 1,
+          "protocol_sum_ns": 151884,
+          "protocol_union_ns": 151884
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    }
+  ],
+  "processes": {
+    "foreground": [
+      2189129
+    ],
+    "background": [
+      2189173
+    ]
+  },
+  "HTTP_workflow_sum_ns": 246888446,
+  "HTTP_workflow_union_ns": 246888446,
+  "HTTP_workflow_span_ns": 246888446,
+  "HTTP_explicit_drain_sum_ns": 36561,
+  "HTTP_with_drain_span_ns": 247402971,
+  "HTTP_requests": [
+    {
+      "request": "1:0",
+      "server_generation": 1,
+      "phase": "setup",
+      "path": "/user/register",
+      "http_status": 201,
+      "start_ns": 2135084113017078,
+      "end_ns": 2135084150800455,
+      "wall_start": 1793598714.0273075,
+      "wall_end": 1793598714.065092,
+      "http_e2e_ms": 37.783377,
+      "post_response_drain": {
+        "origin_request_id": "1:0",
+        "start_ns": 2135084151262551,
+        "end_ns": 2135084151265329,
+        "observed_threads": 0,
+        "pending": 0,
+        "flush": {
+          "calls": 69,
+          "events": 6,
+          "client_process_pid": 2189045
+        }
+      },
+      "native_dispatch_timestamps": {
+        "timestamp_ns": 2135084150539771,
+        "start_ns": 2135084113351202,
+        "end_ns": 2135084150537544
+      }
+    },
+    {
+      "request": "1:1",
+      "server_generation": 1,
+      "phase": "setup",
+      "path": "/user/login",
+      "http_status": 200,
+      "start_ns": 2135084153160627,
+      "end_ns": 2135084184710833,
+      "wall_start": 1793598714.0674512,
+      "wall_end": 1793598714.0990024,
+      "http_e2e_ms": 31.550206,
+      "post_response_drain": {
+        "origin_request_id": "1:1",
+        "start_ns": 2135084185161636,
+        "end_ns": 2135084185164846,
+        "observed_threads": 0,
+        "pending": 0,
+        "flush": {
+          "calls": 7,
+          "events": 2,
+          "client_process_pid": 2189045
+        }
+      },
+      "native_dispatch_timestamps": {
+        "timestamp_ns": 2135084184418975,
+        "start_ns": 2135084153477829,
+        "end_ns": 2135084184416584
+      }
+    },
+    {
+      "request": "1:2",
+      "server_generation": 1,
+      "phase": "setup",
+      "path": "/walker/SuiteRoot",
+      "http_status": 200,
+      "start_ns": 2135084185911405,
+      "end_ns": 2135084196868754,
+      "wall_start": 1793598714.100202,
+      "wall_end": 1793598714.1111603,
+      "http_e2e_ms": 10.957349,
+      "post_response_drain": {
+        "origin_request_id": "1:2",
+        "start_ns": 2135084197254205,
+        "end_ns": 2135084197256284,
+        "observed_threads": 0,
+        "pending": 0,
+        "flush": {
+          "calls": 11,
+          "events": 3,
+          "client_process_pid": 2189045
+        }
+      },
+      "native_dispatch_timestamps": {
+        "timestamp_ns": 2135084196647681,
+        "start_ns": 2135084186311855,
+        "end_ns": 2135084196645864
+      }
+    },
+    {
+      "request": "1:3",
+      "server_generation": 1,
+      "phase": "setup",
+      "path": "/walker/SuiteImport",
+      "http_status": 200,
+      "start_ns": 2135084197896544,
+      "end_ns": 2135084204682155,
+      "wall_start": 1793598714.1121871,
+      "wall_end": 1793598714.1189737,
+      "http_e2e_ms": 6.785611,
+      "post_response_drain": {
+        "origin_request_id": "1:3",
+        "start_ns": 2135084205030654,
+        "end_ns": 2135084205032727,
+        "observed_threads": 0,
+        "pending": 0,
+        "flush": {
+          "calls": 13,
+          "events": 3,
+          "client_process_pid": 2189045
+        }
+      },
+      "native_dispatch_timestamps": {
+        "timestamp_ns": 2135084204511334,
+        "start_ns": 2135084198190996,
+        "end_ns": 2135084204509611
+      }
+    },
+    {
+      "request": "2:4",
+      "server_generation": 2,
+      "phase": "setup",
+      "path": "/walker/SuiteInspect",
+      "http_status": 200,
+      "start_ns": 2135085833080365,
+      "end_ns": 2135085848298252,
+      "wall_start": 1793598715.7473702,
+      "wall_end": 1793598715.7625897,
+      "http_e2e_ms": 15.217887,
+      "post_response_drain": {
+        "origin_request_id": "2:4",
+        "start_ns": 2135085848831428,
+        "end_ns": 2135085848834617,
+        "observed_threads": 0,
+        "pending": 0,
+        "flush": {
+          "calls": 34,
+          "events": 7,
+          "client_process_pid": 2189129
+        }
+      },
+      "native_dispatch_timestamps": {
+        "timestamp_ns": 2135085848084958,
+        "start_ns": 2135085833379861,
+        "end_ns": 2135085848082799
+      }
+    },
+    {
+      "request": "2:5",
+      "server_generation": 2,
+      "phase": "workflow",
+      "path": "/walker/RegionChain/9b33bf85870d4cd2a3166ae685c88933",
+      "http_status": 200,
+      "start_ns": 2135085867656213,
+      "end_ns": 2135086114544659,
+      "wall_start": 1793598715.7819467,
+      "wall_end": 1793598716.0288363,
+      "http_e2e_ms": 246.888446,
+      "post_response_drain": {
+        "origin_request_id": "2:5",
+        "start_ns": 2135086115022623,
+        "end_ns": 2135086115059184,
+        "observed_threads": 1,
+        "pending": 0,
+        "flush": {
+          "calls": 13,
+          "events": 4,
+          "client_process_pid": 2189129
+        }
+      },
+      "native_dispatch_timestamps": {
+        "timestamp_ns": 2135086114259279,
+        "start_ns": 2135085868305691,
+        "end_ns": 2135086114257393
+      }
+    },
+    {
+      "request": "3:6",
+      "server_generation": 3,
+      "phase": "setup",
+      "path": "/walker/SuiteInspect",
+      "http_status": 200,
+      "start_ns": 2135087764106309,
+      "end_ns": 2135087787222835,
+      "wall_start": 1793598717.678395,
+      "wall_end": 1793598717.7015145,
+      "http_e2e_ms": 23.116526,
+      "post_response_drain": {
+        "origin_request_id": "3:6",
+        "start_ns": 2135087787676730,
+        "end_ns": 2135087787679335,
+        "observed_threads": 0,
+        "pending": 0,
+        "flush": {
+          "calls": 34,
+          "events": 7,
+          "client_process_pid": 2189181
+        }
+      },
+      "native_dispatch_timestamps": {
+        "timestamp_ns": 2135087786957446,
+        "start_ns": 2135087765977983,
+        "end_ns": 2135087786955609
+      }
+    }
+  ],
+  "planner_statistics": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/guard_chain-interability-measured-2/planner-statistics-before-workflow.json",
+    "sha256": "5480137f85b85b80ae8fa4809c1d80ab9d539039aeee6b553d16855c0c73ef7c"
+  },
+  "profile_reset": [
+    {
+      "cell_id": "guard_chain/interability",
+      "trial_id": "guard_chain-interability-measured-2",
+      "server_generation": "2",
+      "postgres_instance_id": "53cb0161-8a1a-43aa-bac2-8170e3f10051",
+      "clock_domain": "same-host-perf_counter_ns",
+      "origin_request_id": "2:5",
+      "client_process_pid": 2189129,
+      "parent_process_pid": 2189129,
+      "role": "foreground",
+      "actual_executor": "none",
+      "kind": "explicit_profile_reset",
+      "timestamp_ns": 2135085868302135,
+      "regime": "before_first_workflow_request"
+    }
+  ],
+  "definitions": {
+    "HTTP_response": "Existing instrumented client HTTP end minus start; excludes explicit post-response drain.",
+    "HTTP_span": "First workflow HTTP start to last HTTP end; includes between-request work/gaps.",
+    "with_drain_span": "First workflow HTTP start to last explicit drain end, includes gaps; not sum DB or pure server/CPU."
+  }
+}

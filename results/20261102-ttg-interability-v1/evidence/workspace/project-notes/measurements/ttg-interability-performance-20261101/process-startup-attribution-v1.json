@@ -1,0 +1,1293 @@
+{
+  "passed": true,
+  "scope": "Recorded primary startup wall, deduplicated by actual child PID with identical repeated values; actual child SQL evidence cross-checked via audited process set. No CPU/DB experiment.",
+  "definition": "ProcessReader.init start before type/Lock/Popen; ends after config write and child ready-line parse/PID check. Includes Python/Jac imports and PgStore object construction. Not Popen-only, excludes later load/IPC and lazy DB connection; no separately recorded IPC wall clock.",
+  "sources": [
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-interability-performance/runtime-clean-final-v1/jac/jaclang/runtime/ttg_process_reader.jac",
+      "sha256": "19dcc27f850c4ce01a980488f1b4defb3664e6e118d3cfa172d20299c777b8d7"
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-interability-performance/runtime-clean-final-v1/jac/jaclang/runtime/prefetch.jac",
+      "sha256": "48ce475260048b37ef3f6bced92955270c5f866876953cf783d1cea11354f3f7"
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-interability-performance/runtime-clean-final-v1/jac/jaclang/runtime/ttg_dependency_prefetch.jac",
+      "sha256": "0a63ba372ab1846ade3bd3e9a216101629aee617444b9e89aceb21cad568ada0"
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-interability-performance/runtime-clean-final-v1/jac/jaclang/server/impl/session.impl.jac",
+      "sha256": "f0b781aef69197b1682e54e724073efb07cbf875da7b82d7c264f29c12dfbe18"
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-interability-performance/runtime-clean-final-v1/jac/jaclang/data/impl/store.impl.jac",
+      "sha256": "a42598ada8e84226766d3881b29914dcd5b763be6010be9bdf58f5d4311de165"
+    }
+  ],
+  "rows": [
+    {
+      "case_id": "finite_list32",
+      "config_id": "baseline9282",
+      "unique_PID_counts": [
+        1,
+        1,
+        1
+      ],
+      "startup_sum_ms": [
+        188.7952033430338,
+        192.304661963135,
+        190.8791079185903
+      ],
+      "startup_sum_median_ms": 190.8791079185903,
+      "trials": [
+        {
+          "repeat": 0,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/finite_list32-baseline9282-measured-0.json",
+            "sha256": "edbd641036d91ff5efb4667984fe7179c238bc465abaea0d79a126587446b2e3"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/finite_list32-baseline9282-measured-0.json",
+            "sha256": "d579e0853e6b80451914529890b48a29905be05b8fc5d45b90533b5e2a2eab61"
+          },
+          "HTTP_response_sum_ms": 652.58237,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2167826": 188.7952033430338
+          },
+          "unique_PID_startup_sum_ms": 188.7952033430338,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2167826,
+              "startup_ms": 188.7952033430338,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "bc9715c2-dfaa-44de-95b0-3e4e4c63e202"
+            }
+          ],
+          "counters": {
+            "plan_count": 32,
+            "continuation_count": 64,
+            "continuation_execution_count": 992,
+            "continuation_path_count": 1024,
+            "submitted_count": 31,
+            "promoted_count": 31
+          }
+        },
+        {
+          "repeat": 1,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/finite_list32-baseline9282-measured-1.json",
+            "sha256": "ad0e3db086833fc67f80e429311e6e8f9e06dbccadb9c326c758f7dcb640975f"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/finite_list32-baseline9282-measured-1.json",
+            "sha256": "0cc918ce33c071bd98117faa8d1c054e7f64f1d2fd81bcdfa9661aef09d3ec8d"
+          },
+          "HTTP_response_sum_ms": 654.526185,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2169041": 192.304661963135
+          },
+          "unique_PID_startup_sum_ms": 192.304661963135,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2169041,
+              "startup_ms": 192.304661963135,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "ae65141c-a34a-4803-b034-9b77cf558df7"
+            }
+          ],
+          "counters": {
+            "plan_count": 32,
+            "continuation_count": 64,
+            "continuation_execution_count": 992,
+            "continuation_path_count": 1024,
+            "submitted_count": 31,
+            "promoted_count": 31
+          }
+        },
+        {
+          "repeat": 2,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/finite_list32-baseline9282-measured-2.json",
+            "sha256": "08e71b72d808d242abc4cdb5401b43d4ff0e657f1e2f5b9410059d28fbff651d"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/finite_list32-baseline9282-measured-2.json",
+            "sha256": "ae8a6d880198187090ade21c577071b7309153137d3bacc88eb20ecfef639869"
+          },
+          "HTTP_response_sum_ms": 652.822602,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2172529": 190.8791079185903
+          },
+          "unique_PID_startup_sum_ms": 190.8791079185903,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2172529,
+              "startup_ms": 190.8791079185903,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "6b363695-1173-474b-99ca-ac3d14a56a1a"
+            }
+          ],
+          "counters": {
+            "plan_count": 32,
+            "continuation_count": 64,
+            "continuation_execution_count": 992,
+            "continuation_path_count": 1024,
+            "submitted_count": 31,
+            "promoted_count": 31
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "finite_list32",
+      "config_id": "interability",
+      "unique_PID_counts": [
+        1,
+        1,
+        1
+      ],
+      "startup_sum_ms": [
+        192.90325418114662,
+        189.63779788464308,
+        196.70271407812834
+      ],
+      "startup_sum_median_ms": 192.90325418114662,
+      "trials": [
+        {
+          "repeat": 0,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/finite_list32-interability-measured-0.json",
+            "sha256": "96f09281df7c55afd063ef8e320fb0925d844f843044f31d14b745f22c6b77ca"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/finite_list32-interability-measured-0.json",
+            "sha256": "e3e4d5330b7b77c8a5fe522a64870c27f74d6c30121ae7674a86f5c46ab95263"
+          },
+          "HTTP_response_sum_ms": 254.941144,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2168430": 192.90325418114662
+          },
+          "unique_PID_startup_sum_ms": 192.90325418114662,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2168430,
+              "startup_ms": 192.90325418114662,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "d504ea67-4b07-44d0-a453-089071bd0c77"
+            }
+          ],
+          "counters": {
+            "plan_count": 1,
+            "continuation_count": 0,
+            "continuation_execution_count": 0,
+            "continuation_path_count": 0,
+            "submitted_count": 31,
+            "promoted_count": 31
+          }
+        },
+        {
+          "repeat": 1,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/finite_list32-interability-measured-1.json",
+            "sha256": "4c4d8145d38281ff01be8faf7e36f08f778f78f87a52381c55cfbb02e7508915"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/finite_list32-interability-measured-1.json",
+            "sha256": "6957006c55591e4867a1dcd0ee20fde514a74325bd93da308066fc8d5a523cb8"
+          },
+          "HTTP_response_sum_ms": 251.714834,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2169622": 189.63779788464308
+          },
+          "unique_PID_startup_sum_ms": 189.63779788464308,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2169622,
+              "startup_ms": 189.63779788464308,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "3826df2f-b160-4f2a-a37f-dd96dd4b0627"
+            }
+          ],
+          "counters": {
+            "plan_count": 1,
+            "continuation_count": 0,
+            "continuation_execution_count": 0,
+            "continuation_path_count": 0,
+            "submitted_count": 31,
+            "promoted_count": 31
+          }
+        },
+        {
+          "repeat": 2,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/finite_list32-interability-measured-2.json",
+            "sha256": "88c0dd516bfae83e0b424b47b5658ba38ba8c7b5b51e990fe7593fa1b580e700"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/finite_list32-interability-measured-2.json",
+            "sha256": "c7b6ecdb7a387dbf2365a0ac8b0b8c650e5774465ee029d814dc4b76157f3742"
+          },
+          "HTTP_response_sum_ms": 259.642051,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2171348": 196.70271407812834
+          },
+          "unique_PID_startup_sum_ms": 196.70271407812834,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2171348,
+              "startup_ms": 196.70271407812834,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "1541eead-09b6-4945-89a6-84ddbee94320"
+            }
+          ],
+          "counters": {
+            "plan_count": 1,
+            "continuation_count": 0,
+            "continuation_execution_count": 0,
+            "continuation_path_count": 0,
+            "submitted_count": 31,
+            "promoted_count": 31
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "finite_list1000",
+      "config_id": "baseline9282",
+      "unique_PID_counts": [
+        1,
+        1,
+        1
+      ],
+      "startup_sum_ms": [
+        186.22388690710068,
+        196.07104919850826,
+        190.76006999239326
+      ],
+      "startup_sum_median_ms": 190.76006999239326,
+      "trials": [
+        {
+          "repeat": 0,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/finite_list1000-baseline9282-measured-0.json",
+            "sha256": "b16d957ba53e202a718c6f468e9ddf0a57f232ce90258d70ed053f683b9b59c6"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/finite_list1000-baseline9282-measured-0.json",
+            "sha256": "ffcfe98ea8e865a4e311d75e4851185770d37eb38fd9a2b24f5617c5702b71b1"
+          },
+          "HTTP_response_sum_ms": 30987.718233,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2176797": 186.22388690710068
+          },
+          "unique_PID_startup_sum_ms": 186.22388690710068,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2176797,
+              "startup_ms": 186.22388690710068,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "c79d8c7c-ff09-4c47-9565-1f4d1faa6213"
+            }
+          ],
+          "counters": {
+            "plan_count": 1000,
+            "continuation_count": 2000,
+            "continuation_execution_count": 999000,
+            "continuation_path_count": 1000000,
+            "submitted_count": 999,
+            "promoted_count": 999
+          }
+        },
+        {
+          "repeat": 1,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/finite_list1000-baseline9282-measured-1.json",
+            "sha256": "c8feb7f59c06ff472b70734d7693ac4c7a5a4ac8b5106a739fc4e2da64c6e96c"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/finite_list1000-baseline9282-measured-1.json",
+            "sha256": "88fd821d4a619b0825b580f3dd35314381d789fb4fcc5e9327c4ea2fef11d728"
+          },
+          "HTTP_response_sum_ms": 29852.764293,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2181718": 196.07104919850826
+          },
+          "unique_PID_startup_sum_ms": 196.07104919850826,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2181718,
+              "startup_ms": 196.07104919850826,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "e9666034-4329-4b72-aa7f-8b980e8600a5"
+            }
+          ],
+          "counters": {
+            "plan_count": 1000,
+            "continuation_count": 2000,
+            "continuation_execution_count": 999000,
+            "continuation_path_count": 1000000,
+            "submitted_count": 999,
+            "promoted_count": 999
+          }
+        },
+        {
+          "repeat": 2,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/finite_list1000-baseline9282-measured-2.json",
+            "sha256": "2ae064e2e01d0d3b8769731a2348fa47361d36d0aed233b28df3548c2641529b"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/finite_list1000-baseline9282-measured-2.json",
+            "sha256": "1c092fa4fa932a94bd084d768224dff81ba2ed5888102a0551f271d4ff6d6e81"
+          },
+          "HTTP_response_sum_ms": 30841.348958,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2183921": 190.76006999239326
+          },
+          "unique_PID_startup_sum_ms": 190.76006999239326,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2183921,
+              "startup_ms": 190.76006999239326,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "4f447258-c4dd-4e48-a898-63cba03da8e2"
+            }
+          ],
+          "counters": {
+            "plan_count": 1000,
+            "continuation_count": 2000,
+            "continuation_execution_count": 999000,
+            "continuation_path_count": 1000000,
+            "submitted_count": 999,
+            "promoted_count": 999
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "finite_list1000",
+      "config_id": "interability",
+      "unique_PID_counts": [
+        1,
+        1,
+        1
+      ],
+      "startup_sum_ms": [
+        193.42223089188337,
+        191.26120069995522,
+        190.62818260863423
+      ],
+      "startup_sum_median_ms": 191.26120069995522,
+      "trials": [
+        {
+          "repeat": 0,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/finite_list1000-interability-measured-0.json",
+            "sha256": "7e7225160874fe81b50797296d3bd41a148be90806ecf39d52f23199d24fccbf"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/finite_list1000-interability-measured-0.json",
+            "sha256": "6e0cd3ba0f160b02699170b20b9a378a4cbd9d978f537f1e25a88da4290ba100"
+          },
+          "HTTP_response_sum_ms": 733.942915,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2178350": 193.42223089188337
+          },
+          "unique_PID_startup_sum_ms": 193.42223089188337,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2178350,
+              "startup_ms": 193.42223089188337,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "973b19ad-08af-413f-a491-f9f19038a386"
+            }
+          ],
+          "counters": {
+            "plan_count": 1,
+            "continuation_count": 0,
+            "continuation_execution_count": 0,
+            "continuation_path_count": 0,
+            "submitted_count": 999,
+            "promoted_count": 999
+          }
+        },
+        {
+          "repeat": 1,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/finite_list1000-interability-measured-1.json",
+            "sha256": "38ddc7eb8c4c92717078d4249195c1ba8d80f410b3e0aaf3c90f12b304e1014a"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/finite_list1000-interability-measured-1.json",
+            "sha256": "7f7a57919213e8c54f650e1743581aab84cb8c8b8a7555245df7a9e5f64a95c0"
+          },
+          "HTTP_response_sum_ms": 726.128459,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2179505": 191.26120069995522
+          },
+          "unique_PID_startup_sum_ms": 191.26120069995522,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2179505,
+              "startup_ms": 191.26120069995522,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "8c3a47f0-c466-4234-b4fb-7e3dc4c30a3f"
+            }
+          ],
+          "counters": {
+            "plan_count": 1,
+            "continuation_count": 0,
+            "continuation_execution_count": 0,
+            "continuation_path_count": 0,
+            "submitted_count": 999,
+            "promoted_count": 999
+          }
+        },
+        {
+          "repeat": 2,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/finite_list1000-interability-measured-2.json",
+            "sha256": "c4745576be9ecd76dba52b45ef09b55442ecd5a7e213d31e0f932a8d9f906376"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/finite_list1000-interability-measured-2.json",
+            "sha256": "874debc8c7bc0ba068643ee34f8071293c4ba301a9755b22f8e012ac1c28d5cd"
+          },
+          "HTTP_response_sum_ms": 720.944013,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2186294": 190.62818260863423
+          },
+          "unique_PID_startup_sum_ms": 190.62818260863423,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2186294,
+              "startup_ms": 190.62818260863423,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "63f7d0aa-cddc-45a7-bb5a-96f26351313a"
+            }
+          ],
+          "counters": {
+            "plan_count": 1,
+            "continuation_count": 0,
+            "continuation_execution_count": 0,
+            "continuation_path_count": 0,
+            "submitted_count": 999,
+            "promoted_count": 999
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "guard_chain",
+      "config_id": "baseline9282",
+      "unique_PID_counts": [
+        1,
+        1,
+        1
+      ],
+      "startup_sum_ms": [
+        188.28492192551494,
+        192.03698402270675,
+        189.74744202569127
+      ],
+      "startup_sum_median_ms": 189.74744202569127,
+      "trials": [
+        {
+          "repeat": 0,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/guard_chain-baseline9282-measured-0.json",
+            "sha256": "f12c059b1f75dd44220d4410d00a8d19a00effe1784d6ee2c53848b450d65514"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/guard_chain-baseline9282-measured-0.json",
+            "sha256": "75d376423e3de5e4ecd6edd2fc480d265501e288e5c6d1315fdceca1b75fd7fe"
+          },
+          "HTTP_response_sum_ms": 442.302177,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2188114": 188.28492192551494
+          },
+          "unique_PID_startup_sum_ms": 188.28492192551494,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2188114,
+              "startup_ms": 188.28492192551494,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "ef12ec71-5d9e-40a2-84bf-c202952aedda"
+            }
+          ],
+          "counters": {
+            "plan_count": 2,
+            "continuation_count": 5,
+            "continuation_execution_count": 5,
+            "continuation_path_count": 3,
+            "submitted_count": 2,
+            "promoted_count": 2
+          }
+        },
+        {
+          "repeat": 1,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/guard_chain-baseline9282-measured-1.json",
+            "sha256": "ef43ffe0aeb04c19ea3fe201d335209b8492719d03399b55aba40bd5a62b8a46"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/guard_chain-baseline9282-measured-1.json",
+            "sha256": "44c4ecab33200c9c0c99b5f976105e999b261a6533ea8567b8d961fb79eb2d77"
+          },
+          "HTTP_response_sum_ms": 453.240052,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2188523": 192.03698402270675
+          },
+          "unique_PID_startup_sum_ms": 192.03698402270675,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2188523,
+              "startup_ms": 192.03698402270675,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "796802f7-e8a5-4157-96f6-4ad7979689b4"
+            }
+          ],
+          "counters": {
+            "plan_count": 2,
+            "continuation_count": 5,
+            "continuation_execution_count": 5,
+            "continuation_path_count": 3,
+            "submitted_count": 2,
+            "promoted_count": 2
+          }
+        },
+        {
+          "repeat": 2,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/guard_chain-baseline9282-measured-2.json",
+            "sha256": "b497cee870a10992e1b8d1e18b2841e29ccf2becf53fc27d9ad65e5ca1a36a00"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/guard_chain-baseline9282-measured-2.json",
+            "sha256": "3596d0291265c59debaf14f5cb2cfe6118f76aba1baeb5c5580df24bad334276"
+          },
+          "HTTP_response_sum_ms": 444.50104,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2188963": 189.74744202569127
+          },
+          "unique_PID_startup_sum_ms": 189.74744202569127,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2188963,
+              "startup_ms": 189.74744202569127,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "5785a021-145a-47ed-b7cf-8b9e326d98d9"
+            }
+          ],
+          "counters": {
+            "plan_count": 2,
+            "continuation_count": 5,
+            "continuation_execution_count": 5,
+            "continuation_path_count": 3,
+            "submitted_count": 2,
+            "promoted_count": 2
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "guard_chain",
+      "config_id": "interability",
+      "unique_PID_counts": [
+        1,
+        1,
+        1
+      ],
+      "startup_sum_ms": [
+        190.61511987820268,
+        189.06278209760785,
+        191.69621588662267
+      ],
+      "startup_sum_median_ms": 190.61511987820268,
+      "trials": [
+        {
+          "repeat": 0,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/guard_chain-interability-measured-0.json",
+            "sha256": "c43e6391e458455d2577bc2a710b1658148e0edc852b93234ce5bfb036fd3a17"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/guard_chain-interability-measured-0.json",
+            "sha256": "b252936a476b7e2c6f1ce92fb4fd77f579654f0e5e0e4c500603f35ed3b06fa7"
+          },
+          "HTTP_response_sum_ms": 241.44818,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2187536": 190.61511987820268
+          },
+          "unique_PID_startup_sum_ms": 190.61511987820268,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2187536,
+              "startup_ms": 190.61511987820268,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "38f7e8c9-8ce7-43e6-b636-88e2fd374762"
+            }
+          ],
+          "counters": {
+            "plan_count": 1,
+            "continuation_count": 1,
+            "continuation_execution_count": 0,
+            "continuation_path_count": 0,
+            "submitted_count": 2,
+            "promoted_count": 2
+          }
+        },
+        {
+          "repeat": 1,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/guard_chain-interability-measured-1.json",
+            "sha256": "e168e4b42c6dfa41cb5ca90b0fed97d47b1d10e5683ccccff9f6dd1bf0a33f20"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/guard_chain-interability-measured-1.json",
+            "sha256": "dbe60db9c2fd92d80d5fd56f32c02f05b5d30e96da8d24e637dc247f7851898e"
+          },
+          "HTTP_response_sum_ms": 239.782615,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2188749": 189.06278209760785
+          },
+          "unique_PID_startup_sum_ms": 189.06278209760785,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2188749,
+              "startup_ms": 189.06278209760785,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "53164c22-3ee2-42ba-9ed7-c2ee00c2594e"
+            }
+          ],
+          "counters": {
+            "plan_count": 1,
+            "continuation_count": 1,
+            "continuation_execution_count": 0,
+            "continuation_path_count": 0,
+            "submitted_count": 2,
+            "promoted_count": 2
+          }
+        },
+        {
+          "repeat": 2,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/guard_chain-interability-measured-2.json",
+            "sha256": "c4938df991be8a95f89508d5cf895ba375963ce3b3de5d23b22ea64f394732b7"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/guard_chain-interability-measured-2.json",
+            "sha256": "c4fc9d7ed06eeb1b85c477368e961ac5f4e0905db0c1698e3928f732bbc9de0f"
+          },
+          "HTTP_response_sum_ms": 246.888446,
+          "HTTP_requests": 1,
+          "outcome_scopes": 1,
+          "unique_startup_PIDs": 1,
+          "startup_ms_per_PID": {
+            "2189173": 191.69621588662267
+          },
+          "unique_PID_startup_sum_ms": 191.69621588662267,
+          "requests_with_startup_PIDs": 1,
+          "observations": [
+            {
+              "pid": 2189173,
+              "startup_ms": 191.69621588662267,
+              "request": "2:5",
+              "server_generation": "2",
+              "scope_id": "6d78432a-2a52-4fa9-bd73-c4c7987a2ef4"
+            }
+          ],
+          "counters": {
+            "plan_count": 1,
+            "continuation_count": 1,
+            "continuation_execution_count": 0,
+            "continuation_path_count": 0,
+            "submitted_count": 2,
+            "promoted_count": 2
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "littlex",
+      "config_id": "baseline9282",
+      "unique_PID_counts": [
+        6,
+        6,
+        6
+      ],
+      "startup_sum_ms": [
+        1138.7136508710682,
+        1148.4710751101375,
+        1148.9242250099778
+      ],
+      "startup_sum_median_ms": 1148.4710751101375,
+      "trials": [
+        {
+          "repeat": 0,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/littlex-baseline9282-measured-0.json",
+            "sha256": "d814eebee20e1d568105550fb9397e0a0e93a83f7d77a0de0336043fe5dbc073"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/littlex-baseline9282-measured-0.json",
+            "sha256": "98f9f09b5ce68316abf4c02e66746997fe3200cca0455c2c3b6680f9011aadc5"
+          },
+          "HTTP_response_sum_ms": 1572.528059,
+          "HTTP_requests": 9,
+          "outcome_scopes": 9,
+          "unique_startup_PIDs": 6,
+          "startup_ms_per_PID": {
+            "2193363": 190.82741532474756,
+            "2193370": 191.0302904434502,
+            "2193400": 189.1178060323,
+            "2193408": 188.17914091050625,
+            "2193414": 188.3213729597628,
+            "2193421": 191.2376252003014
+          },
+          "unique_PID_startup_sum_ms": 1138.7136508710682,
+          "requests_with_startup_PIDs": 6,
+          "observations": [
+            {
+              "pid": 2193363,
+              "startup_ms": 190.82741532474756,
+              "request": "2:20",
+              "server_generation": "2",
+              "scope_id": "afb06c25-d84c-44db-afc9-f64c4dbde872"
+            },
+            {
+              "pid": 2193370,
+              "startup_ms": 191.0302904434502,
+              "request": "2:21",
+              "server_generation": "2",
+              "scope_id": "55ce8585-c915-4d65-8591-2d8c280f4d4a"
+            },
+            {
+              "pid": 2193400,
+              "startup_ms": 189.1178060323,
+              "request": "2:25",
+              "server_generation": "2",
+              "scope_id": "742a0f12-7321-4a11-b96a-ec89dc9bab55"
+            },
+            {
+              "pid": 2193408,
+              "startup_ms": 188.17914091050625,
+              "request": "2:26",
+              "server_generation": "2",
+              "scope_id": "44a74512-cd93-4b86-91d0-6abbf105d6cf"
+            },
+            {
+              "pid": 2193414,
+              "startup_ms": 188.3213729597628,
+              "request": "2:27",
+              "server_generation": "2",
+              "scope_id": "eeb336d8-d122-4ee6-a885-ea70969116c2"
+            },
+            {
+              "pid": 2193421,
+              "startup_ms": 191.2376252003014,
+              "request": "2:28",
+              "server_generation": "2",
+              "scope_id": "6a1c2c82-1263-41b0-95f6-13d9e35ea2bf"
+            }
+          ],
+          "counters": {
+            "plan_count": 14,
+            "continuation_count": 86,
+            "continuation_execution_count": 32,
+            "continuation_path_count": 34,
+            "submitted_count": 63,
+            "promoted_count": 63
+          }
+        },
+        {
+          "repeat": 1,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/littlex-baseline9282-measured-1.json",
+            "sha256": "3945862fec705ce2ed460cdb6fb1a6e8c5a1e0fa6e608ad3667d40f7ab9f241c"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/littlex-baseline9282-measured-1.json",
+            "sha256": "e5591b3fc07d5c362eb7d8863c03c9cb0e13b0b8c0b90109a969ffed5a17ddd2"
+          },
+          "HTTP_response_sum_ms": 1586.361139,
+          "HTTP_requests": 9,
+          "outcome_scopes": 9,
+          "unique_startup_PIDs": 6,
+          "startup_ms_per_PID": {
+            "2194937": 189.3298770301044,
+            "2194944": 195.41099108755589,
+            "2194972": 186.40113109722733,
+            "2194979": 187.94156285002828,
+            "2194986": 193.56968672946095,
+            "2194993": 195.8178263157606
+          },
+          "unique_PID_startup_sum_ms": 1148.4710751101375,
+          "requests_with_startup_PIDs": 6,
+          "observations": [
+            {
+              "pid": 2194937,
+              "startup_ms": 189.3298770301044,
+              "request": "2:20",
+              "server_generation": "2",
+              "scope_id": "cb85237b-1970-48a8-8f9f-d29c649fdb33"
+            },
+            {
+              "pid": 2194944,
+              "startup_ms": 195.41099108755589,
+              "request": "2:21",
+              "server_generation": "2",
+              "scope_id": "ad0ece13-4879-4851-8b97-bcb59744d1aa"
+            },
+            {
+              "pid": 2194972,
+              "startup_ms": 186.40113109722733,
+              "request": "2:25",
+              "server_generation": "2",
+              "scope_id": "23bc100d-1b1c-4843-a1c2-c9a6d8b72288"
+            },
+            {
+              "pid": 2194979,
+              "startup_ms": 187.94156285002828,
+              "request": "2:26",
+              "server_generation": "2",
+              "scope_id": "4a2dd82e-1351-4925-8384-77efe74c6db2"
+            },
+            {
+              "pid": 2194986,
+              "startup_ms": 193.56968672946095,
+              "request": "2:27",
+              "server_generation": "2",
+              "scope_id": "8a868503-a2dd-4ff2-aa56-5e3f6538b47d"
+            },
+            {
+              "pid": 2194993,
+              "startup_ms": 195.8178263157606,
+              "request": "2:28",
+              "server_generation": "2",
+              "scope_id": "d0dbd786-30fb-48bc-a847-bb44e907c6fb"
+            }
+          ],
+          "counters": {
+            "plan_count": 14,
+            "continuation_count": 86,
+            "continuation_execution_count": 32,
+            "continuation_path_count": 34,
+            "submitted_count": 63,
+            "promoted_count": 63
+          }
+        },
+        {
+          "repeat": 2,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/littlex-baseline9282-measured-2.json",
+            "sha256": "cec6ca4a0becf333839b24d1f7c1b48ef07fe33b99e663ffc26ac08a65cbd390"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/littlex-baseline9282-measured-2.json",
+            "sha256": "710d9fe9dd7de9dec0c8198716bd97d6ba318aa43944ec7050d43b0c6e7018df"
+          },
+          "HTTP_response_sum_ms": 1588.527644,
+          "HTTP_requests": 9,
+          "outcome_scopes": 9,
+          "unique_startup_PIDs": 6,
+          "startup_ms_per_PID": {
+            "2199253": 191.43981486558914,
+            "2199259": 191.1968570202589,
+            "2199270": 189.01526974514127,
+            "2199277": 194.16731735691428,
+            "2199302": 192.17779207974672,
+            "2199310": 190.9271739423275
+          },
+          "unique_PID_startup_sum_ms": 1148.9242250099778,
+          "requests_with_startup_PIDs": 6,
+          "observations": [
+            {
+              "pid": 2199253,
+              "startup_ms": 191.43981486558914,
+              "request": "2:20",
+              "server_generation": "2",
+              "scope_id": "7c8b63a8-576f-4084-a903-84a9fdb45478"
+            },
+            {
+              "pid": 2199259,
+              "startup_ms": 191.1968570202589,
+              "request": "2:21",
+              "server_generation": "2",
+              "scope_id": "b36cc34e-1df8-43bc-9536-39128a8c199d"
+            },
+            {
+              "pid": 2199270,
+              "startup_ms": 189.01526974514127,
+              "request": "2:25",
+              "server_generation": "2",
+              "scope_id": "7b939644-d51a-4c19-9f8a-a9970c0c45f3"
+            },
+            {
+              "pid": 2199277,
+              "startup_ms": 194.16731735691428,
+              "request": "2:26",
+              "server_generation": "2",
+              "scope_id": "06709f74-8b1c-47c9-8af1-e120ee74e06a"
+            },
+            {
+              "pid": 2199302,
+              "startup_ms": 192.17779207974672,
+              "request": "2:27",
+              "server_generation": "2",
+              "scope_id": "1c0d2651-282a-46c4-b6dd-62bb9b884802"
+            },
+            {
+              "pid": 2199310,
+              "startup_ms": 190.9271739423275,
+              "request": "2:28",
+              "server_generation": "2",
+              "scope_id": "cece9934-52b5-403e-9135-68e447cad78f"
+            }
+          ],
+          "counters": {
+            "plan_count": 14,
+            "continuation_count": 86,
+            "continuation_execution_count": 32,
+            "continuation_path_count": 34,
+            "submitted_count": 63,
+            "promoted_count": 63
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "littlex",
+      "config_id": "interability",
+      "unique_PID_counts": [
+        6,
+        6,
+        6
+      ],
+      "startup_sum_ms": [
+        1145.2754465863109,
+        1139.219087548554,
+        1144.448400940746
+      ],
+      "startup_sum_median_ms": 1144.448400940746,
+      "trials": [
+        {
+          "repeat": 0,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/littlex-interability-measured-0.json",
+            "sha256": "f468682e06cf75688df90866d5cc0d1f9ee794fa783214a887705b924848a794"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/littlex-interability-measured-0.json",
+            "sha256": "c23d337e56ebb2d7cc58c2a94073eb7f8c7ee34941217135f9999aa681d86c58"
+          },
+          "HTTP_response_sum_ms": 1592.227097,
+          "HTTP_requests": 9,
+          "outcome_scopes": 9,
+          "unique_startup_PIDs": 6,
+          "startup_ms_per_PID": {
+            "2194183": 191.22489029541612,
+            "2194190": 190.0786478072405,
+            "2194266": 189.5444947294891,
+            "2194272": 194.54726204276085,
+            "2194280": 191.07080064713955,
+            "2194287": 188.80935106426477
+          },
+          "unique_PID_startup_sum_ms": 1145.2754465863109,
+          "requests_with_startup_PIDs": 6,
+          "observations": [
+            {
+              "pid": 2194183,
+              "startup_ms": 191.22489029541612,
+              "request": "2:20",
+              "server_generation": "2",
+              "scope_id": "04ad85dd-7aad-4a82-b3eb-f398a5a0f94d"
+            },
+            {
+              "pid": 2194190,
+              "startup_ms": 190.0786478072405,
+              "request": "2:21",
+              "server_generation": "2",
+              "scope_id": "f88f11d8-9675-4da1-adc0-5560cfbfe7d7"
+            },
+            {
+              "pid": 2194266,
+              "startup_ms": 189.5444947294891,
+              "request": "2:25",
+              "server_generation": "2",
+              "scope_id": "b9294338-4c26-4de7-aa66-9f7d0de1fb44"
+            },
+            {
+              "pid": 2194272,
+              "startup_ms": 194.54726204276085,
+              "request": "2:26",
+              "server_generation": "2",
+              "scope_id": "372287ba-47bd-452a-b7ca-50ab18111e43"
+            },
+            {
+              "pid": 2194280,
+              "startup_ms": 191.07080064713955,
+              "request": "2:27",
+              "server_generation": "2",
+              "scope_id": "038a8abf-1894-4b9c-b75b-ac937eb6c007"
+            },
+            {
+              "pid": 2194287,
+              "startup_ms": 188.80935106426477,
+              "request": "2:28",
+              "server_generation": "2",
+              "scope_id": "f365e769-ab1e-4bc7-ac83-b0b868b15c5a"
+            }
+          ],
+          "counters": {
+            "plan_count": 14,
+            "continuation_count": 86,
+            "continuation_execution_count": 32,
+            "continuation_path_count": 34,
+            "submitted_count": 63,
+            "promoted_count": 63
+          }
+        },
+        {
+          "repeat": 1,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/littlex-interability-measured-1.json",
+            "sha256": "113f87781a5c3dd0ff20d2c76e8f8ba38d5615e2bdf876be8bc0e1494f04214c"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/littlex-interability-measured-1.json",
+            "sha256": "302a949b326bf2abe3c3f79c13561076d186f4280ec7f1d3ba009674c4b8d63b"
+          },
+          "HTTP_response_sum_ms": 1576.287732,
+          "HTTP_requests": 9,
+          "outcome_scopes": 9,
+          "unique_startup_PIDs": 6,
+          "startup_ms_per_PID": {
+            "2195619": 189.69270726665854,
+            "2195625": 191.11857563257217,
+            "2195652": 188.62723791971803,
+            "2195658": 189.36764588579535,
+            "2195683": 190.13772206380963,
+            "2195690": 190.2751987800002
+          },
+          "unique_PID_startup_sum_ms": 1139.219087548554,
+          "requests_with_startup_PIDs": 6,
+          "observations": [
+            {
+              "pid": 2195619,
+              "startup_ms": 189.69270726665854,
+              "request": "2:20",
+              "server_generation": "2",
+              "scope_id": "1f56e6b2-71cd-4d19-a423-9d103543e863"
+            },
+            {
+              "pid": 2195625,
+              "startup_ms": 191.11857563257217,
+              "request": "2:21",
+              "server_generation": "2",
+              "scope_id": "c3ff3e23-aa84-4e94-9aab-57ea6234cab2"
+            },
+            {
+              "pid": 2195652,
+              "startup_ms": 188.62723791971803,
+              "request": "2:25",
+              "server_generation": "2",
+              "scope_id": "7e727dcc-9020-4499-9afe-b83a4044a4b9"
+            },
+            {
+              "pid": 2195658,
+              "startup_ms": 189.36764588579535,
+              "request": "2:26",
+              "server_generation": "2",
+              "scope_id": "74dbe78c-da98-4e81-930d-6aaf96ebe3f5"
+            },
+            {
+              "pid": 2195683,
+              "startup_ms": 190.13772206380963,
+              "request": "2:27",
+              "server_generation": "2",
+              "scope_id": "753bafe7-a81e-4292-bf44-196e5877f9c2"
+            },
+            {
+              "pid": 2195690,
+              "startup_ms": 190.2751987800002,
+              "request": "2:28",
+              "server_generation": "2",
+              "scope_id": "78119ffa-266b-40af-a744-2704714a98ed"
+            }
+          ],
+          "counters": {
+            "plan_count": 14,
+            "continuation_count": 86,
+            "continuation_execution_count": 32,
+            "continuation_path_count": 34,
+            "submitted_count": 63,
+            "promoted_count": 63
+          }
+        },
+        {
+          "repeat": 2,
+          "metric": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/littlex-interability-measured-2.json",
+            "sha256": "789a6c31f580e65bef5ffa7db05aa9f5fa3506e6de6bb835de2a1b0a35d2e5a7"
+          },
+          "audit": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-review-20261101/formal48-raw-audit/littlex-interability-measured-2.json",
+            "sha256": "ed6c2ae5bc10441294a7152eb5f0d3e44dc2b6c12b3230f67ad610aa9720c719"
+          },
+          "HTTP_response_sum_ms": 1595.082764,
+          "HTTP_requests": 9,
+          "outcome_scopes": 9,
+          "unique_startup_PIDs": 6,
+          "startup_ms_per_PID": {
+            "2198013": 191.05574395507574,
+            "2198019": 191.3948175497353,
+            "2198049": 190.33855758607388,
+            "2198056": 189.47673868387938,
+            "2198062": 189.90995734930038,
+            "2198069": 192.27258581668139
+          },
+          "unique_PID_startup_sum_ms": 1144.448400940746,
+          "requests_with_startup_PIDs": 6,
+          "observations": [
+            {
+              "pid": 2198013,
+              "startup_ms": 191.05574395507574,
+              "request": "2:20",
+              "server_generation": "2",
+              "scope_id": "369b4dfd-93e1-4aed-a297-44ac96fd272c"
+            },
+            {
+              "pid": 2198019,
+              "startup_ms": 191.3948175497353,
+              "request": "2:21",
+              "server_generation": "2",
+              "scope_id": "8ddab36d-9076-4e4a-a0c8-4182689737cf"
+            },
+            {
+              "pid": 2198049,
+              "startup_ms": 190.33855758607388,
+              "request": "2:25",
+              "server_generation": "2",
+              "scope_id": "b1086b36-32e9-4e5c-af1e-8a3012c01557"
+            },
+            {
+              "pid": 2198056,
+              "startup_ms": 189.47673868387938,
+              "request": "2:26",
+              "server_generation": "2",
+              "scope_id": "74a0584b-1038-4e50-9f7d-a9da2a48c9f9"
+            },
+            {
+              "pid": 2198062,
+              "startup_ms": 189.90995734930038,
+              "request": "2:27",
+              "server_generation": "2",
+              "scope_id": "200574c8-daac-4c2a-b43c-7eb560cc8798"
+            },
+            {
+              "pid": 2198069,
+              "startup_ms": 192.27258581668139,
+              "request": "2:28",
+              "server_generation": "2",
+              "scope_id": "e9463462-5ea5-41b7-be39-bf99cda86c2e"
+            }
+          ],
+          "counters": {
+            "plan_count": 14,
+            "continuation_count": 86,
+            "continuation_execution_count": 32,
+            "continuation_path_count": 34,
+            "submitted_count": 63,
+            "promoted_count": 63
+          }
+        }
+      ]
+    }
+  ]
+}

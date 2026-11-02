@@ -1,0 +1,163 @@
+diff --git a/jac/jaclang/compiler/backends/py/impl/jcir_gen_pass.impl.jac b/jac/jaclang/compiler/backends/py/impl/jcir_gen_pass.impl.jac
+index 3b0fa9eec..c375ac023 100644
+--- a/jac/jaclang/compiler/backends/py/impl/jcir_gen_pass.impl.jac
++++ b/jac/jaclang/compiler/backends/py/impl/jcir_gen_pass.impl.jac
+@@ -2033,6 +2033,11 @@ impl JcirGenPass.exit_ability(nd: Ability) -> None {
+             index = 1 if nd.doc is not None else 0;
+             body = body[:index] + [observer] + body[index:];
+         }
++        region_hook = self._ttg_checkpoint(nd);
++        if region_hook is not None {
++            index = 1 if nd.doc is not None else 0;
++            body = body[:index] + [region_hook] + body[index:];
++        }
+     }
+     if (nd.is_abstract and nd.body) {
+         self.emit(E5004, node_override=nd, name=str(nd.sym_name));
+@@ -3143,6 +3148,9 @@ impl JcirGenPass._ttg_checkpoint(nd: UniNode, observe: bool = False) -> CgNode |
+     points = [plan['entries'][ability.py_resolve_name()]]
+         if kind == 'entry'
+         else plan['points'];
++    if kind == 'entry' and not observe and str(points[0]) not in plan.get('interability_regions', {}).get('regions', {}) {
++        return None;
++    }
+     for point in points {
+         event = plan['events'][point];
+         if event['ability'] == ability.py_resolve_name()
+diff --git a/jac/jaclang/impl/sql.impl.jac b/jac/jaclang/impl/sql.impl.jac
+index 1b111fd65..92409444b 100644
+--- a/jac/jaclang/impl/sql.impl.jac
++++ b/jac/jaclang/impl/sql.impl.jac
+@@ -1737,6 +1737,9 @@ impl _call(op: str, args: tuple[ExprNode, ...]) -> ExprNode {
+ }
+ 
+ impl _call_type(op: str, args: tuple[ExprNode, ...]) -> DataType {
++    if op == 'JSON_KIND' and len(args) == 1 and args[0].dtype.name == 'jsonb' {
++        return DataType('text', True);
++    }
+     if op in ('JSON_GET', 'JSON_TEXT', 'JSON_HAS_KEY')
+         and len(args) == 2
+         and args[0].dtype.name == 'jsonb'
+@@ -2427,6 +2430,9 @@ impl PostgresRenderer.source_body(src: Source) -> str {
+ impl PostgresRenderer.extended_expr(ast: ExprNode) -> str {
+     if isinstance(ast, CallNode) {
+         args = [self.expr(e) for e in ast.args];
++        if ast.op == 'JSON_KIND' {
++            return 'jsonb_typeof(' + args[0] + ')';
++        }
+         if ast.op in ('JSON_GET', 'JSON_TEXT', 'JSON_HAS_KEY') {
+             op = '->'
+                 if ast.op == 'JSON_GET'
+@@ -3040,3 +3046,9 @@ impl json_has_key(
+ ) -> ScalarExpr[Nullable[SqlBool]] {
+     return ScalarExpr(_call('JSON_HAS_KEY', (value.ast, key.ast)));
+ }
++
++impl json_kind(
++    value: ScalarExpr[SqlJSON] | ScalarExpr[Nullable[SqlJSON]]
++) -> ScalarExpr[Nullable[SqlText]] {
++    return ScalarExpr(_call('JSON_KIND', (value.ast, )));
++}
+diff --git a/jac/jaclang/runtime/ttg_dependencies.jac b/jac/jaclang/runtime/ttg_dependencies.jac
+index bf63b3169..f4b384265 100644
+--- a/jac/jaclang/runtime/ttg_dependencies.jac
++++ b/jac/jaclang/runtime/ttg_dependencies.jac
+@@ -68,7 +68,8 @@ obj WalkerDependencyGraph {
+         entries: dict[str, int] = {},
+         handlers: dict[str, list[str]] = {},
+         dispatch: dict[int, list[str]] = {},
+-        sql_templates: dict = {};
++        sql_templates: dict = {},
++        interability_regions: dict = {};
+ 
+     def dependencies(event_id: int) -> list[TraceDependency] {
+         return [
+@@ -1120,6 +1121,7 @@ def _trace_field_effects(
+ def compile_checkpoint_plan(arch: uni.Archetype) -> dict {
+     import from jaclang.runtime.ttg_templates { compile_templates }
+     graph = analyze_walker_ast(arch);
++    import from jaclang.runtime.ttg_regions { compile_interability_regions }
+     candidates = [
+         name
+         for name in graph.entries
+@@ -1144,6 +1146,7 @@ def compile_checkpoint_plan(arch: uni.Archetype) -> dict {
+     return {
+         'version': 2,
+         'sql_templates': compile_templates(graph.events),
++        'interability_regions': compile_interability_regions(graph),
+         'walker_name': graph.walker_name,
+         'entries': graph.entries,
+         'handlers': graph.handlers,
+@@ -1198,6 +1201,7 @@ def checkpoint_graph(spec: dict, walker_type: type) -> WalkerDependencyGraph {
+     graph.edges = [TraceDependency(**item) for item in spec['edges']];
+     import from jaclang.runtime.ttg_templates { hydrate_templates }
+     graph.sql_templates = hydrate_templates(spec.get('sql_templates', {}));
++    graph.interability_regions = hydrate_templates(spec.get('interability_regions', {}));
+     graph.entries = dict(spec['entries']);
+     graph.handlers = dict(spec['handlers']);
+     graph.dispatch = {int(k): v for (k, v) in spec['dispatch'].items()};
+diff --git a/jac/jaclang/runtime/ttg_dependency_prefetch.jac b/jac/jaclang/runtime/ttg_dependency_prefetch.jac
+index ad5f7f22c..262460e33 100644
+--- a/jac/jaclang/runtime/ttg_dependency_prefetch.jac
++++ b/jac/jaclang/runtime/ttg_dependency_prefetch.jac
+@@ -253,6 +253,47 @@ def prefetch_continuation(graph: any, scope: any, point: int) {
+             break;
+         }
+     }
++    if state.fused_sql and graph.events[point].kind == 'entry' {
++        import from jaclang.runtime.ttg_regions { resolve_interability_region }
++        resolved = resolve_interability_region(mem, graph, scope.wlk, scope, point,
++            {'id':anchor.id, 'node_type':type(anchor.archetype)}, pending,
++            state.ctx.user_root, state.max_length, state.fusion);
++        if resolved is not None {
++            state.fusion['sql_construction'] = 'compiler_emitted_interability_regions';
++            state.fusion['effective_region_mode'] = 'static_single_successor';
++            if resolved['reused'] { return; }
++            plan: dict = {
++                'origin':str(anchor.id), 'ability':ability, 'visit_event':point,
++                'hops':[], 'ids':[], 'status':'resolved', 'decisions':[],
++                'demanded':False, 'decision_ms':0.0, 'queue_position':0,
++                'site_key':model_site_key(state,graph,point),
++                'ability_key':model_ability_key(state,graph,ability)
++            };
++            state.plans.append(plan);
++            with mem._raw_lock {
++                excluded = set(mem.__mem__) | set(mem.__raw_mem__) | state.submitted;
++            }
++            ids: list = [];
++            for row in resolved['payload'] {
++                uid = row[0];
++                if uid not in excluded and uid not in mem._deleted and uid not in ignored {
++                    ids.append(uid); excluded.add(uid);
++                }
++            }
++            if ids {
++                admission = admit_prefetch(state, plan, 'load', len(ids));
++                if admission.admit {
++                    plan['ids'] = [str(uid) for uid in ids];
++                    state.fusion['payload_dispatches'] += 1;
++                    dispatch_prefetch(state.ctx, ids, state.mode, state.workers,
++                        append=True, observer=payload_observer(state, plan));
++                    state.submitted.update(ids);
++                    plan['status'] = 'submitted';
++                }
++            }
++            return;
++        }
++    }
+     local_paths: dict = {};
+     fused_paths: dict = {};
+     attempted_regions: set = set();
+diff --git a/jac/jaclang/sql.jac b/jac/jaclang/sql.jac
+index 25e751e9c..0a0410a54 100644
+--- a/jac/jaclang/sql.jac
++++ b/jac/jaclang/sql.jac
+@@ -957,3 +957,8 @@ def json_has_key(
+     value: ScalarExpr[SqlJSON] | ScalarExpr[Nullable[SqlJSON]],
+     key: ScalarExpr[SqlText] | ScalarExpr[Nullable[SqlText]]
+ ) -> ScalarExpr[Nullable[SqlBool]];
++
++# JSON scalar kind is nullable for a missing SQL value; JSON null returns "null".
++def json_kind(
++    value: ScalarExpr[SqlJSON] | ScalarExpr[Nullable[SqlJSON]]
++) -> ScalarExpr[Nullable[SqlText]];

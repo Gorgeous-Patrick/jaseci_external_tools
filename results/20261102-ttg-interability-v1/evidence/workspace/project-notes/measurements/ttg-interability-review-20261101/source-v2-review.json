@@ -1,0 +1,99 @@
+{
+  "status": "SCOPED_SOURCE_V2_REPAIR_PASS_NATIVE_PENDING",
+  "scope": "Only immutable repair delta against source-v1 and authored focused regressions. No tests/compiler/runtime/DB executed by reviewer.",
+  "manifest": {
+    "path": "project-notes/measurements/ttg-interability-20261101/source-v2/manifest.json",
+    "sha256": "260f3a3876babcc93f70584fb49afb9d11489eaf5c0d1a2a67bd9d15216cc0ab"
+  },
+  "sources": {
+    "jac/jaclang/impl/sql.impl.jac": "0775fbbbb9f8c45e44575355416521ef6e18cabcd31ce5df3f3fde11fde800d9",
+    "jac/jaclang/runtime/ttg_dependencies.jac": "cccc5d154cc1341a02db326d644bb87b787745ab0f1e09ce661e44d3103315f2",
+    "jac/jaclang/runtime/ttg_dependency_prefetch.jac": "c6c49cfbee08880c37a80215cf237baad8577de7d3d22c6d62317c32c57b35f0",
+    "jac/jaclang/sql.jac": "35c39dbdcebf3f67490c76cdd14860198ffb8c522efb6f9caed63f66aab0e2c8",
+    "jac/jaclang/runtime/ttg_regions.jac": "ea8c490c87f08dfe0c8c584f2785833a2704d0867663895a5155c2caa2b0c998",
+    "jac/tests/runtimelib/fixtures/ttg_region_walkers.jac": "213389c44084c8fcf9606c20c73e2abb9f6aaaee8d06428532349b6924076da8",
+    "jac/tests/runtimelib/test_ttg_regions.jac": "a752a37c8766c84b8919b8e68b804874d923f82b88b548b9fb89604b98ee1ae0",
+    "jac/tests/runtimelib/test_ttg_regions_native.jac": "153dc84c141a9017bdee026e329cc52104486960db84e9420d2f2c6369dc208f"
+  },
+  "changed_files": [
+    "jac/jaclang/runtime/ttg_dependency_prefetch.jac",
+    "jac/jaclang/runtime/ttg_regions.jac",
+    "jac/tests/runtimelib/fixtures/ttg_region_walkers.jac",
+    "jac/tests/runtimelib/test_ttg_regions.jac",
+    "jac/tests/runtimelib/test_ttg_regions_native.jac"
+  ],
+  "unchanged_from_v1": [
+    "jac/jaclang/impl/sql.impl.jac",
+    "jac/jaclang/runtime/ttg_dependencies.jac",
+    "jac/jaclang/sql.jac"
+  ],
+  "prior_review": {
+    "path": "project-notes/measurements/ttg-interability-review-20261101/source-v1-review.json",
+    "sha256": "dcec6d071c1d4c02608b80dfe49c2d024a4fa29f3b86dd5d9cfb482082fba9fc"
+  },
+  "resolutions": [
+    {
+      "id": "I1",
+      "status": "source repair verified",
+      "where": "ttg_regions required_fields construction; runtime current check and full-row cached future-origin check",
+      "reason": "Only guard/output referenced scalar fields are checked. Internal __jac__ marker no longer blanket-rejects the node. Cached populated future origins retain observed unsafe-marker rejection before publication."
+    },
+    {
+      "id": "I2",
+      "status": "source repair verified",
+      "where": "ttg_regions _trace_field_effects invocation",
+      "reason": "Input key set unions all nonempty event.writes with reads. Write-only sink descriptor is examined without executing its getter. Focused setter prepublication refusal authored."
+    },
+    {
+      "id": "I3",
+      "status": "source repair verified",
+      "where": "ttg_regions separate walker/node _jac_exit_funcs_ loops",
+      "reason": "Walker exit callbacks test source node type; node exit callbacks test type(wlk). Matching unknown entry hooks continue to reject via effects.unknown. Focused matching node-exit refusal authored."
+    },
+    {
+      "id": "I4",
+      "status": "source repair verified",
+      "where": "ttg_dependency_prefetch static payload branch and dispatch_fused_payload",
+      "reason": "Candidate ids clipped to remaining then reused combined dispatcher independently clips to max_length minus submitted and current combined IDs. Native cap fixture preloads3 submitted against4 and expects exactly1 new ID."
+    },
+    {
+      "id": "I5",
+      "status": "source repair verified with narrower support",
+      "where": "ttg_regions _integer_output, integer_fields, output checks",
+      "reason": "Supported arithmetic is integer constant/self +/-/* and unary signs. Division, modulo, node-field arithmetic and noninteger operands decline. Arithmetic reads must have exact current type int; append requires exact list. visited+=1/report remains eligible, self.total+=here.value now explicitly unsupported; native handlers still execute normally."
+    }
+  ],
+  "entry_observer": {
+    "status": "Existing record_model_event entry observer used; accepted entry fast path returns before legacy symbolic continuation. Covered non-entry hooks skip re-interpretation.",
+    "emitter": {
+      "path": "jac-ttg/jac/jaclang/compiler/backends/py/impl/jcir_gen_pass.impl.jac",
+      "baseline_commit": "9282e246d708aff69e21cb52b9d0cc4893fc5f0f",
+      "baseline_sha256": "efe40d302f09e59e6d653d813e318d36d290b9284480804a3c48d99a4a536243",
+      "current_observed": {
+        "path": "jac-ttg/jac/jaclang/compiler/backends/py/impl/jcir_gen_pass.impl.jac",
+        "sha256": "efe40d302f09e59e6d653d813e318d36d290b9284480804a3c48d99a4a536243"
+      },
+      "same_bytes": true,
+      "limitation": "Emitter restoration read is separate from immutable8-copy manifest; bind again in final executed closure."
+    }
+  },
+  "guard_semantics": "SQL API/renderer and guard SQL body unchanged from v1. JSON kind validation/no Boolean cast/full-result rejection before atomic publication remain structurally verified. Authored native null/missing/string cases compare actual native reports and require fallback; no executed outcome accepted yet.",
+  "regression_source_scope": [
+    "Ordinary persistent anchors and integer counter native report/activation",
+    "Null/missing/string Boolean storage actual comparison",
+    "Write-only setter and matching node-exit refuse with zero query/publication and no getter call",
+    "Prior-submission cap preserves full native reports",
+    "Existing fanout/cycle/overflow/true/false/cache tests retained"
+  ],
+  "native_pending": [
+    "Actual activation including observer path and normal persistent internal metadata",
+    "Guard malformed values remain transaction-usable on fallback and publish no partial static cache",
+    "Focused native reported results/cache/SQL counts and exact executed source binding"
+  ],
+  "findings": [],
+  "limitations": [
+    "This pass closes the five source-v1 repair conditions only; it is not native or performance acceptance.",
+    "Current code supports a narrower output arithmetic kernel than arbitrary typed reduction; unsupported forms fall back, not theoretical impossibility.",
+    "No additional framework or prior runtime re-audit requested."
+  ]
+}

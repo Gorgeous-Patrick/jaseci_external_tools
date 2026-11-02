@@ -1,0 +1,2138 @@
+diff --git a/jac/jaclang/impl/sql.impl.jac b/jac/jaclang/impl/sql.impl.jac
+index 1b111fd65..92409444b 100644
+--- a/jac/jaclang/impl/sql.impl.jac
++++ b/jac/jaclang/impl/sql.impl.jac
+@@ -1737,6 +1737,9 @@ impl _call(op: str, args: tuple[ExprNode, ...]) -> ExprNode {
+ }
+ 
+ impl _call_type(op: str, args: tuple[ExprNode, ...]) -> DataType {
++    if op == 'JSON_KIND' and len(args) == 1 and args[0].dtype.name == 'jsonb' {
++        return DataType('text', True);
++    }
+     if op in ('JSON_GET', 'JSON_TEXT', 'JSON_HAS_KEY')
+         and len(args) == 2
+         and args[0].dtype.name == 'jsonb'
+@@ -2427,6 +2430,9 @@ impl PostgresRenderer.source_body(src: Source) -> str {
+ impl PostgresRenderer.extended_expr(ast: ExprNode) -> str {
+     if isinstance(ast, CallNode) {
+         args = [self.expr(e) for e in ast.args];
++        if ast.op == 'JSON_KIND' {
++            return 'jsonb_typeof(' + args[0] + ')';
++        }
+         if ast.op in ('JSON_GET', 'JSON_TEXT', 'JSON_HAS_KEY') {
+             op = '->'
+                 if ast.op == 'JSON_GET'
+@@ -3040,3 +3046,9 @@ impl json_has_key(
+ ) -> ScalarExpr[Nullable[SqlBool]] {
+     return ScalarExpr(_call('JSON_HAS_KEY', (value.ast, key.ast)));
+ }
++
++impl json_kind(
++    value: ScalarExpr[SqlJSON] | ScalarExpr[Nullable[SqlJSON]]
++) -> ScalarExpr[Nullable[SqlText]] {
++    return ScalarExpr(_call('JSON_KIND', (value.ast, )));
++}
+diff --git a/jac/jaclang/runtime/ttg_dependencies.jac b/jac/jaclang/runtime/ttg_dependencies.jac
+index bf63b3169..ea312c0ee 100644
+--- a/jac/jaclang/runtime/ttg_dependencies.jac
++++ b/jac/jaclang/runtime/ttg_dependencies.jac
+@@ -68,7 +68,8 @@ obj WalkerDependencyGraph {
+         entries: dict[str, int] = {},
+         handlers: dict[str, list[str]] = {},
+         dispatch: dict[int, list[str]] = {},
+-        sql_templates: dict = {};
++        sql_templates: dict = {},
++        interability_regions: dict = {};
+ 
+     def dependencies(event_id: int) -> list[TraceDependency] {
+         return [
+@@ -1120,6 +1121,7 @@ def _trace_field_effects(
+ def compile_checkpoint_plan(arch: uni.Archetype) -> dict {
+     import from jaclang.runtime.ttg_templates { compile_templates }
+     graph = analyze_walker_ast(arch);
++    import from jaclang.runtime.ttg_regions { compile_interability_regions }
+     candidates = [
+         name
+         for name in graph.entries
+@@ -1144,6 +1146,7 @@ def compile_checkpoint_plan(arch: uni.Archetype) -> dict {
+     return {
+         'version': 2,
+         'sql_templates': compile_templates(graph.events),
++        'interability_regions': compile_interability_regions(graph),
+         'walker_name': graph.walker_name,
+         'entries': graph.entries,
+         'handlers': graph.handlers,
+@@ -1198,6 +1201,9 @@ def checkpoint_graph(spec: dict, walker_type: type) -> WalkerDependencyGraph {
+     graph.edges = [TraceDependency(**item) for item in spec['edges']];
+     import from jaclang.runtime.ttg_templates { hydrate_templates }
+     graph.sql_templates = hydrate_templates(spec.get('sql_templates', {}));
++    graph.interability_regions = hydrate_templates(
++        spec.get('interability_regions', {})
++    );
+     graph.entries = dict(spec['entries']);
+     graph.handlers = dict(spec['handlers']);
+     graph.dispatch = {int(k): v for (k, v) in spec['dispatch'].items()};
+diff --git a/jac/jaclang/runtime/ttg_dependency_prefetch.jac b/jac/jaclang/runtime/ttg_dependency_prefetch.jac
+index ad5f7f22c..ae0872d60 100644
+--- a/jac/jaclang/runtime/ttg_dependency_prefetch.jac
++++ b/jac/jaclang/runtime/ttg_dependency_prefetch.jac
+@@ -105,6 +105,13 @@ def dependency_prefetch(
+         'admission': 'AlwaysPrefetch only; shared batch costs are diagnostic and excluded from training',
+         'queries': 0,
+         'template_queries': 0,
++        'region_queries': 0,
++        'region_cache_paths': 0,
++        'region_origins': 0,
++        'region_reuses': 0,
++        'region_fallbacks': 0,
++        'region_fallback_reason': '',
++        'region_fallback_reasons': {},
+         'frontier_origins': 0,
+         'legacy_fusion_calls': 0,
+         'overflow': 0,
+@@ -253,11 +260,86 @@ def prefetch_continuation(graph: any, scope: any, point: int) {
+             break;
+         }
+     }
++    import from jaclang.runtime.ttg_regions { region_coverage_key }
++    if state.fused_sql
++        and graph.events[point].kind != 'entry'
++        and mem.query_cache_get(
++            region_coverage_key(
++                graph,
++                scope,
++                scope.wlk,
++                ability,
++                anchor.id,
++                state.ctx.user_root,
++                state.cache_token
++            )
++        )
++            is not None {
++        return;
++    }
++    if state.fused_sql and graph.events[point].kind == 'entry' {
++        import from jaclang.runtime.ttg_regions { resolve_interability_region }
++        resolved = resolve_interability_region(
++            mem,
++            graph,
++            scope.wlk,
++            scope,
++            point,
++            {'id': anchor.id, 'node_type': type(anchor.archetype)},
++            pending,
++            state.ctx.user_root,
++            state.max_length,
++            state.fusion,
++            state.cache_token
++        );
++        if resolved is not None {
++            state.fusion['sql_construction'] = 'compiler_emitted_interability_regions';
++            state.fusion['effective_region_mode'] = 'static_single_successor';
++            if resolved['reused'] {
++                return;
++            }
++            plan: dict = {
++                'origin': str(anchor.id),
++                'ability': ability,
++                'visit_event': point,
++                'hops': [],
++                'ids': [],
++                'status': 'resolved',
++                'decisions': [],
++                'demanded': False,
++                'decision_ms': 0.0,
++                'queue_position': 0,
++                'candidate_at': perf_counter(),
++                'resolved_nodes': len(resolved['payload']),
++                'site_key': model_site_key(state, graph, point),
++                'ability_key': model_ability_key(state, graph, ability)
++            };
++            state.plans.append(plan);
++            with mem._raw_lock {
++                excluded = set(mem.__mem__) | set(mem.__raw_mem__) | state.submitted;
++            }
++            ids: list = [];
++            for row in resolved['payload'] {
++                uid = row[0];
++                if uid not in excluded
++                    and uid not in mem._deleted
++                    and uid not in ignored {
++                    ids.append(uid);
++                    excluded.add(uid);
++                }
++            }
++            ids = ids[:remaining];
++            if ids {
++                dispatch_fused_payload(state, {len(state.plans) - 1: ids});
++            }
++            return;
++        }
++    }
+     local_paths: dict = {};
+     fused_paths: dict = {};
+     attempted_regions: set = set();
+     frontier_demands: list = [];
+-    frontier_attempted: list = [];
++    frontier_attempted: set = set();
+     def resolve(active: dict, event: any) -> any {
+         origin = state.ctx.user_root if event.origin == 'root' else None;
+         origin_id = origin.id if origin is not None else active['id'];
+@@ -320,9 +402,36 @@ def prefetch_continuation(graph: any, scope: any, point: int) {
+         query = GraphQuery([], hops=hops).`visit();
+         rows: any = None;
+         if state.fused_sql {
+-            if graph.sql_templates and not frontier_attempted {
++            if graph.sql_templates {
++                import from jaclang.runtime.ttg_templates { cached_emitted_path }
++                cached = cached_emitted_path(
++                    mem, query, origin_id, graph.sql_templates, event.id
++                );
++                if cached is not None {
++                    rows = list(cached);
++                    state.fusion['native_path_reuses'] = state.fusion.get(
++                        'native_path_reuses', 0
++                    )
++                        + 1;
++                }
++            }
++            frontier_key = (event.ability, str(active['id']), event.id);
++            independent = graph.interability_regions.get('summaries', {}).get(
++                event.ability, {}
++            ).get(
++                'frontier_independent_prefix', False
++            );
++            if rows is None
++                and key not in fused_paths
++                and graph.sql_templates
++                and frontier_key not in frontier_attempted
++                and (not frontier_attempted or independent) {
+                 state.fusion['sql_construction'] = 'compiler_emitted_templates';
+-                frontier_attempted.append(True);
++                frontier_attempted.add(frontier_key);
++                state.fusion['frontier_region_attempts'] = state.fusion.get(
++                    'frontier_region_attempts', 0
++                )
++                    + 1;
+                 import from jaclang.runtime.ttg_frontier { resolve_frontier }
+                 frontier = resolve_frontier(
+                     mem,
+diff --git a/jac/jaclang/runtime/ttg_regions.jac b/jac/jaclang/runtime/ttg_regions.jac
+new file mode 100644
+index 000000000..d3afdb832
+--- /dev/null
++++ b/jac/jaclang/runtime/ttg_regions.jac
+@@ -0,0 +1,950 @@
++"""Compile-time, single-successor interability regions; no FIFO SQL interpreter."""
++import ast as pa;
++import from jaclang.runtime.ttg_templates {
++    sql_descriptor,
++    bind_template,
++    publish_paths
++}
++import from jaclang.runtime.ttg_sql { _BuildColumns, _select, _all, _cmp, _union }
++import from jaclang.runtime.ttg_fusion_sql { _native_anchors, _native_path }
++import jaclang.sql as q;
++
++
++def _boolean_guard(expression: str) -> any {
++    tree = pa.parse(expression, mode='eval').body;
++    def lower(node_source: any) -> any {
++        if isinstance(node_source, pa.Attribute)
++            and isinstance(node_source.value, pa.Name)
++            and node_source.value.id == 'here' {
++            return {'field': node_source.attr};
++        }
++        if isinstance(node_source, pa.Constant) and type(node_source.value) is bool {
++            return {'constant': node_source.value};
++        }
++        if isinstance(node_source, pa.UnaryOp) and isinstance(node_source.op, pa.Not) {
++            return {'not': lower(node_source.operand)};
++        }
++        if isinstance(node_source, pa.BoolOp)
++            and isinstance(node_source.op, (pa.And, pa.Or)) {
++            return {
++                'and' if isinstance(node_source.op, pa.And) else 'or': [
++                    lower(n) for n in node_source.values
++                ]
++            };
++        }
++        if isinstance(node_source, pa.Compare)
++            and len(node_source.ops) == 1
++            and isinstance(node_source.ops[0], (pa.Eq, pa.NotEq)) {
++            return {
++                'equal' if isinstance(node_source.ops[0], pa.Eq) else 'different': [
++                    lower(node_source.left),
++                    lower(node_source.comparators[0])
++                ]
++            };
++        }
++        raise ValueError(
++            'Region predicate is not a node_source-local boolean expression'
++        );
++    }
++    return lower(tree);
++}
++
++
++def _guard_fields(predicate: dict) -> list[str] {
++    if 'field' in predicate {
++        return [predicate['field']];
++    }
++    result: list = [];
++    for value in predicate.values() {
++        if type(value) is dict {
++            result.extend(_guard_fields(value));
++        } elif type(value) is list {
++            for child in value {
++                result.extend(_guard_fields(child));
++            }
++        }
++    }
++    return sorted(set(result));
++}
++
++
++def _integer_output(expression: str) -> bool {
++    def check(node_source: any) -> bool {
++        if isinstance(node_source, pa.Constant) {
++            return type(node_source.value) is int;
++        }
++        if isinstance(node_source, pa.Attribute)
++            and isinstance(node_source.value, pa.Name) {
++            return node_source.value.id == 'self';
++        }
++        if isinstance(node_source, pa.BinOp)
++            and isinstance(node_source.op, (pa.Add, pa.Sub, pa.Mult)) {
++            return check(node_source.left) and check(node_source.right);
++        }
++        if isinstance(node_source, pa.UnaryOp)
++            and isinstance(node_source.op, (pa.USub, pa.UAdd)) {
++            return check(node_source.operand);
++        }
++        return False;
++    }
++    return check(pa.parse(expression, mode='eval').body);
++}
++
++
++def summarize_abilities(graph: any) -> dict {
++    # Effect and guarded-visit summaries are computed once by the compiler.
++    access_reads: set = set();
++    for event in graph.events {
++        if event.kind in ('branch', 'visit') {
++            access_reads.update(
++                key
++                for key in event.reads
++                if key.startswith('self.')
++            );
++        }
++    }
++    integer_fields: set = set();
++    for e in graph.events {
++        if e.kind in ('assign', 'scalar_update', 'append') {
++            expr = pa.parse(e.expression, mode='eval').body;
++            if isinstance(expr, (pa.BinOp, pa.UnaryOp)) {
++                integer_fields.update(
++                    key
++                    for key in e.reads
++                    if key.startswith('self.')
++                );
++            }
++            if e.kind == 'scalar_update' {
++                integer_fields.add(e.writes);
++            }
++        }
++    }
++    summaries: dict = {};
++    for (ability, entry_id) in graph.entries.items() {
++        events = [
++            e
++            for e in graph.events
++            if e.ability == ability
++        ];
++        types = [
++            name
++            for (name, handlers) in graph.handlers.items()
++            if ability in handlers
++        ];
++        visits = [
++            e
++            for e in events
++            if e.kind == 'visit'
++        ];
++        rejected: list = [];
++        outputs: list = [];
++        for event in events {
++            if event.kind in ('barrier', 'cancel') {
++                rejected.append(
++                    {
++                        'event': event.id,
++                        'reason': 'Unknown effect, loop, helper call, write or cancellation'
++                    }
++                );
++            } elif event.kind in ('assign', 'scalar_update', 'append') {
++                if not event.writes.startswith('self.')
++                    or event.writes in access_reads {
++                    rejected.append(
++                        {
++                            'event': event.id,
++                            'reason': 'Shared access state or non-output assignment'
++                        }
++                    );
++                } else {
++                    outputs.append(
++                        {
++                            'event': event.id,
++                            'kind': event.kind,
++                            'integer': event.kind == 'scalar_update'
++                                or event.writes in integer_fields
++                                or isinstance(
++                                    pa.parse(event.expression, mode='eval').body,
++                                    (pa.BinOp, pa.UnaryOp)
++                                ),
++                            'writes': event.writes,
++                            'reads': list(event.reads),
++                            'expression': event.expression
++                        }
++                    );
++                    expr = pa.parse(event.expression, mode='eval').body;
++                    if event.kind == 'scalar_update'
++                        or event.writes in integer_fields
++                        or not isinstance(expr, (pa.Constant, pa.Name, pa.Attribute)) {
++                        if not _integer_output(event.expression) {
++                            rejected.append(
++                                {
++                                    'event': event.id,
++                                    'reason': 'Output arithmetic requires a total integer constant/self expression; division and node operands are unsupported'
++                                }
++                            );
++                        }
++                    }
++                }
++            } elif event.kind == 'output' {
++                outputs.append(
++                    {
++                        'event': event.id,
++                        'kind': event.kind,
++                        'writes': '',
++                        'reads': list(event.reads),
++                        'expression': event.expression
++                    }
++                );
++            }
++        }
++        if len(types) != 1 or types[0] == '*' or len(visits) > 1 {
++            rejected.append(
++                {
++                    'event': entry_id,
++                    'reason': 'Region requires one exact dispatch type and at most one visit site'
++                }
++            );
++        }
++        guard: dict = {'constant': True};
++        if visits {
++            visit_event = visits[0];
++            if visit_event.origin != 'here'
++                or len(visit_event.hop_chain) != 1
++                or visit_event.hop_chain[0][0] is None
++                or visit_event.hop_chain[0][1] is None {
++                rejected.append(
++                    {
++                        'event': visit_event.id,
++                        'reason': 'Region requires a single explicitly typed hop'
++                    }
++                );
++            }
++            guards: list = [];
++            for edge_type in graph.edges {
++                if edge_type.kind == 'control' and edge_type.target == visit_event.id {
++                    source = graph.events[edge_type.source];
++                    try {
++                        term = _boolean_guard(source.expression);
++                        guards.append(
++                            term if edge_type.label == 'true' else {'not': term}
++                        );
++                    } except (ValueError, SyntaxError) {
++                        rejected.append(
++                            {
++                                'event': source.id,
++                                'reason': 'Access predicate is not node_source-local boolean'
++                            }
++                        );
++                    }
++                }
++            }
++            guard = {'and': guards} if guards else guard;
++        }
++        # Every branch must be representable, even if it only guards output.
++        for event in events {
++            if event.kind == 'branch' {
++                try {
++                    _boolean_guard(event.expression);
++                } except (ValueError, SyntaxError) {
++                    rejected.append(
++                        {'event': event.id, 'reason': 'Shared or unsupported branch'}
++                    );
++                }
++            }
++        }
++        summaries[ability] = {
++            'ability': ability,
++            'entry': entry_id,
++            'source_type': types[0] if len(types) == 1 else '',
++            'eligible': not rejected,
++            'rejections': rejected,
++            'outputs': outputs,
++            'frontier_independent_prefix': bool(visits)
++                and all(e.kind in ('entry', 'exit', 'input', 'visit') for e in events),
++            'shared_access_reads': sorted(access_reads),
++            'visit': visits[0].id if visits else -1,
++            'guard': guard,
++            'guard_fields': _guard_fields(guard),
++            'dispatch': list(graph.dispatch.get(visits[0].id, [])) if visits else [],
++            'external_dependencies': [
++                'origin identity',
++                'exact runtime dispatch',
++                'actor/ACL context'
++            ],
++            'sql_internal_dependencies': [
++                'here.' + name for name in _guard_fields(guard)
++            ],
++            'checkpoint_proof': 'Entry follows origin/context binding; no shared guard input or mutable external threshold is admitted'
++        };
++    }
++    return summaries;
++}
++
++
++def compile_interability_regions(graph: any) -> dict {
++    summaries = summarize_abilities(graph);
++    regions: dict = {};
++    for (ability, summary) in summaries.items() {
++        if not summary['eligible'] or summary['visit'] < 0 {
++            continue;
++        }
++        rules: list = [];
++        seen: dict = {};
++        active = ability;
++        while active not in seen {
++            item = summaries[active];
++            if not item['eligible'] or item['visit'] < 0 {
++                break;
++            }
++            seen[active] = len(rules);
++            event = graph.events[item['visit']];
++            handlers = item['dispatch'];
++            target = handlers[0] if len(handlers) == 1 else '';
++            rules.append(
++                {
++                    'ability': active,
++                    'entry': item['entry'],
++                    'event': event.id,
++                    'source_type': item['source_type'],
++                    'hops': event.hop_chain,
++                    'target_type': event.hop_chain[0][1],
++                    'guard': item['guard'],
++                    'guard_fields': item['guard_fields'],
++                    'required_fields': sorted(
++                        set(item['guard_fields'])
++                            | {
++                                key.split('::here.', 1)[1]
++                                for output in item['outputs']
++                                for key in output['reads']
++                                if '::here.' in key
++                            }
++                    ),
++                    'target_ability': target,
++                    'dispatch_edge': [event.id, graph.entries[target]]
++                        if target
++                        else [],
++                    'next_phase': -1,
++                    'phase': len(rules)
++                }
++            );
++            if not target
++                or not summaries[target]['eligible']
++                or summaries[target]['visit'] < 0 {
++                break;
++            }
++            active = target;
++        }
++        for rule in rules {
++            rule['next_phase'] = seen.get(rule['target_ability'], -1);
++        }
++        if any(r['next_phase'] >= 0 and r['next_phase'] <= r['phase'] for r in rules)
++            and len(rules) != 1 {
++            continue;
++        }
++        certificate: dict = {
++            'version': 1,
++            'id': 'entry:' + str(summary['entry']),
++            'entry': summary['entry'],
++            'ability': ability,
++            'rules': rules,
++            'summaries': list(seen),
++            'boundary': 'Fetch target but do not expand an unsupported or terminal target ability',
++            'external_dependencies': summary['external_dependencies'],
++            'checkpoint_proof': summary['checkpoint_proof'],
++            'cardinality_proof': 'Runtime SQL certificate requires every enabled immediate path arity <= 1',
++            'acyclicity_proof': 'SQL identity history rejects a repeated target before cache publication',
++            'templates': {}
++        };
++        for gated in (False, True) {
++            certificate['templates']['gated' if gated else 'open'] = sql_descriptor(
++                compile_region_sql(rules, gated)
++            );
++        }
++        regions[str(summary['entry'])] = certificate;
++    }
++    return {
++        'version': 1,
++        'summaries': summaries,
++        'regions': regions,
++        'helper_policy': 'Unresolved helpers are explicit barrier effects; no opaque call is assumed pure'
++    };
++}
++
++
++def _sql_guard(predicate: dict, props: any) -> any {
++    if 'constant' in predicate {
++        return q.boolean(predicate['constant']);
++    }
++    if 'field' in predicate {
++        return _cmp(q.json_text(props, q.text(predicate['field'])), q.text('true'));
++    }
++    if 'not' in predicate {
++        return q.not_nullable(_sql_guard(predicate['not'], props));
++    }
++    if 'and' in predicate {
++        return _all([_sql_guard(p, props) for p in predicate['and']]);
++    }
++    if 'or' in predicate {
++        return q.or_nullable([_sql_guard(p, props) for p in predicate['or']]);
++    }
++    terms: list[dict] = predicate['equal']
++        if 'equal' in predicate
++        else predicate['different'];
++    return _cmp(
++        _sql_guard(terms[0], props),
++        _sql_guard(terms[1], props),
++        '=' if 'equal' in predicate else '<>'
++    );
++}
++
++
++def _region_rows(cols: any, walk: any, rules: list, actor: any) -> any {
++    bodies: list = [];
++    for rule in rules {
++        phase = rule['phase'];
++        node_source = _native_anchors();
++        props = q.json_get(cols.col(node_source, 'props'), q.text('archetype'));
++        guard_value = _sql_guard(rule['guard'], props);
++        enabled = q.coalesce(guard_value, q.boolean(False))
++            if guard_value.ast.dtype.nullable
++            else guard_value;
++        valid = _all(
++            [
++                _cmp(q.json_kind(q.json_get(props, q.text(name))), q.text('boolean'))
++                for name in rule['guard_fields']
++            ]
++        );
++        matches = _native_path(
++            cols, cols.col(walk, 'origin_id'), rule['hops'], actor, True
++        );
++        filtered = _select(
++            matches,
++            cols.pick(
++                matches,
++                ['target_id', 'edge_id', 'arch_type', 'arch_module', 'ord', 'arity']
++            ),
++            predicate=enabled
++        ).as_source(
++            lateral=True
++        );
++        optional = q.optional_source(filtered);
++        target = cols.col(optional, 'target_id');
++        cycle = q.coalesce(q.any_eq(target, cols.col(walk, 'seen')), q.boolean(False));
++        dispatch_valid = q.or_nullable(
++            [
++                q.is_null(target),
++                _all(
++                    [
++                        _cmp(
++                            cols.col(optional, 'arch_type'), q.text(rule['target_type'])
++                        ),
++                        _cmp(
++                            cols.col(optional, 'arch_module'),
++                            q.slot('target_module_' + str(phase), q.text_type())
++                        )
++                    ]
++                )
++            ]
++        );
++        bodies.append(
++            _select(
++                node_source,
++                [
++                    ('slot', q.int64(phase)),
++                    ('depth', cols.col(walk, 'depth')),
++                    ('origin_id', cols.col(walk, 'origin_id'))
++                ]
++                    + cols.pick(
++                        optional,
++                        [
++                            'target_id',
++                            'edge_id',
++                            'arch_type',
++                            'arch_module',
++                            'ord',
++                            'arity'
++                        ]
++                    )
++                    + [
++                        (
++                            'valid',
++                            q.coalesce(_all([valid, dispatch_valid]), q.boolean(False))
++                        ),
++                        ('enabled', enabled),
++                        ('cycle', cycle),
++                        ('next_phase', q.int64(rule['next_phase']))
++                    ],
++                joins=[q.left_join(optional, q.boolean(True))],
++                predicate=_all(
++                    [
++                        _cmp(cols.col(walk, 'phase'), q.int64(phase)),
++                        _cmp(cols.col(node_source, 'id'), cols.col(walk, 'origin_id')),
++                        _cmp(cols.col(node_source, 'kind'), q.text('NodeAnchor')),
++                        _cmp(
++                            cols.col(node_source, 'arch_type'),
++                            q.text(rule['source_type'])
++                        ),
++                        _cmp(
++                            cols.col(node_source, 'arch_module'),
++                            q.slot('source_module_' + str(phase), q.text_type())
++                        )
++                    ]
++                )
++            )
++        );
++    }
++    return _union(bodies).as_source(lateral=True);
++}
++
++
++def compile_region_sql(rules: list, gated: bool) -> any {
++    cols = _BuildColumns();
++    actor = {
++        'uuid': q.slot('actor_uuid', q.uuid_type()),
++        'text': q.slot('actor_text', q.text_type())
++    }
++        if gated
++        else None;
++    schema = [
++        q.field('origin_id', q.uuid_type()),
++        q.field('phase', q.int64_type()),
++        q.field('depth', q.int64_type()),
++        q.field('seen', q.array_type(q.uuid_type()))
++    ];
++    origin = q.slot('origin', q.uuid_type());
++    anchor = _select(
++        None,
++        [
++            ('origin_id', origin),
++            ('phase', q.int64(0)),
++            ('depth', q.int64(0)),
++            ('seen', q.array(q.uuid_type(), [origin]))
++        ]
++    );
++    recursive = len(rules) == 1 and rules[0]['next_phase'] == 0;
++    walk = q.cte_ref(schema);
++    bodies: list = [];
++    for (phase, rule) in enumerate(rules) {
++        emitted = _region_rows(cols, walk, [rule], actor);
++        body = _select(
++            walk,
++            cols.pick(
++                emitted,
++                [
++                    'slot',
++                    'depth',
++                    'origin_id',
++                    'target_id',
++                    'edge_id',
++                    'arch_type',
++                    'arch_module',
++                    'ord',
++                    'arity',
++                    'valid',
++                    'enabled',
++                    'cycle',
++                    'next_phase'
++                ]
++            ),
++            joins=[q.cross_join(emitted)]
++        );
++        bodies.append(body);
++        if recursive or phase + 1 < len(rules) {
++            rows = _region_rows(cols, walk, [rule], actor);
++            target = q.coalesce(
++                cols.col(rows, 'target_id'), cols.col(walk, 'origin_id')
++            );
++            step = _select(
++                walk,
++                [
++                    ('origin_id', target),
++                    ('phase', cols.col(rows, 'next_phase')),
++                    ('depth', q.add(cols.col(walk, 'depth'), q.int64(1))),
++                    ('seen', q.array_append(cols.col(walk, 'seen'), target))
++                ],
++                joins=[q.cross_join(rows)],
++                predicate=_all(
++                    [
++                        cols.col(rows, 'valid'),
++                        cols.col(rows, 'enabled'),
++                        q.not_(cols.col(rows, 'cycle')),
++                        _cmp(cols.col(rows, 'arity'), q.int64(1)),
++                        _cmp(cols.col(rows, 'next_phase'), q.int64(0), '>='),
++                        _cmp(
++                            cols.col(walk, 'depth'),
++                            q.slot('max_depth', q.int64_type()),
++                            '<'
++                        )
++                    ]
++                )
++            );
++            if recursive {
++                q.define_cte(walk, q.union_all(anchor, step), recursive=True);
++            } else {
++                q.define_cte(walk, anchor);
++                walk = q.cte_ref(schema);
++                anchor = step;
++            }
++        } else {
++            q.define_cte(walk, anchor);
++        }
++    }
++    return q.compile_sql(
++        q.ordered(
++            _union(bodies),
++            [
++                q.asc(q.output(q.field('depth', q.int64_type()))),
++                q.asc(q.output(q.field('ord', q.nullable(q.int64_type()))))
++            ],
++            limit=q.slot('row_limit', q.int64_type())
++        )
++    );
++}
++
++
++def region_coverage_key(
++    graph: any,
++    scope: any,
++    wlk: any,
++    ability: str,
++    origin: any,
++    user_root: any,
++    cache_token: str
++) -> tuple {
++    import from jaclang.runtime.graph_walk { access_gated }
++    actor = str(user_root.id) if access_gated() and user_root is not None else None;
++    return (
++        'ttg_interability_coverage_v1',
++        cache_token,
++        id(graph),
++        id(scope),
++        id(wlk),
++        ability,
++        str(origin),
++        actor
++    );
++}
++
++
++def resolve_interability_region(
++    mem: any,
++    graph: any,
++    wlk: any,
++    scope: any,
++    point: int,
++    current: dict,
++    pending: list,
++    user_root: any,
++    max_rows: int,
++    metrics: dict,
++    cache_token: str = ''
++) -> any {
++    import from uuid { UUID }
++    import from jaclang.runtime.ttg_continuation {
++        continuation_type,
++        _plain_scalar_field,
++        known_node_fields
++    }
++    import from jaclang.runtime.ttg_dependencies {
++        _trace_entry_handlers,
++        _trace_node_effects,
++        _trace_safe_storage,
++        TraceEffects
++    }
++    import from jaclang.runtime.ttg_frontier { template_type_matches }
++    import from jaclang.runtime.archetype { NodeArchetype }
++    import from jaclang.runtime.graph_query { GraphQuery, QHop }
++    import from jaclang.runtime.graph_walk { access_gated }
++    import from jaclang.data.query_planner { _acl_pushdown_root }
++    bundle = graph.interability_regions;
++    certificate = bundle.get('regions', {}).get(str(point));
++    if certificate is None {
++        return None;
++    }
++    def decline(reason: str) -> any {
++        metrics['region_fallbacks'] = metrics.get('region_fallbacks', 0) + 1;
++        metrics['region_fallback_reason'] = reason;
++        counts = metrics.setdefault('region_fallback_reasons', {});
++        counts[reason] = counts.get(reason, 0) + 1;
++        return None;
++    }
++    if pending {
++        return decline('Static region has pending queue interference');
++    }
++    if scope.ignores {
++        return decline('Static region cannot expand ignored nodes');
++    }
++    rules = certificate['rules'];
++    import from jaclang.runtime.ttg_dependencies { _trace_field_effects }
++    field_effects = TraceEffects();
++    _trace_field_effects(
++        graph,
++        {key for e in graph.events for key in e.reads}
++            | {
++                e.writes
++                for e in graph.events
++                if e.writes
++            },
++        field_effects
++    );
++    if field_effects.unknown {
++        return decline('Walker field descriptors are unresolved');
++    }
++    queries: list = [];
++    values: dict = {'origin': UUID(str(current['id'])), 'row_limit': max_rows + 1};
++    if any(rule['next_phase'] >= 0 for rule in rules) {
++        values['max_depth'] = max_rows;
++    }
++    actor: any = None;
++    for (phase, rule) in enumerate(rules) {
++        source = continuation_type(wlk, rule['source_type']);
++        target = continuation_type(wlk, rule['target_type']);
++        edge_type = continuation_type(wlk, rule['hops'][0][0]);
++        if not template_type_matches(source, rule['source_type'])
++            or not template_type_matches(target, rule['target_type'])
++            or not template_type_matches(edge_type, rule['hops'][0][0]) {
++            return decline('Static region type token is unresolved or aliased');
++        }
++        if source is None or target is None or edge_type is None {
++            return decline('Unresolved static region type');
++        }
++        for node_source in (source, target) {
++            if not issubclass(node_source, NodeArchetype)
++                or not _trace_safe_storage(node_source)
++                or node_source.__getattribute__ is not NodeArchetype.__getattribute__ {
++                return decline('Custom node_source storage or attribute access');
++            }
++        }
++        effects = TraceEffects();
++        handlers = _trace_entry_handlers(graph, source, effects);
++        _trace_node_effects(graph, source, effects);
++        if effects.unknown or handlers != [rule['ability']] {
++            return decline('Static source dispatch differs from compiled ability');
++        }
++        for callback in getattr(type(wlk), '_jac_exit_funcs_', []) {
++            if callback.trigger is None or issubclass(source, callback.trigger) {
++                return decline(
++                    'Walker exit effects are outside the static region kernel'
++                );
++            }
++        }
++        for callback in getattr(source, '_jac_exit_funcs_', []) {
++            if callback.trigger is None or issubclass(type(wlk), callback.trigger) {
++                return decline(
++                    'Node exit effects are outside the static region kernel'
++                );
++            }
++        }
++        for field in rule['guard_fields'] {
++            if not _plain_scalar_field(source, field, (bool, 'bool')) {
++                return decline(
++                    'Region predicate is not an ordinary declared bool field'
++                );
++            }
++        }
++        for output in bundle['summaries'][rule['ability']]['outputs'] {
++            if output.get('integer', False) {
++                if not all(
++                    type(vars(wlk).get(key[5:])) is int
++                    for key in output['reads']
++                    if key.startswith('self.')
++                ) {
++                    return decline(
++                        'Integer output receiver/operand has an observed wrong type'
++                    );
++                }
++            }
++            if output['kind'] == 'append'
++                and type(vars(wlk).get(output['writes'][5:])) is not list {
++                return decline('Output append receiver is not an exact list');
++            }
++            for read in output['reads'] {
++                if '::here.' in read {
++                    field = read.split('::here.', 1)[1];
++                    if not _plain_scalar_field(
++                        source,
++                        field,
++                        (bool, int, float, str, 'bool', 'int', 'float', 'str')
++                    ) {
++                        return decline('Output read is not an ordinary scalar field');
++                    }
++                } elif read.startswith('self.') {
++                    value = vars(wlk).get(read[5:]);
++                    if type(value) not in (bool, int, float, str, list, type(None)) {
++                        return decline('Output state has nonprimitive effects');
++                    }
++                }
++            }
++        }
++        if phase == 0 {
++            if current['node_type'] is not source {
++                return decline('Current dispatch is not exact');
++            }
++            facts = known_node_fields(scope.path[-1].archetype);
++            if any(
++                facts.get(name + '::unsafe', False) for name in rule['required_fields']
++            ) {
++                return decline('Current node has observed unsafe required fields');
++            }
++        }
++        query = GraphQuery(
++            [], hops=[QHop(dir=int(rule['hops'][0][2]), `edge=edge_type, nd=target)]
++        ).`visit();
++        queries.append(query);
++        values['source_module_' + str(phase)] = source.__module__;
++        values['target_module_' + str(phase)] = target.__module__;
++    }
++    with mem._lock {
++        mem.read_barrier();
++        if 'catalog' in graph.sql_templates {
++            mem.query_cache_put(
++                ('ttg_compiled_catalog_v1', ), graph.sql_templates['catalog']
++            );
++        }
++        for query in queries {
++            visibility = _acl_pushdown_root(query, 1, mem);
++            if access_gated() and visibility is None {
++                return decline('Static region ACL proof failed');
++            }
++            if actor is not None and actor != visibility {
++                return decline('Static region actor differs');
++            }
++            actor = visibility;
++        }
++        coverage = region_coverage_key(
++            graph,
++            scope,
++            wlk,
++            graph.events[point].ability,
++            current['id'],
++            user_root,
++            cache_token
++        );
++        if mem.query_cache_get(coverage) is not None {
++            metrics['region_reuses'] = metrics.get('region_reuses', 0) + 1;
++            return {'paths': [], 'payload': [], 'reused': True};
++        }
++        if actor is not None {
++            values.update({'actor_uuid': UUID(actor), 'actor_text': actor});
++        }
++        descriptor = certificate['templates']['gated' if actor is not None else 'open'];
++        # Finite terminal regions have no depth slot; use the emitted contract exactly.
++        slots = {slot[0] for slot in descriptor['slots']};
++        values = {
++            name: value
++            for (name, value) in values.items()
++            if name in slots
++        };
++        compiled = bind_template(descriptor, values);
++        rows = mem.store.rows(compiled.sql, compiled.params);
++        metrics['region_queries'] = metrics.get('region_queries', 0) + 1;
++        metrics['queries'] += 1;
++        if len(rows) > max_rows {
++            return decline('Static region row budget exceeded; no partial cache');
++        }
++        if not rows {
++            return decline('Static region origin/dispatch is missing');
++        }
++        staged: list = [];
++        payload: list = [];
++        paths: list = [];
++        covered: list = [];
++        expected: tuple[int, int, UUID] | None = (0, 0, UUID(str(current['id'])));
++        for row in rows {
++            phase = int(row[0]);
++            depth = int(row[1]);
++            uid = UUID(str(row[2]));
++            if (phase, depth, uid) != expected {
++                return decline('Static region path closure/order mismatch');
++            }
++            cached = mem.__mem__.get(uid);
++            if cached is not None and cached.is_populated() {
++                observed = known_node_fields(cached.archetype);
++                if any(
++                    observed.get(name + '::unsafe', False)
++                    for name in rules[phase]['required_fields']
++                ) {
++                    return decline(
++                        'Cached future node has observed unsafe required fields'
++                    );
++                }
++            }
++            if row[9] is not True {
++                return decline('Malformed boolean field or unexpected dispatch');
++            }
++            if row[11] is not False {
++                return decline('Static region cycle detected');
++            }
++            enabled = row[10];
++            if type(enabled) is not bool {
++                return decline('Invalid static guard result');
++            }
++            pairs: list = [];
++            if row[3] is not None {
++                if int(row[8]) != 1 or int(row[7]) != 1 {
++                    return decline('Static region fanout requires native fallback');
++                }
++                pairs = [(UUID(str(row[3])), UUID(str(row[4])), row[5], row[6])];
++                payload.extend(pairs);
++            } elif any(v is not None for v in row[4:9]) {
++                return decline('Invalid static empty path marker');
++            }
++            if not enabled and pairs {
++                return decline('Disabled predicate produced path rows');
++            }
++            if enabled {
++                native = graph.sql_templates['native'][str(rules[phase]['event'])][
++                    'gated' if actor is not None else 'open'
++                ];
++                staged.append((queries[phase], uid, pairs, native));
++                paths.append(
++                    {
++                        'event': rules[phase]['event'],
++                        'origin': str(uid),
++                        'ids': [str(p[0]) for p in pairs]
++                    }
++                );
++            }
++            covered.append((uid, rules[phase]['ability']));
++            next_phase = int(row[12]);
++            expected = (next_phase, depth + 1, UUID(str(pairs[0][0])))
++                if pairs and enabled and next_phase >= 0
++                else None;
++        }
++        if expected is not None {
++            return decline('Static region was truncated before its terminal boundary');
++        }
++        if not publish_paths(mem, staged) {
++            return decline('Static native cache publication failed');
++        }
++        for (uid, ability) in covered {
++            mem.query_cache_put(
++                region_coverage_key(
++                    graph, scope, wlk, ability, uid, user_root, cache_token
++                ),
++                True
++            );
++        }
++        metrics['region_cache_paths'] = metrics.get('region_cache_paths', 0)
++            + len(staged);
++        metrics['cache_paths'] += len(staged);
++        metrics['cache_empty_paths'] += sum(
++            1
++            for entry_id in staged
++            if not entry_id[2]
++        );
++        metrics['region_origins'] = metrics.get('region_origins', 0) + len(covered);
++        metrics['regions'].append(
++            {
++                'kind': 'static_interability',
++                'certificate_id': certificate['id'],
++                'compiled': True,
++                'dispatch_edges': [r['dispatch_edge'] for r in rules],
++                'paths': paths,
++                'external_dependencies': certificate['external_dependencies'],
++                'checkpoint': point
++            }
++        );
++        return {'paths': paths, 'payload': payload, 'reused': False};
++    }
++}
+diff --git a/jac/jaclang/runtime/ttg_templates.jac b/jac/jaclang/runtime/ttg_templates.jac
+index 5b284b6ce..356983e84 100644
+--- a/jac/jaclang/runtime/ttg_templates.jac
++++ b/jac/jaclang/runtime/ttg_templates.jac
+@@ -294,3 +294,37 @@ def publish_paths(mem: any, staged: list) -> bool {
+     }
+     return True;
+ }
++
++
++def cached_emitted_path(
++    mem: any, query: any, origin_id: any, bundle: dict, event: int
++) -> any {
++    # Reuse a complete typed native path without constructing an AST or issuing SQL.
++    import from jaclang.data.query_planner { _acl_pushdown_root, _query_cache_key }
++    import from jaclang.runtime.graph_walk { access_gated }
++    with mem._lock {
++        mem.read_barrier();
++        if 'catalog' in bundle {
++            mem.query_cache_put(('ttg_compiled_catalog_v1', ), bundle['catalog']);
++        }
++        actor = _acl_pushdown_root(query, len(query.hops), mem);
++        if access_gated() and actor is None {
++            return None;
++        }
++        native = select_template(bundle, 'native', actor is not None, event);
++        if native is None {
++            return None;
++        }
++        descriptor = native['typed'];
++        values: dict = {'origin': (str(origin_id), )};
++        for (name, dtype, nullable) in descriptor['slots'] {
++            if name != 'origin' {
++                values[name] = actor;
++            }
++        }
++        compiled = bind_template(descriptor, values);
++        return mem.query_cache_get(
++            _query_cache_key('ttg_path', compiled.sql, compiled.params, len(query.hops))
++        );
++    }
++}
+diff --git a/jac/jaclang/sql.jac b/jac/jaclang/sql.jac
+index 25e751e9c..0a0410a54 100644
+--- a/jac/jaclang/sql.jac
++++ b/jac/jaclang/sql.jac
+@@ -957,3 +957,8 @@ def json_has_key(
+     value: ScalarExpr[SqlJSON] | ScalarExpr[Nullable[SqlJSON]],
+     key: ScalarExpr[SqlText] | ScalarExpr[Nullable[SqlText]]
+ ) -> ScalarExpr[Nullable[SqlBool]];
++
++# JSON scalar kind is nullable for a missing SQL value; JSON null returns "null".
++def json_kind(
++    value: ScalarExpr[SqlJSON] | ScalarExpr[Nullable[SqlJSON]]
++) -> ScalarExpr[Nullable[SqlText]];
+diff --git a/jac/tests/runtimelib/fixtures/ttg_region_walkers.jac b/jac/tests/runtimelib/fixtures/ttg_region_walkers.jac
+new file mode 100644
+index 000000000..faafc60cb
+--- /dev/null
++++ b/jac/tests/runtimelib/fixtures/ttg_region_walkers.jac
+@@ -0,0 +1,132 @@
++"""Finite typed regions independent of benchmark names or counter cutoffs."""
++node RegionItem {
++    has value: int = 0;
++}
++
++edge RegionNext {}
++walker RegionTraverse {
++    can walk with RegionItem entry {
++        report here.value;
++        visit [->:RegionNext:->[?:RegionItem]];
++    }
++}
++
++walker RegionReduction {
++    has total: int = 0;
++
++    can walk with RegionItem entry {
++        self.total += here.value;
++        visit [->:RegionNext:->[?:RegionItem]];
++    }
++}
++
++node RegionA {}
++node RegionB {
++    has active: bool = True;
++}
++
++node RegionC {
++    has value: int = 9;
++}
++
++edge RegionAB {}
++edge RegionBC {}
++walker RegionGuard {
++    can start with RegionA entry {
++        visit [->:RegionAB:->[?:RegionB]];
++    }
++
++    can middle with RegionB entry {
++        if here.active {
++            visit [->:RegionBC:->[?:RegionC]];
++        }
++    }
++
++    can finish with RegionC entry {
++        report here.value;
++    }
++}
++
++walker RegionShared {
++    has count: int = 0;
++
++    can walk with RegionItem entry {
++        self.count += 1;
++        if self.count < 4 {
++            visit [->:RegionNext:->[?:RegionItem]];
++        }
++    }
++}
++
++walker RegionCancel {
++    can walk with RegionItem entry {
++        disengage;
++        visit [->:RegionNext:->[?:RegionItem]];
++    }
++}
++
++walker RegionWrite {
++    can walk with RegionItem entry {
++        here.value = 7;
++        visit [->:RegionNext:->[?:RegionItem]];
++    }
++}
++
++walker RegionUnknown {
++    can walk with RegionItem entry {
++        self.opaque();
++        visit [->:RegionNext:->[?:RegionItem]];
++    }
++
++    def opaque {
++        return;
++    }
++}
++
++walker RegionCounterOutput {
++    has visited: int = 0;
++
++    can walk with RegionItem entry {
++        self.visited += 1;
++        report here.value;
++        visit [->:RegionNext:->[?:RegionItem]];
++    }
++}
++
++walker RegionDivision {
++    has total: int = 1;
++
++    can walk with RegionItem entry {
++        self.total //= here.value;
++        visit [->:RegionNext:->[?:RegionItem]];
++    }
++}
++
++walker RegionAssign {
++    has sink: int = 0;
++
++    can walk with RegionItem entry {
++        self.sink = 1;
++        visit [->:RegionNext:->[?:RegionItem]];
++    }
++}
++
++node RegionFrontRoot {}
++node RegionFrontHub {}
++edge RegionFrontEdge {}
++edge RegionFrontLeft {}
++edge RegionFrontRight {}
++walker RegionFrontier {
++    can start with RegionFrontRoot entry {
++        visit [-->[?:RegionFrontHub]];
++    }
++
++    can collect with RegionFrontHub entry {
++        visit [->:RegionFrontLeft:->[?:RegionC]];
++        visit [->:RegionFrontRight:->[?:RegionC]];
++    }
++
++    can gather with RegionC entry {
++        report here.value;
++    }
++}
+diff --git a/jac/tests/runtimelib/test_ttg_dependency_prefetch.jac b/jac/tests/runtimelib/test_ttg_dependency_prefetch.jac
+index 3e5028474..4a715ee7f 100644
+--- a/jac/tests/runtimelib/test_ttg_dependency_prefetch.jac
++++ b/jac/tests/runtimelib/test_ttg_dependency_prefetch.jac
+@@ -142,6 +142,26 @@ test "dependency prefetch: multi-hop and finite cyclic paths consume terminal pa
+ }
+ 
+ test "dependency prefetch: chosen branch and edge subtypes populate and consume raw cache" {
++    import jaclang.runtime.prefetch as prefetch_module;
++    original_dispatch: any = dispatch_prefetch;
++    def complete_dispatch(
++        ctx: any,
++        prefetch_ids: list,
++        mode: str,
++        workers: int = 1,
++        append: bool = False,
++        observer: any = None
++    ) {
++        original_dispatch(
++            ctx, prefetch_ids, mode, workers, append=append, observer=observer
++        );
++        # This checks completed raw-cache promotion, not the production deadline.
++        # Preserve thread execution while synchronizing before native demand.
++        for thread in list(getattr(ctx.mem, '_prefetch_threads', [])) {
++            thread.join(timeout=5);
++            assert not thread.is_alive() , 'Test prefetch worker did not complete';
++        }
++    }
+     original = JacRuntime.exec_ctx;
+     try {
+         for (value, chosen, mode) in [(13, 'c', ''), (3, 'd', 'thread')] {
+@@ -151,7 +171,11 @@ test "dependency prefetch: chosen branch and edge subtypes populate and consume
+                 try {
+                     origin = fetch_origin(ctx, ids['start']);
+                     wlk = FetchBranch();
+-                    with capture_dependency_checkpoints() as capture {
++                    with patch.object(
++                        prefetch_module,
++                        'dispatch_prefetch',
++                        side_effect=complete_dispatch
++                    ), capture_dependency_checkpoints() as capture {
+                         with dependency_prefetch(ctx, mode=mode) as run {
+                             origin spawn wlk;
+                         }
+diff --git a/jac/tests/runtimelib/test_ttg_regions.jac b/jac/tests/runtimelib/test_ttg_regions.jac
+new file mode 100644
+index 000000000..bed0f9c4e
+--- /dev/null
++++ b/jac/tests/runtimelib/test_ttg_regions.jac
+@@ -0,0 +1,126 @@
++"""DB-free static summaries, emitted region SQL and bind contracts."""
++import json;
++import jaclang.sql as q;
++import from uuid { UUID }
++import from unittest.mock { patch }
++import from jaclang.runtime.ttg { JacTTGGenerator }
++import from jaclang.runtime.ttg_dependencies {
++    analyze_walker_dependencies,
++    compile_checkpoint_plan,
++    checkpoint_graph
++}
++import from jaclang.runtime.ttg_regions { summarize_abilities }
++import from jaclang.runtime.ttg_templates { bind_template }
++import from .fixtures.ttg_region_walkers {
++    RegionTraverse,
++    RegionReduction,
++    RegionGuard,
++    RegionShared,
++    RegionCancel,
++    RegionWrite,
++    RegionUnknown,
++    RegionCounterOutput,
++    RegionDivision
++}
++
++
++def region_spec(wlk: any) -> dict {
++    arch = JacTTGGenerator._find_walker_ast_node(wlk);
++    assert arch is not None;
++    return compile_checkpoint_plan(arch);
++}
++
++test "Static summaries separate output reductions from shared access guards" {
++    output = summarize_abilities(analyze_walker_dependencies(RegionReduction));
++    assert not output['walk']['eligible'];
++    assert not output['walk']['shared_access_reads'];
++    assert output['walk']['outputs'][0]['writes'] == 'self.total';
++    shared = summarize_abilities(analyze_walker_dependencies(RegionShared));
++    assert not shared['walk']['eligible'];
++    assert 'self.count' in shared['walk']['shared_access_reads'];
++    assert summarize_abilities(analyze_walker_dependencies(RegionCounterOutput))['walk'][
++        'eligible'
++    ];
++    for wlk in (RegionCancel, RegionWrite, RegionUnknown, RegionDivision) {
++        spec = region_spec(wlk);
++        assert not spec['interability_regions']['regions'] , str(spec);
++        assert spec['interability_regions']['summaries']['walk']['rejections'];
++    }
++}
++
++test "No-counter typed Traverse emits a recursive identity-certified SQL region" {
++    spec = region_spec(RegionTraverse);
++    regions = spec['interability_regions']['regions'];
++    assert len(regions) == 1;
++    certificate = next(iter(regions.values()));
++    assert len(certificate['rules']) == 1;
++    assert certificate['rules'][0]['next_phase'] == 0;
++    assert certificate['rules'][0]['dispatch_edge'];
++    sql = certificate['templates']['open']['sql'];
++    assert 'WITH RECURSIVE' in sql;
++    assert 'ANY(' in sql or 'ANY (' in sql;
++    assert 'array_append' in sql or ' || ' in sql;
++    assert 'COUNT(*) OVER' in sql.upper();
++}
++
++test "A B C uses finite dispatch composition with boolean predicate inside SQL" {
++    spec = region_spec(RegionGuard);
++    summary = spec['interability_regions']['summaries']['middle'];
++    assert summary['guard_fields'] == ['active'];
++    assert summary['sql_internal_dependencies'] == ['here.active'];
++    certificate = spec['interability_regions']['regions'][
++        str(spec['entries']['start'])
++    ];
++    assert [r['ability'] for r in certificate['rules']] == ['start', 'middle'];
++    assert certificate['rules'][0]['dispatch_edge']
++        == [certificate['rules'][0]['event'], spec['entries']['middle']];
++    sql = certificate['templates']['open']['sql'];
++    assert 'WITH RECURSIVE' not in sql;
++    assert 'jsonb_typeof' in sql;
++    assert '->>' in sql;
++    assert 'actor/ACL context' in certificate['external_dependencies'];
++    assert 'shared' in certificate['checkpoint_proof'];
++}
++
++test "Hydrated region binds without runtime SQL AST construction" {
++    spec = region_spec(RegionGuard);
++    graph = checkpoint_graph(json.loads(json.dumps(spec)), RegionGuard);
++    certificate = graph.interability_regions['regions'][str(spec['entries']['start'])];
++    descriptor = certificate['templates']['gated'];
++    values: dict = {
++        'origin': UUID(int=1),
++        'row_limit': 21,
++        'max_depth': 20,
++        'actor_uuid': UUID(int=2),
++        'actor_text': str(UUID(int=2))
++    };
++    for phase in (0, 1) {
++        values['source_module_' + str(phase)] = 'fixture';
++        values['target_module_' + str(phase)] = 'fixture';
++    }
++    values = {
++        name: value
++        for (name, value) in values.items()
++        if name in {s[0] for s in descriptor['slots']}
++    };
++    with patch.object(q, 'table', side_effect=AssertionError('runtime AST')), patch.object(
++        q, 'compile_sql', side_effect=AssertionError('runtime render')
++    ) {
++        first = bind_template(descriptor, values);
++        second = bind_template(descriptor, values);
++        assert first.sql == second.sql == descriptor['sql'];
++    }
++}
++
++test "JSON kind validates nullable JSON and rejects non-JSON operands" {
++    source = q.table('x', [q.field('props', q.json_type())]);
++    # A missing SQL value and JSON null retain distinct kinds in native SQL tests.
++    invalid = False;
++    invalid_argument: any = q.text('wrong');
++    try {
++        q.json_kind(invalid_argument);
++    } except q.SqlError {
++        invalid = True;
++    }
++    assert invalid;
++}
+diff --git a/jac/tests/runtimelib/test_ttg_regions_native.jac b/jac/tests/runtimelib/test_ttg_regions_native.jac
+new file mode 100644
+index 000000000..d699f9c37
+--- /dev/null
++++ b/jac/tests/runtimelib/test_ttg_regions_native.jac
+@@ -0,0 +1,588 @@
++"""Persistent static regions: native execution, exact guards/cache and refusals."""
++import json;
++import os;
++import from pathlib { Path }
++import from tempfile { mkdtemp }
++import from uuid { UUID }
++import from unittest.mock { patch }
++import from jaclang.runtime.context { ExecutionContext }
++import from jaclang.runtime.runtime { JacRuntime }
++import from jaclang.runtime.ttg_dependency_prefetch { dependency_prefetch }
++import from jaclang.runtime.ttg_dependencies {
++    compile_checkpoint_plan,
++    checkpoint_graph
++}
++import from jaclang.runtime.ttg { JacTTGGenerator }
++import from jaclang.runtime.ttg_regions { resolve_interability_region }
++import from .fixtures.ttg_region_walkers {
++    RegionItem,
++    RegionNext,
++    RegionTraverse,
++    RegionReduction,
++    RegionCounterOutput,
++    RegionAssign,
++    RegionA,
++    RegionB,
++    RegionC,
++    RegionAB,
++    RegionBC,
++    RegionGuard,
++    RegionFrontRoot,
++    RegionFrontHub,
++    RegionFrontEdge,
++    RegionFrontLeft,
++    RegionFrontRight,
++    RegionFrontier
++}
++
++
++def region_project -> str {
++    parent = Path('/tmp/ttg-interability-fixtures');
++    parent.mkdir(parents=True, exist_ok=True);
++    return mkdtemp(prefix='case-', dir=str(parent));
++}
++
++
++def region_context(project: str) -> any {
++    ctx = ExecutionContext(
++        base_path_dir=project, full_target_path=str(Path(project, 'region.jac'))
++    );
++    JacRuntime.exec_ctx = ctx;
++    return ctx;
++}
++
++
++def region_chain(
++    project: str, count: int, fanout: bool = False, cycle: bool = False
++) -> list {
++    ctx = region_context(project);
++    try {
++        items = [RegionItem(value=i) for i in range(count)];
++        root ++> items[0];
++        for i in range(count - 1) {
++            items[i] +>:RegionNext:+> items[i + 1];
++        }
++        if fanout {
++            items[0] +>:RegionNext:+> items[2];
++        }
++        if cycle {
++            items[-1] +>:RegionNext:+> items[0];
++        }
++        return [n.__jac__.id for n in items];
++    } finally {
++        ctx.close();
++    }
++}
++
++
++def region_run(
++    project: str, uid: UUID, wlk: any, enabled: bool, strict_cache: bool = False
++) -> tuple {
++    ctx = region_context(project);
++    try {
++        origin = ctx.mem.get(uid).archetype;
++        calls: list = [];
++        store: any = ctx.mem.store;
++        original: any = store.rows;
++        def capture(sql: str, params: dict) -> list {
++            rows = original(sql, params);
++            calls.append({'sql': sql, 'params': params, 'rows': len(rows)});
++            return rows;
++        }
++        import jaclang.data.query_planner as planner;
++        import from contextlib { nullcontext }
++        native_reads: list = [];
++        original_pairs: any = planner._sql_pairs;
++        def pairs(mem: any, origin_ids: list, query: any, upto: int) -> any {
++            before = len(calls);
++            result = original_pairs(mem, origin_ids, query, upto);
++            native_reads.append(
++                {
++                    'origins': [str(x) for x in origin_ids],
++                    'upto': upto,
++                    'sql_calls': len(calls) - before
++                }
++            );
++            return result;
++        }
++        compiler_guard = patch.object(
++            planner, 'compile_query', side_effect=AssertionError('native SQL rebuild')
++        )
++            if strict_cache
++            else nullcontext();
++        topology_guard = patch.object(planner, '_topology_node_ids', return_value=None)
++            if strict_cache
++            else nullcontext();
++        with patch.object(store, 'rows', side_effect=capture), patch.object(
++            planner, '_sql_pairs', side_effect=pairs
++        ), compiler_guard, topology_guard {
++            with dependency_prefetch(
++                ctx, max_length=2048, mode='process', workers=1, fused_sql=enabled
++            ) as run {
++                origin spawn wlk;
++            }
++        }
++        assert not run.errors , str(run.errors);
++        summary = run.summary();
++        if strict_cache {
++            assert native_reads
++                and all(read['sql_calls'] == 0 for read in native_reads) , str(
++                native_reads
++            );
++        }
++        evidence = os.environ.get('TTG_INTERABILITY_EVIDENCE');
++        if evidence {
++            with open(evidence, 'a') as output {
++                output.write(
++                    json.dumps(
++                        {
++                            'wlk': type(wlk).__name__,
++                            'enabled': enabled,
++                            'reports': wlk.reports,
++                            'calls': calls,
++                            'native_pair_reads': native_reads,
++                            'strict_cache': strict_cache,
++                            'summary': summary
++                        },
++                        **{'default': str}
++                    )
++                        + '\n'
++                );
++            }
++        }
++        return (wlk.reports, summary, calls);
++    } finally {
++        ctx.close();
++    }
++}
++
++test "Actual no-counter native chain uses one static query and ordered empty cache" {
++    old = JacRuntime.exec_ctx;
++    try {
++        project = region_project();
++        ids = region_chain(project, 8);
++        plain = region_run(project, ids[0], RegionTraverse(), False);
++        fused = region_run(project, ids[0], RegionTraverse(), True, True);
++        assert plain[0] == list(range(8)) and fused[0] == plain[0];
++        assert fused[1]['fusion']['region_queries'] == 1 , str(fused[1]);
++        assert fused[1]['fusion']['region_cache_paths'] == 8;
++        assert fused[1]['fusion']['cache_empty_paths'] >= 1;
++        assert fused[1]['fusion']['region_origins'] == 8;
++        assert fused[1]['fusion']['payload_dispatches'] == 1;
++        counted = RegionCounterOutput();
++        observed = region_run(project, ids[0], counted, True, True);
++        assert counted.visited == 8 and observed[0] == fused[0];
++        assert observed[1]['fusion']['region_queries'] == 1;
++        # Actual native _sql_pairs calls are measured by region_run strict_cache; no SQL-spelling heuristic.
++    } finally {
++        JacRuntime.exec_ctx = old;
++    }
++}
++
++test "Finite A B C true false exact native reports and guard remains inside SQL" {
++    old = JacRuntime.exec_ctx;
++    try {
++        for active in (True, False) {
++            project = region_project();
++            ctx = region_context(project);
++            try {
++                a = RegionA();
++                b = RegionB(active=active);
++                c = RegionC(value=17);
++                root ++> a;
++                a +>:RegionAB:+> b;
++                b +>:RegionBC:+> c;
++                uid = a.__jac__.id;
++            } finally {
++                ctx.close();
++            }
++            plain = region_run(project, uid, RegionGuard(), False);
++            fused = region_run(project, uid, RegionGuard(), True, True);
++            assert plain[0] == ([17] if active else []);
++            assert fused[0] == plain[0];
++            assert fused[1]['fusion']['region_queries'] == 1 , str(fused[1]);
++            assert fused[1]['fusion']['region_cache_paths'] == (2 if active else 1);
++            selected = [
++                call
++                for call in fused[2]
++                if 'jsonb_typeof' in call['sql'] and 'origin_id' in call['sql']
++            ];
++            assert len(selected) == 1 , str(selected);
++        }
++    } finally {
++        JacRuntime.exec_ctx = old;
++    }
++}
++
++test "Fanout uses native fallback without changing duplicate FIFO visits" {
++    old = JacRuntime.exec_ctx;
++    try {
++        project = region_project();
++        ids = region_chain(project, 3, fanout=True);
++        plain = region_run(project, ids[0], RegionTraverse(), False);
++        fused = region_run(project, ids[0], RegionTraverse(), True);
++        assert fused[0] == plain[0];
++        assert fused[1]['fusion']['region_fallbacks'] >= 1;
++        assert fused[1]['fusion']['region_fallback_reasons'].get(
++            'Static region fanout requires native fallback', 0
++        )
++            >= 1;
++    } finally {
++        JacRuntime.exec_ctx = old;
++    }
++}
++
++test "Cycle and overflow refuse atomically before any native cache publication" {
++    import from types { SimpleNamespace }
++    old = JacRuntime.exec_ctx;
++    try {
++        for cycle in (False, True) {
++            project = region_project();
++            ids = region_chain(project, 4, cycle=cycle);
++            ctx = region_context(project);
++            try {
++                wlk = RegionTraverse();
++                origin = ctx.mem.get(ids[0]);
++                arch = JacTTGGenerator._find_walker_ast_node(RegionTraverse);
++                assert arch is not None;
++                spec = compile_checkpoint_plan(arch);
++                graph = checkpoint_graph(spec, RegionTraverse);
++                scope = SimpleNamespace(path=[origin], ignores=[]);
++                metrics: dict = {
++                    'queries': 0,
++                    'regions': [],
++                    'cache_paths': 0,
++                    'cache_empty_paths': 0
++                };
++                with patch(
++                    'jaclang.runtime.ttg_regions.publish_paths',
++                    side_effect=AssertionError('partial cache')
++                ) {
++                    result = resolve_interability_region(
++                        ctx.mem,
++                        graph,
++                        wlk,
++                        scope,
++                        spec['entries']['walk'],
++                        {'id': ids[0], 'node_type': RegionItem},
++                        [],
++                        None,
++                        20 if cycle else 2,
++                        metrics
++                    );
++                }
++                assert result is None;
++                assert 'cycle' in metrics['region_fallback_reason']
++                    if cycle
++                    else 'budget' in metrics['region_fallback_reason'];
++            } finally {
++                ctx.close();
++            }
++        }
++    } finally {
++        JacRuntime.exec_ctx = old;
++    }
++}
++
++
++test "Null missing and wrong Boolean storage reject statically but retain native behavior" {
++    old = JacRuntime.exec_ctx;
++    try {
++        for variant in ('null', 'missing', 'string') {
++            project = region_project();
++            ctx = region_context(project);
++            try {
++                a = RegionA();
++                b = RegionB(active=True);
++                c = RegionC(value=23);
++                root ++> a;
++                a +>:RegionAB:+> b;
++                b +>:RegionBC:+> c;
++                uid = a.__jac__.id;
++                bid = b.__jac__.id;
++            } finally {
++                ctx.close();
++            }
++            ctx = region_context(project);
++            try {
++                ctx.mem.read_barrier();
++                store: any = ctx.mem.store;
++                if variant == 'missing' {
++                    store.rows(
++                        "UPDATE anchors SET props = props #- '{archetype,active}' WHERE id=:id",
++                        {'id': str(bid)}
++                    );
++                } else {
++                    store.rows(
++                        "UPDATE anchors SET props=jsonb_set(props,'{archetype,active}',CAST(:value AS jsonb)) WHERE id=:id",
++                        {
++                            'id': str(bid),
++                            'value': 'null' if variant == 'null' else json.dumps('true')
++                        }
++                    );
++                }
++            } finally {
++                ctx.close();
++            }
++            plain = region_run(project, uid, RegionGuard(), False);
++            ctx = region_context(project);
++            try {
++                ctx.mem.read_barrier();
++                store: any = ctx.mem.store;
++                if variant == 'missing' {
++                    store.rows(
++                        "UPDATE anchors SET props = props #- '{archetype,active}' WHERE id=:id",
++                        {'id': str(bid)}
++                    );
++                } else {
++                    store.rows(
++                        "UPDATE anchors SET props=jsonb_set(props,'{archetype,active}',CAST(:value AS jsonb)) WHERE id=:id",
++                        {
++                            'id': str(bid),
++                            'value': 'null' if variant == 'null' else json.dumps('true')
++                        }
++                    );
++                }
++            } finally {
++                ctx.close();
++            }
++            fused = region_run(project, uid, RegionGuard(), True);
++            assert fused[0] == plain[0];
++            assert fused[1]['fusion']['region_fallbacks'] >= 1;
++            assert 'Malformed' in fused[1]['fusion']['region_fallback_reason'];
++        }
++    } finally {
++        JacRuntime.exec_ctx = old;
++    }
++}
++
++
++test "Output setter and applicable node exit reject before publication" {
++    import from types { SimpleNamespace }
++    old = JacRuntime.exec_ctx;
++    try {
++        project = region_project();
++        ids = region_chain(project, 3);
++        ctx = region_context(project);
++        try {
++            origin = ctx.mem.get(ids[0]);
++            for mode in ('setter', 'exit') {
++                wlk = RegionAssign() if mode == 'setter' else RegionTraverse();
++                cls: any = type(wlk);
++                arch = JacTTGGenerator._find_walker_ast_node(cls);
++                assert arch is not None;
++                spec = compile_checkpoint_plan(arch);
++                graph = checkpoint_graph(spec, cls);
++                scope = SimpleNamespace(path=[origin], ignores=[]);
++                metrics: dict = {
++                    'queries': 0,
++                    'regions': [],
++                    'cache_paths': 0,
++                    'cache_empty_paths': 0
++                };
++                calls: list = [];
++                def forbidden(value: any) -> any {
++                    calls.append(value);
++                    raise AssertionError('descriptor called');
++                }
++                if mode == 'setter' {
++                    with patch.object(cls, 'sink', property(forbidden, forbidden)), patch(
++                        'jaclang.runtime.ttg_regions.publish_paths',
++                        side_effect=AssertionError('published')
++                    ) {
++                        result = resolve_interability_region(
++                            ctx.mem,
++                            graph,
++                            wlk,
++                            scope,
++                            spec['entries']['walk'],
++                            {'id': ids[0], 'node_type': RegionItem},
++                            [],
++                            None,
++                            20,
++                            metrics
++                        );
++                    }
++                } else {
++                    callback = SimpleNamespace(trigger=cls);
++                    with patch.object(RegionItem, '_jac_exit_funcs_', [callback]), patch(
++                        'jaclang.runtime.ttg_regions.publish_paths',
++                        side_effect=AssertionError('published')
++                    ) {
++                        result = resolve_interability_region(
++                            ctx.mem,
++                            graph,
++                            wlk,
++                            scope,
++                            spec['entries']['walk'],
++                            {'id': ids[0], 'node_type': RegionItem},
++                            [],
++                            None,
++                            20,
++                            metrics
++                        );
++                    }
++                }
++                assert result is None and not calls;
++                assert metrics['queries'] == 0;
++            }
++        } finally {
++            ctx.close();
++        }
++    } finally {
++        JacRuntime.exec_ctx = old;
++    }
++}
++
++test "Static process submission respects the remaining payload cap" {
++    old = JacRuntime.exec_ctx;
++    try {
++        project = region_project();
++        ids = region_chain(project, 4);
++        ctx = region_context(project);
++        try {
++            origin = ctx.mem.get(ids[0]).archetype;
++            assert isinstance(origin, RegionItem);
++            wlk = RegionTraverse();
++            with dependency_prefetch(
++                ctx, max_length=4, mode='process', workers=1, fused_sql=True
++            ) as run {
++                run.submitted.update(
++                    [UUID(int=10001), UUID(int=10002), UUID(int=10003)]
++                );
++                origin spawn wlk;
++            }
++            assert not run.errors , str(run.errors);
++            assert wlk.reports == [0, 1, 2, 3];
++            assert len(run.submitted) == 4 , str(run.summary());
++            assert len(set(ids) & run.submitted) == 1;
++        } finally {
++            ctx.close();
++        }
++    } finally {
++        JacRuntime.exec_ctx = old;
++    }
++}
++
++
++test "Authenticated published paths include ordered empty native cache with zero SQL rebuild" {
++    import from types { SimpleNamespace }
++    import from jaclang.runtime.archetype { Root, AccessLevel }
++    import from jaclang.runtime.graph_query { GraphQuery, QHop }
++    import from jaclang.runtime.graph_walk { access_gated }
++    import from jaclang.data.query_planner { resolve_query_prefix }
++    import jaclang.data.query_planner as planner;
++    import jaclang.sql as q;
++    old = JacRuntime.exec_ctx;
++    try {
++        project = region_project();
++        ctx = region_context(project);
++        try {
++            reader: any = Root().__jac__;
++            reader.persistent = True;
++            setattr(reader, 'root', reader.id);
++            ctx.mem.put(reader);
++            nodes = [RegionItem(value=i) for i in range(3)];
++            for item in nodes {
++                anchor: any = item.__jac__;
++                anchor.persistent = True;
++                setattr(anchor, 'root', reader.id);
++                anchor.own_access().all = AccessLevel.NO_ACCESS;
++                ctx.mem.put(anchor);
++            }
++            for i in range(2) {
++                nodes[i] +>:RegionNext:+> nodes[i + 1];
++            }
++            ids = [n.__jac__.id for n in nodes];
++            reader_id = reader.id;
++        } finally {
++            ctx.close();
++        }
++        ctx = region_context(project);
++        try {
++            ctx.set_user_root(str(reader_id));
++            assert access_gated();
++            anchors = [ctx.mem.get(uid) for uid in ids];
++            wlk = RegionTraverse();
++            arch = JacTTGGenerator._find_walker_ast_node(RegionTraverse);
++            assert arch is not None;
++            spec = compile_checkpoint_plan(arch);
++            graph = checkpoint_graph(spec, RegionTraverse);
++            scope = SimpleNamespace(path=[anchors[0]], ignores=[]);
++            metrics: dict = {
++                'queries': 0,
++                'regions': [],
++                'cache_paths': 0,
++                'cache_empty_paths': 0
++            };
++            with patch.object(q, 'table', side_effect=AssertionError('runtime AST')), patch.object(
++                q, 'compile_sql', side_effect=AssertionError('runtime renderer')
++            ) {
++                result = resolve_interability_region(
++                    ctx.mem,
++                    graph,
++                    wlk,
++                    scope,
++                    spec['entries']['walk'],
++                    {'id': ids[0], 'node_type': RegionItem},
++                    [],
++                    ctx.user_root,
++                    20,
++                    metrics
++                );
++                assert result is not None , str(metrics);
++                store: any = ctx.mem.store;
++                with patch.object(
++                    store, 'rows', side_effect=AssertionError('native cache requery')
++                ), patch.object(planner, '_topology_node_ids', return_value=None) {
++                    for (i, anchor) in enumerate(anchors) {
++                        query = GraphQuery(
++                            anchor.archetype,
++                            hops=[QHop(dir=2, `edge=RegionNext, nd=RegionItem)]
++                        ).`visit();
++                        assert resolve_query_prefix(ctx.mem, query, 1)
++                            == ([ids[i + 1]] if i < 2 else []);
++                    }
++                }
++            }
++            assert metrics['queries'] == 1 and metrics['cache_paths'] == 3;
++        } finally {
++            ctx.close();
++        }
++    } finally {
++        JacRuntime.exec_ctx = old;
++    }
++}
++
++
++test "A later independent collect region batches both paths once after an untyped root" {
++    old = JacRuntime.exec_ctx;
++    try {
++        project = region_project();
++        ctx = region_context(project);
++        try {
++            start = RegionFrontRoot();
++            hub = RegionFrontHub();
++            root ++> start;
++            start +>:RegionFrontEdge:+> hub;
++            leaf = RegionC(value=31);
++            hub +>:RegionFrontLeft:+> leaf;
++            hub +>:RegionFrontRight:+> leaf;
++            uid = start.__jac__.id;
++        } finally {
++            ctx.close();
++        }
++        plain = region_run(project, uid, RegionFrontier(), False);
++        fused = region_run(project, uid, RegionFrontier(), True);
++        assert plain[0] == [31, 31] and fused[0] == plain[0];
++        assert fused[1]['fusion']['template_queries'] == 2 , str(fused[1]);
++        assert fused[1]['fusion']['frontier_region_attempts'] == 2;
++        assert fused[1]['fusion']['fallback_resolver_calls'] == 0;
++        assert any(
++            r.get('kind') == 'batch' and len(r.get('demands', [])) == 2
++            for r in fused[1]['fusion']['regions']
++        );
++    } finally {
++        JacRuntime.exec_ctx = old;
++    }
++}

@@ -1,0 +1,359 @@
+{
+  "passed": true,
+  "scope": "Matched native recapture; SERIALIZABLE, explicit pre-workflow ANALYZE, same-connection first/repeat EXPLAIN. Census warms buffers; separate from primary n=3.",
+  "headers": [
+    "Mode",
+    "Planning first/repeat ms",
+    "Execution first/repeat ms",
+    "Shared hits",
+    "Temp writes (blocks)"
+  ],
+  "widths": [
+    0.16,
+    0.24,
+    0.26,
+    0.17,
+    0.17
+  ],
+  "rows": [
+    [
+      "baseline9282",
+      "0.773 / 0.658",
+      "14.346 / 14.107",
+      "16136",
+      "0"
+    ],
+    [
+      "interability",
+      "1.111 / 0.897",
+      "41.481 / 40.506",
+      "22136",
+      "985"
+    ]
+  ],
+  "modes": [
+    {
+      "mode": "baseline9282",
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-diagnostics-20261102/recapture-v1/cases/finite_list1000-baseline9282-diagnostic/diagnostic-acceptance.json",
+        "sha256": "24fc270355a388ac9ba5f218d6a06cf3a9489208afc20e4600391bfb63fac41d"
+      },
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-diagnostics-20261102/recapture-v1/cases/finite_list1000-baseline9282-diagnostic/captures/ll1000-baseline9282-pid2280064.json",
+        "sha256": "1c2afaa4701594a8d93eeb06de3bfc8a12abf88e9917299fde9587a5075705c0"
+      },
+      "plans": [
+        {
+          "planning_ms": 0.773,
+          "execution_ms": 14.346,
+          "shared_hits": 16136,
+          "shared_reads": 0,
+          "temp_written_blocks": 0
+        },
+        {
+          "planning_ms": 0.658,
+          "execution_ms": 14.107,
+          "shared_hits": 16136,
+          "shared_reads": 0,
+          "temp_written_blocks": 0
+        }
+      ],
+      "state_context": [
+        [
+          "continuation_1ac66e89f4c741fb97788e01d82fb1bd",
+          "ttgperf",
+          2281033,
+          "serializable",
+          "off",
+          "799:799:"
+        ]
+      ],
+      "relations": [
+        [
+          "anchors",
+          2005.0,
+          131,
+          2005,
+          0,
+          "2026-11-02 01:28:57.267926-05",
+          null,
+          0,
+          1,
+          0
+        ],
+        [
+          "graph_types",
+          4.0,
+          1,
+          4,
+          0,
+          "2026-11-02 01:28:57.27178-05",
+          null,
+          0,
+          1,
+          0
+        ]
+      ],
+      "settings": [
+        [
+          "client_encoding",
+          "UTF8"
+        ],
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "effective_cache_size",
+          "524288"
+        ],
+        [
+          "enable_bitmapscan",
+          "on"
+        ],
+        [
+          "enable_hashjoin",
+          "on"
+        ],
+        [
+          "enable_indexscan",
+          "on"
+        ],
+        [
+          "enable_mergejoin",
+          "on"
+        ],
+        [
+          "enable_nestloop",
+          "on"
+        ],
+        [
+          "enable_seqscan",
+          "on"
+        ],
+        [
+          "jit",
+          "on"
+        ],
+        [
+          "jit_above_cost",
+          "100000"
+        ],
+        [
+          "jit_inline_above_cost",
+          "500000"
+        ],
+        [
+          "jit_optimize_above_cost",
+          "500000"
+        ],
+        [
+          "plan_cache_mode",
+          "auto"
+        ],
+        [
+          "random_page_cost",
+          "4"
+        ],
+        [
+          "row_security",
+          "on"
+        ],
+        [
+          "search_path",
+          "\"$user\", public"
+        ],
+        [
+          "server_version_num",
+          "180006"
+        ],
+        [
+          "standard_conforming_strings",
+          "on"
+        ],
+        [
+          "statement_timeout",
+          "0"
+        ],
+        [
+          "work_mem",
+          "4096"
+        ]
+      ]
+    },
+    {
+      "mode": "interability",
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-diagnostics-20261102/recapture-v1/cases/finite_list1000-interability-diagnostic/diagnostic-acceptance.json",
+        "sha256": "64a7a0f27949fffec117e348db02c93732ec04d92acae2dcd4ac97c71ab015fa"
+      },
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-diagnostics-20261102/recapture-v1/cases/finite_list1000-interability-diagnostic/captures/ll1000-interability-pid2286834.json",
+        "sha256": "57ca5283e356ecc0b28f5b50664efd547466bd54315a94c2d90bda7823716350"
+      },
+      "plans": [
+        {
+          "planning_ms": 1.111,
+          "execution_ms": 41.481,
+          "shared_hits": 22136,
+          "shared_reads": 0,
+          "temp_written_blocks": 985
+        },
+        {
+          "planning_ms": 0.897,
+          "execution_ms": 40.506,
+          "shared_hits": 22136,
+          "shared_reads": 0,
+          "temp_written_blocks": 985
+        }
+      ],
+      "state_context": [
+        [
+          "continuation_8d41e63e79454691a39fa320563c0d20",
+          "ttgperf",
+          2286968,
+          "serializable",
+          "off",
+          "836:836:"
+        ]
+      ],
+      "relations": [
+        [
+          "anchors",
+          2005.0,
+          131,
+          2005,
+          0,
+          "2026-11-02 01:31:24.376065-05",
+          null,
+          0,
+          1,
+          0
+        ],
+        [
+          "graph_types",
+          4.0,
+          1,
+          4,
+          0,
+          "2026-11-02 01:31:24.37996-05",
+          null,
+          0,
+          1,
+          0
+        ]
+      ],
+      "settings": [
+        [
+          "client_encoding",
+          "UTF8"
+        ],
+        [
+          "default_statistics_target",
+          "100"
+        ],
+        [
+          "effective_cache_size",
+          "524288"
+        ],
+        [
+          "enable_bitmapscan",
+          "on"
+        ],
+        [
+          "enable_hashjoin",
+          "on"
+        ],
+        [
+          "enable_indexscan",
+          "on"
+        ],
+        [
+          "enable_mergejoin",
+          "on"
+        ],
+        [
+          "enable_nestloop",
+          "on"
+        ],
+        [
+          "enable_seqscan",
+          "on"
+        ],
+        [
+          "jit",
+          "on"
+        ],
+        [
+          "jit_above_cost",
+          "100000"
+        ],
+        [
+          "jit_inline_above_cost",
+          "500000"
+        ],
+        [
+          "jit_optimize_above_cost",
+          "500000"
+        ],
+        [
+          "plan_cache_mode",
+          "auto"
+        ],
+        [
+          "random_page_cost",
+          "4"
+        ],
+        [
+          "row_security",
+          "on"
+        ],
+        [
+          "search_path",
+          "\"$user\", public"
+        ],
+        [
+          "server_version_num",
+          "180006"
+        ],
+        [
+          "standard_conforming_strings",
+          "on"
+        ],
+        [
+          "statement_timeout",
+          "0"
+        ],
+        [
+          "work_mem",
+          "4096"
+        ]
+      ]
+    }
+  ],
+  "result": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-diagnostics-20261102/recapture-v1/result.json",
+    "sha256": "245c76cfbcf382ecd0e4d1d38d08e115d14b10bb8429214b7dd91618bfbd4ca7"
+  },
+  "lifecycle": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-diagnostics-20261102/recapture-v1/lifecycle.json",
+    "sha256": "54b62f94a7b40a7c4f58245c0922896201ab34693524e4e1b860b4079caf632c"
+  },
+  "script": {
+    "path": "/home/baichuan/jaseci/reproduction/ttg-interability-diagnostics/summarize_main.py",
+    "sha256": "5d5454c1a3ed46a048e4a0c9cf60b41ff502125727d27484a3e3d4fec40a655c"
+  },
+  "review_status": "Main source/result/plan binding checked; independent diagnostic reviewer stopped at usage limit before final report. Primary48 and HTTP/startup independent reviews remain complete.",
+  "observations": [
+    "Both selected original queries completed with 1000 rows and full native/restart/physical acceptance.",
+    "New recursive tuple carries phase and a growing seen UUID array; ANY membership guards cycles. Baseline recursive tuple carries origin and depth only.",
+    "New plan performs two additional source-anchor PK checks per origin: 1000 loops each, 3000 hits each, explaining the observed extra6000 shared hits structurally.",
+    "New CTE Scan reports985 temporary written blocks at work_mem4096kB; baseline reports0. Ancestor counters are inclusive and must not be summed.",
+    "No disk shared reads in either diagnostic. These plans locate additional validation/state/spill work; no isolated attribution of milliseconds to a single feature was measured."
+  ],
+  "next_steps": [
+    "Evaluate narrower recursive state or alternative exact cycle/completeness validation under explicit semantic proofs.",
+    "Retain cycle/fanout/overflow/ACL tests; do not simply remove guards.",
+    "Evaluate persistent reader reuse and cold-start-aware admission separately."
+  ]
+}

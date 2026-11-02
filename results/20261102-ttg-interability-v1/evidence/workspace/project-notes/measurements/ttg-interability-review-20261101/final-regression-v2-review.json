@@ -1,0 +1,72 @@
+{
+  "status": "FINAL_DELTA_REGRESSION_PASS_CLEAN_COMMIT_PENDING",
+  "scope": "Small final delta/test-source/regression identity binding only; no raw/native reread, archive scan or reviewer execution.",
+  "evidence": {
+    "source-start.json": {
+      "path": "project-notes/measurements/ttg-interability-20261101/regression-final-v2/source-start.json",
+      "sha256": "0cbda83c2d3dabd4dffeb716d235125967a9a852a2fafb2f7688d00004d90cc3"
+    },
+    "source-end.json": {
+      "path": "project-notes/measurements/ttg-interability-20261101/regression-final-v2/source-end.json",
+      "sha256": "0cbda83c2d3dabd4dffeb716d235125967a9a852a2fafb2f7688d00004d90cc3"
+    },
+    "outcome.json": {
+      "path": "project-notes/measurements/ttg-interability-20261101/regression-final-v2/outcome.json",
+      "sha256": "8896899dc906d71ec33e4180049a4aaaa6587cb0adb3b0704c305e3a3626eeb8"
+    },
+    "tests.log": {
+      "path": "project-notes/measurements/ttg-interability-20261101/regression-final-v2/tests.log",
+      "sha256": "0a77edbd047f4b627688fec99a26e0f68297227be2cb674dfeb7ad3a42b50dc1"
+    },
+    "lifecycle.json": {
+      "path": "project-notes/measurements/ttg-interability-20261101/regression-final-v2/lifecycle.json",
+      "sha256": "da759d299693d4d89cf1bdd758111fa628984d0b6477053f835e2be2d5488f9a"
+    },
+    "launcher.py": {
+      "path": "project-notes/measurements/ttg-interability-20261101/regression-final-v2/launcher.py",
+      "sha256": "bee6197d25ae6ba3867cc5ffd862af66e2e072d3dec5de772245cc783e181ef5"
+    }
+  },
+  "source_hashes": {
+    "jac/jaclang/impl/sql.impl.jac": "0775fbbbb9f8c45e44575355416521ef6e18cabcd31ce5df3f3fde11fde800d9",
+    "jac/jaclang/runtime/ttg_dependencies.jac": "44e58ca2e934bbcbc8539584467ed63b002215161c9e3c111c89be7de2479ba3",
+    "jac/jaclang/runtime/ttg_dependency_prefetch.jac": "0a63ba372ab1846ade3bd3e9a216101629aee617444b9e89aceb21cad568ada0",
+    "jac/jaclang/runtime/ttg_templates.jac": "283e9aa070a6ed4f63fb5713389959ad956481cedd81917d64291d36d5447055",
+    "jac/jaclang/sql.jac": "35c39dbdcebf3f67490c76cdd14860198ffb8c522efb6f9caed63f66aab0e2c8",
+    "jac/tests/runtimelib/test_ttg_dependency_prefetch.jac": "7f913efb09393ca5583c515373e544f94dbc1e216824eda615719f23c19afa91",
+    "jac/jaclang/runtime/ttg_regions.jac": "cf383adfcdfc20ac3b98ed3a9d7c087c5aae61f4dcb0d2a9cbd1820c36b6e783",
+    "jac/tests/runtimelib/fixtures/ttg_region_walkers.jac": "7ad5b09d036f110c9b70e64a8af0efdcf3737b75843b90f52a21ae7153918931",
+    "jac/tests/runtimelib/test_ttg_regions.jac": "43e9c41a2ec968353b7e2b06458592b0261b645b5144ff0c5b0c755879c142be",
+    "jac/tests/runtimelib/test_ttg_regions_native.jac": "1a7f3994b856d69a5a82506de76da9e7b011c0edf650c008f1794fbc3480e588"
+  },
+  "prior_native_review": {
+    "path": "project-notes/measurements/ttg-interability-review-20261101/native-pass-v1-review.json",
+    "sha256": "4d30896b38b2d1342d47764736dbf4f3891d20c94f7e475aac82853edf0b6ca8"
+  },
+  "chosen_test_review": {
+    "path": "project-notes/measurements/ttg-interability-review-20261101/chosen-test-delta-review.json",
+    "sha256": "d1dbd3322d7a004a68994b18bedb8569ca65cb3c3f0ca04510e32e25068bb132"
+  },
+  "test_results": {
+    "passed": 220,
+    "seconds": 19.05,
+    "exit": 0,
+    "source_unchanged": true,
+    "pg_status": 3,
+    "has_pid": false
+  },
+  "delta_vs_native_pass": [
+    "SQL API+renderer bytes unchanged. Dependencies/prefetch/templates/fixtures/native and offline region tests have only formatting/comment token differences.",
+    "ttg_regions _sql_guard terms now annotated list[dict] and chooses existing equal/different list with explicit conditional indexing; compiler-produced predicate variant has exactly one of these keys, preserving its result.",
+    "Expected closure tuple is annotated tuple[int,int,UUID]|None.",
+    "Next expected target uses UUID(str(pairs[0][0])); pairs[0][0] is already explicitly built UUID from row[3], so normalization preserves identity for supported validated rows.",
+    "Chosen dependency test hash exactly equals d1db-reviewed source7f913;9 original assertions and every other test unchanged."
+  ],
+  "findings": [],
+  "pending": "Exact clean commit/proof and final runtime snapshot metadata rebind after owner archive. No new native rerun or framework prerequisite requested.",
+  "limitations": [
+    "Historical173PASS1FAIL and isolated pass remain preserved; cause remains unproven.",
+    "Deterministic chosen test proves completed-cache promotion, not production50ms deadline.",
+    "Archive activity not inspected; lifecycle and source documents are read-only bound evidence."
+  ]
+}

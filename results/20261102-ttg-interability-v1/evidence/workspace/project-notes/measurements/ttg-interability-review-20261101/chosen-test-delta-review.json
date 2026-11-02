@@ -1,0 +1,20 @@
+{
+  "status": "SCOPED_TEST_ONLY_DELTA_PASS_FINAL_RUN_PENDING",
+  "source": {
+    "path": "jac-ttg/jac/tests/runtimelib/test_ttg_dependency_prefetch.jac",
+    "sha256": "7f913efb09393ca5583c515373e544f94dbc1e216824eda615719f23c19afa91"
+  },
+  "baseline_commit": "9282e246d708aff69e21cb52b9d0cc4893fc5f0f",
+  "baseline_source_sha256": "f2d8ba051e68eed005a3115bf18ad35126fa6d0ecad0b64c4dea4faefda8a60e",
+  "scope": "Chosen-branch test setup only; no tests or reproduction run by reviewer.",
+  "checks": [
+    "Captured original real dispatcher remains the imported function; scoped module patch invokes it unchanged with exact args/append/observer.",
+    "Real created thread handles are joined(timeout5) and asserted dead before returning to native demand; asynchronous producer execution remains real.",
+    "All9 existing chosen-test assertions are unchanged; one new thread-liveness assertion is added.",
+    "Everything outside the chosen test, including worker-failure fallback and outstanding-worker tests, remains byte-identical to9282.",
+    "Patch scope exits before context/session cleanup; no production Session/default50ms/accounting or profiling timing path changed."
+  ],
+  "interpretation": "The chosen test now proves completed raw-cache population/promotion and branch/edge-subtype correctness; it does not measure or guarantee meeting the production wait deadline. Historical single failure cause remains unproven; isolated pass is not a flake diagnosis.",
+  "findings": [],
+  "pending": "Bind this exact test hash (or declared formatting delta) to final regression outcome/clean commit closure only."
+}

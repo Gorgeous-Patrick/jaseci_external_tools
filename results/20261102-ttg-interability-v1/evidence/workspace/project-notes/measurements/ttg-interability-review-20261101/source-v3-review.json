@@ -1,0 +1,35 @@
+{
+  "status": "SCOPED_SOURCE_V3_DELTA_PASS_NATIVE_PENDING",
+  "manifest": {
+    "path": "project-notes/measurements/ttg-interability-20261101/source-v3/manifest.json",
+    "sha256": "998751124a7baff6936941ef6f5454ffc12f1d60e3a4cd45608081be2c64090a"
+  },
+  "sources": {
+    "jac/jaclang/impl/sql.impl.jac": "0775fbbbb9f8c45e44575355416521ef6e18cabcd31ce5df3f3fde11fde800d9",
+    "jac/jaclang/runtime/ttg_dependencies.jac": "cccc5d154cc1341a02db326d644bb87b787745ab0f1e09ce661e44d3103315f2",
+    "jac/jaclang/runtime/ttg_dependency_prefetch.jac": "b152b2402ce37b5ce1ad76f498344a05123ef5f6c98e3329638d4d5f61e31270",
+    "jac/jaclang/runtime/ttg_templates.jac": "f5c8b84e0ed4e7500f676dcc84ff7bd734b72191f7268ded09898a5fb89ca154",
+    "jac/jaclang/sql.jac": "35c39dbdcebf3f67490c76cdd14860198ffb8c522efb6f9caed63f66aab0e2c8",
+    "jac/jaclang/runtime/ttg_regions.jac": "f67fccbceddc37d460ec4e7556c2439789d2367f37052f5a5a1264b28b673bfd",
+    "jac/tests/runtimelib/fixtures/ttg_region_walkers.jac": "c2a9690a1b1b96ff90e4ae7d0864022a490d0b3613b6893b1ffadfc657507fc5",
+    "jac/tests/runtimelib/test_ttg_regions.jac": "a752a37c8766c84b8919b8e68b804874d923f82b88b548b9fb89604b98ee1ae0",
+    "jac/tests/runtimelib/test_ttg_regions_native.jac": "bcf4e5d4dc2ec64175c897806a83b7d10cee5671078c9ce3f1fe67ba45847fb4"
+  },
+  "prior_review": {
+    "path": "project-notes/measurements/ttg-interability-review-20261101/source-v2-review.json",
+    "sha256": "0a7c7f759403fb25a1751dd58f4fbc06edc12076b49b54f89d4fdb24e34d7141"
+  },
+  "scope": "Stage2 changed source and authored native proof assertions only; no tests/compiler/runtime/DB execution.",
+  "checks": [
+    "Compiler frontier_independent_prefix is limited to entries/exits/inputs/visits; output, branch, assignment, helper/barrier and cancellation events exclude extra attempts. This flag does not replace the existing collector safety proof.",
+    "First legacy frontier attempt preserved. Additional attempts require pure prefix and distinct ability/active-origin/event; resolve_frontier still receives actual active.transition_pending and applies existing barriers/safety.",
+    "Existing local/reuse paths return first; new complete emitted native-path cache lookup honors ACL decision, typed descriptor/full hop count and cached empty lists. Already fused keys skip a new query. Native execution/duplicate visits remain unchanged.",
+    "Static coverage keys bind invocation UUID, graph identity, scope, walker identity, ability, origin and actor; published covered nodes retain each actual phase ability.",
+    "Fixed-string fallback reason counts preserve earlier fanout failure despite later declines. No weaker output/cache assertion substituted.",
+    "Strict native _sql_pairs wrapper measures store.rows deltas with compile_query forbidden and topology disabled; positive requires nonempty observed native calls and all SQL deltas0. Authenticated cache-consumer test also forbids all store.rows after publication, including ordered final empty marker. This replaces spelling heuristic at source level.",
+    "New same-leaf two-visit native fixture expects duplicate reports[31,31], exactly2 template queries and attempts, fallback resolver0 and a two-demand batch. No executed outcome accepted yet.",
+    "SQL guard/lowering and five earlier repairs remain unchanged in relevant scope. DML test uses actual rows API; no production SQL policy changed."
+  ],
+  "findings": [],
+  "pending": "Bind new native-v5 executed sources/outcome/actual SQL and guarded cache evidence. Partial prior4-test evidence is historical, not full acceptance."
+}

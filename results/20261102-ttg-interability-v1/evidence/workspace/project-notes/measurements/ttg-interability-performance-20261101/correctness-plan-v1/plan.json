@@ -1,0 +1,783 @@
+{
+  "kind": "ttg-interability-four-fixture-v1",
+  "seed": 42,
+  "prefetch_workers": 1,
+  "prefetch_limit": 2048,
+  "max_steps": 32768,
+  "configs": {
+    "off": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "process",
+      "ttg_prefetch_model": "always",
+      "prefetching": "none",
+      "ttg_fused_sql": false
+    },
+    "baseline9282": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "process",
+      "ttg_prefetch_model": "always",
+      "prefetching": "ttg_dependency",
+      "ttg_fused_sql": true
+    },
+    "interability": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "process",
+      "ttg_prefetch_model": "always",
+      "prefetching": "ttg_dependency",
+      "ttg_fused_sql": true
+    }
+  },
+  "correctness_schedule": [
+    {
+      "case_id": "finite_list32",
+      "app": "linked_list",
+      "scale": "smoke",
+      "length": 32,
+      "config_id": "off",
+      "phase": "correctness",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "finite_list32-off-correctness-0"
+    },
+    {
+      "case_id": "finite_list32",
+      "app": "linked_list",
+      "scale": "smoke",
+      "length": 32,
+      "config_id": "baseline9282",
+      "phase": "correctness",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "finite_list32-baseline9282-correctness-0"
+    },
+    {
+      "case_id": "finite_list32",
+      "app": "linked_list",
+      "scale": "smoke",
+      "length": 32,
+      "config_id": "interability",
+      "phase": "correctness",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "finite_list32-interability-correctness-0"
+    },
+    {
+      "case_id": "finite_list1000",
+      "app": "linked_list",
+      "scale": "small",
+      "length": 1000,
+      "config_id": "off",
+      "phase": "correctness",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "finite_list1000-off-correctness-0"
+    },
+    {
+      "case_id": "finite_list1000",
+      "app": "linked_list",
+      "scale": "small",
+      "length": 1000,
+      "config_id": "baseline9282",
+      "phase": "correctness",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "finite_list1000-baseline9282-correctness-0"
+    },
+    {
+      "case_id": "finite_list1000",
+      "app": "linked_list",
+      "scale": "small",
+      "length": 1000,
+      "config_id": "interability",
+      "phase": "correctness",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "finite_list1000-interability-correctness-0"
+    },
+    {
+      "case_id": "guard_chain",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "off",
+      "phase": "correctness",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "guard_chain-off-correctness-0"
+    },
+    {
+      "case_id": "guard_chain",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "baseline9282",
+      "phase": "correctness",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "guard_chain-baseline9282-correctness-0"
+    },
+    {
+      "case_id": "guard_chain",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "interability",
+      "phase": "correctness",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "guard_chain-interability-correctness-0"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "off",
+      "phase": "correctness",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "littlex-off-correctness-0"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "baseline9282",
+      "phase": "correctness",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "littlex-baseline9282-correctness-0"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "interability",
+      "phase": "correctness",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "littlex-interability-correctness-0"
+    }
+  ],
+  "guard_schedule": [
+    {
+      "case_id": "guard_chain_false",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "off",
+      "phase": "guard_correctness",
+      "repeat": 0,
+      "guard": false,
+      "trial_id": "guard_chain_false-off-guard_correctness-0"
+    },
+    {
+      "case_id": "guard_chain_false",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "baseline9282",
+      "phase": "guard_correctness",
+      "repeat": 0,
+      "guard": false,
+      "trial_id": "guard_chain_false-baseline9282-guard_correctness-0"
+    },
+    {
+      "case_id": "guard_chain_false",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "interability",
+      "phase": "guard_correctness",
+      "repeat": 0,
+      "guard": false,
+      "trial_id": "guard_chain_false-interability-guard_correctness-0"
+    }
+  ],
+  "formal_schedule": [
+    {
+      "case_id": "finite_list32",
+      "app": "linked_list",
+      "scale": "smoke",
+      "length": 32,
+      "config_id": "off",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "guard": true,
+      "trial_id": "finite_list32-off-excluded_warmup--1"
+    },
+    {
+      "case_id": "finite_list32",
+      "app": "linked_list",
+      "scale": "smoke",
+      "length": 32,
+      "config_id": "baseline9282",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "guard": true,
+      "trial_id": "finite_list32-baseline9282-excluded_warmup--1"
+    },
+    {
+      "case_id": "finite_list32",
+      "app": "linked_list",
+      "scale": "smoke",
+      "length": 32,
+      "config_id": "interability",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "guard": true,
+      "trial_id": "finite_list32-interability-excluded_warmup--1"
+    },
+    {
+      "case_id": "finite_list32",
+      "app": "linked_list",
+      "scale": "smoke",
+      "length": 32,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "finite_list32-off-measured-0"
+    },
+    {
+      "case_id": "finite_list32",
+      "app": "linked_list",
+      "scale": "smoke",
+      "length": 32,
+      "config_id": "baseline9282",
+      "phase": "measured",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "finite_list32-baseline9282-measured-0"
+    },
+    {
+      "case_id": "finite_list32",
+      "app": "linked_list",
+      "scale": "smoke",
+      "length": 32,
+      "config_id": "interability",
+      "phase": "measured",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "finite_list32-interability-measured-0"
+    },
+    {
+      "case_id": "finite_list32",
+      "app": "linked_list",
+      "scale": "smoke",
+      "length": 32,
+      "config_id": "baseline9282",
+      "phase": "measured",
+      "repeat": 1,
+      "guard": true,
+      "trial_id": "finite_list32-baseline9282-measured-1"
+    },
+    {
+      "case_id": "finite_list32",
+      "app": "linked_list",
+      "scale": "smoke",
+      "length": 32,
+      "config_id": "interability",
+      "phase": "measured",
+      "repeat": 1,
+      "guard": true,
+      "trial_id": "finite_list32-interability-measured-1"
+    },
+    {
+      "case_id": "finite_list32",
+      "app": "linked_list",
+      "scale": "smoke",
+      "length": 32,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 1,
+      "guard": true,
+      "trial_id": "finite_list32-off-measured-1"
+    },
+    {
+      "case_id": "finite_list32",
+      "app": "linked_list",
+      "scale": "smoke",
+      "length": 32,
+      "config_id": "interability",
+      "phase": "measured",
+      "repeat": 2,
+      "guard": true,
+      "trial_id": "finite_list32-interability-measured-2"
+    },
+    {
+      "case_id": "finite_list32",
+      "app": "linked_list",
+      "scale": "smoke",
+      "length": 32,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 2,
+      "guard": true,
+      "trial_id": "finite_list32-off-measured-2"
+    },
+    {
+      "case_id": "finite_list32",
+      "app": "linked_list",
+      "scale": "smoke",
+      "length": 32,
+      "config_id": "baseline9282",
+      "phase": "measured",
+      "repeat": 2,
+      "guard": true,
+      "trial_id": "finite_list32-baseline9282-measured-2"
+    },
+    {
+      "case_id": "finite_list1000",
+      "app": "linked_list",
+      "scale": "small",
+      "length": 1000,
+      "config_id": "baseline9282",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "guard": true,
+      "trial_id": "finite_list1000-baseline9282-excluded_warmup--1"
+    },
+    {
+      "case_id": "finite_list1000",
+      "app": "linked_list",
+      "scale": "small",
+      "length": 1000,
+      "config_id": "interability",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "guard": true,
+      "trial_id": "finite_list1000-interability-excluded_warmup--1"
+    },
+    {
+      "case_id": "finite_list1000",
+      "app": "linked_list",
+      "scale": "small",
+      "length": 1000,
+      "config_id": "off",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "guard": true,
+      "trial_id": "finite_list1000-off-excluded_warmup--1"
+    },
+    {
+      "case_id": "finite_list1000",
+      "app": "linked_list",
+      "scale": "small",
+      "length": 1000,
+      "config_id": "baseline9282",
+      "phase": "measured",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "finite_list1000-baseline9282-measured-0"
+    },
+    {
+      "case_id": "finite_list1000",
+      "app": "linked_list",
+      "scale": "small",
+      "length": 1000,
+      "config_id": "interability",
+      "phase": "measured",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "finite_list1000-interability-measured-0"
+    },
+    {
+      "case_id": "finite_list1000",
+      "app": "linked_list",
+      "scale": "small",
+      "length": 1000,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "finite_list1000-off-measured-0"
+    },
+    {
+      "case_id": "finite_list1000",
+      "app": "linked_list",
+      "scale": "small",
+      "length": 1000,
+      "config_id": "interability",
+      "phase": "measured",
+      "repeat": 1,
+      "guard": true,
+      "trial_id": "finite_list1000-interability-measured-1"
+    },
+    {
+      "case_id": "finite_list1000",
+      "app": "linked_list",
+      "scale": "small",
+      "length": 1000,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 1,
+      "guard": true,
+      "trial_id": "finite_list1000-off-measured-1"
+    },
+    {
+      "case_id": "finite_list1000",
+      "app": "linked_list",
+      "scale": "small",
+      "length": 1000,
+      "config_id": "baseline9282",
+      "phase": "measured",
+      "repeat": 1,
+      "guard": true,
+      "trial_id": "finite_list1000-baseline9282-measured-1"
+    },
+    {
+      "case_id": "finite_list1000",
+      "app": "linked_list",
+      "scale": "small",
+      "length": 1000,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 2,
+      "guard": true,
+      "trial_id": "finite_list1000-off-measured-2"
+    },
+    {
+      "case_id": "finite_list1000",
+      "app": "linked_list",
+      "scale": "small",
+      "length": 1000,
+      "config_id": "baseline9282",
+      "phase": "measured",
+      "repeat": 2,
+      "guard": true,
+      "trial_id": "finite_list1000-baseline9282-measured-2"
+    },
+    {
+      "case_id": "finite_list1000",
+      "app": "linked_list",
+      "scale": "small",
+      "length": 1000,
+      "config_id": "interability",
+      "phase": "measured",
+      "repeat": 2,
+      "guard": true,
+      "trial_id": "finite_list1000-interability-measured-2"
+    },
+    {
+      "case_id": "guard_chain",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "interability",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "guard": true,
+      "trial_id": "guard_chain-interability-excluded_warmup--1"
+    },
+    {
+      "case_id": "guard_chain",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "off",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "guard": true,
+      "trial_id": "guard_chain-off-excluded_warmup--1"
+    },
+    {
+      "case_id": "guard_chain",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "baseline9282",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "guard": true,
+      "trial_id": "guard_chain-baseline9282-excluded_warmup--1"
+    },
+    {
+      "case_id": "guard_chain",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "interability",
+      "phase": "measured",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "guard_chain-interability-measured-0"
+    },
+    {
+      "case_id": "guard_chain",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "guard_chain-off-measured-0"
+    },
+    {
+      "case_id": "guard_chain",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "baseline9282",
+      "phase": "measured",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "guard_chain-baseline9282-measured-0"
+    },
+    {
+      "case_id": "guard_chain",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 1,
+      "guard": true,
+      "trial_id": "guard_chain-off-measured-1"
+    },
+    {
+      "case_id": "guard_chain",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "baseline9282",
+      "phase": "measured",
+      "repeat": 1,
+      "guard": true,
+      "trial_id": "guard_chain-baseline9282-measured-1"
+    },
+    {
+      "case_id": "guard_chain",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "interability",
+      "phase": "measured",
+      "repeat": 1,
+      "guard": true,
+      "trial_id": "guard_chain-interability-measured-1"
+    },
+    {
+      "case_id": "guard_chain",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "baseline9282",
+      "phase": "measured",
+      "repeat": 2,
+      "guard": true,
+      "trial_id": "guard_chain-baseline9282-measured-2"
+    },
+    {
+      "case_id": "guard_chain",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "interability",
+      "phase": "measured",
+      "repeat": 2,
+      "guard": true,
+      "trial_id": "guard_chain-interability-measured-2"
+    },
+    {
+      "case_id": "guard_chain",
+      "app": "region_chain",
+      "scale": "tiny",
+      "length": null,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 2,
+      "guard": true,
+      "trial_id": "guard_chain-off-measured-2"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "off",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "guard": true,
+      "trial_id": "littlex-off-excluded_warmup--1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "baseline9282",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "guard": true,
+      "trial_id": "littlex-baseline9282-excluded_warmup--1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "interability",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "guard": true,
+      "trial_id": "littlex-interability-excluded_warmup--1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "littlex-off-measured-0"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "baseline9282",
+      "phase": "measured",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "littlex-baseline9282-measured-0"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "interability",
+      "phase": "measured",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "littlex-interability-measured-0"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "baseline9282",
+      "phase": "measured",
+      "repeat": 1,
+      "guard": true,
+      "trial_id": "littlex-baseline9282-measured-1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "interability",
+      "phase": "measured",
+      "repeat": 1,
+      "guard": true,
+      "trial_id": "littlex-interability-measured-1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 1,
+      "guard": true,
+      "trial_id": "littlex-off-measured-1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "interability",
+      "phase": "measured",
+      "repeat": 2,
+      "guard": true,
+      "trial_id": "littlex-interability-measured-2"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 2,
+      "guard": true,
+      "trial_id": "littlex-off-measured-2"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "baseline9282",
+      "phase": "measured",
+      "repeat": 2,
+      "guard": true,
+      "trial_id": "littlex-baseline9282-measured-2"
+    }
+  ],
+  "runtimes": {
+    "baseline9282": {
+      "clean": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-next-performance/runtime-clean-9282-v1-manifest/manifest.json",
+        "sha256": "5fd1d912479083dde61ae2f7905c78eb7299aa05e4022bbae31cda95b92c1715"
+      },
+      "overlay": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-next-performance/runtime-direct-9282-v1-overlay/manifest.json",
+        "sha256": "2799a9f6adc5ffed3ebe6548ac7bb4cc5567840693150346535f96b0e4ddf3ed"
+      }
+    },
+    "interability": {
+      "clean": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-interability-performance/runtime-clean-final-v1-manifest/manifest.json",
+        "sha256": "3bdbc5bb44134a2cfdb53469196e17e7c6adbffe659cc114d26ff30e7637fef0"
+      },
+      "overlay": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-interability-performance/runtime-direct-final-v1-overlay/manifest.json",
+        "sha256": "64f645e1077d43bb13d6d968ef1b395119cd65b8962bba42baad143cb05e6a5f"
+      }
+    }
+  },
+  "sources": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/correctness-plan-v1/sources.json",
+    "sha256": "01b767482fd928f4e81b5d4a10be7da16bbca5f7c27b5e4f5a987f5e1a654d20"
+  },
+  "app_snapshot": {
+    "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/snapshot.json",
+    "sha256": "ef180e4e3548780779ca6e894a9a3c564d81dbace299ede6c25710ae6456aea7"
+  },
+  "postgres": {
+    "min_wal_size": "32MB",
+    "max_wal_size": "64MB",
+    "statistics": "ANALYZE anchors; ANALYZE graph_types, once after setup/views before first workflow/reset/HTTP clock; admin excluded"
+  },
+  "storage": {
+    "startup_floor_bytes": 805306368,
+    "case_floor_bytes": 671088640,
+    "in_case_stop_bytes": 536870912
+  },
+  "primary": "Actual business-origin PgWire sendall to ReadyForQuery, all-role/control/data counts, sum/union/perRPC fingerprints; late callbacks retained.",
+  "regime": "NEW uniform analyzed-statistics regime; historical n3 results are a different regime. FreshDB/server per workflow, same seed42/actions/native oracles, excluded warmup12+n3measured36, balanced mode order. One profile reset after setup, Always/process1, no cross-trial state.",
+  "observer": "Exact borrowed compact observer/direct SQL clocks. Natural close/dispatch order, no added waits/ability wrappers. Added native scalar region counters retained.",
+  "sanity": "LL: actual region activation and TOTAL SQL reduction vsOff; tinyAB: one composed guarded region plus path-cache reuse, true/false native correctness, no requiredSQL/latencywin.",
+  "runtime_pending": false
+}

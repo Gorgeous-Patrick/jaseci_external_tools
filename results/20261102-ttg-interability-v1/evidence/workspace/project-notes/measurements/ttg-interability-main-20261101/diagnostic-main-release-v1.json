@@ -1,0 +1,44 @@
+{
+  "status": "approved",
+  "created_at_utc": "2026-11-02T06:26:30.440109+00:00",
+  "candidate": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-diagnostics-20261102/candidate-v3.json",
+    "sha256": "4f9715e3e613d493954d168562c68d6899dcc21a64a19f4a2644ea6be5a8601b"
+  },
+  "scope": {
+    "fresh_workflows": 2,
+    "selected_queries": 2,
+    "explain_plans": 4,
+    "variants": 0,
+    "later_analyze": 0,
+    "runtime_changes": false,
+    "primary_source_changes": false
+  },
+  "command": [
+    "python3",
+    "-B",
+    "reproduction/ttg-interability-diagnostics/runner.py",
+    "--plan",
+    "project-notes/measurements/ttg-interability-performance-20261101/correctness-plan-v1/plan.json",
+    "--selection",
+    "project-notes/measurements/ttg-interability-diagnostics-20261102/selection-v2.json",
+    "--output",
+    "project-notes/measurements/ttg-interability-diagnostics-20261102/recapture-v1",
+    "--cluster",
+    "reproduction/ttg-interability-diagnostics/pg-recapture-v1"
+  ],
+  "source_checks": {
+    "own": 7,
+    "borrowed": 11,
+    "passed": true
+  },
+  "review": "Bounded source review; actual SuiteRoot/SuiteImport actor lineage and targeted atomic DIRECT overlay verified. Prior selected raw query review carries.",
+  "execution_conditions": [
+    "Exclusive diagnostic DB window; no concurrent render, compiler, timing or heavy raw audit.",
+    "Exactly two workflows and four EXPLAIN plans; first failure preserved; no variants or later ANALYZE.",
+    "Keep existing 768/640/512 MiB guards and 10-second monitor.",
+    "Require original query completion and full native semantic/physical acceptance before accepting diagnostic plans.",
+    "Natural stop plus known-owned lifecycle proof before handback."
+  ],
+  "authorization": "Standing user implementation, benchmark and explanation authorization; main releases this concrete bounded diagnostic."
+}

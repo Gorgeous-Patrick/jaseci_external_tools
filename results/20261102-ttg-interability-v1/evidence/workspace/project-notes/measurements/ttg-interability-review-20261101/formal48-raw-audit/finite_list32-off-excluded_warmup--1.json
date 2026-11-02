@@ -1,0 +1,2511 @@
+{
+  "case_id": "finite_list32",
+  "config_id": "off",
+  "phase": "excluded_warmup",
+  "repeat": -1,
+  "trial_id": "finite_list32-off-excluded_warmup--1",
+  "refs": {
+    "acceptance": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/acceptances/finite_list32-off-excluded_warmup--1.json",
+      "sha256": "14fbbee8c24b2387c789276f5f214a363f929331fc895f9cd6a509744c5785cd"
+    },
+    "metrics": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/metrics/finite_list32-off-excluded_warmup--1.json",
+      "sha256": "1eaa3bfa5f7258b5c2e685a7400abb73b18b744025c65a0cc46673a87560a3e7"
+    },
+    "raw": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/artifacts.json",
+      "sha256": "67d879caf4a85bba4af81216da201a21108b879789006a38dab1ad354b70ef3e"
+    },
+    "proof": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/plus-proof.json",
+      "sha256": "5081ce4a79d168320239335f5f5a80850b38cd33c032d51bd3ff8b606b5183eb"
+    }
+  },
+  "database": "continuation_1e0da2ab8e8944bcaaf1f9e923b10b9f",
+  "primary": {
+    "driver_calls": 75,
+    "sql_dispatches": 75,
+    "sql_data": 68,
+    "sql_control": 7,
+    "sql_other": 0,
+    "command_complete": 75,
+    "protocol_cycles": 75,
+    "server_error_messages": 0,
+    "pre_send_driver_errors": 0,
+    "data_rows": 67,
+    "data_row_payload_bytes": 21327,
+    "driver_sum_ns": 28233328,
+    "driver_union_ns": 28233328,
+    "protocol_sum_ns": 24138061,
+    "protocol_union_ns": 24138061,
+    "roles": {
+      "foreground": {
+        "sql_dispatches": 75,
+        "protocol_sum_ns": 24138061,
+        "protocol_union_ns": 24138061
+      },
+      "background_prefetch": {
+        "sql_dispatches": 0,
+        "protocol_sum_ns": 0,
+        "protocol_union_ns": 0
+      },
+      "background_continuation": {
+        "sql_dispatches": 0,
+        "protocol_sum_ns": 0,
+        "protocol_union_ns": 0
+      }
+    }
+  },
+  "late_background_calls": 0,
+  "RPCs": [
+    {
+      "HTTP": {
+        "request": "2:5",
+        "server_generation": 2,
+        "phase": "workflow",
+        "path": "/walker/Traverse/0da464e162684655b9bc31e201c91f66",
+        "http_status": 200,
+        "start_ns": 2134536356727342,
+        "end_ns": 2134536398873060,
+        "wall_start": 1793598166.2710178,
+        "wall_end": 1793598166.3131645,
+        "http_e2e_ms": 42.145718,
+        "post_response_drain": {
+          "origin_request_id": "2:5",
+          "start_ns": 2134536399358958,
+          "end_ns": 2134536399361715,
+          "observed_threads": 0,
+          "pending": 0,
+          "flush": {
+            "calls": 75,
+            "events": 3,
+            "client_process_pid": 2164537
+          }
+        },
+        "native_dispatch_timestamps": {
+          "timestamp_ns": 2134536398606069,
+          "start_ns": 2134536357206687,
+          "end_ns": 2134536398604225
+        }
+      },
+      "SQL_fingerprints": [
+        {
+          "fingerprint": "7c031ced90a8996d01c59b32767e278e58f7dc3f5f52cfba746b97de050b59a3",
+          "kind": "data",
+          "role": "foreground",
+          "sql": "SELECT doc FROM identity_users WHERE user_id = $1",
+          "category": "identity",
+          "driver_calls": 1,
+          "sql_dispatches": 1,
+          "sql_data": 1,
+          "sql_control": 0,
+          "sql_other": 0,
+          "command_complete": 1,
+          "protocol_cycles": 1,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 1,
+          "data_row_payload_bytes": 578,
+          "driver_sum_ns": 172304,
+          "driver_union_ns": 172304,
+          "protocol_sum_ns": 155150,
+          "protocol_union_ns": 155150,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 1,
+              "protocol_sum_ns": 155150,
+              "protocol_union_ns": 155150
+            },
+            "background_prefetch": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        },
+        {
+          "fingerprint": "884b307eaf68c26c0ee2c95bfebc014c633d0d00e03a5e60391e7b2efc4dcd48",
+          "kind": "control",
+          "role": "foreground",
+          "sql": "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY",
+          "category": "control",
+          "driver_calls": 1,
+          "sql_dispatches": 1,
+          "sql_data": 0,
+          "sql_control": 1,
+          "sql_other": 0,
+          "command_complete": 1,
+          "protocol_cycles": 1,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 0,
+          "data_row_payload_bytes": 0,
+          "driver_sum_ns": 100529,
+          "driver_union_ns": 100529,
+          "protocol_sum_ns": 89697,
+          "protocol_union_ns": 89697,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 1,
+              "protocol_sum_ns": 89697,
+              "protocol_union_ns": 89697
+            },
+            "background_prefetch": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        },
+        {
+          "fingerprint": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+          "kind": "control",
+          "role": "foreground",
+          "sql": "SET LOCAL lock_timeout = '10s'",
+          "category": "control",
+          "driver_calls": 2,
+          "sql_dispatches": 2,
+          "sql_data": 0,
+          "sql_control": 2,
+          "sql_other": 0,
+          "command_complete": 2,
+          "protocol_cycles": 2,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 0,
+          "data_row_payload_bytes": 0,
+          "driver_sum_ns": 82924,
+          "driver_union_ns": 82924,
+          "protocol_sum_ns": 69411,
+          "protocol_union_ns": 69411,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 2,
+              "protocol_sum_ns": 69411,
+              "protocol_union_ns": 69411
+            },
+            "background_prefetch": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        },
+        {
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "kind": "data",
+          "role": "foreground",
+          "sql": "\n        SELECT a.id, a.kind, a.arch_type, a.arch_module, a.fingerprint,\n               a.root_id, a.src, a.dst, a.undirected, a.props, a.version,\n               CASE WHEN a.kind = 'NodeAnchor' THEN\n                   (SELECT string_agg(e.id::text, ',' ORDER BY e.seq, e.id)\n                      FROM anchors e WHERE e.src = a.id OR e.dst = a.id)\n               END\n        FROM anchors a WHERE a.id = ANY(CAST($1 AS uuid[]))\n        ",
+          "category": "payload",
+          "driver_calls": 35,
+          "sql_dispatches": 35,
+          "sql_data": 35,
+          "sql_control": 0,
+          "sql_other": 0,
+          "command_complete": 35,
+          "protocol_cycles": 35,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 35,
+          "data_row_payload_bytes": 18207,
+          "driver_sum_ns": 9428908,
+          "driver_union_ns": 9428908,
+          "protocol_sum_ns": 7958557,
+          "protocol_union_ns": 7958557,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 35,
+              "protocol_sum_ns": 7958557,
+              "protocol_union_ns": 7958557
+            },
+            "background_prefetch": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        },
+        {
+          "fingerprint": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+          "kind": "control",
+          "role": "foreground",
+          "sql": "COMMIT",
+          "category": "control",
+          "driver_calls": 2,
+          "sql_dispatches": 2,
+          "sql_data": 0,
+          "sql_control": 2,
+          "sql_other": 0,
+          "command_complete": 2,
+          "protocol_cycles": 2,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 0,
+          "data_row_payload_bytes": 0,
+          "driver_sum_ns": 118335,
+          "driver_union_ns": 118335,
+          "protocol_sum_ns": 105753,
+          "protocol_union_ns": 105753,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 2,
+              "protocol_sum_ns": 105753,
+              "protocol_union_ns": 105753
+            },
+            "background_prefetch": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        },
+        {
+          "fingerprint": "547004d6c33e887b6fe478e1d23004ef14c3fa1c8c4756ec52aea4a3933e7fb0",
+          "kind": "control",
+          "role": "foreground",
+          "sql": "BEGIN ISOLATION LEVEL SERIALIZABLE",
+          "category": "control",
+          "driver_calls": 1,
+          "sql_dispatches": 1,
+          "sql_data": 0,
+          "sql_control": 1,
+          "sql_other": 0,
+          "command_complete": 1,
+          "protocol_cycles": 1,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 0,
+          "data_row_payload_bytes": 0,
+          "driver_sum_ns": 48132,
+          "driver_union_ns": 48132,
+          "protocol_sum_ns": 39250,
+          "protocol_union_ns": 39250,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 1,
+              "protocol_sum_ns": 39250,
+              "protocol_union_ns": 39250
+            },
+            "background_prefetch": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        },
+        {
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "kind": "data",
+          "role": "foreground",
+          "sql": "SELECT n1.id, e1.id FROM unnest(CAST($1 AS uuid[])) WITH ORDINALITY AS f0(id, ord) LEFT JOIN anchors s1 ON s1.id = f0.id JOIN anchors e1 ON e1.kind = 'EdgeAnchor' AND (e1.src = f0.id OR (e1.undirected AND e1.dst = f0.id)) AND (e1.arch_type = $2 OR e1.arch_type IN (SELECT type_name FROM graph_types WHERE ancestor = $2)) JOIN anchors n1 ON n1.id = CASE WHEN e1.src = f0.id THEN e1.dst ELSE e1.src END AND n1.kind = 'NodeAnchor' AND (n1.arch_type = $3 OR n1.arch_type IN (SELECT type_name FROM graph_types WHERE ancestor = $3)) AND (n1.root_id = CAST($4 AS uuid) OR (n1.props->'access'->>'all')::int > -1 OR (n1.props->'access'->'roots'->'anchors') ? CAST($5 AS text) OR EXISTS (SELECT 1 FROM anchors ge WHERE ge.kind = 'EdgeAnchor' AND ge.src = CAST($4 AS uuid) AND (n1.props->'access'->'groups'->'anchors') ? CAST(ge.dst AS text))) ORDER BY f0.ord, e1.seq, e1.id",
+          "category": "ordinary_path",
+          "driver_calls": 32,
+          "sql_dispatches": 32,
+          "sql_data": 32,
+          "sql_control": 0,
+          "sql_other": 0,
+          "command_complete": 32,
+          "protocol_cycles": 32,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 31,
+          "data_row_payload_bytes": 2542,
+          "driver_sum_ns": 18224365,
+          "driver_union_ns": 18224365,
+          "protocol_sum_ns": 15669468,
+          "protocol_union_ns": 15669468,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 32,
+              "protocol_sum_ns": 15669468,
+              "protocol_union_ns": 15669468
+            },
+            "background_prefetch": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        },
+        {
+          "fingerprint": "98f36323c6bcf3d04d4b423d63caa325d692376ef457a4c1b41c27023a19ebf4",
+          "kind": "control",
+          "role": "foreground",
+          "sql": "DISCARD ALL",
+          "category": "control",
+          "driver_calls": 1,
+          "sql_dispatches": 1,
+          "sql_data": 0,
+          "sql_control": 1,
+          "sql_other": 0,
+          "command_complete": 1,
+          "protocol_cycles": 1,
+          "server_error_messages": 0,
+          "pre_send_driver_errors": 0,
+          "data_rows": 0,
+          "data_row_payload_bytes": 0,
+          "driver_sum_ns": 57831,
+          "driver_union_ns": 57831,
+          "protocol_sum_ns": 50775,
+          "protocol_union_ns": 50775,
+          "roles": {
+            "foreground": {
+              "sql_dispatches": 1,
+              "protocol_sum_ns": 50775,
+              "protocol_union_ns": 50775
+            },
+            "background_prefetch": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            },
+            "background_continuation": {
+              "sql_dispatches": 0,
+              "protocol_sum_ns": 0,
+              "protocol_union_ns": 0
+            }
+          }
+        }
+      ],
+      "SQL_intervals": [
+        {
+          "driver_start_ns": 2134536357288284,
+          "driver_end_ns": 2134536357460588,
+          "send_ns": 2134536357305200,
+          "ready_ns": 2134536357460350,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2164567,
+          "connection": 123433222972880,
+          "sql_sha256": "7c031ced90a8996d01c59b32767e278e58f7dc3f5f52cfba746b97de050b59a3",
+          "fingerprint": "7c031ced90a8996d01c59b32767e278e58f7dc3f5f52cfba746b97de050b59a3",
+          "category": "identity",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 64,
+            "record_sha256": "9cbf419d85e7e7abc830f6c76fadde6ec8f46de70610189eb03f1911d48cc9a0"
+          }
+        },
+        {
+          "driver_start_ns": 2134536357792627,
+          "driver_end_ns": 2134536357893156,
+          "send_ns": 2134536357802765,
+          "ready_ns": 2134536357892462,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "884b307eaf68c26c0ee2c95bfebc014c633d0d00e03a5e60391e7b2efc4dcd48",
+          "fingerprint": "884b307eaf68c26c0ee2c95bfebc014c633d0d00e03a5e60391e7b2efc4dcd48",
+          "category": "control",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 65,
+            "record_sha256": "1f48c20d06a55a6de929065b6916be19bcef180f58bd521adb736109ee95ca5d"
+          }
+        },
+        {
+          "driver_start_ns": 2134536357897778,
+          "driver_end_ns": 2134536357942002,
+          "send_ns": 2134536357904285,
+          "ready_ns": 2134536357941852,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+          "fingerprint": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+          "category": "control",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 66,
+            "record_sha256": "b81c68efab35effcf3166ffe9bea6c52d79dac081580bbbd24c90d8d8eebab5a"
+          }
+        },
+        {
+          "driver_start_ns": 2134536357957393,
+          "driver_end_ns": 2134536358495634,
+          "send_ns": 2134536357998599,
+          "ready_ns": 2134536358495390,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 67,
+            "record_sha256": "b14ef759a6445ae207fe6a1f512cdbb85f16e62e180b72b8051df3dee8ba7410"
+          }
+        },
+        {
+          "driver_start_ns": 2134536358661908,
+          "driver_end_ns": 2134536358959843,
+          "send_ns": 2134536358701137,
+          "ready_ns": 2134536358959681,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 68,
+            "record_sha256": "8deec10e061397031dcd8b97ef414ab97e38ad506ea1bff5886035462dc7311e"
+          }
+        },
+        {
+          "driver_start_ns": 2134536359088558,
+          "driver_end_ns": 2134536359147233,
+          "send_ns": 2134536359094483,
+          "ready_ns": 2134536359147071,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+          "fingerprint": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+          "category": "control",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 69,
+            "record_sha256": "1a6710115ccb8c32ba060c353f8c38f6993887b8501f909e231e99c132245423"
+          }
+        },
+        {
+          "driver_start_ns": 2134536359468401,
+          "driver_end_ns": 2134536359516533,
+          "send_ns": 2134536359477040,
+          "ready_ns": 2134536359516290,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "547004d6c33e887b6fe478e1d23004ef14c3fa1c8c4756ec52aea4a3933e7fb0",
+          "fingerprint": "547004d6c33e887b6fe478e1d23004ef14c3fa1c8c4756ec52aea4a3933e7fb0",
+          "category": "control",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 70,
+            "record_sha256": "e6e8d6f058788397f3064ffc4c2081674a6ad327236925ed94ceaa6ad6db054f"
+          }
+        },
+        {
+          "driver_start_ns": 2134536359521087,
+          "driver_end_ns": 2134536359559787,
+          "send_ns": 2134536359527721,
+          "ready_ns": 2134536359559565,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+          "fingerprint": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+          "category": "control",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 71,
+            "record_sha256": "ee66aad27e40f532d2700f1b8cd030a4f7ce9d8cd85b88e895883d2b6ae7f2c2"
+          }
+        },
+        {
+          "driver_start_ns": 2134536359570548,
+          "driver_end_ns": 2134536359824583,
+          "send_ns": 2134536359609730,
+          "ready_ns": 2134536359824406,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 72,
+            "record_sha256": "f88b8edf3e6687cc66f07460d57aa19cf6f4a84c8c4c26682f5d485c0cfbd957"
+          }
+        },
+        {
+          "driver_start_ns": 2134536359999047,
+          "driver_end_ns": 2134536360253977,
+          "send_ns": 2134536360043309,
+          "ready_ns": 2134536360253707,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 73,
+            "record_sha256": "f910d103a2a2edcf44a03d299b58265b628d26dce41595f0c0e079d0f46a385b"
+          }
+        },
+        {
+          "driver_start_ns": 2134536361516542,
+          "driver_end_ns": 2134536362462380,
+          "send_ns": 2134536361594431,
+          "ready_ns": 2134536362462172,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 74,
+            "record_sha256": "5f0ad8b75e7e611173aa4a5039c585d08ecc4613ce3c92f4d1bd648886669e1c"
+          }
+        },
+        {
+          "driver_start_ns": 2134536362499993,
+          "driver_end_ns": 2134536362761939,
+          "send_ns": 2134536362538789,
+          "ready_ns": 2134536362761730,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 75,
+            "record_sha256": "34046fa7a4f21bc3e8d9249ed402b1c12f26d00ae4a2bb325b28df3fecdcbe8e"
+          }
+        },
+        {
+          "driver_start_ns": 2134536363031527,
+          "driver_end_ns": 2134536363634066,
+          "send_ns": 2134536363107681,
+          "ready_ns": 2134536363633887,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 76,
+            "record_sha256": "a233a6817b231f34a7b69732d0bdabd728a280fe28173221697816afa46c91c4"
+          }
+        },
+        {
+          "driver_start_ns": 2134536363666031,
+          "driver_end_ns": 2134536363918172,
+          "send_ns": 2134536363704563,
+          "ready_ns": 2134536363918016,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 77,
+            "record_sha256": "a597209627f2c687ca78a5da071eb6d89263a337a3ce8b8d3b78269e44e93796"
+          }
+        },
+        {
+          "driver_start_ns": 2134536364153300,
+          "driver_end_ns": 2134536364696801,
+          "send_ns": 2134536364228493,
+          "ready_ns": 2134536364696635,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 78,
+            "record_sha256": "ae1b0a9517131116f060ca0812bc0c0c6cc389ffbfe6c66b7801e0db24e62a18"
+          }
+        },
+        {
+          "driver_start_ns": 2134536364724925,
+          "driver_end_ns": 2134536364976121,
+          "send_ns": 2134536364763036,
+          "ready_ns": 2134536364975953,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 79,
+            "record_sha256": "c2c9e21bf05e96a374ecf1035e71db93b885f9bbd7c12a00e5bef95f4415a7bb"
+          }
+        },
+        {
+          "driver_start_ns": 2134536365216342,
+          "driver_end_ns": 2134536365759882,
+          "send_ns": 2134536365292020,
+          "ready_ns": 2134536365759724,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 80,
+            "record_sha256": "2b8d1d14c594a0222df09a49d87d613bbf156538114d4685616b15b09153df89"
+          }
+        },
+        {
+          "driver_start_ns": 2134536365788438,
+          "driver_end_ns": 2134536366046603,
+          "send_ns": 2134536365826742,
+          "ready_ns": 2134536366046408,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 81,
+            "record_sha256": "f7044eada7cb05237449417421e468183a4d29eae6c6fa37a1b41687b304b378"
+          }
+        },
+        {
+          "driver_start_ns": 2134536366273507,
+          "driver_end_ns": 2134536366815894,
+          "send_ns": 2134536366348977,
+          "ready_ns": 2134536366815708,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 82,
+            "record_sha256": "3709fafa6b4138bf951b876b80fb4552bf50c9d6a6c8b4deac953e53317fa639"
+          }
+        },
+        {
+          "driver_start_ns": 2134536366844424,
+          "driver_end_ns": 2134536367103737,
+          "send_ns": 2134536366882956,
+          "ready_ns": 2134536367103565,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 83,
+            "record_sha256": "f4e77043189cd1f95f5cb9655d15b2077a02d5fd50cd01b294a16ccc5e5e054a"
+          }
+        },
+        {
+          "driver_start_ns": 2134536367336186,
+          "driver_end_ns": 2134536367881880,
+          "send_ns": 2134536367411198,
+          "ready_ns": 2134536367881686,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 84,
+            "record_sha256": "ef1a0bbdf4040def00964c0e76d2332fee261a294209b89042c1805c8715cdd8"
+          }
+        },
+        {
+          "driver_start_ns": 2134536367910285,
+          "driver_end_ns": 2134536368170919,
+          "send_ns": 2134536367948029,
+          "ready_ns": 2134536368170727,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 85,
+            "record_sha256": "10053fc9207bd0bd60d5d733dd45c304e89a407d859df7325be2f74aec05f101"
+          }
+        },
+        {
+          "driver_start_ns": 2134536368406712,
+          "driver_end_ns": 2134536368956348,
+          "send_ns": 2134536368482134,
+          "ready_ns": 2134536368956149,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 86,
+            "record_sha256": "42e59d415426af4ed9693c673c243eacf3dc1c697c5354aa0ab73566ef83aed0"
+          }
+        },
+        {
+          "driver_start_ns": 2134536368989387,
+          "driver_end_ns": 2134536369257645,
+          "send_ns": 2134536369038613,
+          "ready_ns": 2134536369257494,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 87,
+            "record_sha256": "203fa468b1562897301d80b564222777665e215b1e81a72eb9dccf1353dc2fe2"
+          }
+        },
+        {
+          "driver_start_ns": 2134536369486313,
+          "driver_end_ns": 2134536370036970,
+          "send_ns": 2134536369561681,
+          "ready_ns": 2134536370036781,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 88,
+            "record_sha256": "d941aec2d7c989eb961999973908cd8ea45e72c2f0e9394be177e88b82391be7"
+          }
+        },
+        {
+          "driver_start_ns": 2134536370066940,
+          "driver_end_ns": 2134536370320070,
+          "send_ns": 2134536370105217,
+          "ready_ns": 2134536370319820,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 89,
+            "record_sha256": "7fb05b2d7d904e3885a54e011300a9f057ffe42640c3e2d40a8d3104fe41f4e7"
+          }
+        },
+        {
+          "driver_start_ns": 2134536370542888,
+          "driver_end_ns": 2134536371097045,
+          "send_ns": 2134536370617615,
+          "ready_ns": 2134536371096829,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 90,
+            "record_sha256": "cc985c9a3e4b04ecf23d565d8b537e3fba5f9e280eec65e6f8ed5511536b8e2c"
+          }
+        },
+        {
+          "driver_start_ns": 2134536371126219,
+          "driver_end_ns": 2134536371380806,
+          "send_ns": 2134536371164479,
+          "ready_ns": 2134536371380640,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 91,
+            "record_sha256": "d3550a07d0356c3fc7452350c9a78dc1b9ba21d0c0fa4d95630332635faa7ec2"
+          }
+        },
+        {
+          "driver_start_ns": 2134536371605965,
+          "driver_end_ns": 2134536372153826,
+          "send_ns": 2134536371680671,
+          "ready_ns": 2134536372153651,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 92,
+            "record_sha256": "dc8922ab363512016cce47bf090465ffe3554f1e55a1cb61144f9111cde92275"
+          }
+        },
+        {
+          "driver_start_ns": 2134536372183192,
+          "driver_end_ns": 2134536372435578,
+          "send_ns": 2134536372221497,
+          "ready_ns": 2134536372435364,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 93,
+            "record_sha256": "e34d7ec5254a995998db43cd8211db107bc9adb3a9a016e0cfc3289499363646"
+          }
+        },
+        {
+          "driver_start_ns": 2134536372660077,
+          "driver_end_ns": 2134536373221276,
+          "send_ns": 2134536372735065,
+          "ready_ns": 2134536373221047,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 94,
+            "record_sha256": "a51c509a7eedab475f94f6b9a5f316153566b92205f043ae9102286bdf29601c"
+          }
+        },
+        {
+          "driver_start_ns": 2134536373268989,
+          "driver_end_ns": 2134536373532840,
+          "send_ns": 2134536373307354,
+          "ready_ns": 2134536373532656,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 95,
+            "record_sha256": "3a4c2f5cb9607b694d6065494bf915d79dea6d9aac9a12fc811ddef1f4067252"
+          }
+        },
+        {
+          "driver_start_ns": 2134536373755954,
+          "driver_end_ns": 2134536374327114,
+          "send_ns": 2134536373829652,
+          "ready_ns": 2134536374326951,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 96,
+            "record_sha256": "f3882dea10e67166fcdf303325ff803e906bb87a18a0f56575dd7517fd857b7a"
+          }
+        },
+        {
+          "driver_start_ns": 2134536374356611,
+          "driver_end_ns": 2134536374609473,
+          "send_ns": 2134536374395223,
+          "ready_ns": 2134536374609247,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 97,
+            "record_sha256": "807226d0f804f779f323699d659d34fd2a22eb63cbc02338461eaf4be8d595e7"
+          }
+        },
+        {
+          "driver_start_ns": 2134536374840603,
+          "driver_end_ns": 2134536375402965,
+          "send_ns": 2134536374915580,
+          "ready_ns": 2134536375402791,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 98,
+            "record_sha256": "15797b08dc7b9717b52246ad6474cdf6b1cc5183b858f40a051845cc5e39bdc1"
+          }
+        },
+        {
+          "driver_start_ns": 2134536375431394,
+          "driver_end_ns": 2134536375678584,
+          "send_ns": 2134536375468781,
+          "ready_ns": 2134536375678422,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 99,
+            "record_sha256": "a1fbd7739613dbe9f9bad420fd0fc545596940366a5a53f5c8220ae67dbc0d67"
+          }
+        },
+        {
+          "driver_start_ns": 2134536375900236,
+          "driver_end_ns": 2134536376473347,
+          "send_ns": 2134536375974262,
+          "ready_ns": 2134536376473179,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 100,
+            "record_sha256": "60c265868b9cf579386eb6327764c1c2a91674a12a83eeb26c61a80df5e69073"
+          }
+        },
+        {
+          "driver_start_ns": 2134536376501854,
+          "driver_end_ns": 2134536376754530,
+          "send_ns": 2134536376540364,
+          "ready_ns": 2134536376754336,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 101,
+            "record_sha256": "29292b4155fc689e9bc78425d1f2d6f4c6bbfa885309b788386bc4d5df7f6149"
+          }
+        },
+        {
+          "driver_start_ns": 2134536376979381,
+          "driver_end_ns": 2134536377549479,
+          "send_ns": 2134536377089784,
+          "ready_ns": 2134536377549275,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 102,
+            "record_sha256": "ff85a85b683bc53c0f7ca60b9cce2f101aff84d9baf210a93fbaace9f4200c16"
+          }
+        },
+        {
+          "driver_start_ns": 2134536377578494,
+          "driver_end_ns": 2134536377826086,
+          "send_ns": 2134536377616284,
+          "ready_ns": 2134536377825908,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 103,
+            "record_sha256": "f0e493a0af13aa3fb7748eb1a9b0924fa5f8ced372cc9da307394f687bbe2a1e"
+          }
+        },
+        {
+          "driver_start_ns": 2134536378079075,
+          "driver_end_ns": 2134536378626851,
+          "send_ns": 2134536378168136,
+          "ready_ns": 2134536378626670,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 104,
+            "record_sha256": "700a4be7ae9107feed7db525c34e4a1a94bd684ba1aeb57dd1eddc5ee9fbd624"
+          }
+        },
+        {
+          "driver_start_ns": 2134536378654860,
+          "driver_end_ns": 2134536378902464,
+          "send_ns": 2134536378692266,
+          "ready_ns": 2134536378902291,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 105,
+            "record_sha256": "252aa2bcb7b31604cd27d225dd500bbfb76b10aa89faa6a5556db11a4155f851"
+          }
+        },
+        {
+          "driver_start_ns": 2134536379151430,
+          "driver_end_ns": 2134536379734693,
+          "send_ns": 2134536379226513,
+          "ready_ns": 2134536379734497,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 106,
+            "record_sha256": "679b679dbd19603983c23e31cfb6e16ce556adba91c9a1fb10369e5df68beebb"
+          }
+        },
+        {
+          "driver_start_ns": 2134536379763376,
+          "driver_end_ns": 2134536380029696,
+          "send_ns": 2134536379801748,
+          "ready_ns": 2134536380028952,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 107,
+            "record_sha256": "78ce03a96bf994e3d4b7801d3e0069155f499189b7167f76eb0b5723756d96ea"
+          }
+        },
+        {
+          "driver_start_ns": 2134536380258539,
+          "driver_end_ns": 2134536380801627,
+          "send_ns": 2134536380334135,
+          "ready_ns": 2134536380801430,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 108,
+            "record_sha256": "dfcf1ae43cd21261810d8b01a7936465448766a799eb5115ce3e8b8846b058bc"
+          }
+        },
+        {
+          "driver_start_ns": 2134536380830197,
+          "driver_end_ns": 2134536381091102,
+          "send_ns": 2134536380868468,
+          "ready_ns": 2134536381090899,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 109,
+            "record_sha256": "f838372abdec70465e12b877ea1189775da2129fd716db652942505835357e5c"
+          }
+        },
+        {
+          "driver_start_ns": 2134536381336659,
+          "driver_end_ns": 2134536381879733,
+          "send_ns": 2134536381421361,
+          "ready_ns": 2134536381879528,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 110,
+            "record_sha256": "d8f5645843029ff982f073d20e5f4661afc0e53e3496ab36e5d78046a2256ebe"
+          }
+        },
+        {
+          "driver_start_ns": 2134536381907666,
+          "driver_end_ns": 2134536382198846,
+          "send_ns": 2134536381948570,
+          "ready_ns": 2134536382198646,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 111,
+            "record_sha256": "e66a800c329003d634efadc5db6c087d130b0a3a3ba3f033d35985c2a8fe98ba"
+          }
+        },
+        {
+          "driver_start_ns": 2134536382423865,
+          "driver_end_ns": 2134536382962140,
+          "send_ns": 2134536382502908,
+          "ready_ns": 2134536382961989,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 112,
+            "record_sha256": "c6dbe470a7b159573505d993bb66f1b7419ec032af18ae700fe0e99586cae750"
+          }
+        },
+        {
+          "driver_start_ns": 2134536382990038,
+          "driver_end_ns": 2134536383283416,
+          "send_ns": 2134536383070243,
+          "ready_ns": 2134536383283246,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 113,
+            "record_sha256": "b343f9025381e508c97b7effbc6ff852e4c82d25aef8280b07e0f5716dbf5474"
+          }
+        },
+        {
+          "driver_start_ns": 2134536383509150,
+          "driver_end_ns": 2134536384079353,
+          "send_ns": 2134536383592556,
+          "ready_ns": 2134536384079165,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 114,
+            "record_sha256": "03db92074fd381eba1ef147fc0310d26e738be7c39458a99d3daa964f6ed0385"
+          }
+        },
+        {
+          "driver_start_ns": 2134536384107563,
+          "driver_end_ns": 2134536384354631,
+          "send_ns": 2134536384145262,
+          "ready_ns": 2134536384354462,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 115,
+            "record_sha256": "61d84240bf528d8fddad4a746ec02fed3d39448a33539c59d1923d79664373f3"
+          }
+        },
+        {
+          "driver_start_ns": 2134536384574508,
+          "driver_end_ns": 2134536385149555,
+          "send_ns": 2134536384649491,
+          "ready_ns": 2134536385149343,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 116,
+            "record_sha256": "a168cf7210c584f2c2a624d2879712655fac59fe0ec100fb313e372c2b25b7bd"
+          }
+        },
+        {
+          "driver_start_ns": 2134536385178264,
+          "driver_end_ns": 2134536385426520,
+          "send_ns": 2134536385215713,
+          "ready_ns": 2134536385426340,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 117,
+            "record_sha256": "d1cd2b9f70ff668d07ac2914fb5ceff736156c2347b4fb50ee491001335f7655"
+          }
+        },
+        {
+          "driver_start_ns": 2134536385646958,
+          "driver_end_ns": 2134536386235441,
+          "send_ns": 2134536385727158,
+          "ready_ns": 2134536386235229,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 118,
+            "record_sha256": "71c75ce4a68c78b919b5abf76412fe0448f5cd3eb71ae21367e9ce8373a29a24"
+          }
+        },
+        {
+          "driver_start_ns": 2134536386263980,
+          "driver_end_ns": 2134536386507156,
+          "send_ns": 2134536386300691,
+          "ready_ns": 2134536386506988,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 119,
+            "record_sha256": "ffc5fa0f09045814c70bc42f45809b7cdf79bc6f414dac6d5dd751ab4e280d02"
+          }
+        },
+        {
+          "driver_start_ns": 2134536386726331,
+          "driver_end_ns": 2134536387308132,
+          "send_ns": 2134536386798478,
+          "ready_ns": 2134536387307951,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 120,
+            "record_sha256": "c289cfe0485e1d405b5a6cd2f5fbeb4d43474b52a0a5122814e34996f53cd48b"
+          }
+        },
+        {
+          "driver_start_ns": 2134536387335368,
+          "driver_end_ns": 2134536387579282,
+          "send_ns": 2134536387374059,
+          "ready_ns": 2134536387579091,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 121,
+            "record_sha256": "35c18591238650b01e466568a84ac889277055330254ae39f52791646b3abe93"
+          }
+        },
+        {
+          "driver_start_ns": 2134536387845782,
+          "driver_end_ns": 2134536388430380,
+          "send_ns": 2134536387919465,
+          "ready_ns": 2134536388430213,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 122,
+            "record_sha256": "55ee419cae553f50b9d9169564d8654a0583e87625358db2dc511bd99b3f2099"
+          }
+        },
+        {
+          "driver_start_ns": 2134536388463189,
+          "driver_end_ns": 2134536388729528,
+          "send_ns": 2134536388519841,
+          "ready_ns": 2134536388729311,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 123,
+            "record_sha256": "a5382648096b326d2e37f7c61e9a1bc420ab7c6a7ef3b8fbade113ba5425f0b7"
+          }
+        },
+        {
+          "driver_start_ns": 2134536388948863,
+          "driver_end_ns": 2134536389548483,
+          "send_ns": 2134536389088245,
+          "ready_ns": 2134536389548291,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 124,
+            "record_sha256": "94f25f7c65fa87029bf88e138069a6b764d7851b81d70d90f598981d0df58e20"
+          }
+        },
+        {
+          "driver_start_ns": 2134536389577330,
+          "driver_end_ns": 2134536389825184,
+          "send_ns": 2134536389615154,
+          "ready_ns": 2134536389824990,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 125,
+            "record_sha256": "8c0173d7bce6872832d6b3c2d315996979f6d3939b44aff36374448b4d59adb0"
+          }
+        },
+        {
+          "driver_start_ns": 2134536390117408,
+          "driver_end_ns": 2134536390643225,
+          "send_ns": 2134536390191486,
+          "ready_ns": 2134536390643039,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 126,
+            "record_sha256": "c10413e93694ce2d2b814ed1a3d6708dd7fefb8037e1fbe06d8d4466342368e7"
+          }
+        },
+        {
+          "driver_start_ns": 2134536390670800,
+          "driver_end_ns": 2134536390920107,
+          "send_ns": 2134536390710361,
+          "ready_ns": 2134536390919869,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 127,
+            "record_sha256": "eee1621640efc032dd97017302545994f9d5b3e25d0e0a2ec50e39081009a895"
+          }
+        },
+        {
+          "driver_start_ns": 2134536391195033,
+          "driver_end_ns": 2134536391725426,
+          "send_ns": 2134536391275077,
+          "ready_ns": 2134536391725275,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 128,
+            "record_sha256": "ecb6c0ee1b92c32f49fe269a79bbde580387d9de244387d29aa4bfc73a4cafbc"
+          }
+        },
+        {
+          "driver_start_ns": 2134536391753041,
+          "driver_end_ns": 2134536391996461,
+          "send_ns": 2134536391789572,
+          "ready_ns": 2134536391996290,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 129,
+            "record_sha256": "25b851f02086ac3a20050a97e480d5be35ac9b57c1c5064837b6edec9ec92222"
+          }
+        },
+        {
+          "driver_start_ns": 2134536392284391,
+          "driver_end_ns": 2134536392806465,
+          "send_ns": 2134536392356613,
+          "ready_ns": 2134536392806271,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 130,
+            "record_sha256": "d40525ca02f0b491baa65f584c81066bdc11924a797a1b7e0a7172f38873ddd0"
+          }
+        },
+        {
+          "driver_start_ns": 2134536392850147,
+          "driver_end_ns": 2134536393150005,
+          "send_ns": 2134536392887394,
+          "ready_ns": 2134536393149764,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 131,
+            "record_sha256": "f2d53a254e29781ac8e9fc8bc121c32e10e12d0f93baf75b8259a4d7773d1a35"
+          }
+        },
+        {
+          "driver_start_ns": 2134536393373384,
+          "driver_end_ns": 2134536393906454,
+          "send_ns": 2134536393446936,
+          "ready_ns": 2134536393906281,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 132,
+            "record_sha256": "10beebcae7cb97c9116658f272a9351b71a3e1d00e132cdfe068b135f9860db3"
+          }
+        },
+        {
+          "driver_start_ns": 2134536393934327,
+          "driver_end_ns": 2134536394235536,
+          "send_ns": 2134536393971745,
+          "ready_ns": 2134536394235369,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 133,
+            "record_sha256": "c2a1783410b1bf10333adc121a633f64a057a63b75e566bc348a20e237014eed"
+          }
+        },
+        {
+          "driver_start_ns": 2134536394452757,
+          "driver_end_ns": 2134536394983398,
+          "send_ns": 2134536394531273,
+          "ready_ns": 2134536394983246,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 134,
+            "record_sha256": "5a785b516e2e819f2534f97b15ac2f31abca2f03393be760d3f5ce0760868ae2"
+          }
+        },
+        {
+          "driver_start_ns": 2134536395014031,
+          "driver_end_ns": 2134536395312083,
+          "send_ns": 2134536395097547,
+          "ready_ns": 2134536395311915,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+          "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+          "category": "payload",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 135,
+            "record_sha256": "ebd506fdb7ed008e412c8178aae2c6c768c474893b8829d68b828d43b0c28230"
+          }
+        },
+        {
+          "driver_start_ns": 2134536395532702,
+          "driver_end_ns": 2134536396096104,
+          "send_ns": 2134536395612276,
+          "ready_ns": 2134536396095936,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+          "category": "ordinary_path",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 136,
+            "record_sha256": "36a1a1ab35c7a467d11c9f8f9688e3bf65b75bdf4d44874d1bf8f13ef883d447"
+          }
+        },
+        {
+          "driver_start_ns": 2134536396826909,
+          "driver_end_ns": 2134536396886569,
+          "send_ns": 2134536396833237,
+          "ready_ns": 2134536396886402,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+          "fingerprint": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+          "category": "control",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 137,
+            "record_sha256": "e5205aecb63923ddfe289328fc7f771de8b52535b451da46e5db6279ec5f437f"
+          }
+        },
+        {
+          "driver_start_ns": 2134536398489964,
+          "driver_end_ns": 2134536398547795,
+          "send_ns": 2134536398496828,
+          "ready_ns": 2134536398547603,
+          "role": "foreground",
+          "client_process_pid": 2164537,
+          "parent_process_pid": 2164537,
+          "backend_pid": 2165424,
+          "connection": 123432949182416,
+          "sql_sha256": "98f36323c6bcf3d04d4b423d63caa325d692376ef457a4c1b41c27023a19ebf4",
+          "fingerprint": "98f36323c6bcf3d04d4b423d63caa325d692376ef457a4c1b41c27023a19ebf4",
+          "category": "control",
+          "raw_ref": {
+            "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/server-2-process-2164537.calls.jsonl.gz",
+            "sha256": "3cbedfdb088dc598cb858dd62eef3062dfd31a6af279726122dc88ca45f31f20",
+            "line": 138,
+            "record_sha256": "f8568a97cbb7e2d899f50dc5abe73cceaa4ce31c2c523129f332383f57c21e2d"
+          }
+        }
+      ],
+      "FG_BG_protocol_overlap_ns": 0,
+      "ordinal": 0,
+      "walker": "Traverse",
+      "path": "/walker/Traverse/0da464e162684655b9bc31e201c91f66",
+      "request": "2:5",
+      "server_generation": 2,
+      "HTTP_e2e_ns": 42145718,
+      "categories": {
+        "identity": 1,
+        "control": 7,
+        "payload": 35,
+        "ordinary_path": 32
+      },
+      "driver_calls": 75,
+      "sql_dispatches": 75,
+      "sql_data": 68,
+      "sql_control": 7,
+      "sql_other": 0,
+      "command_complete": 75,
+      "protocol_cycles": 75,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 67,
+      "data_row_payload_bytes": 21327,
+      "driver_sum_ns": 28233328,
+      "driver_union_ns": 28233328,
+      "protocol_sum_ns": 24138061,
+      "protocol_union_ns": 24138061,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 75,
+          "protocol_sum_ns": 24138061,
+          "protocol_union_ns": 24138061
+        },
+        "background_prefetch": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    }
+  ],
+  "SQL_fingerprints": [
+    {
+      "fingerprint": "7c031ced90a8996d01c59b32767e278e58f7dc3f5f52cfba746b97de050b59a3",
+      "kind": "data",
+      "role": "foreground",
+      "sql": "SELECT doc FROM identity_users WHERE user_id = $1",
+      "category": "identity",
+      "driver_calls": 1,
+      "sql_dispatches": 1,
+      "sql_data": 1,
+      "sql_control": 0,
+      "sql_other": 0,
+      "command_complete": 1,
+      "protocol_cycles": 1,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 1,
+      "data_row_payload_bytes": 578,
+      "driver_sum_ns": 172304,
+      "driver_union_ns": 172304,
+      "protocol_sum_ns": 155150,
+      "protocol_union_ns": 155150,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 1,
+          "protocol_sum_ns": 155150,
+          "protocol_union_ns": 155150
+        },
+        "background_prefetch": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    },
+    {
+      "fingerprint": "884b307eaf68c26c0ee2c95bfebc014c633d0d00e03a5e60391e7b2efc4dcd48",
+      "kind": "control",
+      "role": "foreground",
+      "sql": "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY",
+      "category": "control",
+      "driver_calls": 1,
+      "sql_dispatches": 1,
+      "sql_data": 0,
+      "sql_control": 1,
+      "sql_other": 0,
+      "command_complete": 1,
+      "protocol_cycles": 1,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 0,
+      "data_row_payload_bytes": 0,
+      "driver_sum_ns": 100529,
+      "driver_union_ns": 100529,
+      "protocol_sum_ns": 89697,
+      "protocol_union_ns": 89697,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 1,
+          "protocol_sum_ns": 89697,
+          "protocol_union_ns": 89697
+        },
+        "background_prefetch": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    },
+    {
+      "fingerprint": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+      "kind": "control",
+      "role": "foreground",
+      "sql": "SET LOCAL lock_timeout = '10s'",
+      "category": "control",
+      "driver_calls": 2,
+      "sql_dispatches": 2,
+      "sql_data": 0,
+      "sql_control": 2,
+      "sql_other": 0,
+      "command_complete": 2,
+      "protocol_cycles": 2,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 0,
+      "data_row_payload_bytes": 0,
+      "driver_sum_ns": 82924,
+      "driver_union_ns": 82924,
+      "protocol_sum_ns": 69411,
+      "protocol_union_ns": 69411,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 2,
+          "protocol_sum_ns": 69411,
+          "protocol_union_ns": 69411
+        },
+        "background_prefetch": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    },
+    {
+      "fingerprint": "b0075df9e7359d79cd785221c0ac6a46cf8e920312e2e4d11f08bf1800c6c116",
+      "kind": "data",
+      "role": "foreground",
+      "sql": "\n        SELECT a.id, a.kind, a.arch_type, a.arch_module, a.fingerprint,\n               a.root_id, a.src, a.dst, a.undirected, a.props, a.version,\n               CASE WHEN a.kind = 'NodeAnchor' THEN\n                   (SELECT string_agg(e.id::text, ',' ORDER BY e.seq, e.id)\n                      FROM anchors e WHERE e.src = a.id OR e.dst = a.id)\n               END\n        FROM anchors a WHERE a.id = ANY(CAST($1 AS uuid[]))\n        ",
+      "category": "payload",
+      "driver_calls": 35,
+      "sql_dispatches": 35,
+      "sql_data": 35,
+      "sql_control": 0,
+      "sql_other": 0,
+      "command_complete": 35,
+      "protocol_cycles": 35,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 35,
+      "data_row_payload_bytes": 18207,
+      "driver_sum_ns": 9428908,
+      "driver_union_ns": 9428908,
+      "protocol_sum_ns": 7958557,
+      "protocol_union_ns": 7958557,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 35,
+          "protocol_sum_ns": 7958557,
+          "protocol_union_ns": 7958557
+        },
+        "background_prefetch": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    },
+    {
+      "fingerprint": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+      "kind": "control",
+      "role": "foreground",
+      "sql": "COMMIT",
+      "category": "control",
+      "driver_calls": 2,
+      "sql_dispatches": 2,
+      "sql_data": 0,
+      "sql_control": 2,
+      "sql_other": 0,
+      "command_complete": 2,
+      "protocol_cycles": 2,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 0,
+      "data_row_payload_bytes": 0,
+      "driver_sum_ns": 118335,
+      "driver_union_ns": 118335,
+      "protocol_sum_ns": 105753,
+      "protocol_union_ns": 105753,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 2,
+          "protocol_sum_ns": 105753,
+          "protocol_union_ns": 105753
+        },
+        "background_prefetch": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    },
+    {
+      "fingerprint": "547004d6c33e887b6fe478e1d23004ef14c3fa1c8c4756ec52aea4a3933e7fb0",
+      "kind": "control",
+      "role": "foreground",
+      "sql": "BEGIN ISOLATION LEVEL SERIALIZABLE",
+      "category": "control",
+      "driver_calls": 1,
+      "sql_dispatches": 1,
+      "sql_data": 0,
+      "sql_control": 1,
+      "sql_other": 0,
+      "command_complete": 1,
+      "protocol_cycles": 1,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 0,
+      "data_row_payload_bytes": 0,
+      "driver_sum_ns": 48132,
+      "driver_union_ns": 48132,
+      "protocol_sum_ns": 39250,
+      "protocol_union_ns": 39250,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 1,
+          "protocol_sum_ns": 39250,
+          "protocol_union_ns": 39250
+        },
+        "background_prefetch": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    },
+    {
+      "fingerprint": "0a54b4ae9f0130579d977602a6e4a740856fb219013f1cfec4ddf6b7f3dceb5f",
+      "kind": "data",
+      "role": "foreground",
+      "sql": "SELECT n1.id, e1.id FROM unnest(CAST($1 AS uuid[])) WITH ORDINALITY AS f0(id, ord) LEFT JOIN anchors s1 ON s1.id = f0.id JOIN anchors e1 ON e1.kind = 'EdgeAnchor' AND (e1.src = f0.id OR (e1.undirected AND e1.dst = f0.id)) AND (e1.arch_type = $2 OR e1.arch_type IN (SELECT type_name FROM graph_types WHERE ancestor = $2)) JOIN anchors n1 ON n1.id = CASE WHEN e1.src = f0.id THEN e1.dst ELSE e1.src END AND n1.kind = 'NodeAnchor' AND (n1.arch_type = $3 OR n1.arch_type IN (SELECT type_name FROM graph_types WHERE ancestor = $3)) AND (n1.root_id = CAST($4 AS uuid) OR (n1.props->'access'->>'all')::int > -1 OR (n1.props->'access'->'roots'->'anchors') ? CAST($5 AS text) OR EXISTS (SELECT 1 FROM anchors ge WHERE ge.kind = 'EdgeAnchor' AND ge.src = CAST($4 AS uuid) AND (n1.props->'access'->'groups'->'anchors') ? CAST(ge.dst AS text))) ORDER BY f0.ord, e1.seq, e1.id",
+      "category": "ordinary_path",
+      "driver_calls": 32,
+      "sql_dispatches": 32,
+      "sql_data": 32,
+      "sql_control": 0,
+      "sql_other": 0,
+      "command_complete": 32,
+      "protocol_cycles": 32,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 31,
+      "data_row_payload_bytes": 2542,
+      "driver_sum_ns": 18224365,
+      "driver_union_ns": 18224365,
+      "protocol_sum_ns": 15669468,
+      "protocol_union_ns": 15669468,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 32,
+          "protocol_sum_ns": 15669468,
+          "protocol_union_ns": 15669468
+        },
+        "background_prefetch": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    },
+    {
+      "fingerprint": "98f36323c6bcf3d04d4b423d63caa325d692376ef457a4c1b41c27023a19ebf4",
+      "kind": "control",
+      "role": "foreground",
+      "sql": "DISCARD ALL",
+      "category": "control",
+      "driver_calls": 1,
+      "sql_dispatches": 1,
+      "sql_data": 0,
+      "sql_control": 1,
+      "sql_other": 0,
+      "command_complete": 1,
+      "protocol_cycles": 1,
+      "server_error_messages": 0,
+      "pre_send_driver_errors": 0,
+      "data_rows": 0,
+      "data_row_payload_bytes": 0,
+      "driver_sum_ns": 57831,
+      "driver_union_ns": 57831,
+      "protocol_sum_ns": 50775,
+      "protocol_union_ns": 50775,
+      "roles": {
+        "foreground": {
+          "sql_dispatches": 1,
+          "protocol_sum_ns": 50775,
+          "protocol_union_ns": 50775
+        },
+        "background_prefetch": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        },
+        "background_continuation": {
+          "sql_dispatches": 0,
+          "protocol_sum_ns": 0,
+          "protocol_union_ns": 0
+        }
+      }
+    }
+  ],
+  "processes": {
+    "foreground": [
+      2164537
+    ],
+    "background": []
+  },
+  "HTTP_workflow_sum_ns": 42145718,
+  "HTTP_workflow_union_ns": 42145718,
+  "HTTP_workflow_span_ns": 42145718,
+  "HTTP_explicit_drain_sum_ns": 2757,
+  "HTTP_with_drain_span_ns": 42634373,
+  "HTTP_requests": [
+    {
+      "request": "1:0",
+      "server_generation": 1,
+      "phase": "setup",
+      "path": "/user/register",
+      "http_status": 201,
+      "start_ns": 2134531939629758,
+      "end_ns": 2134531977707611,
+      "wall_start": 1793598161.8539193,
+      "wall_end": 1793598161.8919992,
+      "http_e2e_ms": 38.077853,
+      "post_response_drain": {
+        "origin_request_id": "1:0",
+        "start_ns": 2134531978240439,
+        "end_ns": 2134531978243413,
+        "observed_threads": 0,
+        "pending": 0,
+        "flush": {
+          "calls": 69,
+          "events": 6,
+          "client_process_pid": 2164348
+        }
+      },
+      "native_dispatch_timestamps": {
+        "timestamp_ns": 2134531977412156,
+        "start_ns": 2134531939954116,
+        "end_ns": 2134531977410175
+      }
+    },
+    {
+      "request": "1:1",
+      "server_generation": 1,
+      "phase": "setup",
+      "path": "/user/login",
+      "http_status": 200,
+      "start_ns": 2134531980004637,
+      "end_ns": 2134532011457629,
+      "wall_start": 1793598161.8942952,
+      "wall_end": 1793598161.9257493,
+      "http_e2e_ms": 31.452992,
+      "post_response_drain": {
+        "origin_request_id": "1:1",
+        "start_ns": 2134532011929330,
+        "end_ns": 2134532011932483,
+        "observed_threads": 0,
+        "pending": 0,
+        "flush": {
+          "calls": 7,
+          "events": 2,
+          "client_process_pid": 2164348
+        }
+      },
+      "native_dispatch_timestamps": {
+        "timestamp_ns": 2134532011182808,
+        "start_ns": 2134531980373638,
+        "end_ns": 2134532011180944
+      }
+    },
+    {
+      "request": "1:2",
+      "server_generation": 1,
+      "phase": "setup",
+      "path": "/walker/SuiteRoot",
+      "http_status": 200,
+      "start_ns": 2134532012573715,
+      "end_ns": 2134532034175241,
+      "wall_start": 1793598161.9268644,
+      "wall_end": 1793598161.948467,
+      "http_e2e_ms": 21.601526,
+      "post_response_drain": {
+        "origin_request_id": "1:2",
+        "start_ns": 2134532034565205,
+        "end_ns": 2134532034567848,
+        "observed_threads": 0,
+        "pending": 0,
+        "flush": {
+          "calls": 11,
+          "events": 2,
+          "client_process_pid": 2164348
+        }
+      },
+      "native_dispatch_timestamps": {
+        "timestamp_ns": 2134532033916418,
+        "start_ns": 2134532012907429,
+        "end_ns": 2134532033914613
+      }
+    },
+    {
+      "request": "1:3",
+      "server_generation": 1,
+      "phase": "setup",
+      "path": "/walker/SuiteImport",
+      "http_status": 200,
+      "start_ns": 2134532035220067,
+      "end_ns": 2134532052026890,
+      "wall_start": 1793598161.9495106,
+      "wall_end": 1793598161.9663184,
+      "http_e2e_ms": 16.806823,
+      "post_response_drain": {
+        "origin_request_id": "1:3",
+        "start_ns": 2134532052401016,
+        "end_ns": 2134532052403114,
+        "observed_threads": 0,
+        "pending": 0,
+        "flush": {
+          "calls": 13,
+          "events": 2,
+          "client_process_pid": 2164348
+        }
+      },
+      "native_dispatch_timestamps": {
+        "timestamp_ns": 2134532051818055,
+        "start_ns": 2134532035515900,
+        "end_ns": 2134532051816385
+      }
+    },
+    {
+      "request": "2:4",
+      "server_generation": 2,
+      "phase": "setup",
+      "path": "/walker/SuiteInspect",
+      "http_status": 200,
+      "start_ns": 2134536301598899,
+      "end_ns": 2134536340069057,
+      "wall_start": 1793598166.215889,
+      "wall_end": 1793598166.2543607,
+      "http_e2e_ms": 38.470158,
+      "post_response_drain": {
+        "origin_request_id": "2:4",
+        "start_ns": 2134536340727203,
+        "end_ns": 2134536340730409,
+        "observed_threads": 0,
+        "pending": 0,
+        "flush": {
+          "calls": 63,
+          "events": 6,
+          "client_process_pid": 2164537
+        }
+      },
+      "native_dispatch_timestamps": {
+        "timestamp_ns": 2134536339723196,
+        "start_ns": 2134536301951888,
+        "end_ns": 2134536339720977
+      }
+    },
+    {
+      "request": "2:5",
+      "server_generation": 2,
+      "phase": "workflow",
+      "path": "/walker/Traverse/0da464e162684655b9bc31e201c91f66",
+      "http_status": 200,
+      "start_ns": 2134536356727342,
+      "end_ns": 2134536398873060,
+      "wall_start": 1793598166.2710178,
+      "wall_end": 1793598166.3131645,
+      "http_e2e_ms": 42.145718,
+      "post_response_drain": {
+        "origin_request_id": "2:5",
+        "start_ns": 2134536399358958,
+        "end_ns": 2134536399361715,
+        "observed_threads": 0,
+        "pending": 0,
+        "flush": {
+          "calls": 75,
+          "events": 3,
+          "client_process_pid": 2164537
+        }
+      },
+      "native_dispatch_timestamps": {
+        "timestamp_ns": 2134536398606069,
+        "start_ns": 2134536357206687,
+        "end_ns": 2134536398604225
+      }
+    },
+    {
+      "request": "3:6",
+      "server_generation": 3,
+      "phase": "setup",
+      "path": "/walker/SuiteInspect",
+      "http_status": 200,
+      "start_ns": 2134540645905319,
+      "end_ns": 2134540684744494,
+      "wall_start": 1793598170.560196,
+      "wall_end": 1793598170.5990362,
+      "http_e2e_ms": 38.839175,
+      "post_response_drain": {
+        "origin_request_id": "3:6",
+        "start_ns": 2134540685374354,
+        "end_ns": 2134540685377211,
+        "observed_threads": 0,
+        "pending": 0,
+        "flush": {
+          "calls": 63,
+          "events": 6,
+          "client_process_pid": 2165508
+        }
+      },
+      "native_dispatch_timestamps": {
+        "timestamp_ns": 2134540684400239,
+        "start_ns": 2134540646212802,
+        "end_ns": 2134540684398098
+      }
+    }
+  ],
+  "planner_statistics": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/formal-v1/cases/finite_list32-off-excluded_warmup--1/planner-statistics-before-workflow.json",
+    "sha256": "5d6e814e828603e9e32fbd87893054344c313a55d28b835645a237b854386aca"
+  },
+  "profile_reset": [
+    {
+      "cell_id": "finite_list32/off",
+      "trial_id": "finite_list32-off-excluded_warmup--1",
+      "server_generation": "2",
+      "postgres_instance_id": "53cb0161-8a1a-43aa-bac2-8170e3f10051",
+      "clock_domain": "same-host-perf_counter_ns",
+      "origin_request_id": "2:5",
+      "client_process_pid": 2164537,
+      "parent_process_pid": 2164537,
+      "role": "foreground",
+      "actual_executor": "none",
+      "kind": "explicit_profile_reset",
+      "timestamp_ns": 2134536357204025,
+      "regime": "before_first_workflow_request"
+    }
+  ],
+  "definitions": {
+    "HTTP_response": "Existing instrumented client HTTP end minus start; excludes explicit post-response drain.",
+    "HTTP_span": "First workflow HTTP start to last HTTP end; includes between-request work/gaps.",
+    "with_drain_span": "First workflow HTTP start to last explicit drain end, includes gaps; not sum DB or pure server/CPU."
+  }
+}

@@ -1,0 +1,574 @@
+{
+  "passed": true,
+  "kind": "manual_source_audit_not_native_acceptance",
+  "sources": {
+    "supported_testcases.json": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-continuation-benchmarks/supported_testcases.json",
+      "sha256": "be6952d08d323d5a21b42de8028a200918b897399f142aeb2fa422ff8c8348ec"
+    },
+    "tpch/queries.jac": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-continuation-benchmarks/tpch/queries.jac",
+      "sha256": "ed2fd3d3fc1052cda787885cdb13b125029b3e2f9417ddedd77c64d314df1672"
+    },
+    "tpch/server.jac": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-continuation-benchmarks/tpch/server.jac",
+      "sha256": "13f519ac3292fe4f8cdd89c5cc168bf7c1366df70a5f614ad2565d3d7106b699"
+    },
+    "tpch/models.jac": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-continuation-benchmarks/tpch/models.jac",
+      "sha256": "20e19febc3a55b8308a48613399241beee1bc64063be82878587b2bd754eddd4"
+    },
+    "tpch/loader.jac": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-continuation-benchmarks/tpch/loader.jac",
+      "sha256": "ea270100a27598008f3fd25e8ebcd834131c7d8cff9b1b86fd454c3bbb09bd4a"
+    },
+    "tpch/fixture_loader.py": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-continuation-benchmarks/tpch/fixture_loader.py",
+      "sha256": "486e4049aaf2856fd90e4680dda3d9ce4511579e8caa5d6b0424ca627108f737"
+    }
+  },
+  "rows": [
+    {
+      "case_id": "tpch/Q1",
+      "operation_id": "Q1",
+      "walker": "Q1_PricingSummary",
+      "source_lines": "queries.jac:434-489",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "NO_AFTER_OUTPUT_SLICE",
+      "reason": "agg is a group reduction; cutoff assigned once at Root. Every LineItem is visited before group writes; later entries never read agg to choose a graph access.",
+      "static_summary_needed": "Output slice of group initialization/update and final sort; pure datetime/date/string summaries.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q2",
+      "operation_id": "Q2",
+      "walker": "Q2_MinCostSupplier",
+      "source_lines": "queries.jac:492-505; helpers215-300",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "NO_AFTER_JOIN_CONTEXT_SUMMARY",
+      "reason": "Completed supplier prepass supplies immutable supp_info. Part predicates use input p_size/type; PartSupp visits do not read mutable minima. part_info/part_min_cost/min_supps are join/output context consumed only by reductions/finish.",
+      "static_summary_needed": "Nested-spawn completion and read-only helper summaries; preserve keyed min/ties and final ordering. No key-disjointness assumption needed for access-only proof.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q3",
+      "operation_id": "Q3",
+      "walker": "Q3_ShippingPriority",
+      "source_lines": "queries.jac:510-557",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "NO_AFTER_JOIN_CONTEXT_SUMMARY",
+      "reason": "order_map written at526-529 is read by LineItem at537-550 for output eligibility. Customer/Order visits use node fields and immutable segment/date, never agg/order_map feedback.",
+      "static_summary_needed": "Carry order key/date/priority as per-origin context or use keyed map summary; retain guard before output, distinguish map read from future graph access.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q4",
+      "operation_id": "Q4",
+      "walker": "Q4_OrderPriority",
+      "source_lines": "queries.jac:560-600",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "NO_AFTER_OUTPUT_SLICE",
+      "reason": "order_prio/order_has_late initialized by Order, set by sibling LineItems and read in finish584-598. Only Order date selects a later visit; late flag never gates more graph reads.",
+      "static_summary_needed": "Recognize keyed exists/boolean reduction and output phase; no need turn late flag into access dependence.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q5",
+      "operation_id": "Q5",
+      "walker": "Q5_LocalSupplierVolume",
+      "source_lines": "queries.jac:603-662; helpers20-56",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "MAY_PHASE_ACCESS",
+      "reason": "Region supplier prepass result builds target_nations620-626; _BuildCustNationMap at628 then gates nation_has_customer graph reads28-30 using that completed list. This is a real prepass-to-later-access dependency, not sibling mutation of a shared map during the later stage. order_cust/agg thereafter are value/output context.",
+      "static_summary_needed": "Phase boundary + immutable derived-map effect summary. Target-nation parameterization/relational semijoin can lower the phase; source simplification is optional.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q6",
+      "operation_id": "Q6",
+      "walker": "Q6_ForecastingRevenue",
+      "source_lines": "queries.jac:665-694",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "NO_AFTER_OUTPUT_SLICE",
+      "reason": "revenue is read only by final report. Date/discount/quantity bounds are initialized before the fixed LineItem visit; no sibling changes those bounds.",
+      "static_summary_needed": "Pure date setup, arithmetic predicate and output reduction summaries.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q7",
+      "operation_id": "Q7",
+      "walker": "Q7_VolumeShipping",
+      "source_lines": "queries.jac:697-755",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "MAY_PHASE_ACCESS_GUARD",
+      "reason": "cust_nation is built in completed helper709-710; on_order720-723 reads it before LineItem visit. This immutable prepass map is an access guard, unlike output agg. No Order sibling writes cust_nation.",
+      "static_summary_needed": "Keep the phase/map guard. Validated Customer keys and Order.o_custkey/edge FK correspondence can prove the guard total on the selected path; models alone do not enforce those invariants.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q8",
+      "operation_id": "Q8",
+      "walker": "Q8_NationalMarketShare",
+      "source_lines": "queries.jac:758-812",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "NO_AFTER_JOIN_CONTEXT_SUMMARY",
+      "reason": "supp_nation/matching_parts are completed immutable prepasses. Region/date predicates select Order/LineItem paths. order_year and agg are read only in LineItem output computation/finish.",
+      "static_summary_needed": "Summarize prepasses and keyed ancestor context; split output calculations. Empty matching_parts does not cancel the initial graph visit.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q9",
+      "operation_id": "Q9",
+      "walker": "Q9_ProductTypeProfit",
+      "source_lines": "queries.jac:815-863; helper74-90",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "NO_AFTER_JOIN_CONTEXT_SUMMARY",
+      "reason": "matching_parts/ps_cost/supp_nation prepasses are immutable value joins; order_year flows Order->LineItem. LineItem return guards are followed by arithmetic/output aggregation only; visits never read these evolving aggregates.",
+      "static_summary_needed": "Read-only nested helper summaries + scalar/keyed join context + output slice; preserve supply-cost key and sorting.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q10",
+      "operation_id": "Q10",
+      "walker": "Q10_ReturnedItemReporting",
+      "source_lines": "queries.jac:866-936",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "NO_AFTER_JOIN_CONTEXT_SUMMARY",
+      "reason": "cust_info/order_cust are ancestor context. Date controls Order->LineItem; later LineItem return filters and revenue_by_cust affect only output. Finish uses plain copied customer values, not another graph lookup.",
+      "static_summary_needed": "Expose keyed context and reduction/output phases; fixed cust_nation prepass.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q11",
+      "operation_id": "Q11",
+      "walker": "Q11_ImportantStock",
+      "source_lines": "queries.jac:939-956; helper302-323",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "NO_AFTER_REDUCTION_PHASE_SUMMARY",
+      "reason": "_Q11Compute visits Part/PartSupp independently of total_value/ps_values. Supplier map selects contributions only. Global threshold947-951 filters already materialized values and triggers no future helper/query.",
+      "static_summary_needed": "Preserve complete total-value reduction before threshold output; an aggregate barrier is needed for values, not access feedback.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q12",
+      "operation_id": "Q12",
+      "walker": "Q12_ShippingModes",
+      "source_lines": "queries.jac:959-1003",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "NO_AFTER_JOIN_CONTEXT_SUMMARY",
+      "reason": "order_prio maps Order to priority; LineItem reads it only to choose high/low output counters. Every Order issues its LineItem visit independently of map/counters.",
+      "static_summary_needed": "Per-origin Order priority context and pure output aggregation.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q13",
+      "operation_id": "Q13",
+      "walker": "Q13_CustomerDistribution",
+      "source_lines": "queries.jac:1006-1043",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "NO_AFTER_OUTPUT_SLICE",
+      "reason": "cust_order_count has cross-ability initialize/increment/read effects, but both Customer->Order visits and Order comment checks are independent of those counts; final distribution is plain value computation.",
+      "static_summary_needed": "Do not mistake map membership initialization for access control: visit1018 is outside the if. Preserve zero-order customers/output reduction.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q14",
+      "operation_id": "Q14",
+      "walker": "Q14_PromotionEffect",
+      "source_lines": "queries.jac:1046-1081; helper92-100",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "NO_AFTER_IMMUTABLE_MAP_SUMMARY",
+      "reason": "part_types is immutable after helper completion. It selects promo-revenue contributions only; total/promo sums never control graph access.",
+      "static_summary_needed": "Read-only type-map prepass, date setup and output sum/ratio summaries.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q15",
+      "operation_id": "Q15",
+      "walker": "Q15_TopSupplier",
+      "source_lines": "queries.jac:1084-1135; helper160-173",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "MAY_REDUCTION_TO_HELPER_ACCESS",
+      "reason": "supp_revenue emptiness1111-1114 gates _BuildSuppInfoMap spawn1116. A qualifying LineItem creates a key even if its revenue is zero; an otherwise empty pass skips the later supplier graph traversal. Max revenue itself filters copied output values.",
+      "static_summary_needed": "Explicit existential/reduction barrier before optional supplier helper. Could lower to relational aggregate/semijoin; no theoretical impossibility or mandatory benchmark rewrite.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q16",
+      "operation_id": "Q16",
+      "walker": "Q16_PartsSupplierRelation",
+      "source_lines": "queries.jac:1138-1153; helper325-377",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "NO_AFTER_JOIN_CONTEXT_SUMMARY",
+      "reason": "Immutable complaint keys filter PartSupp contributions. part_combo joins parent Part to child reduction, agg collects supplier sets; Part->PartSupp visits depend only on input brand/type/sizes and node attributes.",
+      "static_summary_needed": "Keyed ancestor context plus distinct-set output reduction; helper completion contract.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q17",
+      "operation_id": "Q17",
+      "walker": "Q17_SmallQuantityOrder",
+      "source_lines": "queries.jac:1156-1211; helper201-213",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "MAY_PREPASS_CANCELLATION",
+      "reason": "matching_partkeys helper completes before1166-1169 empty guard disengages, suppressing the initial LineItem path1173. Once traversal starts, part_qtys/li_data/part_avg are output reductions; sibling quantities do not gate additional graph reads.",
+      "static_summary_needed": "Keep prepass empty/cancel boundary. Final per-part average needs output reduction ordering; rewriting as SQL/window logic is a compiler option, not required simplification.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q18",
+      "operation_id": "Q18",
+      "walker": "Q18_LargeVolumeCustomer",
+      "source_lines": "queries.jac:1214-1274",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "NO_AFTER_JOIN_CONTEXT_SUMMARY",
+      "reason": "cust_info/order_info/order_qty carry joins and quantities into final output. Both map initialization guards1237/1243 only initialize accumulators; visit1240 is unconditional after Order context.",
+      "static_summary_needed": "Keyed ancestor context and completed sum/HAVING-style output reduction. Shared maps are legitimate context, not automatically sibling-access interference.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q19",
+      "operation_id": "Q19",
+      "walker": "Q19_DiscountedRevenue",
+      "source_lines": "queries.jac:1277-1335; helper102-114",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "NO_AFTER_IMMUTABLE_MAP_SUMMARY",
+      "reason": "Completed part_info holds plain brand/container/size values. LineItem branches and map misses select revenue contributions; no later visit/query/spawn follows those guards.",
+      "static_summary_needed": "Pure local predicates + immutable map + reduction/output summary.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q20",
+      "operation_id": "Q20",
+      "walker": "Q20_PotentialPartPromotion",
+      "source_lines": "queries.jac:1338-1375; helper379-419",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "PHASE_VALUE_BARRIER_FIELD_SUMMARY",
+      "reason": "li_qtys is a completed LineItem aggregate passed to unconditional _Q20Phase2 spawn1368. Phase2 Nation/Supplier/PartSupp visits390-397 use nation input/current node, not li_qtys; li_qtys404-409 controls qualifying supplier references, then finish413-415 reads their name/address. It cannot be dismissed as a dead output map.",
+      "static_summary_needed": "Preserve reduce->helper value barrier and map join. Under native full materialization of visited Supplier objects, those final ordinary fields add no new DB fetch, so graph-access feedback is absent. Without a node-field materialization/effect summary, conservatively retain MAY conditional payload-read set; no unsupported independence assertion.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result.",
+        "Node-field materialization contract required for exact additional DB-call proof."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q21",
+      "operation_id": "Q21",
+      "walker": "Q21_SuppliersWhoKeptOrdersWaiting",
+      "source_lines": "queries.jac:1378-1459",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "NO_AFTER_JOIN_REDUCTION_SUMMARY",
+      "reason": "order_final/order_lineitems pass parent context into a completed per-order reduction. on_order status selects LineItem visit; sibling arrays/counts affect only finish joins, exists/anti-exists-style tests and output; no final helper/query.",
+      "static_summary_needed": "Preserve complete per-order group barrier and output anti-join/count computation; fixed target-supplier prepass.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    },
+    {
+      "case_id": "tpch/Q22",
+      "operation_id": "Q22",
+      "walker": "Q22_GlobalSalesOpportunity",
+      "source_lines": "queries.jac:1462-1510; helper421-427",
+      "within_sibling_stage": "NO_MUTABLE_ACCESS_FEEDBACK_AFTER_SUMMARY",
+      "overall_future_access_class": "MAY_GLOBAL_REDUCTION_TO_ACCESS",
+      "reason": "sum_bal/count_bal from all eligible customers determine avg_bal1482. That threshold gates cust spawn _HasOrders1485-1490, whose customer_ordered graph read425 is real future access. Example balances10 and20 ->avg15 checks20; adding eligible sibling100 ->avg43.33 suppresses that same Customer20 order check.",
+      "static_summary_needed": "Global AVG/reduction barrier then per-customer anti-exists lookup. Static summary can expose MAY and phase boundary; relational AVG+anti-join lowering is possible, not mandatory source simplification or theoretical impossibility.",
+      "program_simplification": "Optional output slicing/inlining/context localization/phase lowering; equivalent compiler summaries can preserve source as written.",
+      "compiler_features": "Typed container/alias effects, guard-sensitive access slice and nested spawn/exit phase summaries as relevant; not claimed implemented.",
+      "unknown_or_assumptions": [
+        "Ordinary fields/containers and read-only graph queries; completed synchronous spawn result."
+      ],
+      "native_status": "Source audit only; catalog status offline_prepared_native_pending",
+      "catalog_sources_match": {
+        "tpch/server.jac": true,
+        "tpch/queries.jac": true,
+        "tpch/models.jac": true,
+        "tpch/loader.jac": true,
+        "tpch/fixture_loader.py": true
+      }
+    }
+  ],
+  "counts": {
+    "operations": 22,
+    "within_stage_access_independence_after_summary": 22,
+    "overall_NO_after_summary": 16,
+    "definite_or_conservative_phase_access_MAY": 5,
+    "phase_value_or_node_field_contract_conditional": 1,
+    "MAY_operations": [
+      "Q5",
+      "Q7",
+      "Q15",
+      "Q17",
+      "Q22"
+    ],
+    "conditional_operation": "Q20",
+    "theoretical_impossibility_claims": 0
+  },
+  "distinctions": [
+    "An immutable helper result can control access while creating no sibling-to-sibling mutation feedback in its consumer stage.",
+    "Cross-ability keyed maps carrying copied parent values are not automatically sibling interference; trace their uses to actual future graph/queue/write effects.",
+    "Output reductions can share keys and be order-sensitive without changing any future access. No unique-key assumption is needed for this access-only slicing argument.",
+    "Global/phase dependencies remain real: Q15 optional helper and Q22 threshold-selected order reads; Q17 prepass cancellation.",
+    "Q20 requires preserving aggregate-to-later-helper semantics; classify its field-load footprint conditional on materialization rather than pretending that every map is immutable output or that every aggregate blocks traversal batching."
+  ],
+  "assumptions": [
+    "Finite closed-world loaded graph, ordinary Jac scalar/container fields, no custom getters/metaclasses/monkeypatch effects. models.jac defines fields/edges only; no query-time node methods.",
+    "Graph query/visit reads and nested spawn completion use declared native effects; datetime/date/string helpers are pure parameter setup.",
+    "No automatic access-summary/simplification implementation is claimed. Current analyzer rejection of call/comprehension/maps is a capability gap, not proof of impossibility.",
+    "Model field declarations document foreign-key meanings but do not themselves enforce unique keys/edge-field consistency. Q7 can discharge the map guard only with those extra relational invariants."
+  ],
+  "helper_summary": {
+    "lines": "queries.jac:7-427",
+    "effect": "All inspected query helpers are graph readers plus local/per-walker maps/reductions; no persistent graph mutation. Their graphs depend on constant helper inputs/current node fields. Node-valued supplier maps require residency/materialization effects for field reads.",
+    "setup": "server.jac:4-10 LoadFixture calls loader.jac:9 load_tpch_graph -> Python fixture_loader.load_tables. This is mutating external file/setup IO, outside22 query operations. No claim of purity for setup or arbitrary external code."
+  },
+  "scope": "Exact22 supported_testcases identities; procedural Jac queries and callees read, no SQL replacement, tests, compiler/runtime import, DB or source edits. Old9-walker audit left intact."
+}

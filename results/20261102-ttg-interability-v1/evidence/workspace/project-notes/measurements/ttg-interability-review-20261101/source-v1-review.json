@@ -1,0 +1,123 @@
+{
+  "status": "SOURCE_V1_REQUIRES_NARROW_REPAIRS",
+  "scope": "Immutable nine-copy source/design review and tiny pure Python condition witnesses only; offline/native tests not run or accepted by reviewer.",
+  "manifest": {
+    "path": "project-notes/measurements/ttg-interability-20261101/source-v1/manifest.json",
+    "sha256": "a1ff3d32bfc124c25d85987957bafe44c11dff43a5fb9af437af4346a906d7ef"
+  },
+  "sources": {
+    "jac/jaclang/compiler/backends/py/impl/jcir_gen_pass.impl.jac": "91f8dfe029b57a3dcc8c74a77590c8b261810734922379397a87131c8757dcbf",
+    "jac/jaclang/impl/sql.impl.jac": "0775fbbbb9f8c45e44575355416521ef6e18cabcd31ce5df3f3fde11fde800d9",
+    "jac/jaclang/runtime/ttg_dependencies.jac": "cccc5d154cc1341a02db326d644bb87b787745ab0f1e09ce661e44d3103315f2",
+    "jac/jaclang/runtime/ttg_dependency_prefetch.jac": "96de36e9a7afffd83133d52a9729dde41283f7dbaec6a83c9f1d361880faadad",
+    "jac/jaclang/sql.jac": "35c39dbdcebf3f67490c76cdd14860198ffb8c522efb6f9caed63f66aab0e2c8",
+    "jac/jaclang/runtime/ttg_regions.jac": "968dfb2b9d22bf3d1c07b55c62adcdbfa9dc5d2108aa2eb0723baab8ea69e956",
+    "jac/tests/runtimelib/fixtures/ttg_region_walkers.jac": "954ce7f738c4858b4737a23521ffae6d4918a2703b07cf569010e27e42d394af",
+    "jac/tests/runtimelib/test_ttg_regions.jac": "a0932ab71aa5849f526781a126b5af11ea13a7664b9295d397e0b17821a8c86f",
+    "jac/tests/runtimelib/test_ttg_regions_native.jac": "4a0f0f763345f3345edfbe9d7a785826d149a9f39a91a0d557c2c3c384df44aa"
+  },
+  "tracked_patch": {
+    "path": "project-notes/measurements/ttg-interability-20261101/source-v1/changes.patch",
+    "sha256": "084995998326690d55a821a499550c4a05a88b1ba0918829667da88e828741cf"
+  },
+  "probes": {
+    "path": "project-notes/measurements/ttg-interability-review-20261101/source-v1-pure-probes.json",
+    "sha256": "92ac42641d12f903f07d49912fbe056b1aff297ca60dc50fd90a0a9f039c33e5"
+  },
+  "probe_source": {
+    "path": "project-notes/measurements/ttg-interability-review-20261101/source-v1-pure-probes.py",
+    "sha256": "b1bf7a3370881177f938cf9cb7df270be1a816ee88f94387a57577a0aa727516"
+  },
+  "supplementary_unchanged_runtime_reads": [
+    {
+      "path": "jac-ttg/jac/jaclang/runtime/archetype.jac",
+      "sha256": "2c293a20e861b280af35539afdec68fce8c22d031ba8c276a3bf65bf13572d1b"
+    },
+    {
+      "path": "jac-ttg/jac/jaclang/runtime/impl/archetype.impl.jac",
+      "sha256": "6d7571ffbf2d89b0acfb9b0c1405e2937c5a054ef2809db7e8137effbc999a3a"
+    },
+    {
+      "path": "jac-ttg/jac/jaclang/runtime/osp_kernel_sv.jac",
+      "sha256": "f97e6d29ca562b9bb2757053438e09cbee78b175e959639e2efbdcd5352a0e5c"
+    },
+    {
+      "path": "jac-ttg/jac/jaclang/runtime/ttg_continuation.jac",
+      "sha256": "4bb6c5d842bc5e30366740350692e372e2ad828998511aba116e728c24b5133a"
+    }
+  ],
+  "positive_source_findings": [
+    "New compiler summarize_abilities/compile_interability_regions composes typed dispatch edges from static AST events, not a renamed runtime continuation interpreter. Accepted entry branch returns before old interpreter path.",
+    "Finite A\u2192B\u2192C uses unrolled CTE composition; one-rule homogeneous self-edge uses recursive SQL. Cycles among multiple ability rules are excluded.",
+    "Typed guard SQL uses jsonb_typeof plus text comparison without casting. Wrong/missing/null values yield invalid markers; full ordered rows are validated before publish_paths. Disabled valid-false guard does not publish its unexecuted outgoing path.",
+    "Fanout/closure/order/cycle/truncation are checked before atomic publication; enabled terminal empty paths are staged. Actor/ACL context and per-phase exact source/target type/module checks are present. Unchanged native prefix/full-key publication primitives are reused.",
+    "_trace_node_effects marks any applicable node entry callback unknown; regions322 consumes that unknown flag, so no additional writes/may_cancel handling is needed for those already rejected entries. The specific exit applicability gap is I3."
+  ],
+  "findings": [
+    {
+      "id": "I1",
+      "kind": "activation blocker",
+      "source": "jac/jaclang/runtime/ttg_regions.jac",
+      "lines": [
+        350,
+        353
+      ],
+      "issue": "Any unsafe current field rejects the region, including normal internal __jac__ cached NodeAnchor metadata.",
+      "witness": "known_node_fields iterates vars; ordinary NodeArchetype.__jac__ is cached_property. Populated current node has __jac__::unsafe, so the all-fields test declines even RegionTraverse.",
+      "bounded_fix": "Validate only touched ordinary scalar fields and relevant actual cached values; do not interpret internal metadata as user scalar. Preserve actual nonprimitive/subclass rejection on touched fields."
+    },
+    {
+      "id": "I2",
+      "kind": "effect soundness blocker",
+      "source": "jac/jaclang/runtime/ttg_regions.jac",
+      "lines": [
+        295,
+        298
+      ],
+      "issue": "Descriptor validation includes reads but omits write-only output destinations.",
+      "witness": "self.sink=1 has writes self.sink and no self.sink read. sink property setter can have effects despite standard Archetype.__setattr__ delegating object.__setattr__. The current descriptor scan never sees sink.",
+      "bounded_fix": "Include output write destinations in descriptor/effect validation; conservative descriptor fallback is sufficient."
+    },
+    {
+      "id": "I3",
+      "kind": "effect boundary blocker",
+      "source": "jac/jaclang/runtime/ttg_regions.jac",
+      "lines": [
+        325,
+        327
+      ],
+      "issue": "Typed node exit applicability uses the node source class as trigger subject; node exit trigger refers to walker class.",
+      "witness": "Node exit callback triggered by RegionGuard: issubclass(RegionB,RegionGuard) is false although issubclass(type(wlk),RegionGuard) is true. Applicable unknown node exits bypass the declared conservative boundary.",
+      "bounded_fix": "Separate walker-exit (source-node trigger) from node-exit (walker trigger) checks; unknown matching effects decline."
+    },
+    {
+      "id": "I4",
+      "kind": "resource cap blocker",
+      "source": "jac/jaclang/runtime/ttg_dependency_prefetch.jac",
+      "lines": [
+        258,
+        292
+      ],
+      "issue": "Fast payload dispatch ignores remaining submission budget.",
+      "witness": "max_length4, prior submitted3, region payload3 fresh IDs: branch sends all3 and total becomes6; legacy path518 clips to remaining1.",
+      "bounded_fix": "Cap dispatch candidates to remaining=max_length-len(submitted), including previous scopes/regions. SQL path certification budget and payload submission budget may be distinct but must be explicit."
+    },
+    {
+      "id": "I5",
+      "kind": "supported output contract gap",
+      "source": "jac/jaclang/runtime/ttg_regions.jac",
+      "lines": [
+        335,
+        345
+      ],
+      "issue": "Output scalar arithmetic is marked output-only without operator-specific typed/nonraising validation; None/list/str state is allowed by the same generic read check.",
+      "witness": "RegionReduction with total=None passes allowed state types yet total+=value raises TypeError. Valid declared ints do not make division safe: total/=here.value with value0 is statically accepted by the underlying Div support and raises before visit.",
+      "bounded_fix": "First kernel may restrict to exact safe scalar/report/addition forms with actual-type checks, or an enforced explicit supported-data/operator contract. Unknown/unsafe arithmetic should fall back. No arbitrary exception solver is requested."
+    }
+  ],
+  "limits": [
+    "No claim of actual native mismatch or SQL activation from these pure witnesses; immutable native evidence remains pending.",
+    "Broad aliases, FIFO theorem framework, cost/prepared reuse and old-source re-audits are outside this review."
+  ],
+  "next_scope": "Inspect only immutable repair delta and focused accepted native evidence; no new loop absent concrete issue."
+}
