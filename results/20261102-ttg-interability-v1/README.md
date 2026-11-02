@@ -1,6 +1,6 @@
 # TTG+ interability SQL regions
 
-[Read the 28-page English slides](report/ttg-interability-performance.pdf). Page6 shows the requested A→B / A→C Jac Graph, with each ability dependency graph nested inside its node and the SQL-compilable region highlighted. The editable renderer, full numerical inputs and page previews accompany the PDF.
+[Read the 28-page English slides](report/ttg-interability-performance.pdf). Page6 shows the requested A→B / A→C Jac Graph, with each ability dependency graph nested inside its node and one continuous SQL-compilable region crossing ability boundaries. The editable renderer, full numerical inputs and page previews accompany the PDF.
 
 This release implements compile-time composition of supported typed ability summaries, runtime selection/binding and validated native path-cache publication. A separate Stage2 improvement retries independent LittleX visit prefixes. The report explains both mechanisms, the existing admission model, the full 30-app + 61-operation research inventory, and sibling dependence of future access.
 
