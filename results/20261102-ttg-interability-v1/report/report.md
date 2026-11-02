@@ -55,6 +55,9 @@ Solid access dependencies compose; output-only state stays outside access select
 Origin and actor are ready at A entry. B.active is a node-local SQL input: it need not be known in Python
 before querying B. No output counter feeds the guard.
 
+## Jac Graph with nested ability dependencies and SQL region R1
+
+
 ## Move the supported guard inside SQL
 
 Move the supported guard inside SQL
