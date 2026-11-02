@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-littlex-freethreaded-20261102/comparison-v2/cases/littlex-thread-measured-2/artifacts.json",
+    "sha256": "51ff6fa5bea4eca0012f7ab944cecbd7f35b5f820633573d05ce43766a0c9c83",
+    "files_checked": 42
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_native_semantic_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-littlex-freethreaded-20261102/comparison-v2/cases/littlex-thread-measured-2/artifacts.json",
+      "sha256": "51ff6fa5bea4eca0012f7ab944cecbd7f35b5f820633573d05ce43766a0c9c83",
+      "files_checked": 42
+    },
+    "proof_sha256": "5e5738f5999cb900af50dfca01ea67277d366e85f037a2dacb32f2c2f6052543",
+    "actual_operations_checked": 15,
+    "final_logical_state_sha256": "cb8f3e913ad1875c23a4cf8abaa27ed4e409d5734acfc28b754e7abd59282056",
+    "verifier_sources": {
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/native.py": "f44bf3905bd248df2f7c2fe10db3c926a847d170c963e889bffac94d51435228",
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/datasets/ttg/build.py": "a617dd95626a60babcf56dc10fba0ed3dc4a5c24ceca3033fea0b97401c129b9"
+    },
+    "full_response": {
+      "full_actions_sha256": "6631c577db0bee4381fd1461d52b91cda06af4e1a97d82d61cf7bf723c6186c4",
+      "full_semantic_sha256": "34bd515ceccd842494e1795eb9e9410f4c72e4355fc02b51b28ce865bc136dc9"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-littlex-freethreaded-20261102/comparison-v2/cases/littlex-thread-measured-2/plus-proof.json",
+    "sha256": "5e5738f5999cb900af50dfca01ea67277d366e85f037a2dacb32f2c2f6052543"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-littlex-freethreaded-20261102/comparison-v2/cases/littlex-thread-measured-2/cleanup-target.json",
+    "sha256": "654540ec7f09824bb37a88c4f793ba974fab0c7e32945e636e0315c2a835d6f9"
+  },
+  "database_state": {
+    "database": "continuation_f889c47192ee48a5bd2a09eae16e3fd1",
+    "cluster_owner": "f575ec33-d7ff-4114-b4f6-82ea6eaf4f74",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "3694280291d62a57637a9b7e5d46b0ad4615753666680d94a7bc1e27c08c7e73",
+    "actual_row_count": 77,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('Profile','Tweet','Follow','Post')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-littlex-freethreaded-20261102/comparison-v2/sources.json",
+    "sha256": "967110644374bb8892aac41b90358e50916cb7eea7970c9aaac43bed8854c6f8"
+  }
+}

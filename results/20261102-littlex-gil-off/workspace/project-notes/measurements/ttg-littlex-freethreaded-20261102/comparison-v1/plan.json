@@ -1,0 +1,193 @@
+{
+  "kind": "littlex-gil-off-executors",
+  "runtime_commit": "5ce63eacde69f11817ed791b2d93544d7524be49",
+  "overlay": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-interability-performance-20261101/littlex-dag-repair-v4/runtime-overlay.json",
+    "sha256": "5ece232346dca44a050481597e8c46f5df692a0a0843010ec0ca2ad6e1d0b305"
+  },
+  "clean": {
+    "path": "/home/baichuan/jaseci/reproduction/ttg-interability-performance/runtime-clean-final-v1-manifest/manifest.json",
+    "sha256": "3bdbc5bb44134a2cfdb53469196e17e7c6adbffe659cc114d26ff30e7637fef0"
+  },
+  "sources": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-littlex-freethreaded-20261102/comparison-v1/sources.json",
+    "sha256": "2a9822798ec478d2bebae6ea43f7afcecd20b98f8ef37cb25bebeb1dee883508"
+  },
+  "interpreter": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-littlex-freethreaded-20261102/interpreter-assertions.json",
+    "sha256": "39b6a55484234c9675503a722bcc7cf859ebd03995e9f7e6596e556964ced291"
+  },
+  "schedule": [
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "off",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "guard": true,
+      "trial_id": "littlex-off-excluded_warmup--1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "thread",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "guard": true,
+      "trial_id": "littlex-thread-excluded_warmup--1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "process",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "guard": true,
+      "trial_id": "littlex-process-excluded_warmup--1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "littlex-off-measured-0"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "thread",
+      "phase": "measured",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "littlex-thread-measured-0"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "process",
+      "phase": "measured",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "littlex-process-measured-0"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "thread",
+      "phase": "measured",
+      "repeat": 1,
+      "guard": true,
+      "trial_id": "littlex-thread-measured-1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "process",
+      "phase": "measured",
+      "repeat": 1,
+      "guard": true,
+      "trial_id": "littlex-process-measured-1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 1,
+      "guard": true,
+      "trial_id": "littlex-off-measured-1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "process",
+      "phase": "measured",
+      "repeat": 2,
+      "guard": true,
+      "trial_id": "littlex-process-measured-2"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 2,
+      "guard": true,
+      "trial_id": "littlex-off-measured-2"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "thread",
+      "phase": "measured",
+      "repeat": 2,
+      "guard": true,
+      "trial_id": "littlex-thread-measured-2"
+    }
+  ],
+  "configs": {
+    "off": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "thread",
+      "ttg_prefetch_model": "always",
+      "prefetching": "none",
+      "ttg_fused_sql": false
+    },
+    "thread": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "thread",
+      "ttg_prefetch_model": "always",
+      "prefetching": "ttg_dependency",
+      "ttg_fused_sql": true
+    },
+    "process": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "process",
+      "ttg_prefetch_model": "always",
+      "prefetching": "ttg_dependency",
+      "ttg_fused_sql": true
+    }
+  },
+  "assertion": "GIL off at startup, every SQL boundary, native outcome/close and normal Python exit; actual worker thread/PID/backend required",
+  "storage": {
+    "startup": 268435456,
+    "between": 167772160,
+    "stop": 134217728
+  },
+  "note": "Same repaired code and free-threaded Python in all modes. Full correctness on every fresh workflow. All three excluded warmups must pass before measured trials. No historical timing reuse."
+}

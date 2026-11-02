@@ -1,0 +1,24 @@
+waiting for server to start.... done
+server started
+{"accepted": 1, "trial": "littlex-off-excluded_warmup--1", "gil": {"passed": true, "cell": "off", "processes": 3, "SQL_assertions": 634, "primary_background_SQL": 0, "parent_PIDs": [9791], "background_PIDs": [], "background_thread_ids": [], "background_native_thread_ids": [], "assertion": "Py_GIL_DISABLED == 1 and sys._is_gil_enabled() is False at every observed SQL boundary and native outcome/close"}}
+waiting for server to shut down.... done
+server stopped
+Traceback (most recent call last):
+  File "/home/baichuan/jaseci/reproduction/ttg-littlex-freethreaded/compare.py", line 76, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-littlex-freethreaded/compare.py", line 64, in main
+    trial.run(row,mode,directory,pg,Path(clean['path']),Path(overlay['path']),baseline)
+  File "/home/baichuan/jaseci/reproduction/ttg-littlex-freethreaded/ia_trial.py", line 81, in run
+    return self.w.trial(app,cell,directory,Proxy(),self.native,self.apps.evaluate,self.apps.readers,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-app-performance/workloads.py", line 365, in trial
+    postgres.drop_completed_database(database, directory / 'artifacts.json', server_stopped=server.process is None)
+  File "/home/baichuan/jaseci/reproduction/ttg-littlex-freethreaded/ia_trial.py", line 80, in drop_completed_database
+    trial.finalize(case,cell,directory,active['server'],pg,name,runtime_manifest,overlay_manifest,expected)
+  File "/home/baichuan/jaseci/reproduction/ttg-littlex-freethreaded/ia_trial.py", line 125, in finalize
+    verify_gil_case(directory,cell)
+  File "/home/baichuan/jaseci/reproduction/ttg-littlex-freethreaded/gil_audit.py", line 33, in verify_gil_case
+    assert bg, 'No actual background SQL was executed'
+           ^^
+AssertionError: No actual background SQL was executed
