@@ -1,0 +1,31 @@
+🛠  jac dev mode — using compiler source at /home/baichuan/jaseci/jac-ttg
+E                                                                        [100%]
+
+FAILED /home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-access-20261103/compiler-probe/constructor_v2.jac::constructor_v2.jac
+Traceback (most recent call last):
+  File "/home/baichuan/jaseci/jac-ttg/jac/jaclang/testing/impl/test_runner.impl.jac", line 752, in run_file
+    importlib.import_module(qualified);
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-littlex-freethreaded/python/cpython-3.14.6+freethreaded-linux-x86_64-gnu/lib/python3.14t/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1406, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "/home/baichuan/jaseci/jac-ttg/jac/jaclang/meta_importer.py", line 384, in exec_module
+    raise JacSourceCompileError(
+        f"{file_path} failed to compile:\n{details}", file_path
+    )
+jaclang.meta_importer.JacSourceCompileError: /home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-access-20261103/compiler-probe/constructor_v2.jac failed to compile:
+error[E1030]: Type "type[FolderTreeEntry]" has no attribute "__post_init__"
+  --> /home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-access-20261103/compiler-probe/constructor_v2.jac:12:363
+   10 |     for cls in [FolderTreeEntry, FolderTreeView] {
+   11 |         init = vars(cls)['__init__'];
+   12 |         rows.append({'name': cls.__name__, 'meta': str(type(cls)), 'get': str(cls.__getattribute__), 'set': str(cls.__setattr__), 'code': [(i.opname, str(i.argval)) for i in dis.get_instructions(init)], 'vars': list(vars(init)), 'mro': str(cls.__mro__), 'new_ok': cls.__new__ is object.__new__, 'set_ok': cls.__setattr__ is Archetype.__setattr__, 'post_ok': cls.__post_init__ is Archetype.__post_init__, 'check': _plain_init(cls, ['id', 'name', 'depth', 'path'] if cls is FolderTreeEntry else ['id', 'entries'])});
+      |                                                                                                                                                                                                                                                                                                                                                                           ^^^^^^^^^^^^^
+   13 |     }
+   14 |     Path('/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-access-20261103/constructors-v2.json').write_text(json.dumps(rows, indent=2));
+
+1 error in 2.00s
+✖ Error: Tests failed.

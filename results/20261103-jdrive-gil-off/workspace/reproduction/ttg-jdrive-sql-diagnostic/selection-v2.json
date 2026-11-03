@@ -1,0 +1,35 @@
+{
+  "purpose": "matched_jdrive_read_only_diagnostic",
+  "targets": [
+    {
+      "config_id": "thread",
+      "target_id": "thread-first-tree",
+      "request": "2:6",
+      "generation": "2",
+      "role": "foreground",
+      "fingerprint": "2dc5cdf0355a405a913c23cb0e1ba82e303c2288f1a4a0c1db4e5ab8be231eaf",
+      "sql": "WITH RECURSIVE \"_cte0\" (\"origin_id\") AS (SELECT * FROM (SELECT CAST($1 AS uuid) AS \"origin_id\") AS \"_recursive_anchor\" UNION SELECT \"_t11\".\"id\" AS \"origin_id\" FROM \"_cte0\" AS \"_t0\" INNER JOIN \"anchors\" AS \"_t9\" ON ((\"_t9\".\"kind\" = CAST($2 AS text)) AND ((\"_t9\".\"src\" = \"_t0\".\"origin_id\") OR (\"_t9\".\"undirected\" AND (\"_t9\".\"dst\" = \"_t0\".\"origin_id\"))) AND ((CAST($3 AS text) IS NULL) OR (\"_t9\".\"arch_type\" = CAST($3 AS text)) OR (\"_t9\".\"arch_type\" IN (SELECT \"_t10\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t10\" WHERE (\"_t10\".\"ancestor\" = CAST($3 AS text)))))) INNER JOIN \"anchors\" AS \"_t11\" ON ((\"_t11\".\"id\" = (CASE WHEN (\"_t9\".\"src\" = \"_t0\".\"origin_id\") THEN \"_t9\".\"dst\" ELSE \"_t9\".\"src\" END)) AND (\"_t11\".\"kind\" = CAST($4 AS text)) AND ((CAST($5 AS text) IS NULL) OR (\"_t11\".\"arch_type\" = CAST($5 AS text)) OR (\"_t11\".\"arch_type\" IN (SELECT \"_t12\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t12\" WHERE (\"_t12\".\"ancestor\" = CAST($5 AS text))))) AND ((\"_t11\".\"root_id\" = CAST($6 AS uuid)) OR (CAST(((\"_t11\".\"props\" -> CAST($7 AS text)) ->> CAST($8 AS text)) AS bigint) > CAST($9 AS bigint)) OR ((((\"_t11\".\"props\" -> CAST($7 AS text)) -> CAST($10 AS text)) -> CAST($11 AS text)) ? CAST($12 AS text)) OR EXISTS (SELECT CAST($13 AS bigint) AS \"one\" FROM \"anchors\" AS \"_t13\" WHERE ((\"_t13\".\"kind\" = CAST($14 AS text)) AND (\"_t13\".\"src\" = CAST($6 AS uuid)) AND ((((\"_t11\".\"props\" -> CAST($7 AS text)) -> CAST($15 AS text)) -> CAST($16 AS text)) ? CAST(\"_t13\".\"dst\" AS text)))))) WHERE ((\"_t11\".\"arch_type\" = CAST($17 AS text)) AND (\"_t11\".\"arch_module\" = CAST($18 AS text)) AND (jsonb_typeof(((\"_t11\".\"props\" -> CAST($19 AS text)) -> CAST($20 AS text))) = CAST($21 AS text)) AND (((\"_t11\".\"props\" -> CAST($19 AS text)) ->> CAST($22 AS text)) = CAST($23 AS text)))) SELECT * FROM (SELECT \"_t0\".\"origin_id\" AS \"origin_id\", \"_t2\".\"target_id\" AS \"target_id\", \"_t2\".\"edge_id\" AS \"edge_id\", \"_t2\".\"arch_type\" AS \"arch_type\", \"_t2\".\"arch_module\" AS \"arch_module\", \"_t2\".\"ord\" AS \"ord\", \"_t2\".\"arity\" AS \"arity\", \"_t1\".\"props\" AS \"source_props\", \"_t2\".\"target_props\" AS \"target_props\", \"_t1\".\"arch_type\" AS \"source_type\", \"_t1\".\"arch_module\" AS \"source_module\" FROM \"_cte0\" AS \"_t0\" INNER JOIN \"anchors\" AS \"_t1\" ON (\"_t1\".\"id\" = \"_t0\".\"origin_id\") LEFT JOIN LATERAL (SELECT \"_t5\".\"id\" AS \"target_id\", \"_t4\".\"id\" AS \"edge_id\", \"_t5\".\"arch_type\" AS \"arch_type\", \"_t5\".\"arch_module\" AS \"arch_module\", ROW_NUMBER() OVER (ORDER BY \"_t4\".\"seq\" ASC, \"_t4\".\"id\" ASC) AS \"ord\", COUNT(*) OVER () AS \"arity\", \"_t5\".\"props\" AS \"target_props\" FROM \"anchors\" AS \"_t4\" INNER JOIN \"anchors\" AS \"_t5\" ON ((\"_t5\".\"id\" = (CASE WHEN (\"_t4\".\"src\" = \"_t0\".\"origin_id\") THEN \"_t4\".\"dst\" ELSE \"_t4\".\"src\" END)) AND (\"_t5\".\"kind\" = CAST($24 AS text)) AND ((CAST($25 AS text) IS NULL) OR (\"_t5\".\"arch_type\" = CAST($25 AS text)) OR (\"_t5\".\"arch_type\" IN (SELECT \"_t6\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t6\" WHERE (\"_t6\".\"ancestor\" = CAST($25 AS text))))) AND ((\"_t5\".\"root_id\" = CAST($6 AS uuid)) OR (CAST(((\"_t5\".\"props\" -> CAST($26 AS text)) ->> CAST($27 AS text)) AS bigint) > CAST($28 AS bigint)) OR ((((\"_t5\".\"props\" -> CAST($26 AS text)) -> CAST($29 AS text)) -> CAST($30 AS text)) ? CAST($12 AS text)) OR EXISTS (SELECT CAST($31 AS bigint) AS \"one\" FROM \"anchors\" AS \"_t7\" WHERE ((\"_t7\".\"kind\" = CAST($32 AS text)) AND (\"_t7\".\"src\" = CAST($6 AS uuid)) AND ((((\"_t5\".\"props\" -> CAST($26 AS text)) -> CAST($33 AS text)) -> CAST($34 AS text)) ? CAST(\"_t7\".\"dst\" AS text)))))) WHERE ((\"_t4\".\"kind\" = CAST($35 AS text)) AND ((\"_t4\".\"src\" = \"_t0\".\"origin_id\") OR (\"_t4\".\"undirected\" AND (\"_t4\".\"dst\" = \"_t0\".\"origin_id\"))) AND ((CAST($36 AS text) IS NULL) OR (\"_t4\".\"arch_type\" = CAST($36 AS text)) OR (\"_t4\".\"arch_type\" IN (SELECT \"_t8\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t8\" WHERE (\"_t8\".\"ancestor\" = CAST($36 AS text))))))) AS \"_t2\" ON CAST($37 AS boolean)) AS \"_set\" (\"origin_id\", \"target_id\", \"edge_id\", \"arch_type\", \"arch_module\", \"ord\", \"arity\", \"source_props\", \"target_props\", \"source_type\", \"source_module\") ORDER BY \"origin_id\" ASC, \"ord\" ASC LIMIT CAST($38 AS bigint)",
+      "occurrence": 1,
+      "read_only_source_reviewed": true,
+      "returned_rows": 35,
+      "native_proof": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/comparison-access-v3/cases/jdrive-thread-measured-0/plus-proof.json",
+        "sha256": "411acb172c23967c78fafa60629b3447d37c2e49594c2a5447fc0a4c99067988"
+      },
+      "primary_raw": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/comparison-access-v3/cases/jdrive-thread-measured-0/artifacts.json",
+        "sha256": "cbdb92f6093d350084256b44e43a2161fab65ddaf2936f0b9246d8c31d0494aa"
+      }
+    }
+  ],
+  "context_refs": [
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/comparison-access-v3/results.json",
+      "sha256": "2ac381fd5e8f03ac500a3bcf7a4241af9b15a24b6b45c437acef4296b7472a44"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/comparison-access-v3/plan.json",
+      "sha256": "b799742194fc5b93403f4723356f1e598891973e6d870d15b17cbf2fb0dc348f"
+    }
+  ]
+}

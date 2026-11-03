@@ -1,0 +1,143 @@
+{
+  "kind": "jdrive-access-tree-gil-off-off-thread",
+  "source_verification": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-access-20261103/verification-sql-v2.json",
+    "sha256": "54f1a75a6571121ef2a70f7c9922ce5106979a7131b3639f268b873954966097"
+  },
+  "runtime_commit": "5ce63eacde69f11817ed791b2d93544d7524be49",
+  "overlay": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-access-20261103/runtime-overlay-v2.json",
+    "sha256": "85fa4ea1ef5ab06e167ea4724658cd5269c847639f88f50f045982e483635f69"
+  },
+  "clean": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-access-20261103/runtime-clean-v2.json",
+    "sha256": "3eaae93505bd3917110c309951150c3a0f76264e131b64b73d475555a80e407e"
+  },
+  "sources": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/comparison-access-v3/sources.json",
+    "sha256": "c7ff11943cc58961ef2e306934ee3c7b8de13f3cd28cf8cdfd49e09dffbd90b2"
+  },
+  "interpreter": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-littlex-freethreaded-20261102/interpreter-assertions.json",
+    "sha256": "39b6a55484234c9675503a722bcc7cf859ebd03995e9f7e6596e556964ced291"
+  },
+  "schedule": [
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "off",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "guard": true,
+      "trial_id": "jdrive-off-excluded_warmup--1"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "thread",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "guard": true,
+      "trial_id": "jdrive-thread-excluded_warmup--1"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "jdrive-off-measured-0"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "thread",
+      "phase": "measured",
+      "repeat": 0,
+      "guard": true,
+      "trial_id": "jdrive-thread-measured-0"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "thread",
+      "phase": "measured",
+      "repeat": 1,
+      "guard": true,
+      "trial_id": "jdrive-thread-measured-1"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 1,
+      "guard": true,
+      "trial_id": "jdrive-off-measured-1"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "off",
+      "phase": "measured",
+      "repeat": 2,
+      "guard": true,
+      "trial_id": "jdrive-off-measured-2"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "smoke",
+      "length": null,
+      "config_id": "thread",
+      "phase": "measured",
+      "repeat": 2,
+      "guard": true,
+      "trial_id": "jdrive-thread-measured-2"
+    }
+  ],
+  "configs": {
+    "off": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "thread",
+      "ttg_prefetch_model": "always",
+      "prefetching": "none",
+      "ttg_fused_sql": false
+    },
+    "thread": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "thread",
+      "ttg_prefetch_model": "always",
+      "prefetching": "ttg_dependency",
+      "ttg_fused_sql": true
+    }
+  },
+  "assertion": "GIL off at startup, every SQL boundary, native outcome/close and normal Python exit; actual worker thread/PID/backend required if background SQL occurs; inactive prefetch explicitly labelled",
+  "storage": {
+    "startup": 805306368,
+    "between": 671088640,
+    "stop": 536870912
+  },
+  "note": "Unchanged original JDrive smoke depth3: 40 folders,13 files,1 drive. Same repaired runtime and GIL-off Python; off/thread only. Full semantics/restart/physical checks each workflow; both excluded warmups must pass before measured trials. Output-tree activation and strict total SQL reduction required after the two excluded warmups; same original graph/actions/oracles and explicit ANALYZE regime."
+}

@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "/home/baichuan/jaseci/reproduction/ttg-jdrive-freethreaded/compare_access_v1.py", line 87, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-jdrive-freethreaded/compare_access_v1.py", line 39, in main
+    source=reference(output/'sources.json');guard=Sources(source)
+                                                  ^^^^^^^^^^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-jdrive-freethreaded/ia_runner.py", line 35, in __init__
+    self.verify_hashes()
+  File "/home/baichuan/jaseci/reproduction/ttg-jdrive-freethreaded/ia_runner.py", line 43, in verify_hashes
+    require(hashlib.sha256(Path(name).read_bytes()).hexdigest()==wanted,'Source hash changed: '+name)
+  File "/home/baichuan/jaseci/reproduction/ttg-plus-performance/interop.py", line 15, in require
+    if not value:raise ValueError(message)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Source hash changed: /home/baichuan/jaseci/jac-ttg/jac/jaclang/runtime/ttg_regions.jac

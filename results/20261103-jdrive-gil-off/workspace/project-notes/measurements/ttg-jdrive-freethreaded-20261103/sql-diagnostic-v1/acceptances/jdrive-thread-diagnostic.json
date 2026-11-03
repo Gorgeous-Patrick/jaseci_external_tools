@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/sql-diagnostic-v1/cases/jdrive-thread-diagnostic/artifacts.json",
+    "sha256": "5b7acac53287d6e24a1091c0aa6073558d19a2db9116ad45723bebc5cdc9982d",
+    "files_checked": 58
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_native_semantic_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/sql-diagnostic-v1/cases/jdrive-thread-diagnostic/artifacts.json",
+      "sha256": "5b7acac53287d6e24a1091c0aa6073558d19a2db9116ad45723bebc5cdc9982d",
+      "files_checked": 58
+    },
+    "proof_sha256": "24ca576e042b5045586c91974e8af0da7889fc79c29fceaecbbb552b10fd6c6c",
+    "actual_operations_checked": 13,
+    "final_logical_state_sha256": "ce3cdd5e022f2fc863e9afbd5e9acd5066e2f1e6af73a9d9fa320d872621dfb7",
+    "verifier_sources": {
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/native.py": "f44bf3905bd248df2f7c2fe10db3c926a847d170c963e889bffac94d51435228",
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/datasets/ttg/build.py": "a617dd95626a60babcf56dc10fba0ed3dc4a5c24ceca3033fea0b97401c129b9"
+    },
+    "full_response": {
+      "full_actions_sha256": "9c1d29081f9f73172f52138edbab407badedcbbef1f4ff20f126727835ca1915",
+      "full_semantic_sha256": "e501e4071b0ed094bfa9a0176138c7c64814995406dcc7a7435a2ba7db229b0c"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/sql-diagnostic-v1/cases/jdrive-thread-diagnostic/plus-proof.json",
+    "sha256": "24ca576e042b5045586c91974e8af0da7889fc79c29fceaecbbb552b10fd6c6c"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/sql-diagnostic-v1/cases/jdrive-thread-diagnostic/cleanup-target.json",
+    "sha256": "6518f560dfa51482030b4341b2001b8517d03683a30fc71a0dcbdf1d48baed77"
+  },
+  "database_state": {
+    "database": "continuation_7a396cf2ba694a2cad7e318196b5fe08",
+    "cluster_owner": "1ab88d20-0ef8-4e3a-87c0-28f1c8baec78",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "f3b1995ec4e464da54595866a7c99f098a8956e865cdc3a83b8a1b96fcf63bcd",
+    "actual_row_count": 110,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('Drive','Folder','File','Contains')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/sql-diagnostic-v1/sources.json",
+    "sha256": "eb2cb1f32b82216c5fc360a140713adfcf47c1fc18f7c320814d9073d6461461"
+  }
+}

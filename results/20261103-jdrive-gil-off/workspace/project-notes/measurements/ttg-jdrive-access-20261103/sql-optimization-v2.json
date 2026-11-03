@@ -1,0 +1,2590 @@
+{
+  "passed": true,
+  "change": "Compile output-tree recursion as direct worktable -> edge -> target joins; apply exact bool/dispatch predicates to that same target. Return target properties from the final path join instead of a second anchors join. Native order, ACL, cycle/overflow/malformed fallback and atomic cache contract unchanged.",
+  "source_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-access-20261103/verification-sql-v2.json",
+    "sha256": "54f1a75a6571121ef2a70f7c9922ce5106979a7131b3639f268b873954966097"
+  },
+  "source": {
+    "path": "/home/baichuan/jaseci/jac-ttg/jac/jaclang/runtime/ttg_output_tree.py",
+    "sha256": "7f4b1ad3cf090f1378569087df786d335aef821e50d3f4d495f1dc37530ca202"
+  },
+  "diagnostics": [
+    {
+      "version": 1,
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/sql-diagnostic-v1/cases/jdrive-thread-diagnostic/captures/thread-first-tree-pid3220160.json",
+        "sha256": "d98f1e3f0f88696a1b91297cb44824840b58a1fea72f669668e55d8fc42a52d8"
+      },
+      "result": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/sql-diagnostic-v1/result.json",
+        "sha256": "299b9789d54e2446a9de81e04afee592f63ec50b3aeebb78cced807c85e8011d"
+      },
+      "lifecycle": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/sql-diagnostic-v1/lifecycle.json",
+        "sha256": "43336d8a70c3d6fe00490599e99c671501af2aee282d76fc4a34e6bc1689a482"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/sql-diagnostic-v1/cases/jdrive-thread-diagnostic/diagnostic-acceptance.json",
+        "sha256": "fb1d6e0299ae46d6e8e5964421914459d7d46a4efacff4791013011a81f4f8be"
+      },
+      "plans": [
+        {
+          "planning_ms": 1.027,
+          "execution_ms": 13.938,
+          "root_shared_hits": 9554,
+          "root_shared_reads": 0,
+          "JIT": null,
+          "nodes": [
+            {
+              "path": "Plan",
+              "node_type": "Limit",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 35.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 9554,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0",
+              "node_type": "Recursive Union",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 19.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 9321,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/0",
+              "node_type": "Result",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1",
+              "node_type": "Nested Loop",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 4.5,
+              "actual_loops": 4,
+              "buffers": {
+                "Shared Hit Blocks": 9321,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 43.0,
+              "actual_loops": 4,
+              "buffers": {
+                "Shared Hit Blocks": 32,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1",
+              "node_type": "Nested Loop",
+              "estimated_rows": 10,
+              "actual_rows_per_loop": 6.0,
+              "actual_loops": 172,
+              "buffers": {
+                "Shared Hit Blocks": 9289,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+              "node_type": "WorkTable Scan",
+              "estimated_rows": 10,
+              "actual_rows_per_loop": 4.75,
+              "actual_loops": 172,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/1",
+              "node_type": "Subquery Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 817,
+              "buffers": {
+                "Shared Hit Blocks": 9289,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/1/Plans/0",
+              "node_type": "Nested Loop",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 817,
+              "buffers": {
+                "Shared Hit Blocks": 9289,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/1/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.68,
+              "actual_loops": 817,
+              "buffers": {
+                "Shared Hit Blocks": 6536,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/1/Plans/0/Plans/1",
+              "node_type": "Index Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0.75,
+              "actual_loops": 1376,
+              "buffers": {
+                "Shared Hit Blocks": 2753,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/1/Plans/0/Plans/1/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 1,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/1/Plans/0/Plans/1/Plans/1",
+              "node_type": "Index Only Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1",
+              "node_type": "Sort",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 35.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 9554,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0",
+              "node_type": "Hash Join",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 35.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 9554,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0",
+              "node_type": "Nested Loop",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 35.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 9546,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/0",
+              "node_type": "Hash Join",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 19.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 9329,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 113,
+              "actual_rows_per_loop": 113.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 8,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+              "node_type": "Hash",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 19.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 9321,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "node_type": "CTE Scan",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 19.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 9321,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1",
+              "node_type": "WindowAgg",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 217,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0",
+              "node_type": "WindowAgg",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 217,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0",
+              "node_type": "Sort",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 217,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+              "node_type": "Nested Loop",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 217,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.68,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 152,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+              "node_type": "Index Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0.75,
+              "actual_loops": 32,
+              "buffers": {
+                "Shared Hit Blocks": 65,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 1,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+              "node_type": "Index Only Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1",
+              "node_type": "Hash",
+              "estimated_rows": 113,
+              "actual_rows_per_loop": 113.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 8,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 113,
+              "actual_rows_per_loop": 113.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 8,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            }
+          ]
+        },
+        {
+          "planning_ms": 0.828,
+          "execution_ms": 13.374,
+          "root_shared_hits": 9554,
+          "root_shared_reads": 0,
+          "JIT": null,
+          "nodes": [
+            {
+              "path": "Plan",
+              "node_type": "Limit",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 35.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 9554,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0",
+              "node_type": "Recursive Union",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 19.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 9321,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/0",
+              "node_type": "Result",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1",
+              "node_type": "Nested Loop",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 4.5,
+              "actual_loops": 4,
+              "buffers": {
+                "Shared Hit Blocks": 9321,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 43.0,
+              "actual_loops": 4,
+              "buffers": {
+                "Shared Hit Blocks": 32,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1",
+              "node_type": "Nested Loop",
+              "estimated_rows": 10,
+              "actual_rows_per_loop": 6.0,
+              "actual_loops": 172,
+              "buffers": {
+                "Shared Hit Blocks": 9289,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+              "node_type": "WorkTable Scan",
+              "estimated_rows": 10,
+              "actual_rows_per_loop": 4.75,
+              "actual_loops": 172,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/1",
+              "node_type": "Subquery Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 817,
+              "buffers": {
+                "Shared Hit Blocks": 9289,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/1/Plans/0",
+              "node_type": "Nested Loop",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 817,
+              "buffers": {
+                "Shared Hit Blocks": 9289,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/1/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.68,
+              "actual_loops": 817,
+              "buffers": {
+                "Shared Hit Blocks": 6536,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/1/Plans/0/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/1/Plans/0/Plans/1",
+              "node_type": "Index Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0.75,
+              "actual_loops": 1376,
+              "buffers": {
+                "Shared Hit Blocks": 2753,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/1/Plans/0/Plans/1/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 1,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/1/Plans/0/Plans/1/Plans/1",
+              "node_type": "Index Only Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1",
+              "node_type": "Sort",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 35.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 9554,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0",
+              "node_type": "Hash Join",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 35.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 9554,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0",
+              "node_type": "Nested Loop",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 35.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 9546,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/0",
+              "node_type": "Hash Join",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 19.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 9329,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 113,
+              "actual_rows_per_loop": 113.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 8,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+              "node_type": "Hash",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 19.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 9321,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "node_type": "CTE Scan",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 19.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 9321,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1",
+              "node_type": "WindowAgg",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 217,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0",
+              "node_type": "WindowAgg",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 217,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0",
+              "node_type": "Sort",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 217,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+              "node_type": "Nested Loop",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 217,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.68,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 152,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+              "node_type": "Index Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0.75,
+              "actual_loops": 32,
+              "buffers": {
+                "Shared Hit Blocks": 65,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 1,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+              "node_type": "Index Only Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1",
+              "node_type": "Hash",
+              "estimated_rows": 113,
+              "actual_rows_per_loop": 113.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 8,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 113,
+              "actual_rows_per_loop": 113.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 8,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": 2,
+      "capture": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/sql-diagnostic-v2/cases/jdrive-thread-diagnostic/captures/thread-first-tree-pid3245993.json",
+        "sha256": "276d75165b84c90177d71dce6a12156d95eba0e1b0e220e2569cc150511a15c6"
+      },
+      "result": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/sql-diagnostic-v2/result.json",
+        "sha256": "c4cc5d7a0ec71c55aa5665006407cc3e68da22d8ca49c49f6aa26bb8cae0581b"
+      },
+      "lifecycle": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/sql-diagnostic-v2/lifecycle.json",
+        "sha256": "da4d628d5a432e09617afba92ff60459acbe63e11c5d18faafee71ad739e9b1e"
+      },
+      "acceptance": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/sql-diagnostic-v2/cases/jdrive-thread-diagnostic/diagnostic-acceptance.json",
+        "sha256": "e9fa873358cebdad618ba008c526dbb788c8400e3c8e4ad92d115c8359155adb"
+      },
+      "plans": [
+        {
+          "planning_ms": 0.785,
+          "execution_ms": 0.784,
+          "root_shared_hits": 297,
+          "root_shared_reads": 0,
+          "JIT": null,
+          "nodes": [
+            {
+              "path": "Plan",
+              "node_type": "Limit",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 35.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 297,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0",
+              "node_type": "Recursive Union",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 19.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 72,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/0",
+              "node_type": "Result",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1",
+              "node_type": "Nested Loop",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 4.5,
+              "actual_loops": 4,
+              "buffers": {
+                "Shared Hit Blocks": 72,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/0",
+              "node_type": "Nested Loop",
+              "estimated_rows": 13,
+              "actual_rows_per_loop": 8.0,
+              "actual_loops": 4,
+              "buffers": {
+                "Shared Hit Blocks": 8,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/0/Plans/0",
+              "node_type": "WorkTable Scan",
+              "estimated_rows": 10,
+              "actual_rows_per_loop": 4.75,
+              "actual_loops": 4,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/0/Plans/1",
+              "node_type": "Materialize",
+              "estimated_rows": 40,
+              "actual_rows_per_loop": 54.0,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 8,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/0/Plans/1/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 40,
+              "actual_rows_per_loop": 54.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 8,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1",
+              "node_type": "Memoize",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0.56,
+              "actual_loops": 32,
+              "buffers": {
+                "Shared Hit Blocks": 64,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+              "node_type": "Index Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0.56,
+              "actual_loops": 32,
+              "buffers": {
+                "Shared Hit Blocks": 64,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/1",
+              "node_type": "Index Only Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1",
+              "node_type": "Sort",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 35.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 297,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0",
+              "node_type": "Nested Loop",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 35.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 297,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0",
+              "node_type": "Hash Join",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 19.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 80,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 113,
+              "actual_rows_per_loop": 113.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 8,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1",
+              "node_type": "Hash",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 19.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 72,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0",
+              "node_type": "CTE Scan",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 19.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 72,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1",
+              "node_type": "WindowAgg",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 217,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+              "node_type": "WindowAgg",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 217,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+              "node_type": "Sort",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 217,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+              "node_type": "Nested Loop",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 217,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.68,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 152,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+              "node_type": "Index Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0.75,
+              "actual_loops": 32,
+              "buffers": {
+                "Shared Hit Blocks": 65,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 1,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+              "node_type": "Index Only Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            }
+          ]
+        },
+        {
+          "planning_ms": 0.656,
+          "execution_ms": 0.666,
+          "root_shared_hits": 297,
+          "root_shared_reads": 0,
+          "JIT": null,
+          "nodes": [
+            {
+              "path": "Plan",
+              "node_type": "Limit",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 35.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 297,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0",
+              "node_type": "Recursive Union",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 19.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 72,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/0",
+              "node_type": "Result",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1",
+              "node_type": "Nested Loop",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 4.5,
+              "actual_loops": 4,
+              "buffers": {
+                "Shared Hit Blocks": 72,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/0",
+              "node_type": "Nested Loop",
+              "estimated_rows": 13,
+              "actual_rows_per_loop": 8.0,
+              "actual_loops": 4,
+              "buffers": {
+                "Shared Hit Blocks": 8,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/0/Plans/0",
+              "node_type": "WorkTable Scan",
+              "estimated_rows": 10,
+              "actual_rows_per_loop": 4.75,
+              "actual_loops": 4,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/0/Plans/1",
+              "node_type": "Materialize",
+              "estimated_rows": 40,
+              "actual_rows_per_loop": 54.0,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 8,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/0/Plans/1/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 40,
+              "actual_rows_per_loop": 54.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 8,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1",
+              "node_type": "Memoize",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0.56,
+              "actual_loops": 32,
+              "buffers": {
+                "Shared Hit Blocks": 64,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0",
+              "node_type": "Index Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0.56,
+              "actual_loops": 32,
+              "buffers": {
+                "Shared Hit Blocks": 64,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/0/Plans/1/Plans/1/Plans/0/Plans/1",
+              "node_type": "Index Only Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1",
+              "node_type": "Sort",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 35.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 297,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0",
+              "node_type": "Nested Loop",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 35.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 297,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0",
+              "node_type": "Hash Join",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 19.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 80,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 113,
+              "actual_rows_per_loop": 113.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 8,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1",
+              "node_type": "Hash",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 19.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 72,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/0/Plans/1/Plans/0",
+              "node_type": "CTE Scan",
+              "estimated_rows": 11,
+              "actual_rows_per_loop": 19.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 72,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1",
+              "node_type": "WindowAgg",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 217,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0",
+              "node_type": "WindowAgg",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 217,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0",
+              "node_type": "Sort",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 217,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0",
+              "node_type": "Nested Loop",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.26,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 217,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.68,
+              "actual_loops": 19,
+              "buffers": {
+                "Shared Hit Blocks": 152,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/0/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1",
+              "node_type": "Index Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0.75,
+              "actual_loops": 32,
+              "buffers": {
+                "Shared Hit Blocks": 65,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/0",
+              "node_type": "Seq Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 1.0,
+              "actual_loops": 1,
+              "buffers": {
+                "Shared Hit Blocks": 1,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            },
+            {
+              "path": "Plan/Plans/1/Plans/0/Plans/1/Plans/0/Plans/0/Plans/0/Plans/1/Plans/1",
+              "node_type": "Index Only Scan",
+              "estimated_rows": 1,
+              "actual_rows_per_loop": 0,
+              "actual_loops": 0,
+              "buffers": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "diagnostic_PIDs_dead": [
+    3215413,
+    3215706,
+    3219648,
+    3219812,
+    3219991,
+    3220160,
+    3220347,
+    3242213,
+    3242533,
+    3245993,
+    3246168
+  ],
+  "mechanism": "Old plan scanned 43 eligible targets outside a correlated path, producing 817 path scans for 19 origins. New recursive step materializes 54 candidate edges once and joins endpoints using primary-key lookups (32 loops); 19 final path assemblies remain for ordered cache records.",
+  "primary_results": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/comparison-access-v3/results.json",
+    "sha256": "2ac381fd5e8f03ac500a3bcf7a4241af9b15a24b6b45c437acef4296b7472a44"
+  },
+  "primary_analysis": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/comparison-access-v3/analysis.json",
+    "sha256": "153f1d2b10492d524d07abdc7fdcc90ee61aea0acdd23250c822cbca569c9939"
+  },
+  "primary_lifecycle": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-freethreaded-20261103/comparison-access-v3/lifecycle.json",
+    "sha256": "6106aafc8ffc86a94df962095fe7c5f0957a0b68370db44c36ccc81b99c05546"
+  },
+  "primary_groups": {
+    "off": {
+      "SQL": {
+        "n": 3,
+        "median": 156,
+        "min": 156,
+        "max": 156,
+        "values": [
+          156,
+          156,
+          156
+        ]
+      },
+      "DB_sum_ms": {
+        "n": 3,
+        "median": 55.448432,
+        "min": 52.782231,
+        "max": 71.256402,
+        "values": [
+          52.782231,
+          71.256402,
+          55.448432
+        ]
+      },
+      "DB_union_ms": {
+        "n": 3,
+        "median": 55.448432,
+        "min": 52.782231,
+        "max": 71.256402,
+        "values": [
+          52.782231,
+          71.256402,
+          55.448432
+        ]
+      },
+      "HTTP_sum_ms": {
+        "n": 3,
+        "median": 113.204464,
+        "min": 107.792362,
+        "max": 148.395369,
+        "values": [
+          107.792362,
+          148.395369,
+          113.204464
+        ]
+      },
+      "FG_BG_overlap_ms": {
+        "n": 3,
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "background_SQL": {
+        "n": 3,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "data_SQL": {
+        "n": 3,
+        "median": 107,
+        "min": 107,
+        "max": 107,
+        "values": [
+          107,
+          107,
+          107
+        ]
+      },
+      "control_SQL": {
+        "n": 3,
+        "median": 49,
+        "min": 49,
+        "max": 49,
+        "values": [
+          49,
+          49,
+          49
+        ]
+      }
+    },
+    "thread": {
+      "SQL": {
+        "n": 3,
+        "median": 105,
+        "min": 105,
+        "max": 105,
+        "values": [
+          105,
+          105,
+          105
+        ]
+      },
+      "DB_sum_ms": {
+        "n": 3,
+        "median": 32.622818,
+        "min": 31.692981,
+        "max": 39.209667,
+        "values": [
+          31.692981,
+          39.209667,
+          32.622818
+        ]
+      },
+      "DB_union_ms": {
+        "n": 3,
+        "median": 32.622818,
+        "min": 31.692981,
+        "max": 39.209667,
+        "values": [
+          31.692981,
+          39.209667,
+          32.622818
+        ]
+      },
+      "HTTP_sum_ms": {
+        "n": 3,
+        "median": 109.950906,
+        "min": 103.287932,
+        "max": 123.512586,
+        "values": [
+          109.950906,
+          123.512586,
+          103.287932
+        ]
+      },
+      "FG_BG_overlap_ms": {
+        "n": 3,
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "background_SQL": {
+        "n": 3,
+        "median": 6,
+        "min": 6,
+        "max": 6,
+        "values": [
+          6,
+          6,
+          6
+        ]
+      },
+      "data_SQL": {
+        "n": 3,
+        "median": 53,
+        "min": 53,
+        "max": 53,
+        "values": [
+          53,
+          53,
+          53
+        ]
+      },
+      "control_SQL": {
+        "n": 3,
+        "median": 52,
+        "min": 52,
+        "max": 52,
+        "values": [
+          52,
+          52,
+          52
+        ]
+      }
+    }
+  },
+  "limits": [
+    "Server EXPLAIN times are matched recaptures after census and explicit ANALYZE, not primary HTTP samples.",
+    "Primary n3 per mode, one excluded warmup; unchanged small JDrive 40 folders/13 files/7 requests.",
+    "DB median reduced 41.2%; summed HTTP response median reduced only 2.9%, overlapping ranges. No broad end-to-end speedup claim.",
+    "No observed foreground/background SQL overlap. No CPU or residual wall-time causal attribution."
+  ],
+  "generator": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-jdrive-access-20261103/summarize_sql_optimization_v2.py",
+    "sha256": "34babbe53669c65f798c4522c76b88d341e1438b37616547ea483faa2a8610ef"
+  }
+}
