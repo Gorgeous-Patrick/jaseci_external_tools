@@ -1,0 +1,386 @@
+{
+  "scope": "domain-b: 13 of registry30, one registered read_walker per app; all source bodies and relevant local helpers read, no execution.",
+  "registry": {
+    "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/registry.json",
+    "sha256": "3585ed5b7102c2908f622747f9361bc13c8b7cac4457cf647086c4d24922e4e9"
+  },
+  "assumptions": [
+    "Closed-world declared ordinary Jac node/walker fields, standard graph reads/jid and builtin collection/arithmetic behavior; stable graph during the read walker; no hidden node entry hooks in these sources.",
+    "Prove absence of cross-activation access dependence, not commutative output or safe reordering of reports. Preserve visit order, duplicates and output order.",
+    "Successful defined operations on valid typed graph values. Missing mandatory [0] targets can raise; exception/global-abort behavior is not silently modeled as output-only.",
+    "Framework/database/authentication effects and undeclared external hooks require summaries; without these assumptions the broad operational proof remains unknown. No automatic analyzer was implemented."
+  ],
+  "categories": {
+    "registered_readers": {
+      "no_access_dependence_provable_with_stated_summaries": 13,
+      "requires_semantic_program_simplification": 0,
+      "unknown_under_stated_summaries": 0
+    },
+    "literal_access_affecting_helpers": [
+      "knowledge_map.ExploreLinks",
+      "incident_room.ImpactTrace"
+    ]
+  },
+  "rows": [
+    {
+      "app": "grant_review",
+      "registered_read_walker": "ReviewBoard",
+      "source": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/grant_review/server.jac",
+        "sha256": "ab80f550c5aca95f704969e8786b7f24aafbda3313b8296191d4fee8370b7dc8"
+      },
+      "reader_lines": [
+        43,
+        97
+      ],
+      "classification": "NO_ACCESS_DEPENDENCE_PROVABLE_UNDER_CLOSED_WORLD_SUMMARIES",
+      "output_state": "proposals/reviewers",
+      "reason": "Root visits Proposal and Reviewer (48\u201349); proposal locals total/count/assignments are reinitialized per activation; queries64\u201368 depend on here/a only.",
+      "simplification": "No semantic program simplification required; separate output accumulation from access effects, summarize builtins and nested read comprehensions. Current analyzer support is not asserted.",
+      "additional_walkers": [
+        {
+          "walkers": "AssignReviewer / SubmitReview / ReleaseProposal",
+          "lines": [
+            99,
+            180
+          ],
+          "witness_or_reason": "Assign assignment then submit it: a.submitted False\u2192True (152) changes all(a.submitted) at170. Release guards later assignment/review. Separate Root-only invocations; no sibling visit."
+        }
+      ]
+    },
+    {
+      "app": "lab_samples",
+      "registered_read_walker": "LabBoard",
+      "source": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/lab_samples/server.jac",
+        "sha256": "9286732bdb1bcec1c46baf01ecfa7fa5e44bffa16236297d1a7e3f1092b9fc7f"
+      },
+      "reader_lines": [
+        56,
+        118
+      ],
+      "classification": "NO_ACCESS_DEPENDENCE_PROVABLE_UNDER_CLOSED_WORLD_SUMMARIES",
+      "output_state": "samples/batches/assays",
+      "reason": "Visits62\u201364; nested aliquot/results reads73\u201386 and batch reads97 do not inspect accumulated lists.",
+      "simplification": "No semantic program simplification required; separate output accumulation from access effects, summarize builtins and nested read comprehensions. Current analyzer support is not asserted.",
+      "additional_walkers": [
+        {
+          "walkers": "SplitSample / RecordResult / ReleaseBatch",
+          "lines": [
+            120,
+            245
+          ],
+          "witness_or_reason": "Split decrements remaining141 so a second requested split can fail131; passing Result causes later RecordResult return199\u2013205. ReleaseBatch loops232\u2013240 return on first failed aliquot, suppressing later procedural reads; not sibling traversal."
+        }
+      ]
+    },
+    {
+      "app": "asset_care",
+      "registered_read_walker": "AssetBoard",
+      "source": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/asset_care/server.jac",
+        "sha256": "39796037a1b6a61d8b36fd0b2a17409444114c6d8e19b75337b72b547be8b09e"
+      },
+      "reader_lines": [
+        54,
+        110
+      ],
+      "classification": "NO_ACCESS_DEPENDENCE_PROVABLE_UNDER_CLOSED_WORLD_SUMMARIES",
+      "output_state": "assets/technicians/parts",
+      "reason": "Visits60\u201362; nested inspections/orders/uses70\u201385 are rooted at here/o/u, not self output.",
+      "simplification": "No semantic program simplification required; separate output accumulation from access effects, summarize builtins and nested read comprehensions. Current analyzer support is not asserted.",
+      "additional_walkers": [
+        {
+          "walkers": "ConsumePart / OpenWorkOrder / FinishWorkOrder",
+          "lines": [
+            140,
+            219
+          ],
+          "witness_or_reason": "stock=1, consume1 at194 then another consume1 fails187. Order/asset status controls later commands; all single Root entry, no visit."
+        }
+      ]
+    },
+    {
+      "app": "utility_meter",
+      "registered_read_walker": "MeterBoard",
+      "source": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/utility_meter/server.jac",
+        "sha256": "666633bf03bf7cbb3191000997fa79718418812382b2c5f39b7ac64aa8f1507d"
+      },
+      "reader_lines": [
+        51,
+        81
+      ],
+      "classification": "NO_ACCESS_DEPENDENCE_PROVABLE_UNDER_CLOSED_WORLD_SUMMARIES",
+      "output_state": "buildings/meters",
+      "reason": "Building append59 precedes HasMeter visit60, but the visit never reads buildings; meter queries69/73 are here-relative.",
+      "simplification": "No semantic program simplification required; separate output accumulation from access effects, summarize builtins and nested read comprehensions. Current analyzer support is not asserted.",
+      "additional_walkers": [
+        {
+          "walkers": "BillMeter / CorrectReading / AddReading",
+          "lines": [
+            83,
+            155
+          ],
+          "witness_or_reason": "BillMeter creates EndReading152; CorrectReading then returns on119 and BillMeter on143 before later tariff accesses147\u2013148. This is persistent-state/cross-command dependence, no sibling visit."
+        }
+      ]
+    },
+    {
+      "app": "volunteer_shift",
+      "registered_read_walker": "VolunteerBoard",
+      "source": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/volunteer_shift/server.jac",
+        "sha256": "a3c4c4b9980d257c0f63788371bd8f4ee3de302e9ac7f89f5cd990821162c89b"
+      },
+      "reader_lines": [
+        58,
+        104
+      ],
+      "classification": "NO_ACCESS_DEPENDENCE_PROVABLE_UNDER_CLOSED_WORLD_SUMMARIES",
+      "output_state": "organizations/volunteers/shifts",
+      "reason": "Organization appends67 then unconditional visits68\u201369; child queries76/92/91 never read self lists.",
+      "simplification": "No semantic program simplification required; separate output accumulation from access effects, summarize builtins and nested read comprehensions. Current analyzer support is not asserted.",
+      "additional_walkers": [
+        {
+          "walkers": "JoinShift / CancelSignup",
+          "lines": [
+            106,
+            183
+          ],
+          "witness_or_reason": "capacity1: first signup confirmed, second waitlisted139\u2013149. Cancel changes another signup status179 selected by sorted waiting172\u2013177. DB/ordinary-list order dependence, not sibling visit."
+        }
+      ]
+    },
+    {
+      "app": "poll_assembly",
+      "registered_read_walker": "AssemblyBoard",
+      "source": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/poll_assembly/server.jac",
+        "sha256": "0243c944d1a2ad3681619df881ee250dead5c8a556d763992e472155996d4389"
+      },
+      "reader_lines": [
+        54,
+        107
+      ],
+      "classification": "NO_ACCESS_DEPENDENCE_PROVABLE_UNDER_CLOSED_WORLD_SUMMARIES",
+      "output_state": "assemblies/voters/motions",
+      "reason": "Visits66\u201367 do not consume assemblies63; ballots local75 determines only this motion\u2019s output and option reads83\u201395.",
+      "simplification": "No semantic program simplification required; separate output accumulation from access effects, summarize builtins and nested read comprehensions. Current analyzer support is not asserted.",
+      "additional_walkers": [
+        {
+          "walkers": "CastBallot / CloseMotion",
+          "lines": [
+            109,
+            183
+          ],
+          "witness_or_reason": "Casting same voter twice chooses existing ballot139 and deletes prior OptionRef141\u2013143 rather than creating145; closing writes status180 which blocks later votes124. Single Root abilities, no visits."
+        }
+      ]
+    },
+    {
+      "app": "budget_ledger",
+      "registered_read_walker": "BudgetBoard",
+      "source": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/budget_ledger/server.jac",
+        "sha256": "51699e86f1e07e7db56240ce82b6507e0418fbdb640469f7e35295a79aa75227"
+      },
+      "reader_lines": [
+        58,
+        107
+      ],
+      "classification": "NO_ACCESS_DEPENDENCE_PROVABLE_UNDER_CLOSED_WORLD_SUMMARIES",
+      "output_state": "budgets/envelopes/categories/transfers",
+      "reason": "Unconditional visits76\u201378; child reads88 and output97 never read accumulated budgets/envelopes.",
+      "simplification": "No semantic program simplification required; separate output accumulation from access effects, summarize builtins and nested read comprehensions. Current analyzer support is not asserted.",
+      "additional_walkers": [
+        {
+          "walkers": "AllocateBudget / SpendEnvelope / TransferBudget",
+          "lines": [
+            109,
+            201
+          ],
+          "witness_or_reason": "unallocated1: allocate1 writes124, then another allocation1 returns119. Transfer adjusts two balances190\u2013191 and reference set194\u2013198, controlling later guards178/180\u2013183. No sibling traversal."
+        }
+      ]
+    },
+    {
+      "app": "build_release",
+      "registered_read_walker": "ReleaseBoard",
+      "source": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/build_release/server.jac",
+        "sha256": "1c027eb7989f77b8457451020bcd8a7d8a5937267f2585b8fecc07a7c3ae9c20"
+      },
+      "reader_lines": [
+        46,
+        84
+      ],
+      "classification": "NO_ACCESS_DEPENDENCE_PROVABLE_UNDER_CLOSED_WORLD_SUMMARIES",
+      "output_state": "releases",
+      "reason": "Only visit50; nested builds/checks/dependencies/deployments57\u201376 use local b/c; releases appended53 and read at exit82 only.",
+      "simplification": "No semantic program simplification required; separate output accumulation from access effects, summarize builtins and nested read comprehensions. Current analyzer support is not asserted.",
+      "additional_walkers": [
+        {
+          "walkers": "RecordCheck / DeployBuild / CreateBuild",
+          "lines": [
+            86,
+            167
+          ],
+          "witness_or_reason": "unit fail sets dependent status pending133/135; prerequisite status123 changes later integration/security commands and deploy all156. CreateBuild calls external hashlib.sha25699: no universal effect proof without trusted pure-library summary. These are Root-only operations, not siblings."
+        }
+      ]
+    },
+    {
+      "app": "knowledge_map",
+      "registered_read_walker": "KnowledgeBoard",
+      "source": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/knowledge_map/server.jac",
+        "sha256": "a5aca633b659617cbb8156580eb08be9523e65be31af80d0f0d22a89ab80ca2c"
+      },
+      "reader_lines": [
+        45,
+        74
+      ],
+      "classification": "NO_ACCESS_DEPENDENCE_PROVABLE_UNDER_CLOSED_WORLD_SUMMARIES",
+      "output_state": "articles",
+      "reason": "Visit49; topics/links/backlinks/revisions57\u201366 read graph, never self.articles to control future access. Shared Topic nodes are read-only.",
+      "simplification": "No semantic program simplification required; separate output accumulation from access effects, summarize builtins and nested read comprehensions. Current analyzer support is not asserted.",
+      "additional_walkers": [
+        {
+          "walkers": "ExploreLinks",
+          "lines": [
+            159,
+            181
+          ],
+          "witness_or_reason": "LITERAL traversal MAY dependence: seen write174 flows to guard171 and return172 before visit176. Diamond A\u2192B,C; B\u2192D and C\u2192D queues D twice; first D changes second D access. Self-cycle also demonstrates revisit suppression. Removing titles/output does not remove seen dependence."
+        },
+        {
+          "walkers": "ReviseArticle / ReviewRevision / PublishArticle / LinkArticles",
+          "lines": [
+            76,
+            157
+          ],
+          "witness_or_reason": "Reviewed flag111 enables publication127; LinksTo creation153 changes later exploration targets. Separate command effects; no visits in these Root abilities."
+        }
+      ]
+    },
+    {
+      "app": "return_counter",
+      "registered_read_walker": "ReturnBoard",
+      "source": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/return_counter/server.jac",
+        "sha256": "d211ceee2c9a5ae6810f0a8e6431a421f000b7c4e0455473d3d4605874f4f8cc"
+      },
+      "reader_lines": [
+        54,
+        90
+      ],
+      "classification": "NO_ACCESS_DEPENDENCE_PROVABLE_UNDER_CLOSED_WORLD_SUMMARIES",
+      "output_state": "orders",
+      "reason": "Visit58; nested lines/returns/refunds65\u201382 depend on local l/r, not accumulated orders.",
+      "simplification": "No semantic program simplification required; separate output accumulation from access effects, summarize builtins and nested read comprehensions. Current analyzer support is not asserted.",
+      "additional_walkers": [
+        {
+          "walkers": "RequestReturn / InspectReturn / RefundReturn",
+          "lines": [
+            92,
+            171
+          ],
+          "witness_or_reason": "line.quantity1: successful request1 creates return120; second request1 fails used+quantity111. Inspection status143 enables/blocks refund158, which writes refunded168. No sibling visits."
+        }
+      ]
+    },
+    {
+      "app": "garden_plan",
+      "registered_read_walker": "GardenBoard",
+      "source": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/garden_plan/server.jac",
+        "sha256": "85dc9ec81786907178504759c9d5baa2aca1e8e88af1c83ee370131aff5843a0"
+      },
+      "reader_lines": [
+        49,
+        87
+      ],
+      "classification": "NO_ACCESS_DEPENDENCE_PROVABLE_UNDER_CLOSED_WORLD_SUMMARIES",
+      "output_state": "plots/crops",
+      "reason": "Visits54\u201355; nested planting/crop/task/harvest reads71\u201379 depend on p; sums/local comprehensions only output.",
+      "simplification": "No semantic program simplification required; separate output accumulation from access effects, summarize builtins and nested read comprehensions. Current analyzer support is not asserted.",
+      "additional_walkers": [
+        {
+          "walkers": "PlantCrop / CompleteTask / HarvestPlanting",
+          "lines": [
+            89,
+            181
+          ],
+          "witness_or_reason": "area1: plant1 creates growing area129 and next plant1 fails117. CompleteTask152 changes all(done)170 and harvest writes status178, affecting later capacity/rotation paths104\u2013127. Root-only commands, no siblings."
+        }
+      ]
+    },
+    {
+      "app": "tournament",
+      "registered_read_walker": "BracketBoard",
+      "source": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/tournament/server.jac",
+        "sha256": "6b8e760fb75f3ca083947e733859f84f10a2a9b6be9dd611c5f78d647d1dca0f"
+      },
+      "reader_lines": [
+        68,
+        102
+      ],
+      "classification": "NO_ACCESS_DEPENDENCE_PROVABLE_UNDER_CLOSED_WORLD_SUMMARIES",
+      "output_state": "tournaments",
+      "reason": "Visit72; local rounds/matches reset75/77; home/away tests86\u201387 change output only. Queries76\u201390 do not read self.tournaments.",
+      "simplification": "No semantic program simplification required; separate output accumulation from access effects, summarize builtins and nested read comprehensions. Current analyzer support is not asserted.",
+      "additional_walkers": [
+        {
+          "walkers": "ScoreMatch / _bracket",
+          "lines": [
+            37,
+            50
+          ],
+          "witness_or_reason": "_bracket creates two semifinals sharing final target47. ScoreMatch147\u2013151 writes Home/Away final participants; scoring final first returns132\u2013133, scoring after semifinals can proceed142. Cross-command graph convergence, not literal sibling traversal. ScoreMatch117\u2013156 inspected."
+        }
+      ]
+    },
+    {
+      "app": "incident_room",
+      "registered_read_walker": "IncidentBoard",
+      "source": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/incident_room/server.jac",
+        "sha256": "cefa1f5d60f30500509acba67672492e627d6aa38dd9d701d526842d8fa74058"
+      },
+      "reader_lines": [
+        61,
+        101
+      ],
+      "classification": "NO_ACCESS_DEPENDENCE_PROVABLE_UNDER_CLOSED_WORLD_SUMMARIES",
+      "output_state": "services/incidents",
+      "reason": "Visits66\u201367; dependency/alert/service/action reads74/88\u201393 ignore self output lists. Graph cycles do not imply recursive Board visits.",
+      "simplification": "No semantic program simplification required; separate output accumulation from access effects, summarize builtins and nested read comprehensions. Current analyzer support is not asserted.",
+      "additional_walkers": [
+        {
+          "walkers": "ImpactTrace / OpenIncident",
+          "lines": [
+            29,
+            41
+          ],
+          "witness_or_reason": "LITERAL traversal MAY dependence: seen37 \u2192 guard34/return35 before reverse-DependsOn visit39. Diamond reverse reachability merges at D: first D suppresses second expansion. Seed51\u201356 actually creates API/Database/Cache cycle. OpenIncident117\u2013124 spawns trace and consumes services to create alerts."
+        },
+        {
+          "walkers": "AcknowledgeAlert / CompleteAction / ResolveIncident",
+          "lines": [
+            130,
+            206
+          ],
+          "witness_or_reason": "acknowledged140 and done179 affect short-circuit all guards195\u2013196 and resolution status203. Root-only business calls; not sibling visits."
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Not a full-app independence claim; business database write/read guards are explicitly retained.",
+    "MAY dependence is statically exposed, not every execution depends. seen-set merging can occur without cycles.",
+    "No total visited count is interpreted as depth; no chain/cardinality assumption is made.",
+    "Unsupported current syntax or unknown external behavior is not theoretical impossibility."
+  ]
+}

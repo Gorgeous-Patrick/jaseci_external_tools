@@ -1,0 +1,522 @@
+{
+  "kind": "source-backed-support-hypotheses-not-runtime-acceptance",
+  "registered_apps": 30,
+  "selected_apps": 15,
+  "selection_frozen_before_measured_results": true,
+  "tiers": [
+    "Typed dispatch and bounded supported predicate/visit grammar",
+    "Access dependency slice separate from output-only state; retained native execution",
+    "Runtime exact types/ordinary fields, actor ACL, ordered multiplicity/completeness/cycle/cap validation",
+    "Runtime activation counters show scope actually used; unsupported fallback must remain correct",
+    "Measured benefit is a separate condition from correct/active prefetch"
+  ],
+  "apps": [
+    {
+      "app": "linked_list",
+      "reader": "Traverse",
+      "selected": false,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/originals/linked_list/main.jac",
+        "sha256": "59c9664c3cc533f2942af9a9cc7945e159a6e447d009bc76c03ec5113b62320c"
+      },
+      "line_start": 31,
+      "reader_source": "walker Traverse {\n    has visited: int = 0;\n\n    can visit_item with Item entry {\n        self.visited += 1;\n        report here.value;\n        if self.visited >= 10000 {\n            disengage;\n        }\n        visit [->:Next:->];\n    }\n}\n\n# Sum all values in the list",
+      "visit_syntax_count": 1,
+      "source_assessment": [
+        "Not measured in this fixed15; source-only sibling audit available.",
+        "Not benchmarked is not the same as unsupported. Helpers, loops, shared access-affecting state and dynamic effects require explicit summaries/proof."
+      ]
+    },
+    {
+      "app": "littlex",
+      "reader": "load_feed",
+      "selected": true,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/originals/littlex/server.jac",
+        "sha256": "806b475b5168d7f2f35d340358a00d5368feaa53edf34f298dbea23478926357"
+      },
+      "line_start": 259,
+      "reader_source": "walker load_feed {\n    has search_query: str = \"\",\n        feed: list[TweetView] = [],\n        reports: list[list[TweetView]] = [];\n\n    can run with Root entry {\n        visit [-->[?:Profile]];\n    }\n\n    can collect with Profile entry {\n        # TEMPORARY: typed Post edges so the TTG planner can include Tweets\n        # in the prefetch plan. Real fix is runtime-side (planner should\n        # handle generic out-edges too, with cardinality guards).\n        visit [->:Post:->[?:Tweet]];\n        visit [->:Follow:->[?:Profile]->:Post:->[?:Tweet]];\n    }\n\n    can gather with Tweet entry {\n        self.feed.append(here.to_view());\n    }\n\n    can deliver with Root exit {\n        result = self.feed;\n        if self.search_query {\n            q = self.search_query.lower().strip();\n            result = [\n                t\n                for t in result\n                if q in t.content.lower()\n            ];\n        }\n        result.sort(key=lambda (t: TweetView) { t.created_at; }, reverse=True);\n        report result;\n    }\n}\n",
+      "visit_syntax_count": 3,
+      "source_assessment": [
+        "Root->Profile then Post/Follow/Post typed paths; current compiled feed region crosses abilities.",
+        "Payload/view construction and mutations stay native; fewer SQL statements need not lower SQL or HTTP cost."
+      ]
+    },
+    {
+      "app": "jacord",
+      "reader": "load_channel",
+      "selected": false,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/originals/jacord/server.jac",
+        "sha256": "6a6d0c7e6cdaed6b097d2ef9d0b85bb4647a3a274b583cfa96b5d31d9d4b8576"
+      },
+      "line_start": 172,
+      "reader_source": "walker load_channel {\n    can gather_messages with Channel entry;\n    can collect_message with Message entry;\n}\n",
+      "visit_syntax_count": 0,
+      "source_assessment": [
+        "Not measured in this fixed15; source-only sibling audit available.",
+        "Not benchmarked is not the same as unsupported. Helpers, loops, shared access-affecting state and dynamic effects require explicit summaries/proof."
+      ]
+    },
+    {
+      "app": "jdrive",
+      "reader": "VisibleFolderTree",
+      "selected": true,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/originals/jdrive/server.jac",
+        "sha256": "10a7f455d7ad63c44a05e7b3667d76f017f717968e6a89bae76cdcccd5859942"
+      },
+      "line_start": 103,
+      "reader_source": "walker VisibleFolderTree {\n    has start_id: str = \"\",\n        entries: list[FolderTreeEntry] = [],\n        depths: dict[str, int] = {},\n        paths: dict[str, str] = {},\n        reports: list[FolderTreeView] = [];\n\n    can walk with Folder entry;\n    can done with Folder exit;\n}\n",
+      "visit_syntax_count": 0,
+      "source_assessment": [
+        "Recursive homogeneous tree; typed Contains/Folder, exact trashed==False; output path/depth maps separate from future accesses.",
+        "Output-tree certificate supports this restricted grammar, preserves native output and ordered cache. Cycles, malformed predicates, unsupported effects fall back."
+      ]
+    },
+    {
+      "app": "issue_desk",
+      "reader": "ProjectBoard",
+      "selected": true,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/issue_desk/server.jac",
+        "sha256": "74ac636a0832e616302eaba0b67f4c563003f55192ed25e6326444d1fa85300a"
+      },
+      "line_start": 89,
+      "reader_source": "walker ProjectBoard {\n    has projects: list[dict] = [],\n        engineers: list[dict] = [],\n        issues: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Project]];\n    }\n    can project with Project entry {\n        self.projects.append({\"id\": jid(here), \"name\": here.name});\n        visit [->:HasEngineer:->[?:Engineer]];\n        visit [->:HasIssue:->[?:Issue]];\n    }\n\n    can engineer with Engineer entry {\n        self.engineers.append(\n            {\"id\": jid(here), \"name\": here.name, \"active\": here.active}\n        );\n    }\n    can issue with Issue entry {\n        self.issues.append(_issue_view(here));\n    }\n    can finish with Root exit {\n        report {\n            \"projects\": self.projects,\n            \"engineers\": self.engineers,\n            \"issues\": self.issues\n        };\n    }\n}\n",
+      "visit_syntax_count": 3,
+      "source_assessment": [
+        "Root->Project; independent Engineer and Issue visits.",
+        "_issue_view contains helper graph reads; a typed visit prefix is not proof of whole-helper SQL compilation."
+      ]
+    },
+    {
+      "app": "approval_desk",
+      "reader": "ExpenseBoard",
+      "selected": true,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/approval_desk/server.jac",
+        "sha256": "5239cd1d3650b6e4126f66f19dfec97472ea0ec85681f0e1ac9a6c1e98d0922c"
+      },
+      "line_start": 100,
+      "reader_source": "walker ExpenseBoard {\n    has expenses: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Expense]];\n    }\n    can collect with Expense entry {\n        self.expenses.append(_expense_view(here));\n    }\n    can finish with Root exit {\n        report {\"expenses\": self.expenses};\n    }\n}\n",
+      "visit_syntax_count": 1,
+      "source_assessment": [
+        "Root->Expense typed single-hop visit.",
+        "_expense_view hides graph reads; short path leaves little traversal SQL to remove."
+      ]
+    },
+    {
+      "app": "stock_room",
+      "reader": "Inventory",
+      "selected": true,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/stock_room/server.jac",
+        "sha256": "bdeeb3706db0b8de1c3b453f6a22c48603eb2c07c6165b510866c0c3731a5e6d"
+      },
+      "line_start": 105,
+      "reader_source": "walker Inventory {\n    has warehouses: list[dict] = [],\n        skus: list[dict] = [],\n        lots: list[dict] = [],\n        reservations: list[dict] = [],\n        dispatches: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Warehouse]];\n    }\n    can warehouse with Warehouse entry {\n        self.warehouses.append({\"id\": jid(here), \"name\": here.name});\n        visit [->:HasSKU:->[?:SKU]];\n        visit [->:Stocks:->[?:Lot]];\n        visit [->:Holds:->[?:Reservation]];\n        visit [->:HasDispatch:->[?:Dispatch]];\n    }\n\n    can sku with SKU entry {\n        self.skus.append({\"id\": jid(here), \"name\": here.name, \"code\": here.code});\n    }\n    can lot with Lot entry {\n        sku = [here->:ForSKU:->[?:SKU]][0];\n        self.lots.append(\n            {\n                \"id\": jid(here),\n                \"sku_id\": jid(sku),\n                \"sequence\": here.sequence,\n                \"received\": here.received,\n                \"available\": here.available,\n                \"dispatched\": here.dispatched\n            }\n        );\n    }\n\n    can reservation with Reservation entry {\n        self.reservations.append(_reservation_view(here));\n    }\n    can dispatch with Dispatch entry {\n        reservation = [here->:ForReservation:->[?:Reservation]][0];\n        self.dispatches.append(\n            {\n                \"id\": jid(here),\n                \"reservation_id\": jid(reservation),\n                \"quantity\": here.quantity,\n                \"reference\": here.reference\n            }\n        );\n    }\n\n    can finish with Root exit {\n        report {\n            \"warehouses\": self.warehouses,\n            \"skus\": self.skus,\n            \"lots\": self.lots,\n            \"reservations\": self.reservations,\n            \"dispatches\": self.dispatches\n        };\n    }\n}\n",
+      "visit_syntax_count": 5,
+      "source_assessment": [
+        "Root->Warehouse with four typed outgoing visits.",
+        "Lot/Dispatch use graph-read locals; reservation helper and mutations create boundaries."
+      ]
+    },
+    {
+      "app": "clinic_queue",
+      "reader": "ClinicSchedule",
+      "selected": true,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/clinic_queue/server.jac",
+        "sha256": "2850aca7323dffc2e59f42df703cec49fd5fb19dae02d771ad35c535b3e9749f"
+      },
+      "line_start": 67,
+      "reader_source": "walker ClinicSchedule {\n    has clinics: list[dict] = [],\n        practitioners: list[dict] = [],\n        slots: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Clinic]];\n    }\n    can clinic with Clinic entry {\n        self.clinics.append({\"id\": jid(here), \"name\": here.name, \"date\": here.date});\n        visit [->:HasPractitioner:->[?:Practitioner]];\n    }\n\n    can practitioner with Practitioner entry {\n        self.practitioners.append(\n            {\"id\": jid(here), \"name\": here.name, \"specialty\": here.specialty}\n        );\n        visit [->:OffersSlot:->[?:Slot]];\n    }\n\n    can slot with Slot entry {\n        owner = [here<-:OffersSlot:<-[?:Practitioner]][0];\n        self.slots.append(\n            {\n                \"id\": jid(here),\n                \"practitioner_id\": jid(owner),\n                \"start_minute\": here.start_minute,\n                \"duration\": here.duration,\n                \"appointments\": [\n                    {\"id\": jid(item), \"patient\": item.patient, \"status\": item.status}\n                    for item in [here->:HasAppointment:->[?:Appointment]]\n                ]\n            }\n        );\n    }\n\n    can finish with Root exit {\n        report {\n            \"clinics\": self.clinics,\n            \"practitioners\": self.practitioners,\n            \"slots\": self.slots\n        };\n    }\n}\n",
+      "visit_syntax_count": 3,
+      "source_assessment": [
+        "Root->Clinic->Practitioner->Slot typed dispatch chain.",
+        "Slot reporting performs inverse and appointment reads; no claim all terminal output reads fuse."
+      ]
+    },
+    {
+      "app": "course_path",
+      "reader": "LearningDashboard",
+      "selected": true,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/course_path/server.jac",
+        "sha256": "23f34229dbd614b3abe9ac4790778e72a59702cf2f13f2e873a29ed6738258b1"
+      },
+      "line_start": 89,
+      "reader_source": "walker LearningDashboard {\n    has courses: list[dict] = [],\n        enrollments: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Course]];\n        visit [-->[?:Enrollment]];\n    }\n    can course with Course entry {\n        modules = [];\n        for module in [here->:HasModule:->[?:Module]] {\n            lessons = [];\n            for lesson in [module->:HasLesson:->[?:Lesson]] {\n                lessons.append(\n                    {\n                        \"id\": jid(lesson),\n                        \"title\": lesson.title,\n                        \"position\": lesson.position,\n                        \"minutes\": lesson.minutes,\n                        \"requires\": [\n                            jid(item) for item in [lesson->:Requires:->[?:Lesson]]\n                        ]\n                    }\n                );\n            }\n            modules.append(\n                {\n                    \"id\": jid(module),\n                    \"title\": module.title,\n                    \"position\": module.position,\n                    \"lessons\": lessons\n                }\n            );\n        }\n        self.courses.append({\"id\": jid(here), \"title\": here.title, \"modules\": modules});\n    }\n\n    can enrollment with Enrollment entry {\n        self.enrollments.append(_enrollment_view(here));\n    }\n    can finish with Root exit {\n        report {\"courses\": self.courses, \"enrollments\": self.enrollments};\n    }\n}\n",
+      "visit_syntax_count": 2,
+      "source_assessment": [
+        "Two independent root visits: Course and Enrollment.",
+        "Nested Module/Lesson/Requires loops and helper calls need richer summaries than typed visit templates."
+      ]
+    },
+    {
+      "app": "library_loans",
+      "reader": "LibraryCatalog",
+      "selected": true,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/library_loans/server.jac",
+        "sha256": "a0a53342e4f54bb3b1059858dadf218b7f9d5910656a10ab520b7b0c09d091c8"
+      },
+      "line_start": 99,
+      "reader_source": "walker LibraryCatalog {\n    has libraries: list[dict] = [],\n        patrons: list[dict] = [],\n        titles: list[dict] = [],\n        loans: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Library]];\n    }\n    can library with Library entry {\n        self.libraries.append({\"id\": jid(here), \"name\": here.name});\n        visit [->:HasPatron:->[?:Patron]];\n        visit [->:HasTitle:->[?:Title]];\n        visit [->:HasLoan:->[?:Loan]];\n    }\n\n    can patron with Patron entry {\n        self.patrons.append({\"id\": jid(here), \"name\": here.name});\n    }\n    can title with Title entry {\n        holds = [];\n        for hold in [here->:HasHold:->[?:Hold]] {\n            patron = [hold->:RequestedBy:->[?:Patron]][0];\n            holds.append(\n                {\n                    \"id\": jid(hold),\n                    \"patron_id\": jid(patron),\n                    \"patron\": patron.name,\n                    \"position\": hold.position,\n                    \"status\": hold.status\n                }\n            );\n        }\n        self.titles.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"edition\": here.edition,\n                \"copies\": [\n                    {\n                        \"id\": jid(copy),\n                        \"barcode\": copy.barcode,\n                        \"available\": copy.available\n                    } for copy in [here->:HasCopy:->[?:Copy]]\n                ],\n                \"holds\": holds\n            }\n        );\n    }\n\n    can loan with Loan entry {\n        patron = [here->:Borrower:->[?:Patron]][0];\n        copy = [here->:LoanCopy:->[?:Copy]][0];\n        title = [copy<-:HasCopy:<-[?:Title]][0];\n        self.loans.append(\n            {\n                \"id\": jid(here),\n                \"patron_id\": jid(patron),\n                \"patron\": patron.name,\n                \"copy_id\": jid(copy),\n                \"title_id\": jid(title),\n                \"title\": title.name,\n                \"status\": here.status\n            }\n        );\n    }\n\n    can finish with Root exit {\n        report {\n            \"libraries\": self.libraries,\n            \"patrons\": self.patrons,\n            \"titles\": self.titles,\n            \"loans\": self.loans\n        };\n    }\n}\n",
+      "visit_syntax_count": 4,
+      "source_assessment": [
+        "Root->Library; Patron/Title/Loan branches.",
+        "Nested holds/copies and inverse loan relationships remain procedural reads."
+      ]
+    },
+    {
+      "app": "event_seats",
+      "reader": "EventCatalog",
+      "selected": true,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/event_seats/server.jac",
+        "sha256": "6a2d72da95cecd4eb7c80b90858f6bea15f889adc39248542e32d7fa80febe7f"
+      },
+      "line_start": 94,
+      "reader_source": "walker EventCatalog {\n    has venues: list[dict] = [],\n        events: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Venue]];\n    }\n    can venue with Venue entry {\n        self.venues.append({\"id\": jid(here), \"name\": here.name});\n        visit [->:Hosts:->[?:Event]];\n    }\n    can event with Event entry {\n        sections = [];\n        for section in [here->:HasSection:->[?:Section]] {\n            sections.append(\n                {\n                    \"id\": jid(section),\n                    \"name\": section.name,\n                    \"seats\": [\n                        {\n                            \"id\": jid(seat),\n                            \"label\": seat.label,\n                            \"price_cents\": seat.price_cents,\n                            \"status\": seat.status\n                        } for seat in [section->:HasSeat:->[?:Seat]]\n                    ]\n                }\n            );\n        }\n        self.events.append(\n            {\n                \"id\": jid(here),\n                \"title\": here.title,\n                \"sections\": sections,\n                \"bookings\": [\n                    _booking_view(booking)\n                    for booking in [here->:HasBooking:->[?:Booking]]\n                ]\n            }\n        );\n    }\n\n    can finish with Root exit {\n        report {\"venues\": self.venues, \"events\": self.events};\n    }\n}\n",
+      "visit_syntax_count": 2,
+      "source_assessment": [
+        "Root->Venue->Event typed chain.",
+        "Section/seat nested output loops and booking helper limit full-region compilation."
+      ]
+    },
+    {
+      "app": "help_queue",
+      "reader": "DeskBoard",
+      "selected": true,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/help_queue/server.jac",
+        "sha256": "9af7b8b2183db45fe200d1ececdc84c8887f41a0c8741cc0ce62a5d44f3348eb"
+      },
+      "line_start": 112,
+      "reader_source": "walker DeskBoard {\n    has desks: list[dict] = [],\n        customers: list[dict] = [],\n        agents: list[dict] = [],\n        tickets: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:SupportDesk]];\n    }\n    can desk with SupportDesk entry {\n        self.desks.append({\"id\": jid(here), \"name\": here.name, \"tick\": here.tick});\n        visit [->:HasCustomer:->[?:Customer]];\n        visit [->:HasAgent:->[?:Agent]];\n        visit [->:HasTicket:->[?:Ticket]];\n    }\n\n    can customer with Customer entry {\n        self.customers.append({\"id\": jid(here), \"name\": here.name});\n    }\n    can agent with Agent entry {\n        self.agents.append({\"id\": jid(here), \"name\": here.name, \"tier\": here.tier});\n    }\n    can ticket with Ticket entry {\n        self.tickets.append(_ticket_view(here));\n    }\n    can finish with Root exit {\n        report {\n            \"desks\": self.desks,\n            \"customers\": self.customers,\n            \"agents\": self.agents,\n            \"tickets\": self.tickets\n        };\n    }\n}\n",
+      "visit_syntax_count": 4,
+      "source_assessment": [
+        "Root->SupportDesk; Customer/Agent/Ticket branches.",
+        "Ticket helper reads remain boundaries; routing/SLA writes are separate business operations."
+      ]
+    },
+    {
+      "app": "recipe_pantry",
+      "reader": "PantryBoard",
+      "selected": false,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+        "sha256": "c9be1cf67ba71b678f9b39cb6cb9f040647a65602878a55889bae549418dd44b"
+      },
+      "line_start": 69,
+      "reader_source": "walker PantryBoard {\n    has ingredients: list[dict] = [],\n        recipes: list[dict] = [],\n        meals: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Ingredient]];\n        visit [-->[?:Recipe]];\n        visit [-->[?:Meal]];\n    }\n    can ingredient with Ingredient entry {\n        self.ingredients.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"initial\": here.initial,\n                \"units\": here.units,\n                \"purchased\": sum(p.units for p in [here->:Bought:->[?:Purchase]]),\n                \"consumed\": sum(c.units for c in [here->:Consumed:->[?:Consumption]])\n            }\n        );\n    }\n\n    can recipe with Recipe entry {\n        self.recipes.append({\"id\": jid(here), \"name\": here.name});\n    }\n    can meal with Meal entry {\n        self.meals.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"servings\": here.servings,\n                \"status\": here.status\n            }\n        );\n    }\n    can finish with Root exit {\n        report {\n            \"ingredients\": self.ingredients,\n            \"recipes\": self.recipes,\n            \"meals\": self.meals\n        };\n    }\n}\n",
+      "visit_syntax_count": 3,
+      "source_assessment": [
+        "Not measured in this fixed15; source-only sibling audit available.",
+        "Not benchmarked is not the same as unsupported. Helpers, loops, shared access-affecting state and dynamic effects require explicit summaries/proof."
+      ]
+    },
+    {
+      "app": "trip_board",
+      "reader": "Itinerary",
+      "selected": false,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/trip_board/server.jac",
+        "sha256": "2069bc534bad1c8a67b6bcf56dac7075483d0891e5bd1f8fe1e9f7e58677fa1d"
+      },
+      "line_start": 44,
+      "reader_source": "walker Itinerary {\n    has journeys: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Journey]];\n    }\n    can journey with Journey entry {\n        stops = [\n            {\n                \"id\": jid(s),\n                \"name\": s.name,\n                \"day\": s.day,\n                \"position\": s.position,\n                \"capacity\": s.capacity,\n                \"booked\": sum(\n                    b.guests\n                    for b in [s->:HasStay:->[?:Stay]]\n                    if b.active\n                ),\n                \"bookings\": [\n                    {\"id\": jid(b), \"guests\": b.guests, \"active\": b.active}\n                    for b in [s->:HasStay:->[?:Stay]]\n                ]\n            } for s in [here->:HasStop:->[?:Stop]]\n        ];\n        stops.sort(key=lambda (s: dict) { s[\"position\"]; });\n        self.journeys.append(\n            {\"id\": jid(here), \"name\": here.name, \"days\": here.days, \"stops\": stops}\n        );\n    }\n\n    can finish with Root exit {\n        report {\"journeys\": self.journeys};\n    }\n}\n",
+      "visit_syntax_count": 1,
+      "source_assessment": [
+        "Not measured in this fixed15; source-only sibling audit available.",
+        "Not benchmarked is not the same as unsupported. Helpers, loops, shared access-affecting state and dynamic effects require explicit summaries/proof."
+      ]
+    },
+    {
+      "app": "delivery_route",
+      "reader": "RouteBoard",
+      "selected": true,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/delivery_route/server.jac",
+        "sha256": "7bd7db2b123b9124a7a0f0224b193424670c88b1bf2aece78919ae2465923275"
+      },
+      "line_start": 56,
+      "reader_source": "walker RouteBoard {\n    has depots: list[dict] = [],\n        routes: list[dict] = [],\n        parcels: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Depot]];\n    }\n    can depot with Depot entry {\n        self.depots.append({\"id\": jid(here), \"name\": here.name});\n        visit [->:HasRoute:->[?:Route]];\n        visit [->:HasParcel:->[?:Parcel]];\n    }\n    can parcel with Parcel entry {\n        self.parcels.append(\n            {\n                \"id\": jid(here),\n                \"label\": here.label,\n                \"weight\": here.weight,\n                \"status\": here.status,\n                \"scans\": [s.kind for s in [here->:HasScan:->[?:Scan]]]\n            }\n        );\n    }\n    can route with Route entry {\n        stops = [];\n        for s in [here->:HasStop:->[?:Stop]] {\n            p = [s->:Carries:->[?:Parcel]][0];\n            stops.append(\n                {\n                    \"id\": jid(s),\n                    \"position\": s.position,\n                    \"status\": s.status,\n                    \"parcel_id\": jid(p),\n                    \"label\": p.label\n                }\n            );\n        }\n        stops.sort(key=lambda (s: dict) { s[\"position\"]; });\n        self.routes.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"capacity\": here.capacity,\n                \"loaded\": here.loaded,\n                \"stops\": stops,\n                \"complete\": bool(stops)\n                    and all(s[\"status\"] == \"delivered\" for s in stops)\n            }\n        );\n    }\n\n    can finish with Root exit {\n        report {\"depots\": self.depots, \"routes\": self.routes, \"parcels\": self.parcels};\n    }\n}\n",
+      "visit_syntax_count": 3,
+      "source_assessment": [
+        "Root->Depot; Route/Parcel branches.",
+        "Route stop/carry loop and scans in output; ordering preserved, no whole-loop compilation claim."
+      ]
+    },
+    {
+      "app": "hiring_pipeline",
+      "reader": "HiringBoard",
+      "selected": false,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/hiring_pipeline/server.jac",
+        "sha256": "555c1550c70765e595a674e83370c2822d76f64920d08c99054b7eb7fb704dbc"
+      },
+      "line_start": 47,
+      "reader_source": "walker HiringBoard {\n    has jobs: list[dict] = [],\n        candidates: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Job]];\n        visit [-->[?:Candidate]];\n    }\n    can candidate with Candidate entry {\n        self.candidates.append({\"id\": jid(here), \"name\": here.name});\n    }\n    can job with Job entry {\n        apps = [];\n        for a in [here->:HasApplication:->[?:Application]] {\n            c = [a->:CandidateRef:->[?:Candidate]][0];\n            apps.append(\n                {\n                    \"id\": jid(a),\n                    \"candidate\": c.name,\n                    \"status\": a.status,\n                    \"interviews\": [\n                        {\n                            \"id\": jid(i),\n                            \"round\": i.round,\n                            \"scores\": [s.score for s in [i->:HasScore:->[?:Scorecard]]]\n                        } for i in [a->:HasInterview:->[?:Interview]]\n                    ]\n                }\n            );\n        }\n        self.jobs.append(\n            {\n                \"id\": jid(here),\n                \"title\": here.title,\n                \"positions\": here.positions,\n                \"threshold\": here.threshold,\n                \"applications\": apps\n            }\n        );\n    }\n\n    can finish with Root exit {\n        report {\"jobs\": self.jobs, \"candidates\": self.candidates};\n    }\n}\n",
+      "visit_syntax_count": 2,
+      "source_assessment": [
+        "Not measured in this fixed15; source-only sibling audit available.",
+        "Not benchmarked is not the same as unsupported. Helpers, loops, shared access-affecting state and dynamic effects require explicit summaries/proof."
+      ]
+    },
+    {
+      "app": "sales_pipeline",
+      "reader": "SalesBoard",
+      "selected": false,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/sales_pipeline/server.jac",
+        "sha256": "d06ca4ea398c6f85cfbc068065bb026d5a551826a1fc1053413b7e8ab6ba9b03"
+      },
+      "line_start": 51,
+      "reader_source": "walker SalesBoard {\n    has accounts: list[dict] = [],\n        won_cents: int = 0;\n\n    can start with Root entry {\n        visit [-->[?:Account]];\n    }\n    can account with Account entry {\n        opportunities = [];\n        for o in [here->:HasOpportunity:->[?:Opportunity]] {\n            opportunities.append(\n                {\n                    \"id\": jid(o),\n                    \"title\": o.title,\n                    \"stage\": o.stage,\n                    \"amount_cents\": o.amount_cents,\n                    \"activities\": [a.note for a in [o->:HasActivity:->[?:Activity]]],\n                    \"quotes\": [\n                        {\n                            \"id\": jid(q),\n                            \"total_cents\": q.quantity * q.unit_cents,\n                            \"accepted\": q.accepted\n                        } for q in [o->:HasQuote:->[?:Quote]]\n                    ]\n                }\n            );\n            if o.stage == \"won\" {\n                self.won_cents += o.amount_cents;\n            }\n        }\n        self.accounts.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"contacts\": [c.name for c in [here->:HasContact:->[?:Contact]]],\n                \"opportunities\": opportunities\n            }\n        );\n    }\n\n    can finish with Root exit {\n        report {\"accounts\": self.accounts, \"won_cents\": self.won_cents};\n    }\n}\n",
+      "visit_syntax_count": 1,
+      "source_assessment": [
+        "Not measured in this fixed15; source-only sibling audit available.",
+        "Not benchmarked is not the same as unsupported. Helpers, loops, shared access-affecting state and dynamic effects require explicit summaries/proof."
+      ]
+    },
+    {
+      "app": "grant_review",
+      "reader": "ReviewBoard",
+      "selected": false,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/grant_review/server.jac",
+        "sha256": "ab80f550c5aca95f704969e8786b7f24aafbda3313b8296191d4fee8370b7dc8"
+      },
+      "line_start": 43,
+      "reader_source": "walker ReviewBoard {\n    has proposals: list[dict] = [],\n        reviewers: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Proposal]];\n        visit [-->[?:Reviewer]];\n    }\n    can reviewer with Reviewer entry {\n        self.reviewers.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"conflicts\": [jid(p) for p in [here->:Conflict:->[?:Proposal]]]\n            }\n        );\n    }\n    can proposal with Proposal entry {\n        assignments = [];\n        total = 0;\n        count = 0;\n        for a in [here->:HasAssignment:->[?:Assignment]] {\n            r = [a->:ReviewerRef:->[?:Reviewer]][0];\n            scores = [\n                v.merit * 2 + v.feasibility for v in [a->:HasReview:->[?:Review]]\n            ];\n            assignments.append(\n                {\n                    \"id\": jid(a),\n                    \"reviewer\": r.name,\n                    \"submitted\": a.submitted,\n                    \"scores\": scores\n                }\n            );\n            if scores {\n                total += scores[0];\n                count += 1;\n            }\n        }\n        self.proposals.append(\n            {\n                \"id\": jid(here),\n                \"title\": here.title,\n                \"released\": here.released,\n                \"assignments\": assignments,\n                \"score_total\": total,\n                \"review_count\": count\n            }\n        );\n    }\n\n    can finish with Root exit {\n        report {\"proposals\": self.proposals, \"reviewers\": self.reviewers};\n    }\n}\n",
+      "visit_syntax_count": 2,
+      "source_assessment": [
+        "Not measured in this fixed15; source-only sibling audit available.",
+        "Not benchmarked is not the same as unsupported. Helpers, loops, shared access-affecting state and dynamic effects require explicit summaries/proof."
+      ]
+    },
+    {
+      "app": "lab_samples",
+      "reader": "LabBoard",
+      "selected": false,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/lab_samples/server.jac",
+        "sha256": "9286732bdb1bcec1c46baf01ecfa7fa5e44bffa16236297d1a7e3f1092b9fc7f"
+      },
+      "line_start": 56,
+      "reader_source": "walker LabBoard {\n    has samples: list[dict] = [],\n        batches: list[dict] = [],\n        assays: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Sample]];\n        visit [-->[?:Batch]];\n        visit [-->[?:Assay]];\n    }\n    can sample with Sample entry {\n        self.samples.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"initial\": here.initial,\n                \"remaining\": here.remaining,\n                \"aliquots\": [\n                    {\n                        \"id\": jid(a),\n                        \"number\": a.number,\n                        \"volume\": a.volume,\n                        \"assigned\": bool([a<-:Includes:<-[?:Batch]]),\n                        \"results\": [\n                            {\n                                \"value\": r.value,\n                                \"passed\": r.passed,\n                                \"sequence\": r.sequence\n                            } for r in [a->:HasResult:->[?:Result]]\n                        ]\n                    } for a in [here->:HasAliquot:->[?:Aliquot]]\n                ]\n            }\n        );\n    }\n    can batch with Batch entry {\n        self.batches.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"released\": here.released,\n                \"aliquots\": [jid(a) for a in [here->:Includes:->[?:Aliquot]]]\n            }\n        );\n    }\n    can assay with Assay entry {\n        self.assays.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"lower\": here.lower,\n                \"upper\": here.upper\n            }\n        );\n    }\n    can finish with Root exit {\n        report {\n            \"samples\": self.samples,\n            \"batches\": self.batches,\n            \"assays\": self.assays\n        };\n    }\n}\n",
+      "visit_syntax_count": 3,
+      "source_assessment": [
+        "Not measured in this fixed15; source-only sibling audit available.",
+        "Not benchmarked is not the same as unsupported. Helpers, loops, shared access-affecting state and dynamic effects require explicit summaries/proof."
+      ]
+    },
+    {
+      "app": "asset_care",
+      "reader": "AssetBoard",
+      "selected": false,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/asset_care/server.jac",
+        "sha256": "39796037a1b6a61d8b36fd0b2a17409444114c6d8e19b75337b72b547be8b09e"
+      },
+      "line_start": 54,
+      "reader_source": "walker AssetBoard {\n    has assets: list[dict] = [],\n        technicians: list[dict] = [],\n        parts: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Asset]];\n        visit [-->[?:Technician]];\n        visit [-->[?:Part]];\n    }\n    can asset with Asset entry {\n        self.assets.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"status\": here.status,\n                \"inspections\": [\n                    {\"issue\": i.issue, \"severity\": i.severity}\n                    for i in [here->:HasInspection:->[?:Inspection]]\n                ],\n                \"orders\": [\n                    {\n                        \"id\": jid(o),\n                        \"number\": o.number,\n                        \"status\": o.status,\n                        \"uses\": [\n                            {\n                                \"quantity\": u.quantity,\n                                \"part_id\": jid([u->:PartRef:->[?:Part]][0])\n                            } for u in [o->:UsesPart:->[?:PartUse]]\n                        ]\n                    } for o in [here->:HasOrder:->[?:WorkOrder]]\n                ]\n            }\n        );\n    }\n    can technician with Technician entry {\n        self.technicians.append({\"id\": jid(here), \"name\": here.name});\n    }\n    can part with Part entry {\n        self.parts.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"initial\": here.initial,\n                \"stock\": here.stock\n            }\n        );\n    }\n    can finish with Root exit {\n        report {\n            \"assets\": self.assets,\n            \"parts\": self.parts,\n            \"technicians\": self.technicians\n        };\n    }\n}\n",
+      "visit_syntax_count": 3,
+      "source_assessment": [
+        "Not measured in this fixed15; source-only sibling audit available.",
+        "Not benchmarked is not the same as unsupported. Helpers, loops, shared access-affecting state and dynamic effects require explicit summaries/proof."
+      ]
+    },
+    {
+      "app": "utility_meter",
+      "reader": "MeterBoard",
+      "selected": false,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/utility_meter/server.jac",
+        "sha256": "666633bf03bf7cbb3191000997fa79718418812382b2c5f39b7ac64aa8f1507d"
+      },
+      "line_start": 51,
+      "reader_source": "walker MeterBoard {\n    has buildings: list[dict] = [],\n        meters: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Building]];\n    }\n    can building with Building entry {\n        self.buildings.append({\"id\": jid(here), \"name\": here.name});\n        visit [->:HasMeter:->[?:Meter]];\n    }\n    can meter with Meter entry {\n        self.meters.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"readings\": [\n                    {\"id\": jid(r), \"position\": r.position, \"value\": r.value}\n                    for r in [here->:HasReading:->[?:Reading]]\n                ],\n                \"invoices\": [\n                    {\"id\": jid(i), \"units\": i.units, \"cents\": i.cents}\n                    for i in [here->:HasInvoice:->[?:Invoice]]\n                ]\n            }\n        );\n    }\n    can finish with Root exit {\n        report {\"buildings\": self.buildings, \"meters\": self.meters};\n    }\n}\n",
+      "visit_syntax_count": 2,
+      "source_assessment": [
+        "Not measured in this fixed15; source-only sibling audit available.",
+        "Not benchmarked is not the same as unsupported. Helpers, loops, shared access-affecting state and dynamic effects require explicit summaries/proof."
+      ]
+    },
+    {
+      "app": "volunteer_shift",
+      "reader": "VolunteerBoard",
+      "selected": true,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/volunteer_shift/server.jac",
+        "sha256": "a3c4c4b9980d257c0f63788371bd8f4ee3de302e9ac7f89f5cd990821162c89b"
+      },
+      "line_start": 58,
+      "reader_source": "walker VolunteerBoard {\n    has organizations: list[dict] = [],\n        volunteers: list[dict] = [],\n        shifts: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Organization]];\n    }\n    can organization with Organization entry {\n        self.organizations.append({\"id\": jid(here), \"name\": here.name});\n        visit [->:HasVolunteer:->[?:Volunteer]];\n        visit [->:HasShift:->[?:Shift]];\n    }\n    can volunteer with Volunteer entry {\n        self.volunteers.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"skills\": [s.name for s in [here->:HasSkill:->[?:Skill]]]\n            }\n        );\n    }\n    can shift with Shift entry {\n        self.shifts.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"capacity\": here.capacity,\n                \"signups\": [\n                    {\n                        \"id\": jid(s),\n                        \"position\": s.position,\n                        \"status\": s.status,\n                        \"volunteer\": [s->:VolunteerRef:->[?:Volunteer]][0].name\n                    } for s in [here->:HasSignup:->[?:Signup]]\n                ]\n            }\n        );\n    }\n    can finish with Root exit {\n        report {\n            \"organizations\": self.organizations,\n            \"volunteers\": self.volunteers,\n            \"shifts\": self.shifts\n        };\n    }\n}\n",
+      "visit_syntax_count": 3,
+      "source_assessment": [
+        "Root->Organization; Volunteer/Shift branches.",
+        "Skill/signup/reference reads inside comprehensions constrain full support."
+      ]
+    },
+    {
+      "app": "poll_assembly",
+      "reader": "AssemblyBoard",
+      "selected": false,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/poll_assembly/server.jac",
+        "sha256": "0243c944d1a2ad3681619df881ee250dead5c8a556d763992e472155996d4389"
+      },
+      "line_start": 54,
+      "reader_source": "walker AssemblyBoard {\n    has assemblies: list[dict] = [],\n        voters: list[dict] = [],\n        motions: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Assembly]];\n    }\n    can assembly with Assembly entry {\n        self.assemblies.append(\n            {\"id\": jid(here), \"name\": here.name, \"quorum\": here.quorum}\n        );\n        visit [->:HasVoter:->[?:Voter]];\n        visit [->:HasMotion:->[?:Motion]];\n    }\n    can voter with Voter entry {\n        self.voters.append(\n            {\"id\": jid(here), \"name\": here.name, \"eligible\": here.eligible}\n        );\n    }\n    can motion with Motion entry {\n        ballots = [here->:HasBallot:->[?:Ballot]];\n        self.motions.append(\n            {\n                \"id\": jid(here),\n                \"title\": here.title,\n                \"status\": here.status,\n                \"outcome\": here.outcome,\n                \"ballot_count\": len(ballots),\n                \"options\": [\n                    {\n                        \"id\": jid(o),\n                        \"label\": o.label,\n                        \"votes\": len(\n                            [\n                                b\n                                for b in ballots\n                                if jid(o)\n                                    in [jid(x) for x in [b->:OptionRef:->[?:Option]]]\n                            ]\n                        )\n                    } for o in [here->:HasOption:->[?:Option]]\n                ]\n            }\n        );\n    }\n    can finish with Root exit {\n        report {\n            \"assemblies\": self.assemblies,\n            \"voters\": self.voters,\n            \"motions\": self.motions\n        };\n    }\n}\n",
+      "visit_syntax_count": 3,
+      "source_assessment": [
+        "Not measured in this fixed15; source-only sibling audit available.",
+        "Not benchmarked is not the same as unsupported. Helpers, loops, shared access-affecting state and dynamic effects require explicit summaries/proof."
+      ]
+    },
+    {
+      "app": "budget_ledger",
+      "reader": "BudgetBoard",
+      "selected": true,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/budget_ledger/server.jac",
+        "sha256": "51699e86f1e07e7db56240ce82b6507e0418fbdb640469f7e35295a79aa75227"
+      },
+      "line_start": 58,
+      "reader_source": "walker BudgetBoard {\n    has budgets: list[dict] = [],\n        envelopes: list[dict] = [],\n        categories: list[dict] = [],\n        transfers: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Budget]];\n    }\n    can budget with Budget entry {\n        self.budgets.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"initial\": here.initial,\n                \"unallocated\": here.unallocated\n            }\n        );\n        visit [->:HasEnvelope:->[?:Envelope]];\n        visit [->:HasCategory:->[?:Category]];\n        visit [->:HasTransfer:->[?:Transfer]];\n    }\n    can envelope with Envelope entry {\n        self.envelopes.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"balance\": here.balance,\n                \"entries\": [\n                    {\"amount\": e.amount, \"kind\": e.kind}\n                    for e in [here->:HasEntry:->[?:Entry]]\n                ]\n            }\n        );\n    }\n    can category with Category entry {\n        self.categories.append({\"id\": jid(here), \"name\": here.name});\n    }\n    can transfer with Transfer entry {\n        self.transfers.append({\"reference\": here.reference, \"amount\": here.amount});\n    }\n    can finish with Root exit {\n        report {\n            \"budgets\": self.budgets,\n            \"envelopes\": self.envelopes,\n            \"categories\": self.categories,\n            \"transfers\": self.transfers\n        };\n    }\n}\n",
+      "visit_syntax_count": 4,
+      "source_assessment": [
+        "Root->Budget; Envelope/Category/Transfer typed visit branches.",
+        "Envelope entries are graph reads inside output construction; balances/writes remain native."
+      ]
+    },
+    {
+      "app": "build_release",
+      "reader": "ReleaseBoard",
+      "selected": false,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/build_release/server.jac",
+        "sha256": "1c027eb7989f77b8457451020bcd8a7d8a5937267f2585b8fecc07a7c3ae9c20"
+      },
+      "line_start": 46,
+      "reader_source": "walker ReleaseBoard {\n    has releases: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Release]];\n    }\n    can release with Release entry {\n        self.releases.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"builds\": [\n                    {\n                        \"id\": jid(b),\n                        \"label\": b.label,\n                        \"status\": b.status,\n                        \"artifacts\": [a.digest for a in [b->:Produces:->[?:Artifact]]],\n                        \"checks\": [\n                            {\n                                \"id\": jid(c),\n                                \"name\": c.name,\n                                \"status\": c.status,\n                                \"dependencies\": [\n                                    d.name for d in [c->:DependsOn:->[?:Check]]\n                                ]\n                            } for c in [b->:HasCheck:->[?:Check]]\n                        ],\n                        \"deployments\": [\n                            d.environment for d in [b->:HasDeployment:->[?:Deployment]]\n                        ]\n                    } for b in [here->:HasBuild:->[?:Build]]\n                ]\n            }\n        );\n    }\n    can finish with Root exit {\n        report {\"releases\": self.releases};\n    }\n}\n",
+      "visit_syntax_count": 1,
+      "source_assessment": [
+        "Not measured in this fixed15; source-only sibling audit available.",
+        "Not benchmarked is not the same as unsupported. Helpers, loops, shared access-affecting state and dynamic effects require explicit summaries/proof."
+      ]
+    },
+    {
+      "app": "knowledge_map",
+      "reader": "KnowledgeBoard",
+      "selected": true,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/knowledge_map/server.jac",
+        "sha256": "a5aca633b659617cbb8156580eb08be9523e65be31af80d0f0d22a89ab80ca2c"
+      },
+      "line_start": 45,
+      "reader_source": "walker KnowledgeBoard {\n    has articles: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Article]];\n    }\n    can article with Article entry {\n        self.articles.append(\n            {\n                \"id\": jid(here),\n                \"title\": here.title,\n                \"published_revision\": here.published_revision,\n                \"topics\": [t.name for t in [here->:Tagged:->[?:Topic]]],\n                \"links\": [jid(a) for a in [here->:LinksTo:->[?:Article]]],\n                \"backlinks\": [a.title for a in [here<-:LinksTo:<-[?:Article]]],\n                \"revisions\": [\n                    {\n                        \"id\": jid(r),\n                        \"number\": r.number,\n                        \"body\": r.body,\n                        \"reviewed\": r.reviewed\n                    } for r in [here->:HasRevision:->[?:Revision]]\n                ]\n            }\n        );\n    }\n    can finish with Root exit {\n        report {\"articles\": self.articles};\n    }\n}\n",
+      "visit_syntax_count": 1,
+      "source_assessment": [
+        "Root->Article; four read relations in output comprehensions.",
+        "Most work is helper/comprehension reads instead of chained visits; graph cycles in stored links do not imply recursive visits."
+      ]
+    },
+    {
+      "app": "return_counter",
+      "reader": "ReturnBoard",
+      "selected": false,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/return_counter/server.jac",
+        "sha256": "d211ceee2c9a5ae6810f0a8e6431a421f000b7c4e0455473d3d4605874f4f8cc"
+      },
+      "line_start": 54,
+      "reader_source": "walker ReturnBoard {\n    has orders: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Order]];\n    }\n    can order with Order entry {\n        self.orders.append(\n            {\n                \"id\": jid(here),\n                \"reference\": here.reference,\n                \"lines\": [\n                    {\n                        \"id\": jid(l),\n                        \"name\": l.name,\n                        \"quantity\": l.quantity,\n                        \"unit_cents\": l.unit_cents,\n                        \"returns\": [\n                            {\n                                \"id\": jid(r),\n                                \"reference\": r.reference,\n                                \"quantity\": r.quantity,\n                                \"status\": r.status,\n                                \"refunds\": [\n                                    f.cents for f in [r->:HasRefund:->[?:Refund]]\n                                ]\n                            } for r in [l->:HasReturn:->[?:ReturnRequest]]\n                        ]\n                    } for l in [here->:HasLine:->[?:OrderLine]]\n                ]\n            }\n        );\n    }\n    can finish with Root exit {\n        report {\"orders\": self.orders};\n    }\n}\n",
+      "visit_syntax_count": 1,
+      "source_assessment": [
+        "Not measured in this fixed15; source-only sibling audit available.",
+        "Not benchmarked is not the same as unsupported. Helpers, loops, shared access-affecting state and dynamic effects require explicit summaries/proof."
+      ]
+    },
+    {
+      "app": "garden_plan",
+      "reader": "GardenBoard",
+      "selected": false,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/garden_plan/server.jac",
+        "sha256": "85dc9ec81786907178504759c9d5baa2aca1e8e88af1c83ee370131aff5843a0"
+      },
+      "line_start": 49,
+      "reader_source": "walker GardenBoard {\n    has plots: list[dict] = [],\n        crops: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Plot]];\n        visit [-->[?:Crop]];\n    }\n    can crop with Crop entry {\n        self.crops.append({\"id\": jid(here), \"name\": here.name, \"family\": here.family});\n    }\n    can plot with Plot entry {\n        self.plots.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"area\": here.area,\n                \"plantings\": [\n                    {\n                        \"id\": jid(p),\n                        \"area\": p.area,\n                        \"status\": p.status,\n                        \"crop\": [p->:CropRef:->[?:Crop]][0].name,\n                        \"tasks\": [\n                            {\"id\": jid(t), \"name\": t.name, \"done\": t.done}\n                            for t in [p->:HasTask:->[?:Task]]\n                        ],\n                        \"harvest\": sum(\n                            h.quantity for h in [p->:HasHarvest:->[?:Harvest]]\n                        )\n                    } for p in [here->:HasPlanting:->[?:Planting]]\n                ]\n            }\n        );\n    }\n    can finish with Root exit {\n        report {\"plots\": self.plots, \"crops\": self.crops};\n    }\n}\n",
+      "visit_syntax_count": 2,
+      "source_assessment": [
+        "Not measured in this fixed15; source-only sibling audit available.",
+        "Not benchmarked is not the same as unsupported. Helpers, loops, shared access-affecting state and dynamic effects require explicit summaries/proof."
+      ]
+    },
+    {
+      "app": "tournament",
+      "reader": "BracketBoard",
+      "selected": false,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/tournament/server.jac",
+        "sha256": "6b8e760fb75f3ca083947e733859f84f10a2a9b6be9dd611c5f78d647d1dca0f"
+      },
+      "line_start": 68,
+      "reader_source": "walker BracketBoard {\n    has tournaments: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Tournament]];\n    }\n    can tournament with Tournament entry {\n        rounds = [];\n        for r in [here->:HasRound:->[?:Round]] {\n            matches = [];\n            for m in [r->:HasMatch:->[?:Match]] {\n                home = [m->:Home:->[?:Team]];\n                away = [m->:Away:->[?:Team]];\n                matches.append(\n                    {\n                        \"id\": jid(m),\n                        \"position\": m.position,\n                        \"winner\": m.winner,\n                        \"home\": home[0].name if home else \"pending\",\n                        \"away\": away[0].name if away else \"pending\",\n                        \"results\": [\n                            {\"home\": s.home_score, \"away\": s.away_score}\n                            for s in [m->:HasResult:->[?:Result]]\n                        ]\n                    }\n                );\n            }\n            rounds.append({\"number\": r.number, \"matches\": matches});\n        }\n        self.tournaments.append({\"id\": jid(here), \"name\": here.name, \"rounds\": rounds});\n    }\n    can finish with Root exit {\n        report {\"tournaments\": self.tournaments};\n    }\n}\n",
+      "visit_syntax_count": 1,
+      "source_assessment": [
+        "Not measured in this fixed15; source-only sibling audit available.",
+        "Not benchmarked is not the same as unsupported. Helpers, loops, shared access-affecting state and dynamic effects require explicit summaries/proof."
+      ]
+    },
+    {
+      "app": "incident_room",
+      "reader": "IncidentBoard",
+      "selected": true,
+      "source": {
+        "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/incident_room/server.jac",
+        "sha256": "cefa1f5d60f30500509acba67672492e627d6aa38dd9d701d526842d8fa74058"
+      },
+      "line_start": 61,
+      "reader_source": "walker IncidentBoard {\n    has services: list[dict] = [],\n        incidents: list[dict] = [];\n\n    can start with Root entry {\n        visit [-->[?:Service]];\n        visit [-->[?:Incident]];\n    }\n    can service with Service entry {\n        self.services.append(\n            {\n                \"id\": jid(here),\n                \"name\": here.name,\n                \"dependencies\": [jid(s) for s in [here->:DependsOn:->[?:Service]]]\n            }\n        );\n    }\n    can incident with Incident entry {\n        self.incidents.append(\n            {\n                \"id\": jid(here),\n                \"summary\": here.summary,\n                \"status\": here.status,\n                \"alerts\": [\n                    {\n                        \"id\": jid(a),\n                        \"acknowledged\": a.acknowledged,\n                        \"service\": [a->:AtService:->[?:Service]][0].name\n                    } for a in [here->:HasAlert:->[?:Alert]]\n                ],\n                \"actions\": [\n                    {\"id\": jid(a), \"name\": a.name, \"done\": a.done}\n                    for a in [here->:HasAction:->[?:Action]]\n                ]\n            }\n        );\n    }\n    can finish with Root exit {\n        report {\"services\": self.services, \"incidents\": self.incidents};\n    }\n}\n",
+      "visit_syntax_count": 2,
+      "source_assessment": [
+        "Two root visits: Service and Incident.",
+        "Dependency/alert/action reads inside output; ImpactTrace seen-based early return is a separate access-dependent walker."
+      ]
+    }
+  ],
+  "manual_sibling_audits": [
+    {
+      "path": "/home/baichuan/jaseci/project-notes/ttg-sibling-audit-domain-a.json",
+      "sha256": "f7a81aed27ad225b2cbe69744e73f8ad8ce2af37405434c907ea8e9f15dd9c01"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/ttg-sibling-audit-domain-b.json",
+      "sha256": "f960ba1b470e12db82eadeee0cad4220618a6c0c68a08ba157bf88021eb2bd28"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/ttg-sibling-audit-originals.json",
+      "sha256": "d9727d8a277945b81b1fdb30c4b0ebd1b502a9e7f9e37b10dcdb3e64346c87c6"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/ttg-sibling-audit-procedural.json",
+      "sha256": "cf84d27ea52a0face9d877069bbaf36809fe90d36628b72182bb4db8820dd355"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/ttg-sibling-audit-snb.json",
+      "sha256": "d7e1e490638f0c2463dbd2d93ac265566031b203b78cf8e7bd9ff79cc3a89106"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/ttg-sibling-audit-tpch.json",
+      "sha256": "1f868d3b8488389562bd9e3aa4e60ef1769a7a3a08194fb7940df36895cb09f6"
+    }
+  ],
+  "limits": "Source audits prove conditional absence of sibling access dependence under closed-world field/helper summaries; not automatic compiler support. Current metrics must distinguish static regions, emitted frontier queries, legacy interpretation and zero opportunity. Full business workflows retain mutation/auth/error checks."
+}

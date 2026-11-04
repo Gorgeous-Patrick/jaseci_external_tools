@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-v2-20261104/run-v1/cases/library_loans-off-excluded_warmup--1/artifacts.json",
+    "sha256": "0790507c192756348cb865946e243cc6458bbec81dccb4fba05ab1d8794a965c",
+    "files_checked": 31
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_frozen_domain_scenario_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-v2-20261104/run-v1/cases/library_loans-off-excluded_warmup--1/artifacts.json",
+      "sha256": "0790507c192756348cb865946e243cc6458bbec81dccb4fba05ab1d8794a965c",
+      "files_checked": 31
+    },
+    "proof_sha256": "acb06243b3ecaea46bf36f5c855670a9496c5a8c5a503302002eb5e69fc7e1e9",
+    "actual_operations_checked": 27,
+    "selected_oracle": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/scenarios.py",
+      "sha256": "0f14dc8327012fb3e4e0360b41563b53578415607590b17f4e46cd7a21531c68"
+    },
+    "final_logical_state_sha256": "3bd319aa3b763e98ef4eaf349068a4fbd7655a7bb32a574b4619cfff24ebef4e",
+    "full_response": {
+      "full_actions_sha256": "5bf73a382a73eb5d273982d037ad9509f182bee9a19122b1c633dda520b90272",
+      "full_semantic_sha256": "bcff725bfa75a00b3976a130be02d90ac8fcff9c11b921bb15324d306962b773"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-v2-20261104/run-v1/cases/library_loans-off-excluded_warmup--1/plus-proof.json",
+    "sha256": "acb06243b3ecaea46bf36f5c855670a9496c5a8c5a503302002eb5e69fc7e1e9"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-v2-20261104/run-v1/cases/library_loans-off-excluded_warmup--1/cleanup-target.json",
+    "sha256": "a3485e4cd20e58c0a5967e53a0b758f1af3237a40059952535294d9252215f3d"
+  },
+  "database_state": {
+    "database": "continuation_e8bb281dc617450faf076e235da2f5dd",
+    "cluster_owner": "3fb7a255-d913-452b-8b21-a35a543df8dc",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "b14586beaf35c94c686b707e0470ae38ce2e89807fb3b116390e5f8d6a6eef13",
+    "actual_row_count": 42,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('Library','Patron','Title','Copy','Loan','Hold','HasPatron','HasTitle','HasCopy','HasLoan','Borrower','LoanCopy','HasHold','RequestedBy')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-v2-20261104/sources.json",
+    "sha256": "b354db47d46c1a8fcb7f33a822071772382f6720896ffdd4e3cbf9a5b7b05d36"
+  }
+}

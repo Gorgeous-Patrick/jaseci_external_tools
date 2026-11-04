@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "source": {
+    "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/originals/jdrive/server.impl.jac",
+    "sha256": "0ffa9c18875036ed0eeabd40e59d94c076db7ea36601ed405be36477c2dac731"
+  },
+  "line_start": 44,
+  "code": "impl VisibleFolderTree.walk {\n    cur_id = jid(here);\n    if not self.start_id {\n        self.start_id = cur_id;\n        self.depths[cur_id] = 0;\n        self.paths[cur_id] = here.name;\n    }\n    depth = self.depths.get(cur_id, 0);\n    path = self.paths.get(cur_id, here.name);\n    self.entries.append(\n        FolderTreeEntry(id=cur_id, name=here.name, depth=depth, path=path)\n    );\n    for child in [here ->:Contains:->[?:Folder, trashed == False]] {\n        child_id = jid(child);\n        self.depths[child_id] = depth + 1;\n        self.paths[child_id] = path + \"/\" + child.name;\n    }\n    visit [here ->:Contains:->[?:Folder, trashed == False]];\n}\n\nimpl VisibleFolderTree.done {\n    if jid(here) == self.start_id {\n        self.entries.sort(key=lambda (e: FolderTreeEntry) { e.path; });\n        report FolderTreeView(id=self.start_id, entries=self.entries);\n    }\n}\n",
+  "diagram": "Illustrative Folder A contains Folder B and C, both untrashed; homogeneous ability repeated at each node. Not an additional measured fixture."
+}

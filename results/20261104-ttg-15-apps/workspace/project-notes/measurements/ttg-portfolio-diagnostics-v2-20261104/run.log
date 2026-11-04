@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/home/baichuan/jaseci/reproduction/ttg-portfolio-diagnostics-v2-20261104/profile_run.py", line 47, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-portfolio-diagnostics-v2-20261104/profile_run.py", line 30, in main
+    pg=PG(OWN/'pg-cpu-v1',Path(read_json(plan['clean']['path'])['root']),output,guard,startup_floor=768*1024**2,case_floor=640*1024**2)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-portfolio-diagnostics-v2-20261104/ia_postgres.py", line 22, in __init__
+    self.port=free_port();self.owner=str(uuid.uuid4());self.started=False
+              ^^^^^^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-continuation-performance/owned_postgres.py", line 19, in free_port
+    with socket.socket() as sock:
+         ^^^^^^^^^^^^^^^
+  File "/home/baichuan/.pyenv/versions/3.12.11/lib/python3.12/socket.py", line 233, in __init__
+    _socket.socket.__init__(self, family, type, proto, fileno)
+PermissionError: [Errno 1] Operation not permitted

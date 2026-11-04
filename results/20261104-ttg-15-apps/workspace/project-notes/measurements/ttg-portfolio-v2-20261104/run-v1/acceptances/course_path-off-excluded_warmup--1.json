@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-v2-20261104/run-v1/cases/course_path-off-excluded_warmup--1/artifacts.json",
+    "sha256": "8be6ba140f7beac5cf2aed726de810b213b26fbd9d7569ce8141297bc1c060ff",
+    "files_checked": 31
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_frozen_domain_scenario_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-v2-20261104/run-v1/cases/course_path-off-excluded_warmup--1/artifacts.json",
+      "sha256": "8be6ba140f7beac5cf2aed726de810b213b26fbd9d7569ce8141297bc1c060ff",
+      "files_checked": 31
+    },
+    "proof_sha256": "b8cf046514fdacbf2e6ec3ae36724e4b4f277f846b145465e9d3439c1ac044b0",
+    "actual_operations_checked": 24,
+    "selected_oracle": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/scenarios.py",
+      "sha256": "0f14dc8327012fb3e4e0360b41563b53578415607590b17f4e46cd7a21531c68"
+    },
+    "final_logical_state_sha256": "dcf0c92f2e28157f66acc2408742756008d2058008df738403183d51542d8103",
+    "full_response": {
+      "full_actions_sha256": "273573c3d89540b1e5bb39ef74229df5883d50204ac3baa6cd6be9c02f73390f",
+      "full_semantic_sha256": "e69565f958fc003f1b2970c83e9d30372da158ab4cc5f78ac9e69247a79b881f"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-v2-20261104/run-v1/cases/course_path-off-excluded_warmup--1/plus-proof.json",
+    "sha256": "b8cf046514fdacbf2e6ec3ae36724e4b4f277f846b145465e9d3439c1ac044b0"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-v2-20261104/run-v1/cases/course_path-off-excluded_warmup--1/cleanup-target.json",
+    "sha256": "0edd413c502f3eb71693ab2526126eb9effee38ba74994192b1c3daf6e0c1980"
+  },
+  "database_state": {
+    "database": "continuation_3003f42b85eb407c93f9f303198ade69",
+    "cluster_owner": "3fb7a255-d913-452b-8b21-a35a543df8dc",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "0025abbf5391ab9bc9075c3994d46d888d4a05a645e8c5e9c2c2de064659c7b3",
+    "actual_row_count": 41,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('Course','Module','Lesson','Enrollment','Completion','HasModule','HasLesson','Requires','EnrolledIn','HasCompletion','ForLesson')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-v2-20261104/sources.json",
+    "sha256": "b354db47d46c1a8fcb7f33a822071772382f6720896ffdd4e3cbf9a5b7b05d36"
+  }
+}

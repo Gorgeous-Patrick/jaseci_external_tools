@@ -1,0 +1,91 @@
+{
+  "passed": true,
+  "cpu": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-v2-20261104/cpu-boundaries.json",
+    "sha256": "2cf29b236ee5386eda65aedeaa388d76d4a1b102c0d2663a64e2d8f36f85acf3"
+  },
+  "sql": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-sql-diagnostics-20261104/summary.json",
+    "sha256": "727fe8abbe263e5a864b6ab0d62367da68f6d3787b7d106ada4adcef00b807f1"
+  },
+  "primary": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-v2-20261104/results.json",
+    "sha256": "980ccaa44b30200b3b0c1e63afbd464e3a583bc1de81d9faad173d9d8e47a5b6"
+  },
+  "littlex_matched_sql": [
+    {
+      "occurrence": 0,
+      "off_planning_ms": 1.188,
+      "off_execution_ms": 0.46900000000000003,
+      "off_root_hits": 332,
+      "thread_planning_ms": 2.696,
+      "thread_execution_ms": 1.431,
+      "thread_root_hits": 513
+    },
+    {
+      "occurrence": 1,
+      "off_planning_ms": 1.121,
+      "off_execution_ms": 0.385,
+      "off_root_hits": 329,
+      "thread_planning_ms": 1.897,
+      "thread_execution_ms": 1.147,
+      "thread_root_hits": 513
+    }
+  ],
+  "slides": [
+    {
+      "title": "HelpQueue: expensive prediction, little saved work",
+      "subtitle": "Matched diagnostic: all three EvaluateSLA requests; direct same-thread CPU timers",
+      "bullets": [
+        "Native-worker CPU sum: off 8.72 ms; thread 192.06 ms. Full original workflow and state checks pass.",
+        "plan_continuation alone: 19 calls, 173.00 ms exclusive CPU. Nested timers are partitioned; inclusive recursive totals are not added.",
+        "Primary EvaluateSLA stops at the ticket conditional/graph-read barrier. It still invokes continuation prediction and frontier resolution; only a short prefix is prefetched.",
+        "This directly locates substantial extra runtime work. It does not apportion the entire primary HTTP difference or measure PostgreSQL CPU."
+      ]
+    },
+    {
+      "title": "ApprovalDesk: the exit phase limits the region",
+      "subtitle": "Matched diagnostic: all five SubmitExpense requests, including native rejection cases",
+      "bullets": [
+        "Native-worker CPU sum: off 17.01 ms; thread 112.38 ms. plan_continuation: 29 calls / 77.45 ms exclusive CPU.",
+        "LineItem values accumulate into self.total. Expense exit then chooses approval roles, traverses approvers and creates ApprovalStep nodes.",
+        "Actual primary fallback says: Walker exit effects are outside the static region kernel. The line-item prefix can be fetched; the later routing/write phase remains procedural.",
+        "Compiler eligibility for one prefix is insufficient for profitability. Avoid repeated planning at known unsupported boundaries; price planner CPU in admission."
+      ]
+    },
+    {
+      "title": "LittleX: construction and execution still cost work",
+      "subtitle": "First load_feed diagnostic; declared inputs and full native program unchanged",
+      "bullets": [
+        "Native-worker CPU: off 19.85 ms; thread 29.69 ms. 65 observed event hooks remain.",
+        "Named TTG runtime work totals 12.23 ms exclusive CPU. Static region resolution is attempted 62 times, including later cache/terminal checks.",
+        "Primary workflow SQL falls 153 \u2192 143, yet DB median rises 50.11 \u2192 60.40 ms and HTTP 215.72 \u2192 275.59 ms.",
+        "The matched SQL plans on the next page show why fewer SELECTs need not mean less server work. These diagnostic timings are not primary n=3 measurements."
+      ]
+    },
+    {
+      "title": "LittleX SQL: one complex query versus three simple paths",
+      "subtitle": "Same logical state, actual Bind, uniform ANALYZE; census-warmed matched EXPLAIN",
+      "bullets": [
+        "First plans: off planning 1.188 / execution 0.469 ms total; thread 2.696 / 1.431 ms.",
+        "Immediate repeat: off 1.121 / 0.385 ms; thread 1.897 / 1.147 ms. Root shared hits 329 \u2192 513; all physical reads zero.",
+        "Compiled plan adds six WindowAgg nodes, ordering/CTE/aggregate machinery and an anchors Seq Scan (1,104 rows, 1 loop). Ordinary paths use endpoint primary-key lookups.",
+        "The compiled result includes path/cache metadata and markers: 64 records versus 1 + 20 + 40 native path rows. This is not a claim of 64 distinct fetched nodes."
+      ]
+    },
+    {
+      "title": "What these diagnostics establish",
+      "subtitle": "Separate mechanisms; no single unexplained \u201cthread overhead\u201d label",
+      "bullets": [
+        "Runtime: the direct continuation timers establish a large CPU cost in the two slowest procedural workflows, even with small graphs and compiler-emitted templates.",
+        "Database: matched plans establish extra planning/execution and buffer work for the LittleX combined query in this controlled warm regime.",
+        "Scheduling: all 90 primary samples have zero observed same-request foreground/background SQL overlap. Actual GIL-off threads do not guarantee hidden DB latency.",
+        "Future experiments: skip known-no-benefit regions before runtime interpretation, reuse safe analysis facts, specialize SQL metadata/ACL work, then test cost-based admission. No proposed speedup is counted here."
+      ]
+    }
+  ],
+  "invalid_profile_excluded": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-diagnostics-20261104/cpu-v1/profile-validity.json",
+    "sha256": "8dde5911ec048d168d8146d769ae42706f52207a61e392b85a1831278e98dbb3"
+  }
+}

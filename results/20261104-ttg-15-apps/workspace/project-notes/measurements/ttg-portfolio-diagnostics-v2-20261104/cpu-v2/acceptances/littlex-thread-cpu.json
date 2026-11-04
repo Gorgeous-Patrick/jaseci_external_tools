@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-diagnostics-v2-20261104/cpu-v2/cases/littlex-thread-cpu/artifacts.json",
+    "sha256": "e66518b372744e70db4eb7e62376c3b97777552669af1f1f55773f8a3e6c599d",
+    "files_checked": 43
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_native_semantic_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-diagnostics-v2-20261104/cpu-v2/cases/littlex-thread-cpu/artifacts.json",
+      "sha256": "e66518b372744e70db4eb7e62376c3b97777552669af1f1f55773f8a3e6c599d",
+      "files_checked": 43
+    },
+    "proof_sha256": "a2458c4b32156af44464a8c5d91d8cd79f882550e6e5b6efd8b0e64d2e5decb7",
+    "actual_operations_checked": 15,
+    "final_logical_state_sha256": "c451de447009366732c5b888e703c498abd6b1845d37414fb35517afdd37cd6f",
+    "verifier_sources": {
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/native.py": "f44bf3905bd248df2f7c2fe10db3c926a847d170c963e889bffac94d51435228",
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/datasets/ttg/build.py": "a617dd95626a60babcf56dc10fba0ed3dc4a5c24ceca3033fea0b97401c129b9"
+    },
+    "full_response": {
+      "full_actions_sha256": "6631c577db0bee4381fd1461d52b91cda06af4e1a97d82d61cf7bf723c6186c4",
+      "full_semantic_sha256": "6dcad7b412ec9ff28122852c3635a12f36138dd16230b1c994a27ffa56392f8d"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-diagnostics-v2-20261104/cpu-v2/cases/littlex-thread-cpu/plus-proof.json",
+    "sha256": "a2458c4b32156af44464a8c5d91d8cd79f882550e6e5b6efd8b0e64d2e5decb7"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-diagnostics-v2-20261104/cpu-v2/cases/littlex-thread-cpu/cleanup-target.json",
+    "sha256": "7a1cff0bfca960bf17ecd89ca57b36b0698cd7ee31b2347aa4b21583e0304356"
+  },
+  "database_state": {
+    "database": "continuation_751be296b446442aa37a8f6549d66ccd",
+    "cluster_owner": "d0e1533b-ba9a-408b-a7e5-5186abf2b558",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "f7d00ef8c2e21cb02a71e47c687d587267ef043c8bf98cdcf58984954064cb0c",
+    "actual_row_count": 2249,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('Profile','Tweet','Follow','Post')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-portfolio-diagnostics-v2-20261104/cpu-v2/sources.json",
+    "sha256": "30160cd1dc41be57b57da7c70fbc6776dc865ce37df6a13ad0248977f2e96d11"
+  }
+}

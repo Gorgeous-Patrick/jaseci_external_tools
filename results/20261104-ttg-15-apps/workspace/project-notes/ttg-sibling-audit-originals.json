@@ -1,0 +1,278 @@
+{
+  "passed": true,
+  "kind": "manual_source_audit_not_analyzer_execution",
+  "scope": "4 original registered readers; additional original read/traverse/business exceptions; contribution to main30-app audit only",
+  "sources": {
+    "app_suite/registry.json": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/registry.json",
+      "sha256": "3585ed5b7102c2908f622747f9361bc13c8b7cac4457cf647086c4d24922e4e9"
+    },
+    "app_suite/native.py": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/native.py",
+      "sha256": "f44bf3905bd248df2f7c2fe10db3c926a847d170c963e889bffac94d51435228"
+    },
+    "datasets/ttg/build.py": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/datasets/ttg/build.py",
+      "sha256": "a617dd95626a60babcf56dc10fba0ed3dc4a5c24ceca3033fea0b97401c129b9"
+    },
+    "originals/linked_list/main.jac": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/originals/linked_list/main.jac",
+      "sha256": "59c9664c3cc533f2942af9a9cc7945e159a6e447d009bc76c03ec5113b62320c"
+    },
+    "originals/littlex/server.jac": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/originals/littlex/server.jac",
+      "sha256": "806b475b5168d7f2f35d340358a00d5368feaa53edf34f298dbea23478926357"
+    },
+    "originals/jacord/server.jac": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/originals/jacord/server.jac",
+      "sha256": "6a6d0c7e6cdaed6b097d2ef9d0b85bb4647a3a274b583cfa96b5d31d9d4b8576"
+    },
+    "originals/jacord/server.impl.jac": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/originals/jacord/server.impl.jac",
+      "sha256": "9dcb4280fec0a7691c03dac0617d2e770fcc02020325801c9f741a98b10928ee"
+    },
+    "originals/jdrive/server.jac": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/originals/jdrive/server.jac",
+      "sha256": "10a7f455d7ad63c44a05e7b3667d76f017f717968e6a89bae76cdcccd5859942"
+    },
+    "originals/jdrive/server.impl.jac": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/originals/jdrive/server.impl.jac",
+      "sha256": "0ffa9c18875036ed0eeabd40e59d94c076db7ea36601ed405be36477c2dac731"
+    }
+  },
+  "definitions": {
+    "NO": "Prove earlier sibling output/state writes cannot affect later graph/payload/visit/queue/write accesses under stated closed-world contracts.",
+    "MAY": "Statically expose a feasible data/control/queue effect witness; this is a decidable conservative finding, not an impossibility result.",
+    "UNKNOWN": "Insufficient effects/alias/graph facts for this bounded audit; current analyzer unsupported is separate.",
+    "simplification": "Optional semantics-preserving output slicing/inlining/phase separation, or equivalent hypothetical compiler/effect-summary feature; not an implemented pass."
+  },
+  "assumptions": [
+    "Ordinary Jac node/walker fields and view objects; fixed loaded graph during each read request; no monkeypatch/custom descriptor effects.",
+    "jid is identity-only; native graph-query/visit/report and ordinary containers have declared effects. ACL/root lookup is stable read-only context during the read.",
+    "Native eager visit evaluates/demands its endpoint batch before later ability entries; cancellation of entries is different from retroactively undemanding those endpoints.",
+    "Node names LinkedList/FolderTree do not impose cardinality, unique parent or acyclicity constraints."
+  ],
+  "registered_readers": [
+    {
+      "app": "linked_list",
+      "read_walker": "Traverse",
+      "decision": "STATIC_MAY_ACCESS_DEPENDENCE",
+      "proof_kind": "direct scalar/control/queue effect",
+      "lines": [
+        "originals/linked_list/main.jac:31-42"
+      ],
+      "shared_output": [
+        "report here.value"
+      ],
+      "access_state": [
+        "self.visited += 1",
+        "self.visited >= 10000 -> disengage before Next visit"
+      ],
+      "witness": "After a common prefix of9998 entries, queued B and C share visited. B increments to9999 and enqueues its child; C increments to10000 and cancels the walk, suppressing further queued access. A sibling changes the remaining visit/cancellation budget.",
+      "simplification": "Can expose/encode bounded total-visit budget, but cannot soundly turn this into depth without a single-successor/cardinality and acyclicity/queue proof.",
+      "fixture_scope": "Generator build.py:63-70 constructs an acyclic single Next chain. That separate fixture proof makes sibling frontier vacuous for the chain; smoke32/small1000 also below cutoff. Source schema alone has no such constraint.",
+      "measured": "native.py:247-260 Traverse/Sum/Find; build.py:178-183 session"
+    },
+    {
+      "app": "littlex",
+      "read_walker": "load_feed",
+      "decision": "STATIC_NO_AFTER_CLOSED_WORLD_SUMMARY",
+      "proof_kind": "interprocedural effect summary + output-slice removal",
+      "lines": [
+        "originals/littlex/server.jac:259-292",
+        "originals/littlex/server.jac:122-133"
+      ],
+      "shared_output": [
+        "feed.append(TweetView)",
+        "exit search/filter/sort/report"
+      ],
+      "access_state": [],
+      "reason": "run and collect issue fixed relative paths. Tweet.to_view reads root->Profile and ordinary Tweet fields; neither helper nor abilities mutate graph or read feed/search-result state to choose any graph access. search_query is immutable input and applies only after views are built.",
+      "simplification": "Summarize Tweet.to_view as read-only root/Profile path + pure view construction, then separate feed accumulation/sort from access control. Could be an analyzer feature instead of a source rewrite.",
+      "measured": "native.py:261-276 feed,like,follow,get_profile,create_tweet; build.py:184 session"
+    },
+    {
+      "app": "jacord",
+      "read_walker": "load_channel",
+      "decision": "STATIC_NO_AFTER_CLOSED_WORLD_SUMMARY",
+      "proof_kind": "interprocedural disjoint read/write summary",
+      "lines": [
+        "originals/jacord/server.jac:172-175",
+        "originals/jacord/server.impl.jac:22-39",
+        "originals/jacord/server.impl.jac:238-250"
+      ],
+      "shared_output": [
+        "report MessageView"
+      ],
+      "access_state": [],
+      "reason": "_message_view reads AuthoredBy/reply-count and plain fields; _resolve_author local loop returns a username. Message siblings do not share mutable access-control state; incoming ReplyTo visit is unconditional. Recursive reply graph may branch/cycle; independence alone proves neither chain cardinality nor termination.",
+      "simplification": "Inline/summarize _message_view and _resolve_author; report construction has no graph/queue writes.",
+      "measured": "native.py:280-289 channel/PostReply; build.py:185-186 session"
+    },
+    {
+      "app": "jdrive",
+      "read_walker": "VisibleFolderTree",
+      "decision": "STATIC_NO_AFTER_OUTPUT_DATAFLOW_SUMMARY",
+      "proof_kind": "backward access slice separates shared path/depth/output from visits",
+      "lines": [
+        "originals/jdrive/server.jac:103-112",
+        "originals/jdrive/server.impl.jac:44-68"
+      ],
+      "shared_output": [
+        "start_id",
+        "entries",
+        "depths",
+        "paths"
+      ],
+      "access_state": [],
+      "reason": "depths/paths are genuinely read after other nodes write them; shared/reconvergent child IDs can change OUTPUT path/depth. Those values never choose the two graph reads or final visit. Both use here->Contains->Folder with immutable node-field predicate trashed==False. start_id only initializes output context and selects final report.",
+      "simplification": "Slice away output-only map propagation/append/sort while retaining graph-read effects; no need assume distinct map keys to prove FUTURE ACCESS independence. No seen-set in this walker.",
+      "measured": "native.py:291-307 tree/list_folder/trash/mkdir; build.py:187 session"
+    }
+  ],
+  "additional_walkers": [
+    {
+      "app": "linked_list",
+      "walker": "Sum",
+      "status": "measured",
+      "decision": "STATIC_NO",
+      "refs": [
+        "main.jac:45-56"
+      ],
+      "reason": "total is written at entry and read only for exit reports; unconditional Next visit never reads total."
+    },
+    {
+      "app": "linked_list",
+      "walker": "Find",
+      "status": "measured",
+      "decision": "STATIC_MAY",
+      "refs": [
+        "main.jac:59-72"
+      ],
+      "reason": "found itself is output-only (never read), but a target match calls disengage before Next visit. Queued matching B suppresses later C ability/path access; explicit queue cancellation effect."
+    },
+    {
+      "app": "littlex",
+      "walker": "load_feed_stepwise",
+      "status": "present_only_not_native_replay",
+      "decision": "STATIC_MAY",
+      "refs": [
+        "server.jac:295-341"
+      ],
+      "reason": "seen_profiles membership returns before Post visit (309-314); root_profile_id written by first Profile suppresses Follow visits in later Profiles (315-317). seen_tweets suppresses to_view root/Profile read for repeated Tweet (321-327). Distinct output feed is not the cause."
+    },
+    {
+      "app": "littlex",
+      "walker": "get_channels",
+      "status": "present_only_not_native_replay",
+      "decision": "STATIC_MAY",
+      "refs": [
+        "server.jac:345-367",
+        "server.jac:143-159"
+      ],
+      "reason": "seen[cid] gates Channel.to_view(False). A repeated Channel sibling skips root/Profile, membership and member-count graph reads. No further visit is needed for real future-access dependence."
+    },
+    {
+      "app": "littlex",
+      "walker": "get_trending",
+      "status": "present_only_not_native_replay",
+      "decision": "STATIC_NO_AFTER_PURE_OUTPUT_SUMMARY",
+      "refs": [
+        "server.jac:224-255"
+      ],
+      "reason": "seen return gates ordinary content/string tally only; no graph query, visit, graph write or disengage follows it. counts and seen affect output, unlike get_channels. allroots enumeration is a read-only builtin contract."
+    },
+    {
+      "app": "littlex",
+      "walker": "get_all_profiles/get_profile",
+      "status": "get_profile_measured_helper;get_all_profiles_present_only",
+      "decision": "STATIC_NO_AFTER_CALLEE_SUMMARY",
+      "refs": [
+        "server.jac:94-111",
+        "server.jac:192-221"
+      ],
+      "reason": "to_user_view pure; to_profile_view graph reads depend on current Profile and immutable with-context, not results accumulator."
+    },
+    {
+      "app": "littlex",
+      "walker": "find_profile/find_tweet/find_channel and derived business walkers",
+      "status": "like_tweet/follow_user/create_tweet measured;other variants present_only",
+      "decision": "SINGLETON_BOUNDARY_AND_EXPLICIT_EFFECTS",
+      "refs": [
+        "server.jac:372-407",
+        "server.jac:410-577"
+      ],
+      "reason": "jobj(input_id) then visit[target] has at most one target; resolved actor is fixed context for that target, not sibling feedback. Derived walkers write likes/comments/edges/delete nodes and often disengage: retain graph-write/cancel effects, never summarize as read-only. Their changes affect later requests; this is not evidence of two sibling entries in the singleton native invocation. _now/grant/jobj require builtin/external summaries."
+    },
+    {
+      "app": "jacord",
+      "walker": "ListChannelIds",
+      "status": "present_only_not_native_replay",
+      "decision": "STATIC_MAY_LOOP_CARRIED_FUTURE_ACCESS",
+      "refs": [
+        "server.impl.jac:215-231"
+      ],
+      "reason": "ids length reaches limit inside first workspace channels loop; return suppresses HasChannel graph query of later workspace. This is iteration dependence, not two queued abilities. Prefix/order/cardinality summary needed for faithful batching."
+    },
+    {
+      "app": "jacord",
+      "walker": "ListWorkspaces/ListChannels",
+      "status": "present_only_not_native_replay",
+      "decision": "STATIC_NO_AFTER_LOCAL_OUTPUT_SUMMARY",
+      "refs": [
+        "server.impl.jac:189-212"
+      ],
+      "reason": "local out appends never influence later graph access; guards use invariant input/current resolved object."
+    },
+    {
+      "app": "jacord",
+      "walker": "EnsureUser/CreateWorkspace/CreateChannel/PostMessage/PostReply/JoinWorkspace",
+      "status": "PostReply_measured;others_present_or_setup",
+      "decision": "EXPLICIT_DB_EFFECTS_SINGLE_ROOT_INVOCATION",
+      "refs": [
+        "server.impl.jac:45-182"
+      ],
+      "reason": "Single Root entry, no queued child abilities. Graph writes/permission grants can affect later requests. JoinWorkspace loop read/return uses DB membership, not a mutated per-sibling accumulator. Clock/grant/jobj need effect contracts; no blanket sibling proof for arbitrary external implementations."
+    },
+    {
+      "app": "jdrive",
+      "walker": "ListFolder",
+      "status": "measured",
+      "decision": "STATIC_NO_AFTER_HELPER_SUMMARY",
+      "refs": [
+        "server.impl.jac:3-19",
+        "server.impl.jac:40-42"
+      ],
+      "reason": "_folder_view reads Folder/File children. Local entries and each child trashed branch control output constructors only, with no shared-state-gated subsequent graph read."
+    },
+    {
+      "app": "jdrive",
+      "walker": "GetRoot/NewFolder/TrashFolder",
+      "status": "NewFolder/TrashFolder_measured;GetRoot_setup_or_present",
+      "decision": "EXPLICIT_DB_EFFECTS_SINGLE_TARGET",
+      "refs": [
+        "server.impl.jac:22-37",
+        "server.impl.jac:71-80"
+      ],
+      "reason": "Create/attach and trashed writes affect later tree/list requests. Native endpoints invoke one Root/Folder, not sibling recursion. Do not erase DB writes or confuse cross-request dependencies with read-walker sibling dependence."
+    },
+    {
+      "app": "jdrive",
+      "walker": "Upload/Download",
+      "status": "present_only_original_walkers;native_suite_blob_support_is_separate",
+      "decision": "UNKNOWN_EXTERNAL_STORAGE_EFFECTS",
+      "refs": [
+        "server.jac:32",
+        "server.impl.jac:83-110"
+      ],
+      "reason": "Ambient storage.upload/get_metadata/exists/download and file object methods are external. Need effect/alias contracts; no theoretical impossibility claimed. Native.py replay does not invoke these walkers."
+    }
+  ],
+  "counts_registered": {
+    "total": 4,
+    "direct_MAY": 1,
+    "NO_with_closed_world_summary": 3,
+    "unknown": 0
+  },
+  "provenance": "Read-only inspection; no imports of Jac runtime/compiler, no tests/DB/benchmark execution; hashes are source bytes, not native acceptance."
+}

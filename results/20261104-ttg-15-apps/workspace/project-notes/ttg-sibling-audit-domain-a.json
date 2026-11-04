@@ -1,0 +1,949 @@
+{
+  "schema": "ttg-sibling-source-audit-v1",
+  "owner_suffix": "domain-a",
+  "created_at_utc": "2026-11-02T03:46:24.133190+00:00",
+  "audit_mode": "Read-only source inspection; no DB, compiler, tests, runtime or benchmark execution. Only these new audit outputs were written.",
+  "scope": {
+    "assigned_apps": [
+      "issue_desk",
+      "approval_desk",
+      "stock_room",
+      "clinic_queue",
+      "course_path",
+      "library_loans",
+      "event_seats",
+      "help_queue",
+      "recipe_pantry",
+      "trip_board",
+      "delivery_route",
+      "hiring_pipeline",
+      "sales_pipeline"
+    ],
+    "registered_reader_denominator": 13,
+    "global_registry_entry_count": 30,
+    "other_apps_and_61_paper_cases": "Assigned separately; no conclusion about them in this slice."
+  },
+  "definitions": {
+    "future_access": "Targets/predicates/execution of later graph reads, visits, queue operations, early returns before accesses, disengage, and heap writes that feed another access decision. Output values alone do not establish dependence.",
+    "PROVABLE_NO": "Conditional structural effect proof: sibling writes do not reach another sibling future-access control/data inputs. Output order/values may still depend on execution order.",
+    "STATIC_MAY": "Explicit read-after-write, alias/queue/guard or cancellation path exposes possible dependence; not proof every fixture or execution depends.",
+    "UNKNOWN": "Unavailable effect summaries or undecided invariants prevent a proof; not theoretical impossibility.",
+    "simplification": "Analysis-side lowering/inlining/summaries may make a proof easier. None of these registered readers requires a semantics-changing source simplification. No automatic analysis is claimed."
+  },
+  "assumptions": [
+    "Closed-world application-declared ordinary Jac fields and handlers; normal built-in list/dict/set/numeric/string operations, typing.cast, jid identity and standard graph query/visit semantics.",
+    "No concurrent graph mutation, hostile descriptors, monkey-patched builtins or unmodelled external callbacks. If introduced, their effects must be summarized or marked UNKNOWN; no absence proof transfers automatically.",
+    "Well-formed application graph and ordinary completion are the proof domain; malformed graph indexing failures are not silently treated as successful visits.",
+    "Shared output objects are not aliased into graph fields or consulted by undisclosed callbacks. All relevant local reader helpers were inspected.",
+    "No node-count bound is a depth proof. Typed edges do not imply outdegree one or acyclicity. Reader schedules remain general finite FIFO/fanout schedules with duplicates preserved; ReachIssue needs explicit seen/topology reasoning."
+  ],
+  "registered_reader_summary": {
+    "provable_no": 13,
+    "static_may": 0,
+    "unknown": 0,
+    "requires_semantics_changing_program_simplification": 0,
+    "qualification": "This is the 13-app slice only, after the stated source/effect summaries. Existing analyzer coverage was not tested."
+  },
+  "registered_readers": [
+    {
+      "app_id": "issue_desk",
+      "registered_read_walker": "ProjectBoard",
+      "classification": "PROVABLE_NO_FUTURE_ACCESS_SIBLING_DEPENDENCE",
+      "shared_output_state": [
+        "projects",
+        "engineers",
+        "issues"
+      ],
+      "access_affecting_shared_walker_state": [],
+      "reasoning": "Unconditional Project -> Engineer/Issue visits; _issue_view reads only the current Issue graph. No accumulator is read by a visit or helper access decision.",
+      "static_summary_needed": "Readonly helper summary",
+      "semantics_changing_simplification_required": false,
+      "current_analyzer_support": "Not evaluated; this is a hypothetical static effect-summary argument, not an implemented analyzer result.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/issue_desk/server.jac",
+          "lines": [
+            89,
+            118
+          ],
+          "sha256": "74ac636a0832e616302eaba0b67f4c563003f55192ed25e6326444d1fa85300a"
+        },
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/issue_desk/server.jac",
+          "lines": [
+            40,
+            59
+          ],
+          "sha256": "74ac636a0832e616302eaba0b67f4c563003f55192ed25e6326444d1fa85300a"
+        }
+      ]
+    },
+    {
+      "app_id": "approval_desk",
+      "registered_read_walker": "ExpenseBoard",
+      "classification": "PROVABLE_NO_FUTURE_ACCESS_SIBLING_DEPENDENCE",
+      "shared_output_state": [
+        "expenses"
+      ],
+      "access_affecting_shared_walker_state": [],
+      "reasoning": "Each Expense invokes the same readonly _expense_view; its local step sorting and line/payment queries do not consume self.expenses.",
+      "static_summary_needed": "Readonly helper and local-loop summary",
+      "semantics_changing_simplification_required": false,
+      "current_analyzer_support": "Not evaluated; this is a hypothetical static effect-summary argument, not an implemented analyzer result.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/approval_desk/server.jac",
+          "lines": [
+            100,
+            112
+          ],
+          "sha256": "5239cd1d3650b6e4126f66f19dfec97472ea0ec85681f0e1ac9a6c1e98d0922c"
+        },
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/approval_desk/server.jac",
+          "lines": [
+            37,
+            74
+          ],
+          "sha256": "5239cd1d3650b6e4126f66f19dfec97472ea0ec85681f0e1ac9a6c1e98d0922c"
+        }
+      ]
+    },
+    {
+      "app_id": "stock_room",
+      "registered_read_walker": "Inventory",
+      "classification": "PROVABLE_NO_FUTURE_ACCESS_SIBLING_DEPENDENCE",
+      "shared_output_state": [
+        "warehouses",
+        "skus",
+        "lots",
+        "reservations",
+        "dispatches"
+      ],
+      "access_affecting_shared_walker_state": [],
+      "reasoning": "Warehouse visits four fixed typed relations. Lot, reservation and dispatch queries depend on the current node; all five shared lists are output-only.",
+      "static_summary_needed": "Readonly helper summary",
+      "semantics_changing_simplification_required": false,
+      "current_analyzer_support": "Not evaluated; this is a hypothetical static effect-summary argument, not an implemented analyzer result.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/stock_room/server.jac",
+          "lines": [
+            105,
+            164
+          ],
+          "sha256": "bdeeb3706db0b8de1c3b453f6a22c48603eb2c07c6165b510866c0c3731a5e6d"
+        },
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/stock_room/server.jac",
+          "lines": [
+            59,
+            80
+          ],
+          "sha256": "bdeeb3706db0b8de1c3b453f6a22c48603eb2c07c6165b510866c0c3731a5e6d"
+        }
+      ]
+    },
+    {
+      "app_id": "clinic_queue",
+      "registered_read_walker": "ClinicSchedule",
+      "classification": "PROVABLE_NO_FUTURE_ACCESS_SIBLING_DEPENDENCE",
+      "shared_output_state": [
+        "clinics",
+        "practitioners",
+        "slots"
+      ],
+      "access_affecting_shared_walker_state": [],
+      "reasoning": "Clinic -> Practitioner -> Slot visits are unconditional. Slot owner/appointment queries do not consume any shared output list.",
+      "static_summary_needed": "Direct effect separation and comprehension summary",
+      "semantics_changing_simplification_required": false,
+      "current_analyzer_support": "Not evaluated; this is a hypothetical static effect-summary argument, not an implemented analyzer result.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/clinic_queue/server.jac",
+          "lines": [
+            67,
+            110
+          ],
+          "sha256": "2850aca7323dffc2e59f42df703cec49fd5fb19dae02d771ad35c535b3e9749f"
+        }
+      ]
+    },
+    {
+      "app_id": "course_path",
+      "registered_read_walker": "LearningDashboard",
+      "classification": "PROVABLE_NO_FUTURE_ACCESS_SIBLING_DEPENDENCE",
+      "shared_output_state": [
+        "courses",
+        "enrollments"
+      ],
+      "access_affecting_shared_walker_state": [],
+      "reasoning": "Root visits Course and Enrollment. Nested module/lesson/prerequisite queries and enrollment views are readonly, rooted at the current node, and independent of accumulated output.",
+      "static_summary_needed": "Nested-loop and readonly helper summary",
+      "semantics_changing_simplification_required": false,
+      "current_analyzer_support": "Not evaluated; this is a hypothetical static effect-summary argument, not an implemented analyzer result.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/course_path/server.jac",
+          "lines": [
+            89,
+            132
+          ],
+          "sha256": "23f34229dbd614b3abe9ac4790778e72a59702cf2f13f2e873a29ed6738258b1"
+        },
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/course_path/server.jac",
+          "lines": [
+            35,
+            57
+          ],
+          "sha256": "23f34229dbd614b3abe9ac4790778e72a59702cf2f13f2e873a29ed6738258b1"
+        }
+      ]
+    },
+    {
+      "app_id": "library_loans",
+      "registered_read_walker": "LibraryCatalog",
+      "classification": "PROVABLE_NO_FUTURE_ACCESS_SIBLING_DEPENDENCE",
+      "shared_output_state": [
+        "libraries",
+        "patrons",
+        "titles",
+        "loans"
+      ],
+      "access_affecting_shared_walker_state": [],
+      "reasoning": "Library visits Patron/Title/Loan without output-dependent guards. Per-title copy/hold and per-loan borrower/copy/title queries only read graph state.",
+      "static_summary_needed": "Nested-loop/comprehension summary",
+      "semantics_changing_simplification_required": false,
+      "current_analyzer_support": "Not evaluated; this is a hypothetical static effect-summary argument, not an implemented analyzer result.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/library_loans/server.jac",
+          "lines": [
+            99,
+            174
+          ],
+          "sha256": "a0a53342e4f54bb3b1059858dadf218b7f9d5910656a10ab520b7b0c09d091c8"
+        }
+      ]
+    },
+    {
+      "app_id": "event_seats",
+      "registered_read_walker": "EventCatalog",
+      "classification": "PROVABLE_NO_FUTURE_ACCESS_SIBLING_DEPENDENCE",
+      "shared_output_state": [
+        "venues",
+        "events"
+      ],
+      "access_affecting_shared_walker_state": [],
+      "reasoning": "Venue visits Event unconditionally. Local section/seat loops and _booking_view query current-event bookings without reading shared outputs.",
+      "static_summary_needed": "Readonly helper and nested-loop summary",
+      "semantics_changing_simplification_required": false,
+      "current_analyzer_support": "Not evaluated; this is a hypothetical static effect-summary argument, not an implemented analyzer result.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/event_seats/server.jac",
+          "lines": [
+            94,
+            139
+          ],
+          "sha256": "6a2d72da95cecd4eb7c80b90858f6bea15f889adc39248542e32d7fa80febe7f"
+        },
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/event_seats/server.jac",
+          "lines": [
+            57,
+            69
+          ],
+          "sha256": "6a2d72da95cecd4eb7c80b90858f6bea15f889adc39248542e32d7fa80febe7f"
+        }
+      ]
+    },
+    {
+      "app_id": "help_queue",
+      "registered_read_walker": "DeskBoard",
+      "classification": "PROVABLE_NO_FUTURE_ACCESS_SIBLING_DEPENDENCE",
+      "shared_output_state": [
+        "desks",
+        "customers",
+        "agents",
+        "tickets"
+      ],
+      "access_affecting_shared_walker_state": [],
+      "reasoning": "Desk visits Customer/Agent/Ticket unconditionally. _ticket_view reads ticket relations; shared output lists never select accesses.",
+      "static_summary_needed": "Readonly helper summary",
+      "semantics_changing_simplification_required": false,
+      "current_analyzer_support": "Not evaluated; this is a hypothetical static effect-summary argument, not an implemented analyzer result.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/help_queue/server.jac",
+          "lines": [
+            112,
+            145
+          ],
+          "sha256": "9af7b8b2183db45fe200d1ececdc84c8887f41a0c8741cc0ce62a5d44f3348eb"
+        },
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/help_queue/server.jac",
+          "lines": [
+            62,
+            84
+          ],
+          "sha256": "9af7b8b2183db45fe200d1ececdc84c8887f41a0c8741cc0ce62a5d44f3348eb"
+        }
+      ]
+    },
+    {
+      "app_id": "recipe_pantry",
+      "registered_read_walker": "PantryBoard",
+      "classification": "PROVABLE_NO_FUTURE_ACCESS_SIBLING_DEPENDENCE",
+      "shared_output_state": [
+        "ingredients",
+        "recipes",
+        "meals"
+      ],
+      "access_affecting_shared_walker_state": [],
+      "reasoning": "Three unconditional Root visits. Purchase/consumption sums are computed from the current Ingredient graph, only for output.",
+      "static_summary_needed": "Comprehension/reduction summary",
+      "semantics_changing_simplification_required": false,
+      "current_analyzer_support": "Not evaluated; this is a hypothetical static effect-summary argument, not an implemented analyzer result.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+          "lines": [
+            69,
+            112
+          ],
+          "sha256": "c9be1cf67ba71b678f9b39cb6cb9f040647a65602878a55889bae549418dd44b"
+        }
+      ]
+    },
+    {
+      "app_id": "trip_board",
+      "registered_read_walker": "Itinerary",
+      "classification": "PROVABLE_NO_FUTURE_ACCESS_SIBLING_DEPENDENCE",
+      "shared_output_state": [
+        "journeys"
+      ],
+      "access_affecting_shared_walker_state": [],
+      "reasoning": "Per-Journey stop/stay reads, local booked sums and local sorting do not read self.journeys before any access.",
+      "static_summary_needed": "Local sort/comprehension summary",
+      "semantics_changing_simplification_required": false,
+      "current_analyzer_support": "Not evaluated; this is a hypothetical static effect-summary argument, not an implemented analyzer result.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/trip_board/server.jac",
+          "lines": [
+            44,
+            78
+          ],
+          "sha256": "2069bc534bad1c8a67b6bcf56dac7075483d0891e5bd1f8fe1e9f7e58677fa1d"
+        }
+      ]
+    },
+    {
+      "app_id": "delivery_route",
+      "registered_read_walker": "RouteBoard",
+      "classification": "PROVABLE_NO_FUTURE_ACCESS_SIBLING_DEPENDENCE",
+      "shared_output_state": [
+        "depots",
+        "routes",
+        "parcels"
+      ],
+      "access_affecting_shared_walker_state": [],
+      "reasoning": "Depot visits Route/Parcel unconditionally. Route stop/parcel reads and Parcel scan reads do not use shared output; complete is an output expression.",
+      "static_summary_needed": "Nested-loop/local sort summary",
+      "semantics_changing_simplification_required": false,
+      "current_analyzer_support": "Not evaluated; this is a hypothetical static effect-summary argument, not an implemented analyzer result.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/delivery_route/server.jac",
+          "lines": [
+            56,
+            111
+          ],
+          "sha256": "7bd7db2b123b9124a7a0f0224b193424670c88b1bf2aece78919ae2465923275"
+        }
+      ]
+    },
+    {
+      "app_id": "hiring_pipeline",
+      "registered_read_walker": "HiringBoard",
+      "classification": "PROVABLE_NO_FUTURE_ACCESS_SIBLING_DEPENDENCE",
+      "shared_output_state": [
+        "jobs",
+        "candidates"
+      ],
+      "access_affecting_shared_walker_state": [],
+      "reasoning": "Root visits Job and Candidate unconditionally. Job-local Application/Candidate/Interview/Scorecard reads do not consume shared outputs.",
+      "static_summary_needed": "Nested-loop/comprehension summary",
+      "semantics_changing_simplification_required": false,
+      "current_analyzer_support": "Not evaluated; this is a hypothetical static effect-summary argument, not an implemented analyzer result.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/hiring_pipeline/server.jac",
+          "lines": [
+            47,
+            91
+          ],
+          "sha256": "555c1550c70765e595a674e83370c2822d76f64920d08c99054b7eb7fb704dbc"
+        }
+      ]
+    },
+    {
+      "app_id": "sales_pipeline",
+      "registered_read_walker": "SalesBoard",
+      "classification": "PROVABLE_NO_FUTURE_ACCESS_SIBLING_DEPENDENCE",
+      "shared_output_state": [
+        "accounts",
+        "won_cents"
+      ],
+      "access_affecting_shared_walker_state": [],
+      "reasoning": "Account visits are unconditional. Opportunity/activity/quote/contact reads do not consume accounts or won_cents. won_cents += amount is report-only, including its per-opportunity stage guard.",
+      "static_summary_needed": "Nested-loop and output-reduction summary",
+      "semantics_changing_simplification_required": false,
+      "current_analyzer_support": "Not evaluated; this is a hypothetical static effect-summary argument, not an implemented analyzer result.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/sales_pipeline/server.jac",
+          "lines": [
+            51,
+            94
+          ],
+          "sha256": "d06ca4ea398c6f85cfbc068065bb026d5a551826a1fc1053413b7e8ab6ba9b03"
+        }
+      ]
+    }
+  ],
+  "additional_walkers_and_business_exceptions": [
+    {
+      "app_id": "issue_desk",
+      "walkers": [
+        "ReachIssue",
+        "BlockIssue"
+      ],
+      "scope": "same_walker_queue_and_nested_walker",
+      "classification": "STATIC_MAY_DEPENDENCE",
+      "reasoning_or_minimal_witness": "ReachIssue.seen guards return before Blocks visit; found triggers disengage. Diamond A->B,C; B->D,C->D makes the second D entry return after the first inserts D. If B matches target, queued C can be cancelled. This is queue/identity dependence, not a depth argument. BlockIssue uses reach.found to suppress a new Blocks edge; exact absence needs topology/identity and target reasoning.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/issue_desk/server.jac",
+          "lines": [
+            198,
+            247
+          ],
+          "sha256": "74ac636a0832e616302eaba0b67f4c563003f55192ed25e6326444d1fa85300a"
+        }
+      ]
+    },
+    {
+      "app_id": "approval_desk",
+      "walkers": [
+        "SubmitExpense"
+      ],
+      "scope": "sibling_reduction_to_ancestor_exit",
+      "classification": "STATIC_MAY_DEPENDENCE",
+      "reasoning_or_minimal_witness": "LineItem siblings add quantity*unit_cents to self.total. Expense exit tests zero and >50000, then selects manager versus manager+finance approver queries and creates steps. Contributions 49999 and 2 change the exit finance path. No LineItem entry branches on prior total; the dependence is on the later common exit. A pure reduction summary can expose it without changing semantics.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/approval_desk/server.jac",
+          "lines": [
+            164,
+            210
+          ],
+          "sha256": "5239cd1d3650b6e4126f66f19dfec97472ea0ec85681f0e1ac9a6c1e98d0922c"
+        }
+      ]
+    },
+    {
+      "app_id": "stock_room",
+      "walkers": [
+        "ReserveStock"
+      ],
+      "scope": "ordinary_loop_not_queued_siblings",
+      "classification": "STATIC_MAY_DEPENDENCE",
+      "reasoning_or_minimal_witness": "remaining controls break and allocation/write targets in the lot loop. Quantity 3 with available lots [3,3] touches only the first; availability [2,3] also allocates from the second. Preserve sequential remaining and FIFO ordering; flattening this loop as independent siblings would change semantics.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/stock_room/server.jac",
+          "lines": [
+            189,
+            236
+          ],
+          "sha256": "bdeeb3706db0b8de1c3b453f6a22c48603eb2c07c6165b510866c0c3731a5e6d"
+        }
+      ]
+    },
+    {
+      "app_id": "stock_room",
+      "walkers": [
+        "ReleaseReservation",
+        "DispatchReservation"
+      ],
+      "scope": "actual_sibling_writes_but_no_access_feedback",
+      "classification": "PROVABLE_NO_FUTURE_ACCESS_DEPENDENCE_WITHIN_THIS_TRAVERSAL",
+      "reasoning_or_minimal_witness": "Allocation siblings query their own FromLot, then update Lot.available or Lot.dispatched. Later Allocation target selection does not read either updated field, even if two allocations alias a lot. Writes may conflict and final values matter; shared writes alone do not establish future-access dependence. Reservation exit writes status and reports; report view reads graph fields after the updates.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/stock_room/server.jac",
+          "lines": [
+            239,
+            304
+          ],
+          "sha256": "bdeeb3706db0b8de1c3b453f6a22c48603eb2c07c6165b510866c0c3731a5e6d"
+        },
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/stock_room/server.jac",
+          "lines": [
+            59,
+            80
+          ],
+          "sha256": "bdeeb3706db0b8de1c3b453f6a22c48603eb2c07c6165b510866c0c3731a5e6d"
+        }
+      ]
+    },
+    {
+      "app_id": "help_queue",
+      "walkers": [
+        "EvaluateSLA",
+        "_escalate"
+      ],
+      "scope": "conditional_same_walker_parent_state_and_heap_effects",
+      "classification": "STATIC_MAY_DEPENDENCE_WITHOUT_CARDINALITY_INVARIANT",
+      "reasoning_or_minimal_witness": "SupportDesk entries overwrite self.now; Ticket entries use it to decide whether to query the senior agent and rewrite assignment. With FIFO pending D1,D2, ticks 0/100, D1 ticket opened0 and SLA30, D2 executes before the D1 ticket and changes its escalation decision. On the seeded/application-generated single-desk graph (Seed 89-108, no business desk constructor), now is stable across distinct Ticket siblings. _escalate changes AssignedAgent edges/escalated, not status, replies or SLA read by the next distinct Ticket guard; prove nonaliasing if treating these writes as independent. This conditional proof is not a blanket unknown or a claim that the two-desk state is produced by Seed.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/help_queue/server.jac",
+          "lines": [
+            229,
+            253
+          ],
+          "sha256": "9af7b8b2183db45fe200d1ececdc84c8887f41a0c8741cc0ce62a5d44f3348eb"
+        },
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/help_queue/server.jac",
+          "lines": [
+            52,
+            60
+          ],
+          "sha256": "9af7b8b2183db45fe200d1ececdc84c8887f41a0c8741cc0ce62a5d44f3348eb"
+        },
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/help_queue/server.jac",
+          "lines": [
+            86,
+            108
+          ],
+          "sha256": "9af7b8b2183db45fe200d1ececdc84c8887f41a0c8741cc0ce62a5d44f3348eb"
+        }
+      ]
+    },
+    {
+      "app_id": "recipe_pantry",
+      "walkers": [
+        "ShoppingList"
+      ],
+      "scope": "shared_reduction_used_only_in_output",
+      "classification": "PROVABLE_NO_FUTURE_ACCESS_SIBLING_DEPENDENCE",
+      "reasoning_or_minimal_witness": "required is a shared keyed sum, but no meal access is selected from it. _requirements reads only the current Meal/Recipe graph. Root exit always queries all Ingredients; required changes report values/shortages, not query targets or branches before that query.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+          "lines": [
+            134,
+            156
+          ],
+          "sha256": "c9be1cf67ba71b678f9b39cb6cb9f040647a65602878a55889bae549418dd44b"
+        },
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+          "lines": [
+            33,
+            38
+          ],
+          "sha256": "c9be1cf67ba71b678f9b39cb6cb9f040647a65602878a55889bae549418dd44b"
+        }
+      ]
+    },
+    {
+      "app_id": "issue_desk",
+      "walkers": [
+        "CloseIssue",
+        "ReopenIssue"
+      ],
+      "scope": "interoperation_heap_dependence_not_same_walker_siblings",
+      "classification": "STATIC_MAY_DEPENDENCE_ACROSS_CALLS",
+      "reasoning_or_minimal_witness": "Closing a blocker changes the open-blocker guard on a later dependent CloseIssue. These single-Root operations have interoperation heap dependence, not queued Issue sibling callbacks.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/issue_desk/server.jac",
+          "lines": [
+            249,
+            299
+          ],
+          "sha256": "74ac636a0832e616302eaba0b67f4c563003f55192ed25e6326444d1fa85300a"
+        }
+      ]
+    },
+    {
+      "app_id": "approval_desk",
+      "walkers": [
+        "DecideApproval",
+        "PayExpense"
+      ],
+      "scope": "interoperation_heap_dependence_not_same_walker_siblings",
+      "classification": "STATIC_MAY_DEPENDENCE_ACROSS_CALLS",
+      "reasoning_or_minimal_witness": "Deciding an earlier step changes the earlier-position pending guard for a later decision; approval/payment status and HasPayment control PayExpense. Root-only calls, not sibling visits.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/approval_desk/server.jac",
+          "lines": [
+            212,
+            276
+          ],
+          "sha256": "5239cd1d3650b6e4126f66f19dfec97472ea0ec85681f0e1ac9a6c1e98d0922c"
+        }
+      ]
+    },
+    {
+      "app_id": "stock_room",
+      "walkers": [
+        "ReserveStock",
+        "ReceiveStock",
+        "ReleaseReservation",
+        "DispatchReservation"
+      ],
+      "scope": "interoperation_heap_dependence_not_same_walker_siblings",
+      "classification": "STATIC_MAY_DEPENDENCE_ACROSS_CALLS",
+      "reasoning_or_minimal_witness": "Reserving the last available unit changes another reservation availability guard. Receive/release change available; dispatch/release change reservation status guards. Separate calls/heap conflicts; ReserveStock loop and allocation siblings are classified separately above.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/stock_room/server.jac",
+          "lines": [
+            166,
+            304
+          ],
+          "sha256": "bdeeb3706db0b8de1c3b453f6a22c48603eb2c07c6165b510866c0c3731a5e6d"
+        }
+      ]
+    },
+    {
+      "app_id": "clinic_queue",
+      "walkers": [
+        "BookAppointment",
+        "CancelAppointment",
+        "AddSlot"
+      ],
+      "scope": "interoperation_heap_dependence_not_same_walker_siblings",
+      "classification": "STATIC_MAY_DEPENDENCE_ACROSS_CALLS",
+      "reasoning_or_minimal_witness": "A booked slot creates HasAppointment; a second overlapping slot for the same practitioner now returns before creation. Cancellation removes that booked-status condition. All are Root-only.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/clinic_queue/server.jac",
+          "lines": [
+            112,
+            211
+          ],
+          "sha256": "2850aca7323dffc2e59f42df703cec49fd5fb19dae02d771ad35c535b3e9749f"
+        }
+      ]
+    },
+    {
+      "app_id": "course_path",
+      "walkers": [
+        "CompleteLesson",
+        "Enroll",
+        "AddLesson"
+      ],
+      "scope": "interoperation_heap_dependence_not_same_walker_siblings",
+      "classification": "STATIC_MAY_DEPENDENCE_ACROSS_CALLS",
+      "reasoning_or_minimal_witness": "Completing prerequisite P adds Completion/ForLesson, changing a later dependent lesson guard. Duplicate enrollment and prerequisite topology also affect Root-only calls. No recursive prerequisite walk or chain proof is implemented here.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/course_path/server.jac",
+          "lines": [
+            134,
+            266
+          ],
+          "sha256": "23f34229dbd614b3abe9ac4790778e72a59702cf2f13f2e873a29ed6738258b1"
+        },
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/course_path/server.jac",
+          "lines": [
+            35,
+            57
+          ],
+          "sha256": "23f34229dbd614b3abe9ac4790778e72a59702cf2f13f2e873a29ed6738258b1"
+        }
+      ]
+    },
+    {
+      "app_id": "library_loans",
+      "walkers": [
+        "BorrowTitle",
+        "PlaceHold",
+        "CancelHold",
+        "ReturnLoan",
+        "_lend"
+      ],
+      "scope": "interoperation_heap_dependence_not_same_walker_siblings",
+      "classification": "STATIC_MAY_DEPENDENCE_ACROSS_CALLS",
+      "reasoning_or_minimal_witness": "Borrowing the last copy changes later availability/hold guards. Returning marks a loan/copy, selects the lowest-position queued hold, follows RequestedBy and calls _lend; cancelling a hold changes that selected patron. All business walkers have one Root handler.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/library_loans/server.jac",
+          "lines": [
+            176,
+            306
+          ],
+          "sha256": "a0a53342e4f54bb3b1059858dadf218b7f9d5910656a10ab520b7b0c09d091c8"
+        },
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/library_loans/server.jac",
+          "lines": [
+            54,
+            72
+          ],
+          "sha256": "a0a53342e4f54bb3b1059858dadf218b7f9d5910656a10ab520b7b0c09d091c8"
+        }
+      ]
+    },
+    {
+      "app_id": "event_seats",
+      "walkers": [
+        "HoldSeats",
+        "ConfirmBooking",
+        "CancelBooking"
+      ],
+      "scope": "interoperation_heap_dependence_not_same_walker_siblings",
+      "classification": "STATIC_MAY_DEPENDENCE_ACROSS_CALLS",
+      "reasoning_or_minimal_witness": "Holding seat S changes S.status, causing another hold of S to return before booking writes; cancellation frees seats and confirmed cancellation selects a refund write. Root-only loops, not Seat entry siblings.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/event_seats/server.jac",
+          "lines": [
+            141,
+            237
+          ],
+          "sha256": "6a2d72da95cecd4eb7c80b90858f6bea15f889adc39248542e32d7fa80febe7f"
+        },
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/event_seats/server.jac",
+          "lines": [
+            44,
+            69
+          ],
+          "sha256": "6a2d72da95cecd4eb7c80b90858f6bea15f889adc39248542e32d7fa80febe7f"
+        }
+      ]
+    },
+    {
+      "app_id": "help_queue",
+      "walkers": [
+        "AdvanceClock",
+        "ReplyTicket",
+        "AssignTicket",
+        "ResolveTicket"
+      ],
+      "scope": "interoperation_heap_dependence_not_same_walker_siblings",
+      "classification": "STATIC_MAY_DEPENDENCE_ACROSS_CALLS",
+      "reasoning_or_minimal_witness": "AdvanceClock changes deadline comparisons; first ReplyTicket changes HasReply and may escalate; escalation changes later agent-tier guard. ResolveTicket uses status+reply guards. These are cross-call heap effects; EvaluateSLA is separately classified.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/help_queue/server.jac",
+          "lines": [
+            183,
+            305
+          ],
+          "sha256": "9af7b8b2183db45fe200d1ececdc84c8887f41a0c8741cc0ce62a5d44f3348eb"
+        },
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/help_queue/server.jac",
+          "lines": [
+            52,
+            60
+          ],
+          "sha256": "9af7b8b2183db45fe200d1ececdc84c8887f41a0c8741cc0ce62a5d44f3348eb"
+        }
+      ]
+    },
+    {
+      "app_id": "recipe_pantry",
+      "walkers": [
+        "BuyIngredient",
+        "CookMeal"
+      ],
+      "scope": "interoperation_heap_dependence_not_same_walker_siblings",
+      "classification": "STATIC_MAY_DEPENDENCE_ACROSS_CALLS",
+      "reasoning_or_minimal_witness": "Cooking one of two meals that share the last ingredient unit decreases units and causes the second cook to return before consumption writes. Root-only operations; the quantity check and ordered mutation loop must be preserved.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+          "lines": [
+            158,
+            203
+          ],
+          "sha256": "c9be1cf67ba71b678f9b39cb6cb9f040647a65602878a55889bae549418dd44b"
+        },
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+          "lines": [
+            33,
+            38
+          ],
+          "sha256": "c9be1cf67ba71b678f9b39cb6cb9f040647a65602878a55889bae549418dd44b"
+        }
+      ]
+    },
+    {
+      "app_id": "trip_board",
+      "walkers": [
+        "ReserveStay",
+        "CancelStay",
+        "AddStop",
+        "MoveStop"
+      ],
+      "scope": "interoperation_heap_dependence_not_same_walker_siblings",
+      "classification": "STATIC_MAY_DEPENDENCE_ACROSS_CALLS",
+      "reasoning_or_minimal_witness": "A stay consuming remaining capacity changes the next ReserveStay guard; cancellation restores capacity. Stop insertion/move reads and rewrites sibling position fields in an ordinary loop. There are no queued Stop callbacks in these business walkers.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/trip_board/server.jac",
+          "lines": [
+            80,
+            203
+          ],
+          "sha256": "2069bc534bad1c8a67b6bcf56dac7075483d0891e5bd1f8fe1e9f7e58677fa1d"
+        }
+      ]
+    },
+    {
+      "app_id": "delivery_route",
+      "walkers": [
+        "AssignParcel",
+        "LoadRoute",
+        "DeliveryAttempt",
+        "RetryStop"
+      ],
+      "scope": "interoperation_heap_dependence_not_same_walker_siblings",
+      "classification": "STATIC_MAY_DEPENDENCE_ACROSS_CALLS",
+      "reasoning_or_minimal_witness": "A successful attempt marks the earliest stop delivered, so the next attempt selects a different stop/parcel; failure blocks progress until retry. Assignment changes capacity/status guards. Root-only calls and local loops, not queued Stop abilities.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/delivery_route/server.jac",
+          "lines": [
+            130,
+            252
+          ],
+          "sha256": "7bd7db2b123b9124a7a0f0224b193424670c88b1bf2aece78919ae2465923275"
+        }
+      ]
+    },
+    {
+      "app_id": "hiring_pipeline",
+      "walkers": [
+        "OfferApplication",
+        "ApplyJob",
+        "ScheduleInterview",
+        "ScoreInterview"
+      ],
+      "scope": "interoperation_heap_dependence_not_same_walker_siblings",
+      "classification": "STATIC_MAY_DEPENDENCE_ACROSS_CALLS",
+      "reasoning_or_minimal_witness": "Two eligible applications for a one-position job: offering the first changes the offered-count guard and blocks the second; offering the same candidate elsewhere also changes exclusivity. Root-only calls, not Application siblings in HiringBoard.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/hiring_pipeline/server.jac",
+          "lines": [
+            106,
+            227
+          ],
+          "sha256": "555c1550c70765e595a674e83370c2822d76f64920d08c99054b7eb7fb704dbc"
+        }
+      ]
+    },
+    {
+      "app_id": "sales_pipeline",
+      "walkers": [
+        "AcceptQuote",
+        "CloseWon",
+        "QualifyOpportunity",
+        "LogActivity"
+      ],
+      "scope": "interoperation_heap_dependence_not_same_walker_siblings",
+      "classification": "STATIC_MAY_DEPENDENCE_ACROSS_CALLS",
+      "reasoning_or_minimal_witness": "Accepting quote Q1 sets accepted and makes Q2 on the same Opportunity return; CloseWon writes stage and amount after querying accepted quotes. Root-only calls. SalesBoard.won_cents remains output-only.",
+      "source_refs": [
+        {
+          "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/sales_pipeline/server.jac",
+          "lines": [
+            115,
+            236
+          ],
+          "sha256": "d06ca4ea398c6f85cfbc068065bb026d5a551826a1fc1053413b7e8ab6ba9b03"
+        }
+      ]
+    }
+  ],
+  "source_inventory": {
+    "registry": {
+      "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/registry.json",
+      "sha256": "3585ed5b7102c2908f622747f9361bc13c8b7cac4457cf647086c4d24922e4e9"
+    },
+    "apps": {
+      "issue_desk": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/issue_desk/server.jac",
+        "sha256": "74ac636a0832e616302eaba0b67f4c563003f55192ed25e6326444d1fa85300a"
+      },
+      "approval_desk": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/approval_desk/server.jac",
+        "sha256": "5239cd1d3650b6e4126f66f19dfec97472ea0ec85681f0e1ac9a6c1e98d0922c"
+      },
+      "stock_room": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/stock_room/server.jac",
+        "sha256": "bdeeb3706db0b8de1c3b453f6a22c48603eb2c07c6165b510866c0c3731a5e6d"
+      },
+      "clinic_queue": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/clinic_queue/server.jac",
+        "sha256": "2850aca7323dffc2e59f42df703cec49fd5fb19dae02d771ad35c535b3e9749f"
+      },
+      "course_path": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/course_path/server.jac",
+        "sha256": "23f34229dbd614b3abe9ac4790778e72a59702cf2f13f2e873a29ed6738258b1"
+      },
+      "library_loans": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/library_loans/server.jac",
+        "sha256": "a0a53342e4f54bb3b1059858dadf218b7f9d5910656a10ab520b7b0c09d091c8"
+      },
+      "event_seats": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/event_seats/server.jac",
+        "sha256": "6a2d72da95cecd4eb7c80b90858f6bea15f889adc39248542e32d7fa80febe7f"
+      },
+      "help_queue": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/help_queue/server.jac",
+        "sha256": "9af7b8b2183db45fe200d1ececdc84c8887f41a0c8741cc0ce62a5d44f3348eb"
+      },
+      "recipe_pantry": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+        "sha256": "c9be1cf67ba71b678f9b39cb6cb9f040647a65602878a55889bae549418dd44b"
+      },
+      "trip_board": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/trip_board/server.jac",
+        "sha256": "2069bc534bad1c8a67b6bcf56dac7075483d0891e5bd1f8fe1e9f7e58677fa1d"
+      },
+      "delivery_route": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/delivery_route/server.jac",
+        "sha256": "7bd7db2b123b9124a7a0f0224b193424670c88b1bf2aece78919ae2465923275"
+      },
+      "hiring_pipeline": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/hiring_pipeline/server.jac",
+        "sha256": "555c1550c70765e595a674e83370c2822d76f64920d08c99054b7eb7fb704dbc"
+      },
+      "sales_pipeline": {
+        "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/sales_pipeline/server.jac",
+        "sha256": "d06ca4ea398c6f85cfbc068065bb026d5a551826a1fc1053413b7e8ab6ba9b03"
+      }
+    }
+  },
+  "external_effects_observed": "No opaque application external effect was found in the inspected reader call closure; imported cast is modeled as identity. Library _lend and HelpQueue _escalate are explicitly modeled graph mutators, not assumed pure.",
+  "execution_evidence": null
+}

@@ -1,0 +1,24 @@
+waiting for server to start.... done
+server started
+waiting for server to shut down.... done
+server stopped
+Traceback (most recent call last):
+  File "/home/baichuan/jaseci/reproduction/ttg-portfolio-sql-diagnostics-20261104/run_sql.py", line 59, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-portfolio-sql-diagnostics-20261104/run_sql.py", line 53, in main
+    with storage_watch(E,case,512*1024**2):Trial().run(case,mode,directory,pg,Path(plan['clean']['path']),E/'overlay.json',expected)
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-portfolio-sql-diagnostics-20261104/ia_trial.py", line 81, in run
+    return self.w.trial(app,cell,directory,Proxy(),self.native,self.apps.evaluate,self.apps.readers,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-app-performance/workloads.py", line 365, in trial
+    postgres.drop_completed_database(database, directory / 'artifacts.json', server_stopped=server.process is None)
+  File "/home/baichuan/jaseci/reproduction/ttg-portfolio-sql-diagnostics-20261104/ia_trial.py", line 80, in drop_completed_database
+    trial.finalize(case,cell,directory,active['server'],pg,name,runtime_manifest,overlay_manifest,expected)
+  File "/home/baichuan/jaseci/reproduction/ttg-portfolio-sql-diagnostics-20261104/ia_trial.py", line 178, in finalize
+    pg.accept_completed(case,cell,database,directory,proof,expected)
+  File "/home/baichuan/jaseci/reproduction/ttg-portfolio-sql-diagnostics-20261104/run_sql.py", line 33, in accept_completed
+    assert actual and actual[0]['error'] is None and actual[0]['returned_rows']==t['returned_rows']
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

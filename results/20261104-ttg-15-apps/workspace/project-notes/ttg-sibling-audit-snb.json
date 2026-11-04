@@ -1,0 +1,599 @@
+{
+  "passed": true,
+  "scope": "SNB Interactive v1 source-only sibling-future-access inventory; all29 supported operation IDs, actual Jac traversal distinguished from procedural loops and persistent command effects.",
+  "sources": [
+    {
+      "path": "reproduction/ttg-continuation-benchmarks/snb/server.jac",
+      "sha256": "b1f367b55e6341bdcf035afa37186585018f1d02da8a41c0ce49ee3b3e025b99"
+    },
+    {
+      "path": "reproduction/ttg-continuation-benchmarks/snb/fixture_loader.py",
+      "sha256": "0ecee74693b7d4dc39b26c3190104949e7212537fc98fa50d79182ddc6480fe0"
+    },
+    {
+      "path": "reproduction/ttg-continuation-benchmarks/supported_testcases.json",
+      "sha256": "be6952d08d323d5a21b42de8028a200918b897399f142aeb2fa422ff8c8348ec"
+    }
+  ],
+  "counts": {
+    "operations": 29,
+    "with_literal_visit": 17,
+    "root_only_no_sibling_traversal": 12,
+    "visit_operations_no_cross_sibling_future_access_under_summaries": 15,
+    "visit_operations_with_later_access_dependence": [
+      "IS2 nested spawn selection",
+      "IC3 final person-field materialization"
+    ]
+  },
+  "assumptions": [
+    "Closed-world ordinary declared Jac fields and standard builtin arithmetic/collections; stable valid typed graph for reads; input/config fields unmodified during operation.",
+    "Graph-read, jobj/jid, spawn, edge iteration and framework descriptor effects require explicit read-only/standard summaries. Python helper implementation was read, but runtime/framework closure was not audited in this source-only task. Without summaries broad hidden-effect claims remain UNKNOWN.",
+    "Output ordering and shared output provenance remain observable even where future graph access is independent. Mandatory [0], dict keys, field typing and exceptions require valid-shape assumptions; no unconditional proof for malformed graphs.",
+    "Read-only independence does not establish acyclicity, cardinality1, speedup or safe speculative writes. No analyzer was implemented, no static algorithm completeness or theoretical impossibility claim."
+  ],
+  "rows": [
+    {
+      "operation_id": "IC1",
+      "case_id": "snb/IC1",
+      "walker": "IC1",
+      "lines": [
+        201,
+        231
+      ],
+      "literal_visit_traversal": true,
+      "decision": "NO",
+      "reason": "_near builds candidate/distances before visit206. Read-only first_name controls local return209; output rows do not alter sibling city/organization queries210\u2013218.",
+      "callees": [
+        "_near",
+        "_friends",
+        "edge_rows"
+      ],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IC2",
+      "case_id": "snb/IC2",
+      "walker": "IC2",
+      "lines": [
+        232,
+        247
+      ],
+      "literal_visit_traversal": true,
+      "decision": "NO",
+      "reason": "Unchanged max_date gates author read238 per message; rows only controls sort/report245. No counter threshold changes visits235.",
+      "callees": [
+        "_friends",
+        "_author",
+        "_content"
+      ],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IC3",
+      "case_id": "snb/IC3",
+      "walker": "IC3",
+      "lines": [
+        248,
+        277
+      ],
+      "literal_visit_traversal": true,
+      "decision": "NO_VISIT_DEPENDENCE_BUT_MAY_FINAL_PAYLOAD_ACCESS",
+      "reason": "People initialization255 and message count increments262\u2013263 do not guard later visit targets. However final counts>0 condition269 controls people[key] lookup and person first/last-name reads270\u2013272. One X message plus one Y message enables those later fields; removing the Y sibling suppresses them. This is real final materialization access, not merely plain-dict output.",
+      "callees": [
+        "_near",
+        "_friends",
+        "_author"
+      ],
+      "simplification": "IC3 requires exposing final payload materialization separately; snapshotting required fields before aggregation could remove that later field demand but is an unimplemented transformation."
+    },
+    {
+      "operation_id": "IC4",
+      "case_id": "snb/IC4",
+      "walker": "IC4",
+      "lines": [
+        278,
+        292
+      ],
+      "literal_visit_traversal": true,
+      "decision": "NO",
+      "reason": "old/counts writes284\u2013285 affect final plain tag-name/count output289, not subsequent _tags(here) queries283 or visits281.",
+      "callees": [
+        "_friends",
+        "_tags"
+      ],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IC5",
+      "case_id": "snb/IC5",
+      "walker": "IC5",
+      "lines": [
+        293,
+        310
+      ],
+      "literal_visit_traversal": false,
+      "decision": "NO_SIBLING_TRAVERSAL",
+      "reason": "Single Root ability295; _near controls procedural candidate reads. forums key/count mutations302\u2013303 feed aggregation, while eligible membership join_date300 gates forum message/author reads303. No Jac visit or sibling ability.",
+      "callees": [
+        "_near",
+        "_friends",
+        "edge_rows",
+        "_author"
+      ],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IC6",
+      "case_id": "snb/IC6",
+      "walker": "IC6",
+      "lines": [
+        311,
+        325
+      ],
+      "literal_visit_traversal": true,
+      "decision": "NO",
+      "reason": "Read-only tag_name gates per-message arithmetic317\u2013318; counts never chooses future visits/graph queries. _near remains a procedural precursor.",
+      "callees": [
+        "_near",
+        "_friends",
+        "_tags"
+      ],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IC7",
+      "case_id": "snb/IC7",
+      "walker": "IC7",
+      "lines": [
+        326,
+        343
+      ],
+      "literal_visit_traversal": false,
+      "decision": "NO_SIBLING_TRAVERSAL",
+      "reason": "Single Root ability328; each row reads Likes/liker/friends before latest comparison338. latest chooses output, not later graph accesses. Ordinary loops and like-date selection are not sibling visits.",
+      "callees": [
+        "edge_rows",
+        "_content",
+        "_friends"
+      ],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IC8",
+      "case_id": "snb/IC8",
+      "walker": "IC8",
+      "lines": [
+        344,
+        357
+      ],
+      "literal_visit_traversal": true,
+      "decision": "NO",
+      "reason": "Root loop348 enqueues reply visits from graph only; each reply _author351 and output append352 is independent of prior rows.",
+      "callees": [
+        "_author"
+      ],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IC9",
+      "case_id": "snb/IC9",
+      "walker": "IC9",
+      "lines": [
+        358,
+        371
+      ],
+      "literal_visit_traversal": true,
+      "decision": "NO",
+      "reason": "_near precalculates visits360; message date is immutable request/node state363, not prior output, before author364.",
+      "callees": [
+        "_near",
+        "_friends",
+        "_author",
+        "_content"
+      ],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IC10",
+      "case_id": "snb/IC10",
+      "walker": "IC10",
+      "lines": [
+        372,
+        391
+      ],
+      "literal_visit_traversal": true,
+      "decision": "NO",
+      "reason": "Direct/_near determine candidates before376. Birthday local guard380 precedes per-person interest/post/tag/city reads381\u2013388. score is local and never changes later query targets; rows only report.",
+      "callees": [
+        "_friends",
+        "_near",
+        "_tags"
+      ],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IC11",
+      "case_id": "snb/IC11",
+      "walker": "IC11",
+      "lines": [
+        392,
+        409
+      ],
+      "literal_visit_traversal": true,
+      "decision": "NO",
+      "reason": "Per-person WorkAt/organization-place reads396\u2013397 depend on here/work. Request/year predicate398 only gates output; rows never feeds access.",
+      "callees": [
+        "_near",
+        "_friends",
+        "edge_rows"
+      ],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IC12",
+      "case_id": "snb/IC12",
+      "walker": "IC12",
+      "lines": [
+        421,
+        440
+      ],
+      "literal_visit_traversal": true,
+      "decision": "NO",
+      "reason": "names/comments are fresh per Person425. They deduplicate output counts430/433\u2013435, not other siblings accesses. _is_class has its own per-call DFS visited/cancellation dependence; distinguish that procedural helper from person siblings.",
+      "callees": [
+        "_friends",
+        "_tags",
+        "_is_class"
+      ],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IC13",
+      "case_id": "snb/IC13",
+      "walker": "IC13",
+      "lines": [
+        157,
+        179
+      ],
+      "literal_visit_traversal": false,
+      "decision": "NO_SIBLING_TRAVERSAL",
+      "reason": "Single Root ability159. BFS frontier/seen and target early-return165 control future _friends-equivalent edge reads168. Diamond A\u2192B,C\u2192D suppresses a later D expansion; target found in current layer cancels all following layers. distance increments once per layer172, not per visited person.",
+      "callees": [],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IC14",
+      "case_id": "snb/IC14",
+      "walker": "IC14",
+      "lines": [
+        452,
+        478
+      ],
+      "literal_visit_traversal": false,
+      "decision": "NO_SIBLING_TRAVERSAL",
+      "reason": "Single Root ability454. Path-local membership463 suppresses cycles; solutions makes while458 stop only after the current for-path layer finishes. A solution found midlayer does not cancel remaining same-layer paths. Next layer is skipped; subsequent selected solutions drive _edge_weight472.",
+      "callees": [
+        "_friends",
+        "_edge_weight",
+        "_author"
+      ],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IS1",
+      "case_id": "snb/IS1",
+      "walker": "IS1",
+      "lines": [
+        46,
+        57
+      ],
+      "literal_visit_traversal": true,
+      "decision": "NO",
+      "reason": "Person profile appends rows50\u201354; neither rows nor a sibling-written value controls city query50 or visit48.",
+      "callees": [],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IS2",
+      "case_id": "snb/IS2",
+      "walker": "IS2",
+      "lines": [
+        73,
+        92
+      ],
+      "literal_visit_traversal": true,
+      "decision": "MAY",
+      "reason": "messages append77 \u2192 sort79/slice81 \u2192 nested message spawn84. With11 messages, changing one sibling message date can alter which10 run ReplyOf/HasCreator helper accesses. Output-state erasure alone cannot prove no future access.",
+      "callees": [
+        "_OriginalPost",
+        "_content"
+      ],
+      "simplification": "IS2 requires making top10 selection plus per-message helper effects explicit; traversal cannot be declared independent by dropping messages as output."
+    },
+    {
+      "operation_id": "IS3",
+      "case_id": "snb/IS3",
+      "walker": "IS3",
+      "lines": [
+        93,
+        108
+      ],
+      "literal_visit_traversal": true,
+      "decision": "NO",
+      "reason": "dates is fully initialized97 before visits98 and only read103. rows output/sort does not feed later graph reads.",
+      "callees": [
+        "friendship_dates"
+      ],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IS4",
+      "case_id": "snb/IS4",
+      "walker": "IS4",
+      "lines": [
+        109,
+        114
+      ],
+      "literal_visit_traversal": true,
+      "decision": "NO",
+      "reason": "One initial message visit; content selects ordinary here fields, and rows is only reported. No natural multi-target sibling frontier is introduced by start111.",
+      "callees": [
+        "_content"
+      ],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IS5",
+      "case_id": "snb/IS5",
+      "walker": "IS5",
+      "lines": [
+        115,
+        121
+      ],
+      "literal_visit_traversal": true,
+      "decision": "NO",
+      "reason": "Message\u2192HasCreator visit118 is here-relative; author appends output119. No shared mutable state feeds access.",
+      "callees": [],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IS6",
+      "case_id": "snb/IS6",
+      "walker": "IS6",
+      "lines": [
+        122,
+        136
+      ],
+      "literal_visit_traversal": true,
+      "decision": "NO",
+      "reason": "forum_id/title writes130 feed moderator output133\u2013134, not visit131 or another graph query. Shared output provenance may be order-sensitive under fanout; that is distinct from access dependence. Comment ancestry follows here.is_comment126; source alone proves neither arity1 nor acyclicity.",
+      "callees": [],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "IS7",
+      "case_id": "snb/IS7",
+      "walker": "IS7",
+      "lines": [
+        137,
+        156
+      ],
+      "literal_visit_traversal": true,
+      "decision": "NO",
+      "reason": "author_jid initialized141 before reply siblings142; per-reply creator/neighbor queries145\u2013146 do not depend on rows or previous replies.",
+      "callees": [],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "U1",
+      "case_id": "snb/U1",
+      "walker": "U1",
+      "lines": [
+        479,
+        499
+      ],
+      "literal_visit_traversal": false,
+      "decision": "NO_SIBLING_TRAVERSAL",
+      "reason": "Single Root mutation484. Duplicate person guard485; writes Person486\u2013489 before duplicate emails/languages raise493, so later tag/study/work accesses494\u2013496 are skipped on error. No sibling queue; rollback is a runtime contract, not proven here.",
+      "callees": [],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "U2",
+      "case_id": "snb/U2",
+      "walker": "U2",
+      "lines": [
+        500,
+        508
+      ],
+      "literal_visit_traversal": false,
+      "decision": "NO_SIBLING_TRAVERSAL",
+      "reason": "Single Root mutation502. Post type/duplicate Likes guards504\u2013505 control edge creation506. Existing Likes from prior operation changes this control path; no visit.",
+      "callees": [],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "U3",
+      "case_id": "snb/U3",
+      "walker": "U3",
+      "lines": [
+        509,
+        517
+      ],
+      "literal_visit_traversal": false,
+      "decision": "NO_SIBLING_TRAVERSAL",
+      "reason": "Single Root mutation511. Comment type/duplicate Likes guards513\u2013514 control515. Ordinary persistent read/write dependence, no sibling visit.",
+      "callees": [],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "U4",
+      "case_id": "snb/U4",
+      "walker": "U4",
+      "lines": [
+        518,
+        527
+      ],
+      "literal_visit_traversal": false,
+      "decision": "NO_SIBLING_TRAVERSAL",
+      "reason": "Single Root mutation520. Duplicate forum guard521 precedes creation522 and moderator/tag resolution523\u2013524. No visit.",
+      "callees": [],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "U5",
+      "case_id": "snb/U5",
+      "walker": "U5",
+      "lines": [
+        528,
+        535
+      ],
+      "literal_visit_traversal": false,
+      "decision": "NO_SIBLING_TRAVERSAL",
+      "reason": "Single Root mutation530. HasMember duplicate query532 before edge creation533; successful earlier membership makes later duplicate raise. No sibling activation.",
+      "callees": [],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "U6",
+      "case_id": "snb/U6",
+      "walker": "U6",
+      "lines": [
+        536,
+        551
+      ],
+      "literal_visit_traversal": false,
+      "decision": "NO_SIBLING_TRAVERSAL",
+      "reason": "Single Root mutation540. Duplicate message guard541 precedes writes542\u2013548; creator/forum/country/tag bindings resolve procedurally. Created IDs/edges affect later operations, not siblings.",
+      "callees": [],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "U7",
+      "case_id": "snb/U7",
+      "walker": "U7",
+      "lines": [
+        552,
+        567
+      ],
+      "literal_visit_traversal": false,
+      "decision": "NO_SIBLING_TRAVERSAL",
+      "reason": "Single Root mutation556. Duplicate message guard557 precedes writes558\u2013565; ReplyOf links change future ancestry queries. No visit; no source proof of graph acyclicity/functional edges.",
+      "callees": [],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    },
+    {
+      "operation_id": "U8",
+      "case_id": "snb/U8",
+      "walker": "U8",
+      "lines": [
+        568,
+        575
+      ],
+      "literal_visit_traversal": false,
+      "decision": "NO_SIBLING_TRAVERSAL",
+      "reason": "Single Root mutation570. Self/duplicate check572 uses _friends; success573 adds Knows and changes future neighbors/_near/BFS operations. No sibling visit.",
+      "callees": [
+        "_friends"
+      ],
+      "simplification": "No semantic rewrite required for stated distinction; ordinary loop/comprehension/library effect summaries may be needed. No implementation claim."
+    }
+  ],
+  "helpers": {
+    "_OriginalPost": {
+      "lines": [
+        58,
+        71
+      ],
+      "effect": "Here-dependent Message/Person traversal. original_id/creator outputs do not guard access. No seen/step bound; ReplyOf graph cycle or multiple parents are not ruled out by this source. A single-chain optimization requires separate cardinality/acyclicity evidence."
+    },
+    "_content": {
+      "lines": [
+        72,
+        72
+      ],
+      "effect": "Field-only conditional image_file/content; no graph writes/visits."
+    },
+    "_friends": {
+      "lines": [
+        180,
+        182
+      ],
+      "effect": "Read-only outgoing+incoming Knows concat; preserve duplicates/order; no universal uniqueness proof."
+    },
+    "_near": {
+      "lines": [
+        183,
+        198
+      ],
+      "effect": "Local BFS visited-set writes190\u2013191 affect later frontier/query origins193\u2013195; diamond merge witness. depth is explicit hop-layer limit range185 and distance is assigned per layer, never total visited count. Called before visits; no Jac sibling abilities inside helper."
+    },
+    "_author": {
+      "lines": [
+        199,
+        199
+      ],
+      "effect": "Read first HasCreator; requires nonempty typed graph, does not prove unique creator."
+    },
+    "_tags": {
+      "lines": [
+        200,
+        200
+      ],
+      "effect": "Read-only HasTag targets."
+    },
+    "_is_class": {
+      "lines": [
+        410,
+        420
+      ],
+      "effect": "Local DFS stack and seen414\u2013417 control repeated SubClassOf queries; name match416 returns before further pending work. Diamond/cycle skips revisits. Procedural per-call state, reset for each tag."
+    },
+    "_edge_weight": {
+      "lines": [
+        441,
+        451
+      ],
+      "effect": "Read-only two-direction comments/ReplyOf/author loops; local weight accumulator never guards later reads. Parent kind only selects arithmetic448."
+    },
+    "friendship_dates": {
+      "source": {
+        "path": "reproduction/ttg-continuation-benchmarks/snb/fixture_loader.py",
+        "sha256": "0ecee74693b7d4dc39b26c3190104949e7212537fc98fa50d79182ddc6480fe0"
+      },
+      "lines": [
+        19,
+        25
+      ],
+      "effect": "Iterates person.__jac__.edges; edge kind/endpoint selects other node, stores creation_date by ref. Local result only, no graph writes. Requires summaries for Jac.object_ref, __jac__ descriptors and archetype access; opaque without those."
+    },
+    "edge_rows": {
+      "source": {
+        "path": "reproduction/ttg-continuation-benchmarks/snb/fixture_loader.py",
+        "sha256": "0ecee74693b7d4dc39b26c3190104949e7212537fc98fa50d79182ddc6480fe0"
+      },
+      "lines": [
+        28,
+        37
+      ],
+      "effect": "Iterates __jac__.edges, filters kind/direction, reads target/source/archetype/getattr edge fields. No mutations except local rows. Ordinary framework/archetype summaries required; getter/descriptor effects otherwise unknown."
+    },
+    "seed_graph": {
+      "source": {
+        "path": "reproduction/ttg-continuation-benchmarks/snb/fixture_loader.py",
+        "sha256": "0ecee74693b7d4dc39b26c3190104949e7212537fc98fa50d79182ddc6480fe0"
+      },
+      "lines": [
+        7,
+        16
+      ],
+      "effect": "Seed only, outside29 operation denominator. External file/JSON and Jac.save/connect/root/object_ref/diagnostics, graph mutations. This is not silently treated pure."
+    }
+  },
+  "limitations": [
+    "No DB, tests, compiler, runtime execution or native acceptance claim.",
+    "SNB fixture/source semantics beyond dependency classification were not re-audited.",
+    "Branch/early return driven by fixed request/current node is not a sibling-carried dependency; visited/frontier/cancellation inside a procedural helper is labeled separately.",
+    "All29 operation sources bind to supported_testcases source hashes."
+  ]
+}
