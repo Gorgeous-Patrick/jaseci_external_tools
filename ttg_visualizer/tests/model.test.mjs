@@ -125,7 +125,16 @@ test('LittleX sealed capture joins finite DAG template across all four feed requ
     assert.equal(view.queries.length,1);
     assert.equal(view.queries[0].sql,littlex.compiler.templates.find(t=>t.id===view.templateId).sql);
     assert.deepEqual(view.bindings.map(x=>[x.event,x.count]),[[1,1],[4,20],[5,40]]);
-    assert.equal(view.regionPath.split(' Z').length-1,1);
+    // A single connected region may have holes between its branching corridors.
+    // In SVG's downward-y coordinates, the exterior winds positive and holes
+    // negative; counting Z commands would incorrectly count holes as regions.
+    const rings=view.regionPath.split(' Z').filter(s=>s.trim());
+    const areas=rings.map(r=>{
+      const pts=[...r.matchAll(/[ML](-?[0-9.]+),(-?[0-9.]+)/g)].map(x=>[+x[1],+x[2]]);
+      return pts.reduce((area,p,i)=>{const q=pts[(i+1)%pts.length];return area+p[0]*q[1]-q[0]*p[1];},0);
+    });
+    assert.equal(areas.filter(a=>a>0).length,1);
+    assert(areas.every(a=>a!==0));
     for(const binding of view.bindings)for(const p of binding.paths){
       assert.equal(p.edges.length,p.nodes.length-1);
       for(let i=0;i<p.edges.length;i++){

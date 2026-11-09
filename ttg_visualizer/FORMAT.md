@@ -88,3 +88,11 @@ For LittleX only, framework Root nodes and root edges omitted from the domain
 fixture are recovered from verified SuiteRoot/SuiteImport and physical seed
 census records. Their evidence fields state their provenance. `visited` remains
 empty because feed outputs do not establish a complete visit trace.
+
+The SQL walkthrough is derived client-side; it does not modify the bundle.
+Blocks and clause fragments carry original SQL character ranges. Tokens retain
+original names and constants; the pretty view adds whitespace only. Alias
+explanations use the exact SQL predicates and compiler parameters. Runtime slot
+values remain unknown. The displayed dependency graph is logical, not a physical
+PostgreSQL plan. The bounded parser rejects unsupported shape/parameter bindings
+rather than assigning the recorded-app explanation to arbitrary SQL.

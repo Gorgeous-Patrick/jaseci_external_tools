@@ -23,7 +23,7 @@ def main():
     out.mkdir(exist_ok=True)
     shutil.copyfile(built, out / 'index.html')
     shutil.copytree(ROOT / 'public', out, dirs_exist_ok=True)
-    tracked = ['main.jac', 'model.js', 'style.css', 'jac.toml', 'public/data/jdrive.json', 'public/data/littlex.json']
+    tracked = ['main.jac', 'model.js', 'sql_explainer.js', 'style.css', 'jac.toml', 'public/data/jdrive.json', 'public/data/littlex.json']
     files = {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest() for name in tracked}
     result = dict(schema='jac.ttg.viewer-build', version=1, source_sha256=files,
                   index_sha256=hashlib.sha256((out / 'index.html').read_bytes()).hexdigest())

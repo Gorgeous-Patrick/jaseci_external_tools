@@ -53,8 +53,12 @@ data bundle. Serve the whole `dist` directory, not only the HTML file.
 2. **SQL & timeline**: select a compiler template or a real query. Links require
    exact original SQL text. Foreground and background queries keep their actual
    send-to-ready coordinates. Control queries can be shown separately.
-3. **Evidence**: source/capture hashes, compiler-cache provenance, and scope.
-4. **Open bundle**: replace the dataset with another version-1 JSON bundle.
+3. **SQL walkthrough**: both LittleX and JDrive have a logical SQL dataflow graph.
+   Select a block to read its Jac source, exact SQL fragments, alias roles and
+   constant/runtime parameters. Click an alias or parameter to highlight its
+   exact occurrences. See the output-column contract below the graph.
+4. **Evidence**: source/capture hashes, compiler-cache provenance, and scope.
+5. **Open bundle**: replace the dataset with another version-1 JSON bundle.
 
 The default is the accepted JDrive `thread / measured-0` capture from
 `ttg-portfolio-v2-20261104`. It includes 486 initial graph nodes, 19 compiler
@@ -171,3 +175,32 @@ Set `PLAYWRIGHT_MODULE` to reuse an existing Playwright installation. Tests cove
 real SQL counts/joins, corrupt relation rejection, declaration/annex navigation,
 graph pagination, request switching, controls, bundle import, and mobile layout.
 Screenshots and browser results are written to ignored `artifacts/`.
+
+## SQL walkthrough scope
+
+`sql_explainer.js` reads the selected request's **exact-matched region template**.
+A bounded tokenizer splits balanced WITH / WITH RECURSIVE definitions, retains
+original character offsets, and derives clause excerpts and alias roles from
+SQL plus the compiler's constants/slots. Display formatting changes whitespace
+only. Raw snippets and the whole original SQL remain accessible.
+
+- LittleX: three visit CTEs, both collect CTEs depending on the Profile CTE;
+  all three path outputs plus the separate slot −1 type-catalog branch reach
+  the final UNION ALL / ordering step. Catalog rows are outside the path LIMIT.
+- JDrive: seed plus UNION recursive origin set, exact boolean/type predicate,
+  then a separate ordered path-enumeration pass and result LIMIT. The second
+  pass does not repeat the `trashed = false` expansion predicate. The LIMIT is
+  not a recursion depth bound.
+
+This is a logical SQL explanation, not a PostgreSQL physical plan or a replay of
+intermediate result rows. Bound values and per-CTE rows were not captured.
+Native effect/cache checks and separate payload hydration are distinguished
+from SQL path calculation. The adapter supports the two recorded certificate
+shapes; unknown shapes fail closed to the original SQL view.
+
+Check exact fragment binding, whitespace-only formatting, dependency direction,
+ACL/alias roles, catalog handling and recursive LIMIT semantics with:
+
+```bash
+node tests/sql_explainer.test.mjs
+```

@@ -6,6 +6,8 @@ import from "./model.js" {
     sqlLabel, sqlDetails, pretty, short, timebar, graphHeight, abilityNames, selectedRegion, nestedRegion, graphOverview, finiteDagView
 }
 
+import from "./sql_explainer.js" { explainQuery, walkthroughStep, walkthroughFragment, highlightedSQL, symbolInfo }
+
 def:pub app -> JsxElement {
     has bundle: any = None,
         error: str = "",
@@ -20,6 +22,9 @@ def:pub app -> JsxElement {
         queryId: str = "",
         templateId: str = "",
         tab: str = "graph",
+        sqlStep: str = "",
+        sqlPart: str = "all",
+        sqlSymbol: str = "",
         edgeKind: str = "order",
         zoom: int = 100,
         showControl: bool = False,
@@ -27,6 +32,9 @@ def:pub app -> JsxElement {
 
     def install(data: any) {
         bundle = data;
+        sqlStep = "";
+        sqlPart = "all";
+        sqlSymbol = "";
         example = "littlex" if data.`walker == "load_feed" else ("jdrive" if data.`walker == "VisibleFolderTree" else "");
         focus = firstNode(data);
         nodeHistory = [];
@@ -96,6 +104,9 @@ def:pub app -> JsxElement {
     canvasHeight = graphHeight(bundle, focus, page, requestId, selectedAbility);
     expansion = nestedRegion(bundle, focus, page, requestId, selectedAbility);
     overview = graphOverview(bundle, focus, requestId);
+    walkthrough = explainQuery(bundle, requestId);
+    sqlBlock = walkthroughStep(walkthrough, sqlStep);
+    sqlFragment = walkthroughFragment(sqlBlock, sqlPart);
 
     return <div className="shell">
         <header>
@@ -124,7 +135,8 @@ def:pub app -> JsxElement {
         <nav className="tabs">
             <button className={"active" if tab == "graph" else ""} onClick={lambda { tab = "graph"; }}>01 · Graph & hooks</button>
             <button className={"active" if tab == "sql" else ""} onClick={lambda { tab = "sql"; }}>02 · SQL & timeline</button>
-            <button className={"active" if tab == "evidence" else ""} onClick={lambda { tab = "evidence"; }}>03 · Evidence</button>
+            <button className={"active" if tab == "walkthrough" else ""} onClick={lambda { tab = "walkthrough"; }}>03 · SQL walkthrough</button>
+            <button className={"active" if tab == "evidence" else ""} onClick={lambda { tab = "evidence"; }}>04 · Evidence</button>
             <span className="grow"></span>
             <label>Request <select value={requestId} onChange={lambda (e: any) { requestId = e.target.value; queryId = ""; }}>
                 {for r in bundle.requests { <option key={r.id} value={r.id}>{r.id}</option> }}
@@ -413,7 +425,7 @@ def:pub app -> JsxElement {
                 </section>
                 <section className="panel sql-detail">
                     {if detail {
-                        <div className="panel-title">{detail.title}</div>
+                        <div className="panel-title">{detail.title}{if walkthrough.supported { <button onClick={lambda { tab = "walkthrough"; }}>Walk through this request’s region SQL →</button> }}</div>
                         <p className="mono pad">SHA256 {detail.sql_sha256}</p>
                         <pre className="sql-code">{detail.sql}</pre>
                         <div className="detail-grid"><div><h3>Parameters / slots</h3><pre>{pretty(detail.parameters)}</pre></div><div><h3>Evidence</h3><pre>{pretty(detail.evidence)}</pre></div></div>
@@ -422,6 +434,75 @@ def:pub app -> JsxElement {
                     }}
                 </section>
             </div>
+        }}
+        {if tab == "walkthrough" {
+            if walkthrough.supported {
+                <section className="walkthrough-header panel">
+                    <div><div className="eyebrow">ONE SQL STATEMENT · LOGICAL DATAFLOW</div><h2>{"LittleX: three visits, one finite SQL DAG" if walkthrough.finite else "JDrive: recursion first, ordered path records second"}</h2>
+                        <p>Click a block, then inspect its Jac source, table aliases and exact SQL clauses. Arrows show dependencies, not PostgreSQL's physical execution plan.</p></div>
+                    <div className="walkthrough-facts"><b>{walkthrough.characters} characters</b><span>{walkthrough.constants} compiler constants · {len(walkthrough.inputSlots)} runtime slots</span><span>Captured: {walkthrough.query.rows} result rows · {walkthrough.query.duration_ms.toFixed(3)} ms</span></div>
+                </section>
+                <section className="panel walkthrough-flow">
+                    <div className="walkthrough-inputs"><b>Runtime input</b>{for slot in walkthrough.inputSlots { <span key={slot.name}>:{slot.name} <small>{slot.type}</small></span> }}<em>Concrete Bind values were not retained.</em></div>
+                    <div className="graph-scroll">
+                        <svg className="sql-flow" viewBox="0 0 1100 440" role="img" aria-label="Logical SQL block dependency graph">
+                            <defs><marker id="sql-flow-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8" fill="#117ab0"/></marker></defs>
+                            {for link in walkthrough.links { <path key={link.path} className="sql-flow-edge" d={link.path} fill="none" stroke="#6796b4" strokeWidth="2" markerEnd="url(#sql-flow-arrow)"/> }}
+                            {for item in walkthrough.graph {
+                                <g key={item.id} className="sql-flow-node" data-step={item.id} onClick={lambda { sqlStep = item.id; sqlPart = "all"; sqlSymbol = ""; }}>
+                                    <rect x={item.x} y={item.y} width={item.w} height={item.h} rx="10" fill={"#e4f3fc" if sqlBlock.id == item.id else "#fff"} stroke={"#117ab0" if sqlBlock.id == item.id else "#c8d6e2"} strokeWidth="2"/>
+                                    <text x={item.x + 16} y={item.y + 28} className="sql-block-key">{item.id}</text>
+                                    <text x={item.x + 16} y={item.y + 53} className="nested-text">{short(item.title, 37)}</text>
+                                    <text x={item.x + 16} y={item.y + 76} className="nested-small">Inspect exact SQL →</text>
+                                </g>
+                            }}
+                        </svg>
+                    </div>
+                    <div className="sql-flow-caption">{ "CTE 1 and CTE 2 both consume CTE 0. Neither consumes the other’s Tweet results. The −1 branch returns type metadata." if walkthrough.finite else "UNION removes repeated origin IDs. The loop stops when it adds no new origins. The outer row LIMIT is not a recursion depth limit." }</div>
+                </section>
+                <div className="walkthrough-content">
+                    <section className="panel sql-meaning">
+                        <div className="panel-title">READ THIS BLOCK</div><h2>{sqlBlock.title}</h2><p>{sqlBlock.description}</p><p className="meaning-why">{sqlBlock.why}</p>
+                        {if sqlBlock.jac {
+                            <div className="panel-title">JAC VISIT</div><pre className="jac-excerpt">{sqlBlock.jac}</pre>
+                            <button onClick={lambda { selectEvent(sqlBlock.event); tab = "graph"; }}>{sqlBlock.location} · event {sqlBlock.event} ↗</button>
+                        }}
+                        <div className="panel-title section-gap">WHAT DO THE TABLE ALIASES MEAN?</div>
+                        {if len(sqlBlock.aliases) {
+                            <table className="explain-table"><thead><tr><th>Alias</th><th>Table</th><th>Role</th></tr></thead><tbody>
+                                {for alias in sqlBlock.aliases { <tr key={alias.name}><td><button className={"symbol-button chosen" if sqlSymbol == alias.name else "symbol-button"} onClick={lambda { sqlSymbol = alias.name; }}>{alias.name}</button></td><td><code>{alias.table}</code></td><td>{alias.role}{if alias.type { <small>type constraint: {alias.type}</small> }}</td></tr> }}
+                            </tbody></table>
+                        } else { <p>This block introduces no base-table alias.</p> }}
+                        <details className="sql-parameters"><summary>Parameters used here · {len(sqlBlock.parameters)}</summary>
+                            <table className="explain-table"><thead><tr><th>Name</th><th>Value / binding</th></tr></thead><tbody>
+                                {for param in sqlBlock.parameters { <tr key={param.name}><td><button className="symbol-button" onClick={lambda { sqlSymbol = param.name; }}>{":" + param.name}</button></td><td><code>{param.value}</code><small>{param.type}</small></td></tr> }}
+                            </tbody></table>
+                        </details>
+                    </section>
+                    <section className="panel sql-fragment-panel">
+                        <div className="panel-title"><span>EXACT SQL · EXPLANATION BY CLAUSE</span><span className="muted">Click an alias or parameter to highlight it</span></div>
+                        <div className="fragment-tabs">{for frag in sqlBlock.fragments {
+                            <button key={frag.id} className={"active" if sqlFragment.id == frag.id else ""} onClick={lambda { sqlPart = frag.id; }}>{frag.title}</button>
+                        }}</div>
+                        <p className="fragment-note">{sqlFragment.note}</p>
+                        {if sqlSymbol { <div className="symbol-info">{symbolInfo(sqlBlock, sqlSymbol) or sqlSymbol}<button onClick={lambda { sqlSymbol = ""; }}>Clear highlight</button></div> }}
+                        <pre className="explained-sql">{for token in highlightedSQL(sqlFragment.sql, sqlSymbol) { <span key={str(token.key)} className={"sql-token " + token.kind + (" selected" if token.active else "")} onClick={lambda { sqlSymbol = token.symbol; }}>{token.text}</span> }}</pre>
+                        <div className="snippet-proof">Original SQL characters [{sqlBlock.start + sqlFragment.start}, {sqlBlock.start + sqlFragment.end}) · whitespace-only display formatting</div>
+                        <details className="original-snippet"><summary>Original fragment bytes</summary><pre>{sqlFragment.sql}</pre></details>
+                    </section>
+                </div>
+                <section className="panel sql-result-contract">
+                    <div className="panel-title">WHAT COMES BACK?</div>
+                    <p>These are path / validation records. They are not the application's final JSON response.</p>
+                    <table className="explain-table"><thead><tr><th>Output column</th><th>Meaning</th></tr></thead><tbody>{for col in walkthrough.columns { <tr key={col[0]}><td><code>{col[0]}</code></td><td>{col[1]}</td></tr> }}</tbody></table>
+                    <div className="result-stages"><span>SQL path records</span><b>→</b><span>Runtime contract checks + path cache</span><b>→</b><span>Separate payload hydration</span><b>→</b><span>Native visits + output</span></div>
+                    <p>Selected request also records {len(walkthrough.payloadQueries)} background data query. No per-CTE result rows or full Bind values were retained, so this page does not invent intermediate row samples.</p>
+                    <button onClick={lambda { queryId = walkthrough.query.id; templateId = ""; tab = "sql"; }}>Open exact captured query & timeline →</button>
+                    <details className="original-snippet"><summary>Full original SQL and provenance</summary><p className="mono">SQL SHA256 {walkthrough.query.sql_sha256}</p><pre>{pretty(walkthrough.query.evidence)}</pre><pre>{walkthrough.template.sql}</pre></details>
+                </section>
+            } else {
+                <section className="panel walkthrough-header"><h2>SQL walkthrough unavailable</h2><p>{walkthrough.reason}</p><button onClick={lambda { tab = "sql"; }}>Open exact SQL & timeline</button></section>
+            }
         }}
         {if tab == "evidence" {
             <section className="panel evidence-panel"><div className="panel-title">PROVENANCE & SCOPE</div>
