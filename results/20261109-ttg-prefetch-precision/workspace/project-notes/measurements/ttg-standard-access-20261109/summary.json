@@ -1,0 +1,170 @@
+{
+  "kind": "standard-only-access-implementation-and-matched-sql-diagnostic",
+  "passed": true,
+  "scope": "SQL-only warmed matched captured data; no HTTP or whole-application speedup claim",
+  "no_compatibility_mode": true,
+  "samples_per_variant": 21,
+  "excluded_warmups_per_variant": 3,
+  "rows": [
+    {
+      "app": "littlex",
+      "anchors": 2300,
+      "business_path_rows": 61,
+      "removed_catalog_rows": 3,
+      "summary_ms": {
+        "before": {
+          "planning_ms": {
+            "median": 1.718,
+            "min": 1.693,
+            "max": 1.808
+          },
+          "execution_ms": {
+            "median": 0.873,
+            "min": 0.855,
+            "max": 0.967
+          }
+        },
+        "after": {
+          "planning_ms": {
+            "median": 1.517,
+            "min": 1.489,
+            "max": 1.569
+          },
+          "execution_ms": {
+            "median": 0.423,
+            "min": 0.413,
+            "max": 0.504
+          }
+        }
+      },
+      "execution_reduction_percent": 51.546391752577314,
+      "sql_characters": {
+        "before": 9070,
+        "after": 8463
+      },
+      "shared_hits": {
+        "before": [
+          501
+        ],
+        "after": [
+          330
+        ]
+      },
+      "sql_identical": false,
+      "evidence": "/home/baichuan/jaseci/project-notes/measurements/ttg-standard-access-20261109/sql-v1/littlex.json",
+      "sha256": "37d1d783114394c738f85b0dc240639a2e65ee480376c0fec07a3687d07d779f"
+    },
+    {
+      "app": "jdrive",
+      "anchors": 113,
+      "business_path_rows": 35,
+      "removed_catalog_rows": 0,
+      "summary_ms": {
+        "before": {
+          "planning_ms": {
+            "median": 0.609,
+            "min": 0.604,
+            "max": 0.703
+          },
+          "execution_ms": {
+            "median": 0.626,
+            "min": 0.619,
+            "max": 0.842
+          }
+        },
+        "after": {
+          "planning_ms": {
+            "median": 0.61,
+            "min": 0.596,
+            "max": 0.651
+          },
+          "execution_ms": {
+            "median": 0.627,
+            "min": 0.62,
+            "max": 0.679
+          }
+        }
+      },
+      "execution_reduction_percent": -0.15974440894568342,
+      "sql_characters": {
+        "before": 4080,
+        "after": 4080
+      },
+      "shared_hits": {
+        "before": [
+          297
+        ],
+        "after": [
+          297
+        ]
+      },
+      "sql_identical": true,
+      "evidence": "/home/baichuan/jaseci/project-notes/measurements/ttg-standard-access-20261109/sql-v1/jdrive.json",
+      "sha256": "7463c04c4331cbe9cf8ce571cad21c7e1ae7a69b8ac7dd1911284ab9417ef678"
+    }
+  ],
+  "checks": {
+    "native-final-v1": {
+      "outcome": {
+        "exit": 0,
+        "passed": true
+      },
+      "lifecycle": {
+        "child_pid": 1494540,
+        "child_exit": 0,
+        "stop_exit": 0,
+        "pg_status": 3,
+        "has_pid": false,
+        "free_bytes": 11454963712,
+        "finished": 1794254502.0331438
+      },
+      "log_sha256": "afd5b2d4ff2fa283d5dbd3d6bce74bd0a9b9c3265f7dd7b1ffec5038e9f976c4"
+    },
+    "class-import-v1": {
+      "outcome": {
+        "exit": 0,
+        "passed": true
+      },
+      "lifecycle": {
+        "child_pid": 1489970,
+        "child_exit": 0,
+        "stop_exit": 0,
+        "pg_status": 3,
+        "has_pid": false,
+        "free_bytes": 11456995328,
+        "finished": 1794254400.1296306
+      },
+      "log_sha256": "252912ce3d17fb1857339988ad5cf4a34803224613a76dda0e99b7fbc33e1caa"
+    }
+  },
+  "sql_lifecycle": {
+    "status": 3,
+    "pidfile": false,
+    "stop_code": 0,
+    "finished_ns": 1794254536175506811
+  },
+  "current_sources": {
+    "jac/jaclang/cli/docs/reference/language/library-mode.md": "32d1ba4e40677e7caabf01293f4c0168db30883360daf35e5a1bd424927f0a9d",
+    "jac/jaclang/cli/docs/reference/language/osp.md": "eba61367991a3e41a5483127d747962440b5df647a65c0382f5676086a609c92",
+    "jac/jaclang/data/impl/query_planner.impl.jac": "8162196bfd8d4323ed4dfda22c3a33651fd216935b54f2ae342ce12e3f430d4f",
+    "jac/jaclang/data/ttg_acl.jac": "f23b435df1d525a37938ff8de570beafbaafe46ce78693df7dd823902462ba31",
+    "jac/jaclang/runtime/archetype.jac": "dbb907a32542829d9de7395a069f9d9530812b24884050a47a24c92728e42e6d",
+    "jac/jaclang/runtime/impl/archetype.impl.jac": "09002609a0bad05e671e2826a905b410aaf92bf8dbb31abb7e74badfca2a87ad",
+    "jac/jaclang/runtime/impl/runtime.impl.jac": "baae735d0e4d28e9f806d6f345f7de81df3f0df36088b1ac62bbc77fd9af7064",
+    "jac/jaclang/runtime/runtime.jac": "02421a47921b3a26196b480296298c463ec9f0af41f0e4e365d102cc870eb5df",
+    "jac/jaclang/runtime/ttg_frontier.jac": "e3ed98d09f8d6ce369897cedee28679e70901f03302ca418af129f0d9fc5a32e",
+    "jac/jaclang/runtime/ttg_region_dag.jac": "f29dec8ae4655170dbb2729d6e738a01402c3429e8c84117811a605e76f5ded4",
+    "jac/jaclang/runtime/ttg_regions.jac": "e947185965695a3de64d69c406ff4b9e2da4c3b1945db5543e8ae312afba6958",
+    "jac/jaclang/runtime/ttg_sql.jac": "eb67efe7e96c73a2307c9c6b6d54619965d2ee4c9647b4b102c5f77152d35cf1",
+    "jac/jaclang/runtime/ttg_templates.jac": "53e8d89d5425453748265690ca0df783ee3b5f0fbbd9309e1c2cba4df9c98ea9",
+    "jac/tests/runtimelib/fixtures/serve_shared_root.jac": "518da6528bb77b600dce45ade6d379f54fe082bf0942d363d981cde2b5061be6",
+    "jac/tests/runtimelib/fixtures/ttg_region_walkers.jac": "fe86ba6fcfcd76ad8e4e08a947c99a40f71099c38c1eba67817ed93ebc89329d",
+    "jac/tests/runtimelib/test_acl_pushdown.jac": "64f2fef72649a740566dd7af915baa52667a9c96aa253902a2f739ddf7282a3c",
+    "jac/tests/runtimelib/test_jaseci.jac": "cf83dadfccc3b187aa8de4d90c553aeedbaf2e83db9f8bdd4d4c81b13f0eaa56",
+    "jac/tests/runtimelib/test_shared_root.jac": "0ebfe2592ee1e7d94e6d2f10cbadc518e0916101cb40fa3c1aa671e782068ee4",
+    "jac/tests/runtimelib/test_ttg_authenticated_acl.jac": "f0394a56134f7dcc8ba41d13caba62c900c1d7c877a118ca5594a972311301a1",
+    "jac/tests/runtimelib/test_ttg_regions_native.jac": "826d81aded29c552a634059878fdaccca93e68d64d246b542d603d1a57cf75f2",
+    "jac/tests/runtimelib/test_standard_access.jac": "faeb6be16323027b34863c2ea5a61ea064ed5692fc0e7e9eb86f82cd291b0e07"
+  },
+  "base_commit": "96868d0400a2f91fbfa48112c7ee291c891d2d03"
+}

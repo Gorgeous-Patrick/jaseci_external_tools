@@ -1,0 +1,63 @@
+🛠  jac dev mode — using compiler source at /home/baichuan/jaseci/jac-ttg/jac
+E..........................                                              [100%]
+
+FAILED /home/baichuan/jaseci/jac-ttg/jac/tests/runtimelib/test_acl_pushdown.jac::test_acl_pushdown.jac
+Traceback (most recent call last):
+  File "/home/baichuan/jaseci/jac-ttg/jac/jaclang/testing/impl/test_runner.impl.jac", line 752, in run_file
+    importlib.import_module(qualified);
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/baichuan/jaseci/reproduction/runtime/pbs314/python/install/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1406, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "/home/baichuan/jaseci/jac-ttg/jac/jaclang/meta_importer.py", line 384, in exec_module
+    raise JacSourceCompileError(
+        f"{file_path} failed to compile:\n{details}", file_path
+    )
+jaclang.meta_importer.JacSourceCompileError: /home/baichuan/jaseci/jac-ttg/jac/tests/runtimelib/test_acl_pushdown.jac failed to compile:
+error[E0013]: 'edge' is a keyword and cannot be used as a variable name (prefix with backtick to escape: `edge)
+  --> /home/baichuan/jaseci/jac-ttg/jac/tests/runtimelib/test_acl_pushdown.jac:288:17
+  286 |             ctx.mem.put(leaf);
+  287 |             for (src, dst) in [(reader, middle), (middle, leaf)] {
+  288 |                 edge = EdgeAnchor(archetype=GenericEdge(), source=src, target=dst, is_undirected=False);
+      |                 ^^^^
+  289 |                 edge.persistent = True;
+  290 |                 src.edges.append(edge);
+error[E0003]: Expected identifier, got '.'
+  --> /home/baichuan/jaseci/jac-ttg/jac/tests/runtimelib/test_acl_pushdown.jac:289:21
+  287 |             for (src, dst) in [(reader, middle), (middle, leaf)] {
+  288 |                 edge = EdgeAnchor(archetype=GenericEdge(), source=src, target=dst, is_undirected=False);
+  289 |                 edge.persistent = True;
+      |                     ^
+  290 |                 src.edges.append(edge);
+  291 |                 dst.edges.append(edge);
+error[E0002]: Missing ';'
+  --> /home/baichuan/jaseci/jac-ttg/jac/tests/runtimelib/test_acl_pushdown.jac:289:21
+  287 |             for (src, dst) in [(reader, middle), (middle, leaf)] {
+  288 |                 edge = EdgeAnchor(archetype=GenericEdge(), source=src, target=dst, is_undirected=False);
+  289 |                 edge.persistent = True;
+      |                     ^
+  290 |                 src.edges.append(edge);
+  291 |                 dst.edges.append(edge);
+error[E0004]: Unexpected token in expression: '.'
+  --> /home/baichuan/jaseci/jac-ttg/jac/tests/runtimelib/test_acl_pushdown.jac:289:21
+  287 |             for (src, dst) in [(reader, middle), (middle, leaf)] {
+  288 |                 edge = EdgeAnchor(archetype=GenericEdge(), source=src, target=dst, is_undirected=False);
+  289 |                 edge.persistent = True;
+      |                     ^
+  290 |                 src.edges.append(edge);
+  291 |                 dst.edges.append(edge);
+error[E0002]: Missing ';'
+  --> /home/baichuan/jaseci/jac-ttg/jac/tests/runtimelib/test_acl_pushdown.jac:289:22
+  287 |             for (src, dst) in [(reader, middle), (middle, leaf)] {
+  288 |                 edge = EdgeAnchor(archetype=GenericEdge(), source=src, target=dst, is_undirected=False);
+  289 |                 edge.persistent = True;
+      |                      ^^^^^^^^^^
+  290 |                 src.edges.append(edge);
+  291 |                 dst.edges.append(edge);
+
+26 passed, 1 error in 14.09s
+✖ Error: Tests failed.

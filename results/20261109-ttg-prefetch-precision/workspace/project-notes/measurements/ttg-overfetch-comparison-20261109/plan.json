@@ -1,0 +1,225 @@
+{
+  "kind": "aggressive-conservative-overfetch-comparison",
+  "runtime_commit": "96868d0400a2f91fbfa48112c7ee291c891d2d03",
+  "clean": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-standard-access-comparison-20261109/clean-manifest.json",
+    "sha256": "6fae6e72ea60d8c3c7b1866c69c1b7234658c1d5e92b27404f8e5432e29ed250"
+  },
+  "overlay": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-standard-access-comparison-20261109/overlay-manifest.json",
+    "sha256": "cdbd008bf9d445164de67e8bfe0e081fe88128a785ad7a64c49125862c07760d"
+  },
+  "sources": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-overfetch-comparison-20261109/sources.json",
+    "sha256": "f325cffd99532f25e70be53e6fe6935c24e1c47ad1e08c6e49fa1cef8d2563f6"
+  },
+  "configs": {
+    "aggressive": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "thread",
+      "ttg_prefetch_model": "always",
+      "prefetching": "ttg",
+      "ttg_fused_sql": false
+    },
+    "conservative": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "thread",
+      "ttg_prefetch_model": "always",
+      "prefetching": "ttg_dependency",
+      "ttg_fused_sql": true
+    }
+  },
+  "schedule": [
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "jdrive-aggressive-excluded_warmup--1"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "jdrive-conservative-excluded_warmup--1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "littlex-aggressive-excluded_warmup--1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "littlex-conservative-excluded_warmup--1"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "jdrive-aggressive-measured-0"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "jdrive-conservative-measured-0"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "jdrive-conservative-measured-1"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "jdrive-aggressive-measured-1"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "jdrive-aggressive-measured-2"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "jdrive-conservative-measured-2"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "littlex-aggressive-measured-0"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "littlex-conservative-measured-0"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "littlex-conservative-measured-1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "littlex-aggressive-measured-1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "littlex-aggressive-measured-2"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "littlex-conservative-measured-2"
+    }
+  ],
+  "seed": 42,
+  "statistics": "ANALYZE anchors and graph_types once after setup, before primary HTTP/reset",
+  "storage": {
+    "startup": 805306368,
+    "between": 671088640,
+    "stop": 536870912
+  },
+  "selection": "Fixed JDrive small and LittleX small, same standard-only runtime, aggressive ttg and conservative ttg_dependency, both thread. No case removed for poor performance.",
+  "scope": "Precision diagnostic, not uninstrumented latency benchmark. Request-bound payload delivery/demand/OSP entry instrumentation identical in both modes. 16 fresh workflows: four excluded warmups, twelve measured, n3 per four cells. Full native correctness and physical-state replay per case; actual GIL-off at SQL boundaries; setup, steady reads and restart excluded."
+}

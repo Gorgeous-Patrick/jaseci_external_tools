@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-standard-access-comparison-20261109/run-v1/cases/jdrive-thread-measured-0/artifacts.json",
+    "sha256": "9693d090156af894638ac4c168ef54ea020d4843c16b624a423bbbef5cd45837",
+    "files_checked": 164
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_native_semantic_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-standard-access-comparison-20261109/run-v1/cases/jdrive-thread-measured-0/artifacts.json",
+      "sha256": "9693d090156af894638ac4c168ef54ea020d4843c16b624a423bbbef5cd45837",
+      "files_checked": 164
+    },
+    "proof_sha256": "3001743eaa0cda6220e3430db83c815570935573ac748f969c80efed707f10a2",
+    "actual_operations_checked": 13,
+    "final_logical_state_sha256": "4e28baf1394358089100d8a5d5b13af37cecb83dc430422280e31c020505563d",
+    "verifier_sources": {
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/native.py": "f44bf3905bd248df2f7c2fe10db3c926a847d170c963e889bffac94d51435228",
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/datasets/ttg/build.py": "a617dd95626a60babcf56dc10fba0ed3dc4a5c24ceca3033fea0b97401c129b9"
+    },
+    "full_response": {
+      "full_actions_sha256": "9c1d29081f9f73172f52138edbab407badedcbbef1f4ff20f126727835ca1915",
+      "full_semantic_sha256": "24805f8c90b9fa76a086ea5daed0b75ccb9affac367deb6f5accf225ac349235"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-standard-access-comparison-20261109/run-v1/cases/jdrive-thread-measured-0/plus-proof.json",
+    "sha256": "3001743eaa0cda6220e3430db83c815570935573ac748f969c80efed707f10a2"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-standard-access-comparison-20261109/run-v1/cases/jdrive-thread-measured-0/cleanup-target.json",
+    "sha256": "cdf46efb9636ddb96dc5789aec5651d276ab591ad45333f8e56cfad2dc01a272"
+  },
+  "database_state": {
+    "database": "continuation_a38b1a9d244c40f792758656b92ca481",
+    "cluster_owner": "c17ceb46-4c42-48e8-b8eb-6775c387e9a2",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "88d47c022c5784cf94b040ee9318334a3b744b47cf2591aafb2d646cd95e8553",
+    "actual_row_count": 974,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('Drive','Folder','File','Contains')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-standard-access-comparison-20261109/sources.json",
+    "sha256": "953742ee5ec89750b37e237d0f4ba8dbf4ab5aa1c54e36e2e25ce49ab55b4ac2"
+  }
+}

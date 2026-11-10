@@ -1,0 +1,44 @@
+2026-11-09 14:57:04.359 EST [1481834] LOG:  starting PostgreSQL 18.6 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+2026-11-09 14:57:04.359 EST [1481834] LOG:  listening on IPv4 address "127.0.0.1", port 44369
+2026-11-09 14:57:04.364 EST [1481840] LOG:  database system was shut down at 2026-11-09 14:57:03 EST
+2026-11-09 14:57:04.371 EST [1481834] LOG:  database system is ready to accept connections
+2026-11-09 14:57:08.605 EST [1481979] ERROR:  relation "kv_state" does not exist at character 28
+2026-11-09 14:57:08.605 EST [1481979] STATEMENT:  
+	        SELECT value FROM kv_state
+	        WHERE key = $1 AND (expires_at IS NULL OR expires_at > now())
+	        
+2026-11-09 14:57:08.606 EST [1481979] ERROR:  relation "kv_state" does not exist at character 28
+2026-11-09 14:57:08.606 EST [1481979] STATEMENT:  
+	        SELECT value FROM kv_state
+	        WHERE key = $1 AND (expires_at IS NULL OR expires_at > now())
+	        
+2026-11-09 14:57:08.723 EST [1481979] ERROR:  could not serialize access due to concurrent update
+2026-11-09 14:57:08.723 EST [1481979] STATEMENT:  
+	            INSERT INTO anchors
+	                (id, kind, arch_type, arch_module, fingerprint, root_id,
+	                 src, dst, undirected, props, format_version, version, updated_at)
+	            VALUES
+	            (CAST($1 AS uuid), $2, $3, $4, $5, CAST($6 AS uuid), CAST($7 AS uuid), CAST($8 AS uuid), $9, CAST($10 AS jsonb), $11, $12, now())
+	            ON CONFLICT (id) DO UPDATE SET
+	                kind = EXCLUDED.kind,
+	                arch_type = EXCLUDED.arch_type,
+	                arch_module = EXCLUDED.arch_module,
+	                fingerprint = EXCLUDED.fingerprint,
+	                root_id = EXCLUDED.root_id,
+	                src = EXCLUDED.src,
+	                dst = EXCLUDED.dst,
+	                undirected = EXCLUDED.undirected,
+	                props = EXCLUDED.props,
+	                format_version = EXCLUDED.format_version,
+	                version = EXCLUDED.version + 1,
+	                updated_at = now()
+	            WHERE anchors.version = EXCLUDED.version
+	            RETURNING id, version
+	            
+2026-11-09 14:57:18.747 EST [1481834] LOG:  received fast shutdown request
+2026-11-09 14:57:18.750 EST [1481834] LOG:  aborting any active transactions
+2026-11-09 14:57:18.750 EST [1481834] LOG:  background worker "logical replication launcher" (PID 1481843) exited with exit code 1
+2026-11-09 14:57:18.750 EST [1481838] LOG:  shutting down
+2026-11-09 14:57:18.753 EST [1481838] LOG:  checkpoint starting: shutdown immediate
+2026-11-09 14:57:18.828 EST [1481838] LOG:  checkpoint complete: wrote 107 buffers (2.6%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.009 s, sync=0.057 s, total=0.078 s; sync files=62, longest=0.003 s, average=0.001 s; distance=687 kB, estimate=687 kB; lsn=0/17FD3B0, redo lsn=0/17FD3B0
+2026-11-09 14:57:18.835 EST [1481834] LOG:  database system is shut down

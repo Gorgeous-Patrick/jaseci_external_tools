@@ -1,0 +1,814 @@
+import time as _perf_clock;
+import threading as _perf_threading;
+import continuation_probe as _perf_sink;
+import threading;
+
+glob _INT32 = '!i',
+     _INT16 = '!h',
+     _sql_log_state: list = [None],
+     _sql_log_lock: threading.Lock = threading.Lock(),
+     _selep_trace_state: list = [None],
+     _selep_trace_lock: threading.Lock = threading.Lock();
+
+
+def _compact_sql(sql: str) -> str {
+    return ' '.join(str(sql).split());
+}
+
+
+def _sql_log_path -> str {
+    import os;
+    env_path = os.environ.get('JAC_SQL_LOG', '').strip();
+    if env_path {
+        return env_path;
+    }
+    try {
+        import from jaclang.project.config { get_config }
+        cfg = get_config();
+        if cfg is not None {
+            return str(getattr(cfg.run, 'sql_log', '') or '').strip();
+        }
+    } except Exception {
+        ;
+    }
+    return '';
+}
+
+
+def _selep_trace_path -> str {
+    import os;
+    return os.environ.get('JAC_SELEP_TRACE', '').strip();
+}
+
+
+impl sql_log_reset_for_tests -> None {
+    with _sql_log_lock {
+        state = _sql_log_state[0];
+        if state is not None and state is not False {
+            try {
+                state[0].close();
+            } except Exception {
+                ;
+            }
+        }
+        _sql_log_state[0] = None;
+    }
+}
+
+
+impl selep_trace_reset_for_tests -> None {
+    with _selep_trace_lock {
+        state = _selep_trace_state[0];
+        if state is not None and state is not False {
+            try {
+                state[0].close();
+            } except Exception {
+                ;
+            }
+        }
+        _selep_trace_state[0] = None;
+    }
+}
+
+
+def _trace_jsonable(v: any) -> any {
+    if v is None or isinstance(v, (str, int, float, bool)) {
+        return v;
+    }
+    if isinstance(v, bytes) {
+        return {"__bytes_hex__": v.hex()};
+    }
+    if isinstance(v, (list, tuple, set)) {
+        out: list = [];
+        for item in v {
+            out.append(_trace_jsonable(item));
+        }
+        return out;
+    }
+    if isinstance(v, dict) {
+        mapped: dict[str, any] = {};
+        for pair in v.items() {
+            key = pair[0];
+            value = pair[1];
+            mapped[str(key)] = _trace_jsonable(value);
+        }
+        return mapped;
+    }
+    return str(v);
+}
+
+
+def _trace_jsonable_params(params: dict) -> dict {
+    out: dict[str, any] = {};
+    for pair in params.items() {
+        key = pair[0];
+        value = pair[1];
+        out[str(key)] = _trace_jsonable(value);
+    }
+    return out;
+}
+
+
+def _write_selep_trace(
+    conn: any,
+    sql: str,
+    params: dict,
+    pos_sql: str,
+    args: list,
+    elapsed_ms: float,
+    row_count: int,
+    error: str = ''
+) -> None {
+    if _selep_trace_state[0] is False {
+        return;
+    }
+    with _selep_trace_lock {
+        state = _selep_trace_state[0];
+        if state is None {
+            try {
+                import pathlib;
+                path = _selep_trace_path();
+                if not path {
+                    _selep_trace_state[0] = False;
+                    return;
+                }
+                p = pathlib.Path(path);
+                p.parent.mkdir(parents=True, exist_ok=True);
+                state = (p.open('a'),);
+                _selep_trace_state[0] = state;
+            } except Exception {
+                _selep_trace_state[0] = False;
+                return;
+            }
+        }
+        if state is False {
+            return;
+        }
+        try {
+            import json;
+            import time;
+            fh = state[0];
+            record = {
+                "ts_ns": time.time_ns(),
+                "thread_id": threading.get_ident(),
+                "database": str(getattr(conn, 'database', '') or ''),
+                "application_name": str(getattr(conn, 'application_name', '') or ''),
+                "elapsed_ms": elapsed_ms,
+                "row_count": row_count,
+                "status": 'error' if error else 'ok',
+                "error": error,
+                "sql": _compact_sql(sql),
+                "params": _trace_jsonable_params(params),
+                "pos_sql": _compact_sql(pos_sql),
+                "args": _trace_jsonable(args)
+            };
+            fh.write(json.dumps(record, sort_keys=True) + "\n");
+            fh.flush();
+        } except Exception {
+            ;
+        }
+    }
+}
+
+
+def _write_sql_log(
+    conn: any,
+    sql: str,
+    params: dict,
+    elapsed_ms: float,
+    row_count: int,
+    error: str = ''
+) -> None {
+    if _sql_log_state[0] is False {
+        return;
+    }
+    with _sql_log_lock {
+        state = _sql_log_state[0];
+        if state is None {
+            try {
+                import csv;
+                import pathlib;
+                path = _sql_log_path();
+                if not path {
+                    _sql_log_state[0] = False;
+                    return;
+                }
+                p = pathlib.Path(path);
+                p.parent.mkdir(parents=True, exist_ok=True);
+                fh = p.open('w', newline='');
+                writer = csv.writer(fh);
+                writer.writerow([
+                    'ts_ns',
+                    'thread_id',
+                    'database',
+                    'application_name',
+                    'elapsed_ms',
+                    'row_count',
+                    'param_count',
+                    'param_keys',
+                    'status',
+                    'error',
+                    'sql'
+                ]);
+                state = (fh, writer);
+                _sql_log_state[0] = state;
+            } except Exception {
+                _sql_log_state[0] = False;
+                return;
+            }
+        }
+        if state is False {
+            return;
+        }
+        try {
+            import time;
+            fh = state[0];
+            writer = state[1];
+            keys = sorted([str(k) for k in params.keys()]);
+            writer.writerow([
+                time.time_ns(),
+                threading.get_ident(),
+                str(getattr(conn, 'database', '') or ''),
+                str(getattr(conn, 'application_name', '') or ''),
+                f"{elapsed_ms:.3f}",
+                row_count,
+                len(params),
+                ' '.join(keys),
+                'error' if error else 'ok',
+                error,
+                _compact_sql(sql)
+            ]);
+            fh.flush();
+        } except Exception {
+            ;
+        }
+    }
+}
+
+
+impl _encode_param(v: any) -> (bytes | None) {
+    if v is None {
+        return None;
+    }
+    if isinstance(v, bool) {
+        return b'true' if v else b'false';
+    }
+    if isinstance(v, bytes) {
+        return v;
+    }
+    if isinstance(v, (list, tuple, set)) {
+        return _array_literal(v).encode('utf-8');
+    }
+    if isinstance(v, dict) {
+        import json;
+        def _coerce(o: object) -> str {
+            return str(o);
+        }
+        return json.dumps(v, `default=_coerce).encode('utf-8');
+    }
+    return str(v).encode('utf-8');
+}
+
+
+impl _array_literal(vals: any) -> str {
+    parts: list[str] = [];
+    for v in vals {
+        s = str(v);
+        escaped = s.replace('\\', '\\\\').replace('"', '\\"');
+        parts.append(f'"{escaped}"');
+    }
+    return '{' + ','.join(parts) + '}';
+}
+
+
+impl _decode_value(oid: int, raw: bytes) -> any {
+    if oid == 16 {
+        return raw == b't';
+    }
+    if oid in (20, 21, 23, 26, 28) {
+        return int(raw.decode('utf-8'));
+    }
+    if oid in (700, 701) {
+        return float(raw.decode('utf-8'));
+    }
+    return raw.decode('utf-8');
+}
+
+
+impl _named_to_positional(sql: str, params: dict) -> tuple[str, list] {
+    out: list[str] = [];
+    order: dict[str, int] = {};
+    args: list = [];
+    i = 0;
+    n = len(sql);
+    in_squote = False;
+    in_dquote = False;
+    while i < n {
+        ch = sql[i];
+        if in_squote {
+            out.append(ch);
+            if ch == "'" {
+                if i + 1 < n and sql[i + 1] == "'" {
+                    out.append("'");
+                    i += 1;
+                } else {
+                    in_squote = False;
+                }
+            }
+            i += 1;
+            continue;
+        }
+        if in_dquote {
+            out.append(ch);
+            if ch == '"' {
+                in_dquote = False;
+            }
+            i += 1;
+            continue;
+        }
+        if ch == "'" {
+            in_squote = True;
+            out.append(ch);
+            i += 1;
+            continue;
+        }
+        if ch == '"' {
+            in_dquote = True;
+            out.append(ch);
+            i += 1;
+            continue;
+        }
+        if ch == ':' {
+            if i + 1 < n and sql[i + 1] == ':' {
+                out.append('::');
+                i += 2;
+                continue;
+            }
+            j = i + 1;
+            name = '';
+            while j < n and (sql[j].isalnum() or sql[j] == '_') {
+                name += sql[j];
+                j += 1;
+            }
+            if name and name in params {
+                if name not in order {
+                    order[name] = len(args) + 1;
+                    args.append(params[name]);
+                }
+                out.append(f"${order[name]}");
+                i = j;
+                continue;
+            }
+        }
+        out.append(ch);
+        i += 1;
+    }
+    return (''.join(out), args);
+}
+
+
+def _scram_proofs(
+    password: str, server_first: str, client_first_bare: str
+) -> tuple[str, str, str] {
+    fields: dict[str, str] = {};
+    for part in server_first.split(',') {
+        if '=' in part {
+            (k, v) = part.split('=', 1);
+            fields[k] = v;
+        }
+    }
+    server_nonce = fields.get('r', '');
+    salt = base64.b64decode(fields.get('s', ''));
+    iterations = int(fields.get('i', '4096'));
+    salted = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, iterations);
+    client_key = hmac.new(salted, b'Client Key', hashlib.sha256).digest();
+    stored_key = hashlib.sha256(client_key).digest();
+    client_final_wo = f"c=biws,r={server_nonce}";
+    auth_message = (
+        client_first_bare + ',' + server_first + ',' + client_final_wo
+    ).encode(
+        'utf-8'
+    );
+    client_sig = hmac.new(stored_key, auth_message, hashlib.sha256).digest();
+    proof = bytes((a ^ b) for (a, b) in zip(client_key, client_sig, strict=True));
+    server_key = hmac.new(salted, b'Server Key', hashlib.sha256).digest();
+    server_sig = hmac.new(server_key, auth_message, hashlib.sha256).digest();
+    return (
+        client_final_wo,
+        base64.b64encode(proof).decode('ascii'),
+        base64.b64encode(server_sig).decode('ascii')
+    );
+}
+
+
+def _parse_error_fields(payload: bytes) -> dict[str, str] {
+    fields: dict[str, str] = {};
+    i = 0;
+    while i < len(payload) {
+        code = payload[i:i + 1];
+        if code == b'\x00' {
+            break;
+        }
+        end = payload.index(b'\x00', i + 1);
+        fields[code.decode('ascii')] = payload[i + 1:end].decode(
+            'utf-8', errors='replace'
+        );
+        i = end + 1;
+    }
+    return fields;
+}
+
+
+impl PgWireConnection.postinit -> None {
+    self.notifications = deque();
+    self.parameters = {};
+    self._sock = None;
+    self._closed = False;
+    self._connect_socket();
+    self._startup();
+}
+
+
+impl PgWireConnection._connect_socket -> None {
+    if self.unix_sock {
+        s: any = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM);
+        s.settimeout(self.timeout);
+        s.connect(self.unix_sock);
+    } else {
+        s: any = socket.create_connection(
+            (self.host or '127.0.0.1', self.port), timeout=self.timeout
+        );
+        s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1);
+    }
+    self._sock = s;
+}
+
+
+impl PgWireConnection._startup -> None {
+    opts = {
+        'user': self.user,
+        'database': self.database,
+        'application_name': self.application_name,
+        'client_encoding': 'UTF8'
+    };
+    body = struct.pack(_INT32, PROTOCOL_VERSION);
+    for (k, v) in opts.items() {
+        body += k.encode('utf-8') + b'\x00' + str(v).encode('utf-8') + b'\x00';
+    }
+    body += b'\x00';
+    sock: any = self._sock;
+    sock.sendall(struct.pack(_INT32, len(body) + 4) + body);
+    while True {
+        (mtype, payload) = self._read_message();
+        if self._handle_async(mtype, payload) {
+            continue;
+        }
+        if mtype == 'R' {
+            code = struct.unpack(_INT32, payload[:4])[0];
+            self._authenticate(code, payload);
+        } elif mtype == 'K' {
+            _perf_sink.connected(self, struct.unpack('!I', payload[:4])[0]);
+            continue;
+        } elif mtype == 'E' {
+            raise PgWireError(_parse_error_fields(payload));
+        } elif mtype == 'Z' {
+            return;
+        }
+    }
+}
+
+
+impl PgWireConnection._authenticate(code: int, payload: bytes) -> None {
+    if code == 0 {
+        return;
+    }
+    if code == 3 {
+        assert self.password is not None , 'server requires a password';
+        self._send('p', self.password.encode('utf-8') + b'\x00');
+        return;
+    }
+    if code == 5 {
+        assert self.password is not None , 'server requires a password (md5)';
+        salt = payload[4:8];
+        inner = hashlib.md5((self.password + self.user).encode('utf-8')).hexdigest();
+        outer = hashlib.md5(inner.encode('ascii') + salt).hexdigest();
+        self._send('p', b'md5' + outer.encode('ascii') + b'\x00');
+        return;
+    }
+    if code == 10 {
+        self._scram_auth(payload);
+        return;
+    }
+    raise PgWireError({'C': '28000', 'M': f'unsupported authentication method {code}'});
+}
+
+
+impl PgWireConnection._scram_auth(payload: bytes) -> None {
+    assert self.password is not None , 'server requires a password (scram)';
+    mechs = [
+        m.decode('ascii')
+        for m in payload[4:].split(b'\x00')
+        if m
+    ];
+    assert 'SCRAM-SHA-256' in mechs , f'no supported SASL mechanism in {mechs}';
+    nonce = base64.b64encode(_pysecrets.token_bytes(18)).decode('ascii');
+    client_first_bare = f"n=,r={nonce}";
+    initial = ('n,,' + client_first_bare).encode('utf-8');
+    body = b'SCRAM-SHA-256\x00' + struct.pack(_INT32, len(initial)) + initial;
+    self._send('p', body);
+
+    (mtype, resp) = self._read_message();
+    while self._handle_async(mtype, resp) {
+        (mtype, resp) = self._read_message();
+    }
+    if mtype == 'E' {
+        raise PgWireError(_parse_error_fields(resp));
+    }
+    assert mtype == 'R' and struct.unpack(_INT32, resp[:4])[0] == 11 , (
+        'expected SASL continue'
+    );
+    server_first = resp[4:].decode('utf-8');
+    (client_final_wo, proof_b64, server_sig_b64) = _scram_proofs(
+        self.password, server_first, client_first_bare
+    );
+    server_nonce = client_final_wo.split('r=', 1)[1];
+    assert server_nonce.startswith(nonce) , 'server nonce mismatch';
+    self._send('p', (client_final_wo + ',p=' + proof_b64).encode('utf-8'));
+
+    (mtype, resp) = self._read_message();
+    while self._handle_async(mtype, resp) {
+        (mtype, resp) = self._read_message();
+    }
+    if mtype == 'E' {
+        raise PgWireError(_parse_error_fields(resp));
+    }
+    assert mtype == 'R' and struct.unpack(_INT32, resp[:4])[0] == 12 , (
+        'expected SASL final'
+    );
+    final = resp[4:].decode('utf-8');
+    got_sig = final.split('v=', 1)[1] if 'v=' in final else '';
+    assert got_sig == server_sig_b64 , 'server signature verification failed';
+}
+
+
+def _frame(msg_type: str, payload: bytes) -> bytes {
+    return msg_type.encode('ascii') + struct.pack(_INT32, len(payload) + 4) + payload;
+}
+
+
+impl PgWireConnection._send(msg_type: str, payload: bytes) -> None {
+    sock: any = self._sock;
+    sock.sendall(_frame(msg_type, payload));
+}
+
+
+impl PgWireConnection._read_exact(n: int) -> bytes {
+    buf = b'';
+    sock: any = self._sock;
+    while len(buf) < n {
+        chunk = sock.recv(n - len(buf));
+        if not chunk {
+            self._closed = True;
+            raise PgWireError({'C': '08006', 'M': 'connection closed by server'});
+        }
+        buf += chunk;
+    }
+    return buf;
+}
+
+
+impl PgWireConnection._read_message -> tuple[str, bytes] {
+    header = self._read_exact(5);
+    mtype = header[:1].decode('ascii');
+    length = struct.unpack(_INT32, header[1:5])[0];
+    payload = self._read_exact(length - 4) if length > 4 else b'';
+    return (mtype, payload);
+}
+
+
+impl PgWireConnection._handle_async(msg_type: str, payload: bytes) -> bool {
+    if msg_type == 'A' {
+        pid = struct.unpack(_INT32, payload[:4])[0];
+        rest = payload[4:];
+        end = rest.index(b'\x00');
+        channel = rest[:end].decode('utf-8');
+        body = rest[end + 1:].split(b'\x00')[0].decode('utf-8');
+        self.notifications.append((pid, channel, body));
+        return True;
+    }
+    if msg_type == 'S' {
+        parts = payload.split(b'\x00');
+        if len(parts) >= 2 {
+            self.parameters[parts[0].decode('utf-8')] = parts[1].decode('utf-8');
+        }
+        return True;
+    }
+    if msg_type == 'N' {
+        logger.debug(f"pg notice: {_parse_error_fields(payload).get('M', '')}");
+        return True;
+    }
+    return False;
+}
+
+
+impl PgWireConnection.run(sql: str, **params: any) -> list {
+    _perf_driver_start = _perf_clock.perf_counter_ns();
+    _perf_origin = _perf_sink.binding();
+    _perf_thread_id = _perf_threading.get_ident();
+    _perf_c = 0;
+    _perf_d = 0;
+    _perf_d_bytes = 0;
+    _perf_errors = 0;
+    _perf_ready_count = 0;
+    _perf_send_ns: any = None;
+    _perf_ready_ns: any = None;
+    _perf_frame: any = None;
+    _perf_sent = False;
+    assert not self._closed , 'connection is closed';
+    log_sql = _sql_log_state[0] is not False;
+    log_selep = _selep_trace_state[0] is not False;
+    start = 0.0;
+    if log_sql or log_selep {
+        import time as _time;
+        start = _time.perf_counter();
+    }
+    rows: list = [];
+    pos_sql = sql;
+    args: list = [];
+    try {
+        (pos_sql, args) = _named_to_positional(sql, params);
+        bind = (
+            b'\x00\x00'
+            + struct.pack(_INT16, 0)
+            + struct.pack(_INT16, len(args))
+        );
+        for a in args {
+            enc = _encode_param(a);
+            if enc is None {
+                bind += struct.pack(_INT32, -1);
+            } else {
+                bind += struct.pack(_INT32, len(enc)) + enc;
+            }
+        }
+        bind += struct.pack(_INT16, 0);
+        sock: any = self._sock;
+        _perf_frame = (
+            _frame(
+                'P',
+                b'\x00'
+                    + pos_sql.encode('utf-8')
+                    + b'\x00'
+                    + struct.pack(_INT16, 0)
+            )
+                + _frame('B', bind)
+                + _frame('D', b'P\x00')
+                + _frame('E', b'\x00' + struct.pack(_INT32, 0))
+                + _frame('S', b'')
+        );
+
+        _perf_send_ns = _perf_clock.perf_counter_ns();
+        sock.sendall(_perf_frame);
+        _perf_sent = True;
+
+        oids: list[int] = [];
+        err: (dict | None) = None;
+        while True {
+            (mtype, payload) = self._read_message();
+            if self._handle_async(mtype, payload) {
+                continue;
+            }
+            if mtype in ('1', '2', '3', 'C', 'n', 's') {
+                if mtype == 'C' { _perf_c += 1; }
+                continue;
+            }
+            if mtype == 'T' {
+                oids = [];
+                nfields = struct.unpack(_INT16, payload[:2])[0];
+                pos = 2;
+                for _i in range(nfields) {
+                    end = payload.index(b'\x00', pos);
+                    pos = end + 1 + 6;
+                    oids.append(struct.unpack(_INT32, payload[pos:pos + 4])[0]);
+                    pos += 4 + 8;
+                }
+                continue;
+            }
+            if mtype == 'D' {
+                _perf_d += 1;
+                _perf_d_bytes += len(payload);
+                ncols = struct.unpack(_INT16, payload[:2])[0];
+                pos = 2;
+                row: list = [];
+                for ci in range(ncols) {
+                    vlen = struct.unpack(_INT32, payload[pos:pos + 4])[0];
+                    pos += 4;
+                    if vlen == -1 {
+                        row.append(None);
+                    } else {
+                        raw = payload[pos:pos + vlen];
+                        pos += vlen;
+                        oid = oids[ci] if ci < len(oids) else 25;
+                        row.append(_decode_value(oid, raw));
+                    }
+                }
+                rows.append(tuple(row));
+                continue;
+            }
+            if mtype == 'E' {
+                _perf_errors += 1;
+                err = _parse_error_fields(payload);
+                continue;
+            }
+            if mtype == 'Z' {
+                _perf_ready_ns = _perf_clock.perf_counter_ns();
+                _perf_ready_count += 1;
+                if err is not None {
+                    raise PgWireError(err);
+                }
+                if log_sql or log_selep {
+                    import time as _time;
+                    elapsed_ms = (_time.perf_counter() - start) * 1000;
+                    if log_sql {
+                        _write_sql_log(
+                            self,
+                            sql,
+                            params,
+                            elapsed_ms,
+                            len(rows)
+                        );
+                    }
+                    if log_selep {
+                        _write_selep_trace(
+                            self,
+                            sql,
+                            params,
+                            pos_sql,
+                            args,
+                            elapsed_ms,
+                            len(rows)
+                        );
+                    }
+                }
+                _perf_driver_end = _perf_clock.perf_counter_ns();
+                _perf_sink.record_boundary(
+                    self, pos_sql, sql, _perf_origin, _perf_thread_id,
+                    _perf_driver_start, _perf_send_ns, _perf_ready_ns, _perf_driver_end,
+                    _perf_c, _perf_d, _perf_d_bytes, _perf_errors, _perf_ready_count,
+                    len(rows), None, _perf_frame, _perf_sent
+                );
+                return rows;
+            }
+        }
+    } except Exception as e {
+        if log_sql or log_selep {
+            import time as _time;
+            elapsed_ms = (_time.perf_counter() - start) * 1000;
+            error = f"{type(e).__name__}: {e}";
+            if log_sql {
+                _write_sql_log(
+                    self,
+                    sql,
+                    params,
+                    elapsed_ms,
+                    len(rows),
+                    error
+                );
+            }
+            if log_selep {
+                _write_selep_trace(
+                    self,
+                    sql,
+                    params,
+                    pos_sql,
+                    args,
+                    elapsed_ms,
+                    len(rows),
+                    error
+                );
+            }
+        }
+        _perf_driver_end = _perf_clock.perf_counter_ns();
+        _perf_sink.record_boundary(
+            self, pos_sql, sql, _perf_origin, _perf_thread_id,
+            _perf_driver_start, _perf_send_ns, _perf_ready_ns, _perf_driver_end,
+            _perf_c, _perf_d, _perf_d_bytes, _perf_errors, _perf_ready_count,
+            len(rows), f"{type(e).__name__}: {e}", _perf_frame, _perf_sent
+        );
+        raise;
+    }
+}
+
+
+impl PgWireConnection.close -> None {
+    if self._closed {
+        return;
+    }
+    self._closed = True;
+    try {
+        self._send('X', b'');
+    } except Exception { }
+    try {
+        sock: any = self._sock;
+        sock.close();
+    } except Exception { }
+}

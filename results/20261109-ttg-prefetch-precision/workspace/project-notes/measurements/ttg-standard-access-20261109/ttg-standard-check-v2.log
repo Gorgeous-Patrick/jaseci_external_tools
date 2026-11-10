@@ -1,0 +1,539 @@
+[dev] jac dev mode - using compiler source at /home/baichuan/jaseci/jac-ttg/jac
+  Checking jac/jaclang/data/query_planner.jac...
+jac/jaclang/data/query_planner.jac ok [100%]
+
+=================================== FAILURES ===================================
+______________________ jac/jaclang/data/query_planner.jac ______________________
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/data/query_planner.jac:38:6
+   36 | def resolve_ttg_path(
+   37 |     mem: Session, q: GraphQuery, origin_id: UUID, max_rows: int
+   38 | ) -> (list | None);
+      |      ^^^^^^^^^^^^^
+   39 | 
+   40 | 
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:54:39
+   52 | 
+   53 | class LazyRefs(list) {
+   54 |     def init(self: LazyRefs, resolve: any, query: GraphQuery) -> None;
+      |                                       ^^^
+   55 |     def _realize(self: LazyRefs) -> None;
+   56 |     def _bounded(self: LazyRefs, limit: (int | None), offset: int) -> list;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/data/query_planner.jac:56:71
+   54 |     def init(self: LazyRefs, resolve: any, query: GraphQuery) -> None;
+   55 |     def _realize(self: LazyRefs) -> None;
+   56 |     def _bounded(self: LazyRefs, limit: (int | None), offset: int) -> list;
+      |                                                                       ^^^^
+   57 |     def _count(self: LazyRefs) -> int;
+   58 |     def _mem(self: LazyRefs) -> any;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:58:33
+   56 |     def _bounded(self: LazyRefs, limit: (int | None), offset: int) -> list;
+   57 |     def _count(self: LazyRefs) -> int;
+   58 |     def _mem(self: LazyRefs) -> any;
+      |                                 ^^^
+   59 |     def __len__(self: LazyRefs) -> int;
+   60 |     def __bool__(self: LazyRefs) -> bool;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:61:37
+   59 |     def __len__(self: LazyRefs) -> int;
+   60 |     def __bool__(self: LazyRefs) -> bool;
+   61 |     def __iter__(self: LazyRefs) -> any;
+      |                                     ^^^
+   62 |     def __getitem__(self: LazyRefs, key: any) -> any;
+   63 |     def __repr__(self: LazyRefs) -> str;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:62:42
+   60 |     def __bool__(self: LazyRefs) -> bool;
+   61 |     def __iter__(self: LazyRefs) -> any;
+   62 |     def __getitem__(self: LazyRefs, key: any) -> any;
+      |                                          ^^^
+   63 |     def __repr__(self: LazyRefs) -> str;
+   64 |     def __eq__(self: LazyRefs, other: any) -> bool;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:62:50
+   60 |     def __bool__(self: LazyRefs) -> bool;
+   61 |     def __iter__(self: LazyRefs) -> any;
+   62 |     def __getitem__(self: LazyRefs, key: any) -> any;
+      |                                                  ^^^
+   63 |     def __repr__(self: LazyRefs) -> str;
+   64 |     def __eq__(self: LazyRefs, other: any) -> bool;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:64:39
+   62 |     def __getitem__(self: LazyRefs, key: any) -> any;
+   63 |     def __repr__(self: LazyRefs) -> str;
+   64 |     def __eq__(self: LazyRefs, other: any) -> bool;
+      |                                       ^^^
+   65 |     def __contains__(self: LazyRefs, item: any) -> bool;
+   66 |     def __reversed__(self: LazyRefs) -> any;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:65:44
+   63 |     def __repr__(self: LazyRefs) -> str;
+   64 |     def __eq__(self: LazyRefs, other: any) -> bool;
+   65 |     def __contains__(self: LazyRefs, item: any) -> bool;
+      |                                            ^^^
+   66 |     def __reversed__(self: LazyRefs) -> any;
+   67 |     def __add__(self: LazyRefs, other: any) -> any;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:66:41
+   64 |     def __eq__(self: LazyRefs, other: any) -> bool;
+   65 |     def __contains__(self: LazyRefs, item: any) -> bool;
+   66 |     def __reversed__(self: LazyRefs) -> any;
+      |                                         ^^^
+   67 |     def __add__(self: LazyRefs, other: any) -> any;
+   68 |     def __setitem__(self: LazyRefs, key: any, value: any) -> None;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:67:40
+   65 |     def __contains__(self: LazyRefs, item: any) -> bool;
+   66 |     def __reversed__(self: LazyRefs) -> any;
+   67 |     def __add__(self: LazyRefs, other: any) -> any;
+      |                                        ^^^
+   68 |     def __setitem__(self: LazyRefs, key: any, value: any) -> None;
+   69 |     def __delitem__(self: LazyRefs, key: any) -> None;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:67:48
+   65 |     def __contains__(self: LazyRefs, item: any) -> bool;
+   66 |     def __reversed__(self: LazyRefs) -> any;
+   67 |     def __add__(self: LazyRefs, other: any) -> any;
+      |                                                ^^^
+   68 |     def __setitem__(self: LazyRefs, key: any, value: any) -> None;
+   69 |     def __delitem__(self: LazyRefs, key: any) -> None;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:68:42
+   66 |     def __reversed__(self: LazyRefs) -> any;
+   67 |     def __add__(self: LazyRefs, other: any) -> any;
+   68 |     def __setitem__(self: LazyRefs, key: any, value: any) -> None;
+      |                                          ^^^
+   69 |     def __delitem__(self: LazyRefs, key: any) -> None;
+   70 |     def append(self: LazyRefs, item: any) -> None;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:68:54
+   66 |     def __reversed__(self: LazyRefs) -> any;
+   67 |     def __add__(self: LazyRefs, other: any) -> any;
+   68 |     def __setitem__(self: LazyRefs, key: any, value: any) -> None;
+      |                                                      ^^^
+   69 |     def __delitem__(self: LazyRefs, key: any) -> None;
+   70 |     def append(self: LazyRefs, item: any) -> None;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:69:42
+   67 |     def __add__(self: LazyRefs, other: any) -> any;
+   68 |     def __setitem__(self: LazyRefs, key: any, value: any) -> None;
+   69 |     def __delitem__(self: LazyRefs, key: any) -> None;
+      |                                          ^^^
+   70 |     def append(self: LazyRefs, item: any) -> None;
+   71 |     def extend(self: LazyRefs, items: any) -> None;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:70:38
+   68 |     def __setitem__(self: LazyRefs, key: any, value: any) -> None;
+   69 |     def __delitem__(self: LazyRefs, key: any) -> None;
+   70 |     def append(self: LazyRefs, item: any) -> None;
+      |                                      ^^^
+   71 |     def extend(self: LazyRefs, items: any) -> None;
+   72 |     def insert(self: LazyRefs, i: int, item: any) -> None;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:71:39
+   69 |     def __delitem__(self: LazyRefs, key: any) -> None;
+   70 |     def append(self: LazyRefs, item: any) -> None;
+   71 |     def extend(self: LazyRefs, items: any) -> None;
+      |                                       ^^^
+   72 |     def insert(self: LazyRefs, i: int, item: any) -> None;
+   73 |     def remove(self: LazyRefs, item: any) -> None;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:72:46
+   70 |     def append(self: LazyRefs, item: any) -> None;
+   71 |     def extend(self: LazyRefs, items: any) -> None;
+   72 |     def insert(self: LazyRefs, i: int, item: any) -> None;
+      |                                              ^^^
+   73 |     def remove(self: LazyRefs, item: any) -> None;
+   74 |     def pop(self: LazyRefs, i: int = -1) -> any;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:73:38
+   71 |     def extend(self: LazyRefs, items: any) -> None;
+   72 |     def insert(self: LazyRefs, i: int, item: any) -> None;
+   73 |     def remove(self: LazyRefs, item: any) -> None;
+      |                                      ^^^
+   74 |     def pop(self: LazyRefs, i: int = -1) -> any;
+   75 |     def clear(self: LazyRefs) -> None;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:74:45
+   72 |     def insert(self: LazyRefs, i: int, item: any) -> None;
+   73 |     def remove(self: LazyRefs, item: any) -> None;
+   74 |     def pop(self: LazyRefs, i: int = -1) -> any;
+      |                                             ^^^
+   75 |     def clear(self: LazyRefs) -> None;
+   76 |     def sort(self: LazyRefs, **kw: any) -> None;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:76:36
+   74 |     def pop(self: LazyRefs, i: int = -1) -> any;
+   75 |     def clear(self: LazyRefs) -> None;
+   76 |     def sort(self: LazyRefs, **kw: any) -> None;
+      |                                    ^^^
+   77 |     def reverse(self: LazyRefs) -> None;
+   78 |     def index(self: LazyRefs, item: any, *a: any) -> int;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:78:37
+   76 |     def sort(self: LazyRefs, **kw: any) -> None;
+   77 |     def reverse(self: LazyRefs) -> None;
+   78 |     def index(self: LazyRefs, item: any, *a: any) -> int;
+      |                                     ^^^
+   79 |     def count(self: LazyRefs, item: any) -> int;
+   80 |     def copy(self: LazyRefs) -> list;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:78:46
+   76 |     def sort(self: LazyRefs, **kw: any) -> None;
+   77 |     def reverse(self: LazyRefs) -> None;
+   78 |     def index(self: LazyRefs, item: any, *a: any) -> int;
+      |                                              ^^^
+   79 |     def count(self: LazyRefs, item: any) -> int;
+   80 |     def copy(self: LazyRefs) -> list;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/data/query_planner.jac:79:37
+   77 |     def reverse(self: LazyRefs) -> None;
+   78 |     def index(self: LazyRefs, item: any, *a: any) -> int;
+   79 |     def count(self: LazyRefs, item: any) -> int;
+      |                                     ^^^
+   80 |     def copy(self: LazyRefs) -> list;
+   81 | }
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/data/query_planner.jac:80:33
+   78 |     def index(self: LazyRefs, item: any, *a: any) -> int;
+   79 |     def count(self: LazyRefs, item: any) -> int;
+   80 |     def copy(self: LazyRefs) -> list;
+      |                                 ^^^^
+   81 | }
+   82 | 
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/data/query_planner.jac:84:42
+   82 | 
+   83 | 
+   84 | def cache_ttg_paths(mem: Session, paths: list) -> bool;
+      |                                          ^^^^
+   85 | 
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:24:55
+   22 | 
+   23 | 
+   24 | def _acl_pushdown_root(q: GraphQuery, upto: int, mem: any = None) -> (str | None) {
+      |                                                       ^^^
+   25 |     if not access_gated() {
+   26 |         return None;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:50:32
+   48 | 
+   49 | 
+   50 | def _freeze_cache_value(value: any) -> any {
+      |                                ^^^
+   51 |     if isinstance(value, UUID) {
+   52 |         return str(value);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:61:14
+   59 |     }
+   60 |     if isinstance(value, dict) {
+   61 |         out: list = [];
+      |              ^^^^
+   62 |         for k in sorted(value.keys(), key=str) {
+   63 |             out.append((str(k), _freeze_cache_value(value[k])));
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:50:40
+   48 | 
+   49 | 
+   50 | def _freeze_cache_value(value: any) -> any {
+      |                                        ^^^
+   51 |     if isinstance(value, UUID) {
+   52 |         return str(value);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:71:51
+   69 | 
+   70 | 
+   71 | def _query_cache_key(kind: str, sql: str, params: dict, upto: int) -> tuple {
+      |                                                   ^^^^
+   72 |     return (kind, upto, sql, _freeze_cache_value(params));
+   73 | }
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "tuple" used without type arguments, defaulting to "tuple[any]"; consider adding explicit type arguments
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:71:71
+   69 | 
+   70 | 
+   71 | def _query_cache_key(kind: str, sql: str, params: dict, upto: int) -> tuple {
+      |                                                                       ^^^^^
+   72 |     return (kind, upto, sql, _freeze_cache_value(params));
+   73 | }
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:90:20
+   88 | 
+   89 | 
+   90 | def _type_name(tp: any) -> (str | None) {
+      |                    ^^^
+   91 |     if tp is None {
+   92 |         return None;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:102:33
+  100 | 
+  101 | 
+  102 | def _single_node_type_name(hop: any) -> (tuple | None) {
+      |                                 ^^^
+  103 |     nd = hop.nd;
+  104 |     if nd is None {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "tuple" used without type arguments, defaulting to "tuple[any]"; consider adding explicit type arguments
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:102:41
+  100 | 
+  101 | 
+  102 | def _single_node_type_name(hop: any) -> (tuple | None) {
+      |                                         ^^^^^^^^^^^^^^
+  103 |     nd = hop.nd;
+  104 |     if nd is None {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:145:47
+  143 | 
+  144 | 
+  145 | def _existing_topology_index(mem: Session) -> any {
+      |                                               ^^^
+  146 |     idx = mem?._topology_index;
+  147 |     if idx is None {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:166:10
+  164 | 
+  165 | def _topology_hop_complete_for(
+  166 |     idx: any, ids: list[UUID], hop: tuple[str | None, str | None, int]
+      |          ^^^
+  167 | ) -> bool {
+  168 |     for uid in ids {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "tuple" used without type arguments, defaulting to "tuple[any]"; consider adding explicit type arguments
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:305:16
+  303 |     }
+  304 |     cq.params['origin'] = [str(i) for i in origin_ids];
+  305 |     cache_key: (tuple | None) = None;
+      |                ^^^^^^^^^^^^^^
+  306 |     if not cq.residual {
+  307 |         cache_key = _query_cache_key("pairs", cq.sql, cq.params, upto);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:344:17
+  342 | ) -> tuple[list[tuple[any, any]], dict[any, Anchor], list[QPred], bool] {
+  343 |     origins = origin_anchors(q);
+  344 |     local: dict[any, Anchor] = {};
+      |                 ^^^
+  345 |     sql_ids: list[UUID] = [];
+  346 |     mem_origins: list[Anchor] = [];
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:370:15
+  368 |         akey = anchor_key(a);
+  369 |         local[akey] = a;
+  370 |         ekey: any = None;
+      |               ^^^
+  371 |         if e is not None {
+  372 |             ekey = anchor_key(e);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:342:23
+  340 | def _resolve_pairs(
+  341 |     mem: Session, q: GraphQuery, upto: int
+  342 | ) -> tuple[list[tuple[any, any]], dict[any, Anchor], list[QPred], bool] {
+      |                       ^^^
+  343 |     origins = origin_anchors(q);
+  344 |     local: dict[any, Anchor] = {};
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:342:28
+  340 | def _resolve_pairs(
+  341 |     mem: Session, q: GraphQuery, upto: int
+  342 | ) -> tuple[list[tuple[any, any]], dict[any, Anchor], list[QPred], bool] {
+      |                            ^^^
+  343 |     origins = origin_anchors(q);
+  344 |     local: dict[any, Anchor] = {};
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:342:40
+  340 | def _resolve_pairs(
+  341 |     mem: Session, q: GraphQuery, upto: int
+  342 | ) -> tuple[list[tuple[any, any]], dict[any, Anchor], list[QPred], bool] {
+      |                                        ^^^
+  343 |     origins = origin_anchors(q);
+  344 |     local: dict[any, Anchor] = {};
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:382:24
+  380 | 
+  381 | def _materialize_ids(
+  382 |     mem: Session, ids: list, local: dict[any, Anchor]
+      |                        ^^^^
+  383 | ) -> list[Anchor] {
+  384 |     missing = [
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:382:42
+  380 | 
+  381 | def _materialize_ids(
+  382 |     mem: Session, ids: list, local: dict[any, Anchor]
+      |                                          ^^^
+  383 | ) -> list[Anchor] {
+  384 |     missing = [
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:401:37
+  399 | 
+  400 | 
+  401 | def _unique_nodes(pairs: list[tuple[any, any]]) -> list {
+      |                                     ^^^
+  402 |     seen: set = set();
+  403 |     out: list = [];
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:401:42
+  399 | 
+  400 | 
+  401 | def _unique_nodes(pairs: list[tuple[any, any]]) -> list {
+      |                                          ^^^
+  402 |     seen: set = set();
+  403 |     out: list = [];
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "set" used without type arguments, defaulting to "set[any]"; consider adding explicit type arguments
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:402:11
+  400 | 
+  401 | def _unique_nodes(pairs: list[tuple[any, any]]) -> list {
+  402 |     seen: set = set();
+      |           ^^^
+  403 |     out: list = [];
+  404 |     for (nid, _) in pairs {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:403:10
+  401 | def _unique_nodes(pairs: list[tuple[any, any]]) -> list {
+  402 |     seen: set = set();
+  403 |     out: list = [];
+      |          ^^^^
+  404 |     for (nid, _) in pairs {
+  405 |         if nid is not None and nid not in seen {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:401:52
+  399 | 
+  400 | 
+  401 | def _unique_nodes(pairs: list[tuple[any, any]]) -> list {
+      |                                                    ^^^^
+  402 |     seen: set = set();
+  403 |     out: list = [];
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:504:15
+  502 |     }
+  503 |     (pairs, local, tail, _used_topology) = _resolve_pairs(mem, q, len(q.hops));
+  504 |     edge_ids: list = [];
+      |               ^^^^
+  505 |     node_of: dict = {};
+  506 |     seen: set = set();
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:505:14
+  503 |     (pairs, local, tail, _used_topology) = _resolve_pairs(mem, q, len(q.hops));
+  504 |     edge_ids: list = [];
+  505 |     node_of: dict = {};
+      |              ^^^^
+  506 |     seen: set = set();
+  507 |     for (nid, eid) in pairs {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "set" used without type arguments, defaulting to "set[any]"; consider adding explicit type arguments
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:506:11
+  504 |     edge_ids: list = [];
+  505 |     node_of: dict = {};
+  506 |     seen: set = set();
+      |           ^^^
+  507 |     for (nid, eid) in pairs {
+  508 |         if eid is None or eid in seen {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "set" used without type arguments, defaulting to "set[any]"; consider adding explicit type arguments
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:543:17
+  541 |     }
+  542 |     out: list[Anchor] = [];
+  543 |     seen_nodes: set = set();
+      |                 ^^^
+  544 |     for ea in edges {
+  545 |         out.append(ea);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:816:35
+  814 | impl LazyRefs.index(self: LazyRefs, item: any, *a: any) -> int {
+  815 |     self._realize();
+  816 |     return list.index(self, item, *a);
+      |                                   ^^
+  817 | }
+  818 | 
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:887:13
+  885 | 
+  886 | impl cache_ttg_paths(mem: Session, paths: list) -> bool {
+  887 |     staged: list = [];
+      |             ^^^^
+  888 |     for (query, origin_id, rows) in paths {
+  889 |         upto = len(query.hops);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W2003]: 'mem' is defined but never used
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:24:50
+   22 | 
+   23 | 
+   24 | def _acl_pushdown_root(q: GraphQuery, upto: int, mem: any = None) -> (str | None) {
+      |                                                  ^^^
+   25 |     if not access_gated() {
+   26 |         return None;
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W2074]: f-string has no placeholders — use a regular string
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:297:18
+  295 |         if early {
+  296 |             logger.error(
+  297 |                 f"graph query has non-pushable predicates at intermediate hops "
+      |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  298 |                 f"{early}; results downstream of them are not filtered by those "
+  299 |                 f"predicates"
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W2074]: f-string has no placeholders — use a regular string
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/data/impl/query_planner.impl.jac:299:18
+  297 |                 f"graph query has non-pushable predicates at intermediate hops "
+  298 |                 f"{early}; results downstream of them are not filtered by those "
+  299 |                 f"predicates"
+      |                  ^^^^^^^^^^^^
+  300 |             );
+  301 |         }
+  → run 'jac guide reference/diagnostics' for guidance
+
+============================== 1 passed in 3.46s ===============================
