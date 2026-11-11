@@ -49,9 +49,10 @@ for g in d['groups']:
 for r in d['recipe_root_rates']:
  assert r['root_demand']==39 and r['nonroot_demand']==r['all_demand']-39
  assert r['nonroot_coverage']==r['covered']/r['nonroot_demand']
-report=read(P/'slides/report/report-manifest.json');assert report['pages']==12
-for r in [report['source'],report['data'],*report['outputs']]:
- assert mapping[r['path']]['sha256']==r['sha256'],r
+for version in ('report','report-v2'):
+ report=read(P/'slides'/version/'report-manifest.json');assert report['pages']==12
+ for r in [report['source'],report['data'],*report['outputs']]:
+  assert mapping[r['path']]['sha256']==r['sha256'],r
 assert sha(P/'slides/derive.py')==d['derive_source_sha256']
 print(json.dumps(dict(passed=True,files=len(actual),archives=len(archives),sealed_files=sealed,
  mapped_paths=len(mapping),derivation_inputs=len(d['inputs']),slides=report['pages']),indent=2))

@@ -1,6 +1,8 @@
 # Aggressive vs. Conservative TTG: Access, coverage and unnecessary fetches
 
-[Open the 12-page English slides](slides/report/ttg-access-visit-comparison.pdf) · [Slide previews](slides/report/contact-sheet.png) · [Editable renderer](slides/render.py) · [Source-bound slide data](slides/slide-data.json)
+[Open the updated 12-page English slides](slides/report-v2/ttg-access-visit-comparison.pdf) · [Combined comparison table — page 4](slides/report-v2/slide-04.png) · [Editable renderer](slides/render_v2.py) · [Source-bound slide data](slides/slide-data.json)
+
+Version 2 puts the combined Aggressive/Conservative hit-rate and unnecessary-fetch table on **page 4**, with the definitions directly below it. The other eleven slides and all measurement data are unchanged. The [original version](slides/report/ttg-access-visit-comparison.pdf) is preserved.
 
 This report compares the legacy Aggressive policy with Conservative plus the new Access-demand implementation. Both policies use the same tested current runtime, GIL-off Python and thread executor. The fixed JDrive, LittleX and RecipePantry workflows ran 24 fresh cases: 6 excluded warmups and 18 measured cases, n=3 per app/policy. All business responses and state checks passed. Counts are identical in all three measured repetitions.
 
@@ -48,7 +50,7 @@ This verifies all package files, all 24 archive member sets and hashes, every ma
 To regenerate the PDF from the packaged data (Matplotlib required):
 
 ```bash
-python3 slides/render.py
+python3 slides/render_v2.py
 ```
 
 Regeneration changes output hashes/metadata; use a copy of the package. The PDF's numerical source is `slides/slide-data.json`. `slides/derive.py` shows the original raw-to-slide derivation; original absolute paths are preserved in evidence and resolved through `manifests/path-mapping.json` by the verifier. Re-executing the benchmark needs the recorded interpreter/runtime dependencies and workspace layout; full installed runtimes, PostgreSQL clusters and caches are excluded.
