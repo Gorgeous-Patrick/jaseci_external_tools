@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-visit-performance-20261110/run-v1/cases/littlex-conservative-measured-2/artifacts.json",
+    "sha256": "58afe75afc93acefff26f1be576f052019fed100d70487c0c59d4cda617113ca",
+    "files_checked": 43
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_native_semantic_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-visit-performance-20261110/run-v1/cases/littlex-conservative-measured-2/artifacts.json",
+      "sha256": "58afe75afc93acefff26f1be576f052019fed100d70487c0c59d4cda617113ca",
+      "files_checked": 43
+    },
+    "proof_sha256": "02ae8e518a74160ef36c32b9e4834634e3eab2df5dbf6006fafcd5dcac783b03",
+    "actual_operations_checked": 15,
+    "final_logical_state_sha256": "c451de447009366732c5b888e703c498abd6b1845d37414fb35517afdd37cd6f",
+    "verifier_sources": {
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/native.py": "f44bf3905bd248df2f7c2fe10db3c926a847d170c963e889bffac94d51435228",
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/datasets/ttg/build.py": "a617dd95626a60babcf56dc10fba0ed3dc4a5c24ceca3033fea0b97401c129b9"
+    },
+    "full_response": {
+      "full_actions_sha256": "6631c577db0bee4381fd1461d52b91cda06af4e1a97d82d61cf7bf723c6186c4",
+      "full_semantic_sha256": "6dcad7b412ec9ff28122852c3635a12f36138dd16230b1c994a27ffa56392f8d"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-visit-performance-20261110/run-v1/cases/littlex-conservative-measured-2/plus-proof.json",
+    "sha256": "02ae8e518a74160ef36c32b9e4834634e3eab2df5dbf6006fafcd5dcac783b03"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-visit-performance-20261110/run-v1/cases/littlex-conservative-measured-2/cleanup-target.json",
+    "sha256": "8c72706aca6c615098df75b356d6a5b653d00dfc7715db6e653f0367aa615f3d"
+  },
+  "database_state": {
+    "database": "continuation_f4e1f835ff2a45c19018c9c859dd3766",
+    "cluster_owner": "ae99adf5-a65f-443a-bff8-75fdf9739349",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "0abb9b6bbc35d908b433078be3e7108e084d0c2d78105081e1ce4c776acfcce6",
+    "actual_row_count": 2249,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('Profile','Tweet','Follow','Post')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-visit-performance-20261110/sources.json",
+    "sha256": "d966ad80906585bee9b5f8ff6343c22624848f567c09d874d5cdbd85c60817a0"
+  }
+}

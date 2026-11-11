@@ -1,0 +1,1375 @@
+diff --git a/jac/jaclang/cli/docs/reference/language/library-mode.md b/jac/jaclang/cli/docs/reference/language/library-mode.md
+index 9880da921..b188a97bb 100644
+--- a/jac/jaclang/cli/docs/reference/language/library-mode.md
++++ b/jac/jaclang/cli/docs/reference/language/library-mode.md
+@@ -439,7 +439,7 @@ visit(
+ | `check_read_access(anchor)` | Check read permission | `anchor`: Target anchor |
+ | `check_write_access(anchor)` | Check write permission | `anchor`: Target anchor |
+ | `check_connect_access(anchor)` | Check connect permission | `anchor`: Target anchor |
+-| `check_access_level(anchor, no_custom)` | Get access level for anchor | `anchor`: Target<br>`no_custom`: skip custom check |
++| `check_access_level(anchor)` | Get standard access level for anchor | `anchor`: Target |
+ 
+ ### **Module Management & Archetypes**
+ 
+@@ -538,3 +538,15 @@ Library mode provides a pure Python implementation of Jac's object-spatial progr
+ - **Zero-Friction Integration**: Drop into existing Python projects with no build-system changes
+ 
+ Use it when you want Jac's graph-native and AI-integrated programming model while staying entirely in Python syntax.
++
++### Standard permissions in this experimental runtime
++
++Archetypes must use standard anchor permissions (owner, public, root grants and
++ group grants). Defining or inheriting a custom `__jac_access__` raises `TypeError`
++at class registration; assigning an instance override is also rejected. There is
++no compatibility switch. Native graph queries and TTG SQL apply standard ACL
++conditions at every hop, including untyped intermediate nodes. SQL templates no
++longer enumerate all persisted node types to prove the absence of custom hooks.
++Recompile application artifacts after upgrading: old templates contain the removed
++catalog-proof output branch. Arbitrary Python mutation of framework classes is
++outside the supported runtime contract.
+diff --git a/jac/jaclang/cli/docs/reference/language/osp.md b/jac/jaclang/cli/docs/reference/language/osp.md
+index 557b8f823..ec588f628 100644
+--- a/jac/jaclang/cli/docs/reference/language/osp.md
++++ b/jac/jaclang/cli/docs/reference/language/osp.md
+@@ -879,44 +879,32 @@ walker:pub read_feed {
+ 
+ Outside a server (CLI runs, scripts, tests without a server) there are no separate users, so `root.shared` is the current root itself: `jid(root.shared) == jid(root)`.
+ 
+-### 7 Archetype-Level Access Policy (`__jac_access__`)
++### 7 Standard-Only Access Policy
+ 
+-`grant` opens one node its owner chose to share. When openness is an invariant of the *type* - every instance of a machine-generated cache, commons state anyone may rebuild - encode it once on the archetype instead of remembering a `grant()` at every creation site:
++This experimental runtime supports standard anchor permissions only. A class
++that defines or inherits a custom `__jac_access__` method is rejected when it is
++registered, including node and edge classes. There is no compatibility mode.
++Use explicit grants when creating shared objects:
+ 
+ ```jac
+-node PublicNode {
+-    def __jac_access__ -> AccessLevel {
+-        return AccessLevel.WRITE;   # every instance opens WRITE to every user
+-    }
+-}
+-
+-edge PublicEdge {
+-    def __jac_access__ -> AccessLevel {
+-        return AccessLevel.WRITE;
+-    }
+-}
+-
+-node CatalogEntry(PublicNode) {}   # subtypes inherit the policy
+-edge Lists(PublicEdge) {}
+-```
+-
+-Whenever a user who does not own the anchor touches it, the runtime consults the hook *before* per-instance grants. Return a member of the ambient `AccessLevel` enum - `NO_ACCESS`, `READ`, `CONNECT`, `WRITE`, no import needed - and that level is final: stored grants are not consulted. Return `None` to fall through to normal grant checking, which makes conditional policies cheap:
+-
+-```jac
+-node Report {
+-    has published: bool = False;
+-
+-    def __jac_access__ -> AccessLevel | None {
+-        return AccessLevel.READ if self.published else None;   # unpublished: grants decide
++node CatalogEntry { has title: str = ""; }
++walker create_entry {
++    can run with Root entry {
++        fresh = root ++> CatalogEntry(title="Shared entry");
++        grant(fresh, level=AccessLevel.READ);
+     }
+ }
+ ```
+ 
+-Always return `AccessLevel` members. String (`"WRITE"`) and int (`2`) spellings are accepted for compatibility, but a typo'd string raises `KeyError` at access-check time - in production, on the first cross-user request - while a misspelled member fails at check time, and the int mapping may change.
+-
+-**Grant or hook?** `grant`/`allow_root` are per-instance policy the *owner* decides at runtime - right for user-owned contributions (posts, profiles). `__jac_access__` is a per-archetype invariant the *author* decides - right for app-owned public structure (docs caches, catalogs, commons state), where a forgotten grant on one creation path only surfaces when a *second* user hits it. The owner and the system root always have `WRITE` regardless of the hook.
++Owner, public, per-root and group grants remain supported. Persisted graph-query
++SQL checks standard read permissions at every hop, including intermediate nodes.
++TTG uses the same rule and no longer scans all persisted node types to search for
++custom permission implementations. Direct access to an edge still checks its own
++permissions; a node deletion authorized by standard permissions removes its
++incident edges as before.
+ 
+-Traversal authorizes the *node* being reached, and deleting an authorized node detaches its incident edges with it - but a non-owner reading, mutating, or deleting an edge object directly is checked against the *edge's* own level, so a fully open structure pairs a `PublicNode` base with a `PublicEdge` base as above.
++Recompile application artifacts after upgrading. Previously emitted TTG templates
++containing a type-catalog proof branch are not supported by the new runtime.
+ 
+ ---
+ 
+diff --git a/jac/jaclang/data/impl/query_planner.impl.jac b/jac/jaclang/data/impl/query_planner.impl.jac
+index 89fd922ac..43b1c788b 100644
+--- a/jac/jaclang/data/impl/query_planner.impl.jac
++++ b/jac/jaclang/data/impl/query_planner.impl.jac
+@@ -26,14 +26,10 @@ def _acl_pushdown_root(q: GraphQuery, upto: int, mem: any = None) -> (str | None
+         return None;
+     }
+     import from jaclang.runtime.runtime { JacRuntimeInterface }
+-    import from jaclang.data.ttg_acl { standard_node_access, standard_catalog_access }
++    import from jaclang.data.ttg_acl { standard_node_access }
+     for hop in q.hops[:upto] {
+         nd = hop.nd;
+-        if nd is None {
+-            if upto != 1 or not standard_catalog_access(mem) {
+-                return None;
+-            }
+-        } else {
++        if nd is not None {
+             types = nd if isinstance(nd, tuple) else (nd, );
+             if not all(standard_node_access(nt) for nt in types) {
+                 return None;
+@@ -259,8 +255,8 @@ impl _sql_pairs(
+     }
+     mem.read_barrier();
+     acl_root = _acl_pushdown_root(q, upto, mem);
+-    import from jaclang.runtime.ttg_templates { cache_key }
+-    emitted_key = cache_key(q, origin_ids, acl_root);
++    import from jaclang.runtime.ttg_templates { cache_key as emitted_cache_key }
++    emitted_key = emitted_cache_key(q, origin_ids, acl_root);
+     if upto == len(q.hops)
+         and emitted_key is not None
+         and (not access_gated() or acl_root is not None) {
+diff --git a/jac/jaclang/data/ttg_acl.jac b/jac/jaclang/data/ttg_acl.jac
+index cefc3371d..c67dbcc33 100644
+--- a/jac/jaclang/data/ttg_acl.jac
++++ b/jac/jaclang/data/ttg_acl.jac
+@@ -1,98 +1,11 @@
+-import sys;
+-import from types { ModuleType }
++"""Standard permissions are the runtime contract; no persisted type census."""
+ import from jaclang.runtime.archetype { Archetype, NodeArchetype }
+ 
+-glob _STANDARD_ACCESS: any = vars(Archetype).get('__jac_access__');
+-
+ 
+ def standard_node_access(node_type: any) -> bool {
+     if type(node_type) is not type or not issubclass(node_type, NodeArchetype) {
+         return False;
+     }
+-    for base in node_type.__mro__ {
+-        if '__jac_access__' in vars(base) {
+-            return _STANDARD_ACCESS is not None
+-                and vars(base)['__jac_access__'] is _STANDARD_ACCESS;
+-        }
+-    }
+-    return False;
+-}
+-
+-
+-def catalog_node_type(name: any, module_name: any) -> any {
+-    import from jaclang.runtime.runtime { JacRuntime }
+-    if type(name) is not str
+-        or not name
+-        or type(module_name) is not str
+-        or not module_name {
+-        return None;
+-    }
+-    module = JacRuntime.loaded_modules.get(module_name);
+-    if module is None {
+-        module = sys.modules.get(module_name);
+-    }
+-
+-    if type(module) is not ModuleType {
+-        return None;
+-    }
+-    resolved = vars(module).get(name);
+-    if resolved is None or type(resolved) is not type {
+-        return None;
+-    }
+-    declared_module = vars(resolved).get('__module__');
+-    if type(resolved.__name__) is not str
+-        or resolved.__name__ != name
+-        or type(declared_module) is not str
+-        or declared_module != module_name {
+-        return None;
+-    }
+-    return resolved;
+-}
+-
+-
+-def standard_catalog_access(mem: any) -> bool {
+-    import from jaclang.data.store { TxnIsolation }
+-    import from jaclang.runtime.ttg_sql { compile_acl_type_catalog }
+-    if mem is None or mem.store is None {
+-        return False;
+-    }
+-    with mem._lock {
+-        mem.read_barrier();
+-        if mem.store.txn_isolation()
+-            not in (TxnIsolation.SERIALIZABLE, TxnIsolation.SNAPSHOT_READ_ONLY) {
+-            return False;
+-        }
+-        key = ('ttg_standard_acl_catalog', 1);
+-        cached = mem.query_cache_get(key);
+-        if cached is not None {
+-            if not cached['approved'] {
+-                return False;
+-            }
+-            return all(
+-                catalog_node_type(name, module_name) is node_type
+-                    and standard_node_access(node_type)
+-                for (name, module_name, node_type) in cached['types']
+-            );
+-        }
+-        emitted = mem.query_cache_get(('ttg_compiled_catalog_v1', ));
+-        if emitted is not None {
+-            import from jaclang.runtime.ttg_templates { bind_template }
+-            compiled = bind_template(emitted, {});
+-        } else {
+-            compiled = compile_acl_type_catalog();
+-        }
+-        rows = mem.store.rows(compiled.sql, compiled.params);
+-        approved = True;
+-        types: list = [];
+-        for (name, module_name) in rows {
+-            resolved = catalog_node_type(name, module_name);
+-            if resolved is None or not standard_node_access(resolved) {
+-                approved = False;
+-                break;
+-            }
+-            types.append((name, module_name, resolved));
+-        }
+-        mem.query_cache_put(key, {'approved': approved, 'types': types});
+-        return approved;
+-    }
++    Archetype.require_standard_access(node_type);
++    return True;
+ }
+diff --git a/jac/jaclang/runtime/archetype.jac b/jac/jaclang/runtime/archetype.jac
+index 414c20362..3a8624843 100644
+--- a/jac/jaclang/runtime/archetype.jac
++++ b/jac/jaclang/runtime/archetype.jac
+@@ -153,6 +153,7 @@ obj Archetype {
+     def __jac__ -> Anchor;
+ 
+     def __init_subclass__(cls: any, **kwargs: object) -> None;
++    static def require_standard_access(cls: any) -> None;
+     static def install_subclass_hook(hook: Callable[[type], None]) -> None;
+     static def uninstall_subclass_hook(hook: Callable[[type], None]) -> None;
+     static def _subclass_tree -> list[type];
+diff --git a/jac/jaclang/runtime/impl/archetype.impl.jac b/jac/jaclang/runtime/impl/archetype.impl.jac
+index 28833629c..8225d8288 100644
+--- a/jac/jaclang/runtime/impl/archetype.impl.jac
++++ b/jac/jaclang/runtime/impl/archetype.impl.jac
+@@ -226,6 +226,7 @@ impl Archetype.__jac__ -> Anchor {
+ }
+ 
+ impl Archetype.__init_subclass__(cls: any, **kwargs: object) -> None {
++    Archetype.require_standard_access(cls);
+     super.__init_subclass__(**kwargs);
+     if not cls.__dict__.get('__jac_base__', False) {
+         import from jaclang { JacRuntimeInterface as _ }
+@@ -240,6 +241,17 @@ impl Archetype.__init_subclass__(cls: any, **kwargs: object) -> None {
+     }
+ }
+ 
++impl Archetype.require_standard_access(cls: any) -> None {
++    # Inspect raw dictionaries: a descriptor must never execute during validation.
++    for base in cls.__mro__ {
++        if base is not Archetype and '__jac_access__' in vars(base) {
++            raise TypeError(
++                f"{cls.__name__}: custom __jac_access__ is unsupported; use standard anchor permissions"
++            );
++        }
++    }
++}
++
+ impl Archetype._subclass_tree -> list[type] {
+     found: list[type] = [];
+     seen: set[type] = set();
+@@ -290,6 +302,11 @@ impl Archetype.uninstall_subclass_hook(hook: Callable[[type], None]) -> None {
+ impl Archetype.postinit -> None { }
+ 
+ impl Archetype.__setattr__(name: str, value: any) -> None {
++    if name == '__jac_access__' {
++        raise TypeError(
++            'Custom __jac_access__ is unsupported; use standard anchor permissions'
++        );
++    }
+     object.__setattr__(self, name, value);
+     an = self.__dict__.get('__jac__');
+     if an is None or not an.persistent {
+diff --git a/jac/jaclang/runtime/impl/runtime.impl.jac b/jac/jaclang/runtime/impl/runtime.impl.jac
+index 30b42dcb0..9baabb755 100644
+--- a/jac/jaclang/runtime/impl/runtime.impl.jac
++++ b/jac/jaclang/runtime/impl/runtime.impl.jac
+@@ -143,9 +143,8 @@ impl JacAccessValidation.check_write_access(
+     return JacAccessValidation._check_access(to, AccessLevel.CONNECT, op_hint);
+ }
+ 
+-impl JacAccessValidation.check_access_level(
+-    to: Anchor, no_custom: bool = False
+-) -> AccessLevel {
++impl JacAccessValidation.check_access_level(to: Anchor) -> AccessLevel {
++    Archetype.require_standard_access(type(to.archetype));
+     if (not to.persistent or (to.hash == 0)) {
+         return AccessLevel.WRITE;
+     }
+@@ -158,11 +157,6 @@ impl JacAccessValidation.check_access_level(
+     if ((jroot == jctx.system_root) or (jroot.id == to.root) or (jroot == to)) {
+         return AccessLevel.WRITE;
+     }
+-    if (
+-        not no_custom and ((custom_level := to.archetype.__jac_access__()) is not None)
+-    ) {
+-        return access_level_cast(custom_level);
+-    }
+     access_level: AccessLevel = AccessLevel.NO_ACCESS;
+ 
+     to_access = to.access;
+@@ -816,6 +810,7 @@ impl JacPersistence.object_ref(`obj: Archetype) -> str {
+ }
+ 
+ impl JacArchetype.make_archetype(cls: type[Archetype]) -> type[Archetype] {
++    Archetype.require_standard_access(cls);
+     entries: OrderedDict[(str, ObjectSpatialFunction)] = OrderedDict(
+         (fn.name, fn) for fn in cls._jac_entry_funcs_
+     );
+diff --git a/jac/jaclang/runtime/runtime.jac b/jac/jaclang/runtime/runtime.jac
+index 22706ae65..287a4b043 100644
+--- a/jac/jaclang/runtime/runtime.jac
++++ b/jac/jaclang/runtime/runtime.jac
+@@ -224,7 +224,7 @@ class JacAccessValidation {
+     static def check_read_access(to: Anchor) -> bool;
+     static def check_connect_access(to: Anchor, op_hint: str = "connect") -> bool;
+     static def check_write_access(to: Anchor, op_hint: str = "write") -> bool;
+-    static def check_access_level(to: Anchor, no_custom: bool = False) -> AccessLevel;
++    static def check_access_level(to: Anchor) -> AccessLevel;
+ }
+ 
+ class JacGraph {
+diff --git a/jac/jaclang/runtime/ttg_dependencies.jac b/jac/jaclang/runtime/ttg_dependencies.jac
+index 177778887..af2c0d674 100644
+--- a/jac/jaclang/runtime/ttg_dependencies.jac
++++ b/jac/jaclang/runtime/ttg_dependencies.jac
+@@ -70,6 +70,7 @@ obj WalkerDependencyGraph {
+         handlers: dict[str, list[str]] = {},
+         dispatch: dict[int, list[str]] = {},
+         sql_templates: dict = {},
++        access_plan: dict = {},
+         interability_regions: dict = {};
+ 
+     def dependencies(event_id: int) -> list[TraceDependency] {
+@@ -1180,6 +1181,7 @@ def _trace_field_effects(
+ 
+ def compile_checkpoint_plan(arch: uni.Archetype) -> dict {
+     import from jaclang.runtime.ttg_templates { compile_templates }
++    import from jaclang.runtime.ttg_access_plan { compile_access_plan }
+     graph = analyze_walker_ast(arch);
+     import from jaclang.runtime.ttg_regions { compile_interability_regions }
+     candidates = [
+@@ -1217,6 +1219,7 @@ def compile_checkpoint_plan(arch: uni.Archetype) -> dict {
+     }
+     return {
+         'version': 2,
++        'access_plan': compile_access_plan(arch),
+         'sql_templates': compile_templates(graph.events),
+         'interability_regions': regions,
+         'walker_name': graph.walker_name,
+@@ -1264,6 +1267,7 @@ def checkpoint_graph(spec: dict, walker_type: type) -> WalkerDependencyGraph {
+     graph = WalkerDependencyGraph(
+         walker_name=spec['walker_name'], runtime_walker=walker_type
+     );
++    graph.access_plan = spec.get('access_plan', {});
+     for item in spec['events'] {
+         fields = dict(item);
+         fields['reads'] = tuple(fields['reads']);
+diff --git a/jac/jaclang/runtime/ttg_dependency_prefetch.jac b/jac/jaclang/runtime/ttg_dependency_prefetch.jac
+index 80aa3a7b1..5ed04de64 100644
+--- a/jac/jaclang/runtime/ttg_dependency_prefetch.jac
++++ b/jac/jaclang/runtime/ttg_dependency_prefetch.jac
+@@ -104,6 +104,13 @@ def dependency_prefetch(
+             else '',
+         'admission': 'AlwaysPrefetch only; shared batch costs are diagnostic and excluded from training',
+         'queries': 0,
++        'access_queries': 0,
++        'access_cache_complete_skips': 0,
++        'access_resolved_nodes': 0,
++        'access_payload_ids': 0,
++        'access_guard_skips': 0,
++        'access_declines': 0,
++        'access_last_decline': '',
+         'template_queries': 0,
+         'region_queries': 0,
+         'region_cache_paths': 0,
+@@ -244,6 +251,12 @@ def prefetch_continuation(graph: any, scope: any, point: int) {
+     for (name, value) in current_facts.items() {
+         values[ability + '::here.' + name] = value;
+     }
++    import from jaclang.runtime.ttg_access_plan { prefetch_accesses }
++    prefetch_accesses(state, graph, scope, point);
++    remaining = state.max_length - len(state.submitted);
++    if remaining <= 0 {
++        return;
++    }
+     ignored = {item.id for item in scope.ignores};
+     pending: list[dict] = [];
+     pending_truncated = False;
+diff --git a/jac/jaclang/runtime/ttg_frontier.jac b/jac/jaclang/runtime/ttg_frontier.jac
+index 28e932b00..65426dcd5 100644
+--- a/jac/jaclang/runtime/ttg_frontier.jac
++++ b/jac/jaclang/runtime/ttg_frontier.jac
+@@ -102,9 +102,6 @@ def resolve_frontier(
+     actor: any = None;
+     with mem._lock {
+         mem.read_barrier();
+-        if 'catalog' in bundle {
+-            mem.query_cache_put(('ttg_compiled_catalog_v1', ), bundle['catalog']);
+-        }
+         for site in sites {
+             hops: list = [];
+             for (edge, node, direction) in site['hops'] {
+diff --git a/jac/jaclang/runtime/ttg_region_dag.jac b/jac/jaclang/runtime/ttg_region_dag.jac
+index 5ab12586d..85cdcf7ef 100644
+--- a/jac/jaclang/runtime/ttg_region_dag.jac
++++ b/jac/jaclang/runtime/ttg_region_dag.jac
+@@ -190,40 +190,7 @@ def compile_dag_sql(rules: list, gated: bool) -> any {
+         ],
+         limit=q.slot('row_limit', q.int64_type())
+     );
+-    if not gated {
+-        return q.compile_sql(paths);
+-    }
+-    # The same statement proves all persisted subtype access implementations.
+-    # Limit path rows independently: catalog rows must never be truncated.
+-    catalog = _native_anchors();
+-    proof = _select(
+-        catalog,
+-        [
+-            ('slot', q.int64(-1)),
+-            ('origin_id', q.slot('origin', q.uuid_type())),
+-            ('target_id', q.null(q.uuid_type())),
+-            ('edge_id', q.null(q.uuid_type())),
+-            (
+-                'arch_type',
+-                q.cast(cols.col(catalog, 'arch_type'), q.nullable(q.text_type()))
+-            ),
+-            ('arch_module', cols.col(catalog, 'arch_module')),
+-            ('ord', q.null(q.int64_type())),
+-            ('arity', q.null(q.int64_type()))
+-        ],
+-        predicate=_cmp(cols.col(catalog, 'kind'), q.text('NodeAnchor')),
+-        distinct=True
+-    );
+-    return q.compile_sql(
+-        q.ordered(
+-            _union([paths, proof]),
+-            [
+-                q.asc(q.output(q.field('slot', q.int64_type()))),
+-                q.asc(q.output(q.field('origin_id', q.uuid_type()))),
+-                q.asc(q.output(q.field('ord', q.nullable(q.int64_type()))))
+-            ]
+-        )
+-    );
++    return q.compile_sql(paths);
+ }
+ 
+ 
+@@ -298,16 +265,6 @@ def resolve_dag_region(
+     }
+     with mem._lock {
+         mem.read_barrier();
+-        if 'catalog' in graph.sql_templates {
+-            mem.query_cache_put(
+-                ('ttg_compiled_catalog_v1', ), graph.sql_templates['catalog']
+-            );
+-        }
+-        import from jaclang.data.ttg_acl {
+-            standard_catalog_access,
+-            standard_node_access,
+-            catalog_node_type
+-        }
+         import from jaclang.data.store { TxnIsolation }
+         if access_gated()
+             and mem.store.txn_isolation()
+@@ -323,14 +280,7 @@ def resolve_dag_region(
+             user_root,
+             cache_token
+         );
+-        if mem.query_cache_get(coverage) is not None
+-            and (
+-                not access_gated()
+-                or (
+-                    mem.query_cache_get(('ttg_standard_acl_catalog', 1)) is not None
+-                    and standard_catalog_access(mem)
+-                )
+-            ) {
++        if mem.query_cache_get(coverage) is not None {
+             metrics['region_reuses'] = metrics.get('region_reuses', 0) + 1;
+             return {'paths': [], 'payload': [], 'reused': True, 'kind': 'finite_dag'};
+         }
+@@ -358,32 +308,6 @@ def resolve_dag_region(
+         rows = mem.store.rows(compiled.sql, compiled.params);
+         metrics['region_queries'] = metrics.get('region_queries', 0) + 1;
+         metrics['queries'] += 1;
+-        catalog_types: list = [];
+-        if actor is not None {
+-            proof_rows = [
+-                row
+-                for row in rows
+-                if int(row[0]) == -1
+-            ];
+-            if not proof_rows {
+-                return decline('DAG persisted ACL catalog is missing');
+-            }
+-            for row in proof_rows {
+-                resolved = catalog_node_type(row[4], row[5]);
+-                if UUID(str(row[1])) != UUID(str(current['id']))
+-                    or any(row[i] is not None for i in (2, 3, 6, 7))
+-                    or resolved is None
+-                    or not standard_node_access(resolved) {
+-                    return decline('DAG persisted ACL catalog is unproved');
+-                }
+-                catalog_types.append((row[4], row[5], resolved));
+-            }
+-            rows = [
+-                row
+-                for row in rows
+-                if int(row[0]) != -1
+-            ];
+-        }
+         if len(rows) > max_rows {
+             return decline('DAG row budget exceeded; no partial publication');
+         }
+@@ -468,12 +392,6 @@ def resolve_dag_region(
+         if not publish_paths(mem, staged) {
+             return decline('DAG atomic native publication failed');
+         }
+-        if actor is not None {
+-            mem.query_cache_put(
+-                ('ttg_standard_acl_catalog', 1),
+-                {'approved': True, 'types': catalog_types}
+-            );
+-        }
+         for (uid, ability) in covered {
+             mem.query_cache_put(
+                 region_coverage_key(
+diff --git a/jac/jaclang/runtime/ttg_regions.jac b/jac/jaclang/runtime/ttg_regions.jac
+index 125b4f187..3d1534a12 100644
+--- a/jac/jaclang/runtime/ttg_regions.jac
++++ b/jac/jaclang/runtime/ttg_regions.jac
+@@ -930,11 +930,6 @@ def resolve_interability_region(
+     }
+     with mem._lock {
+         mem.read_barrier();
+-        if 'catalog' in graph.sql_templates {
+-            mem.query_cache_put(
+-                ('ttg_compiled_catalog_v1', ), graph.sql_templates['catalog']
+-            );
+-        }
+         for query in queries {
+             visibility = _acl_pushdown_root(query, 1, mem);
+             if access_gated() and visibility is None {
+diff --git a/jac/jaclang/runtime/ttg_sql.jac b/jac/jaclang/runtime/ttg_sql.jac
+index c9c70d664..9ce63d007 100644
+--- a/jac/jaclang/runtime/ttg_sql.jac
++++ b/jac/jaclang/runtime/ttg_sql.jac
+@@ -1699,29 +1699,3 @@ def compile_layered(
+         }
+     );
+ }
+-
+-
+-@lru_cache(maxsize=1)
+-def compile_acl_type_catalog -> q.CompiledSQL {
+-    cols = _BuildColumns();
+-    catalog = q.table(
+-        'anchors',
+-        [
+-            q.field('kind', q.text_type()),
+-            q.field('arch_type', q.text_type()),
+-            q.field('arch_module', q.nullable(q.text_type()))
+-        ]
+-    );
+-    return q.compile_sql(
+-        _select(
+-            catalog,
+-            cols.pick(catalog, ['arch_type', 'arch_module']),
+-            predicate=_cmp(cols.col(catalog, 'kind'), q.text('NodeAnchor')),
+-            distinct=True,
+-            order=[
+-                q.asc(cols.col(catalog, 'arch_type')),
+-                q.asc(cols.col(catalog, 'arch_module'))
+-            ]
+-        )
+-    );
+-}
+diff --git a/jac/jaclang/runtime/ttg_templates.jac b/jac/jaclang/runtime/ttg_templates.jac
+index 5fae18b4d..1b4ecc0fe 100644
+--- a/jac/jaclang/runtime/ttg_templates.jac
++++ b/jac/jaclang/runtime/ttg_templates.jac
+@@ -108,7 +108,6 @@ def compile_templates(events: list) -> dict {
+     # Called by compile_checkpoint_plan, before serialized checkpoint emission.
+     import json;
+     import from jaclang.runtime.ttg_fusion_sql { compile_fused_region }
+-    import from jaclang.runtime.ttg_sql { compile_acl_type_catalog }
+     import from jaclang.runtime.graph_query { GraphQuery, QHop }
+     import from jaclang.data.sqlcompile { compile_query }
+     wall = perf_counter_ns() if _profile['enabled'] else 0;
+@@ -132,7 +131,6 @@ def compile_templates(events: list) -> dict {
+         if not sites {
+             return bundle;
+         }
+-        bundle['catalog'] = sql_descriptor(compile_acl_type_catalog());
+         for gated in (False, True) {
+             mode = 'gated' if gated else 'open';
+             actor = {
+@@ -201,8 +199,7 @@ def compile_templates(events: list) -> dict {
+             + sum(
+                 len(d['sql'].encode()) for modes in bundle['native'].values()
+                 for pair in modes.values() for d in pair.values()
+-            )
+-            + len(bundle['catalog']['sql'].encode());
++            );
+         return bundle;
+     } finally {
+         _record('generation', wall, cpu);
+@@ -313,9 +310,6 @@ def cached_emitted_path(
+     import from jaclang.runtime.graph_walk { access_gated }
+     with mem._lock {
+         mem.read_barrier();
+-        if 'catalog' in bundle {
+-            mem.query_cache_put(('ttg_compiled_catalog_v1', ), bundle['catalog']);
+-        }
+         actor = _acl_pushdown_root(query, len(query.hops), mem);
+         if access_gated() and actor is None {
+             return None;
+diff --git a/jac/tests/runtimelib/fixtures/serve_shared_root.jac b/jac/tests/runtimelib/fixtures/serve_shared_root.jac
+index 18d76dd43..b0bccb1e9 100644
+--- a/jac/tests/runtimelib/fixtures/serve_shared_root.jac
++++ b/jac/tests/runtimelib/fixtures/serve_shared_root.jac
+@@ -51,14 +51,10 @@ walker:pub make_readonly {
+     }
+ }
+ 
+-# Commons state deletable by anyone: the archetype opens WRITE to all, so
++# Commons state deletable by anyone: the creator grants WRITE to all, so
+ # any identity can clear stale generations regardless of who created them.
+ node Bin {
+     has tag: str = "";
+-
+-    def __jac_access__ -> any {
+-        return AccessLevel.WRITE;
+-    }
+ }
+ 
+ edge HasBin {}
+@@ -68,6 +64,9 @@ walker:pub leave_bin {
+ 
+     can run with Root entry {
+         fresh = root.shared +>:HasBin():+> Bin(tag=self.tag);
++        if fresh {
++            grant(fresh, level=AccessLevel.WRITE);
++        }
+         report 1 if fresh is not None else 0;
+     }
+ }
+diff --git a/jac/tests/runtimelib/fixtures/ttg_region_walkers.jac b/jac/tests/runtimelib/fixtures/ttg_region_walkers.jac
+index 5d7385ec3..b9bc9e38c 100644
+--- a/jac/tests/runtimelib/fixtures/ttg_region_walkers.jac
++++ b/jac/tests/runtimelib/fixtures/ttg_region_walkers.jac
+@@ -136,12 +136,6 @@ node DagTweet {
+     has value: int = 0;
+ }
+ 
+-node DagCustomTweet(DagTweet) {
+-    def __jac_access__ -> any {
+-        raise AssertionError('Access hook must not run during certification');
+-    }
+-}
+-
+ edge DagPost {}
+ edge DagFollow {}
+ walker DagFeed {
+diff --git a/jac/tests/runtimelib/test_acl_pushdown.jac b/jac/tests/runtimelib/test_acl_pushdown.jac
+index 899b763ae..2d76adecf 100644
+--- a/jac/tests/runtimelib/test_acl_pushdown.jac
++++ b/jac/tests/runtimelib/test_acl_pushdown.jac
+@@ -12,10 +12,8 @@ per-root grant does not scale to a large audience, so a grant may also name a
+ *group*, and membership is an edge -- one grant, one membership per member,
+ instead of one dict entry per member on every object.
+ 
+-An archetype that overrides `__jac_access__` runs arbitrary Jac, which has no
+-SQL form, so those must decline any pushdown and keep the object-space filter.
+-The decline is the point: correctness never depends on whether a query could be
+-compiled.
++Custom access hooks are rejected at class registration. Every supported node
++uses standard permissions, including untyped intermediate query hops.
+ 
+ """
+ 
+@@ -37,14 +35,6 @@ node Team {
+ 
+ edge MemberOf {}
+ 
+-node CustomDoc {
+-    has label: str = "";
+-
+-    def __jac_access__ -> AccessLevel {
+-        return AccessLevel.READ;
+-    }
+-}
+-
+ 
+ def _as_any(v: any) -> any {
+     return v;
+@@ -150,7 +140,6 @@ test "public read acl does not fetch owner root" {
+             JacRuntime.exec_ctx = old;
+             ctx1.close();
+         }
+-
+         ctx2 = _ctx(td);
+         JacRuntime.exec_ctx = ctx2;
+         try {
+@@ -263,37 +252,95 @@ test "a grant to a group reaches every member without a per-root entry" {
+ }
+ 
+ 
+-test "a custom __jac_access__ declines the pushdown and still filters" {
++test "custom access is rejected before a class can be used" {
++    rejected = False;
++    try {
++        type(
++            'ForbiddenDoc',
++            (Doc, ),
++            {'__jac_access__': lambda (self: any) { AccessLevel.READ; }}
++        );
++    } except TypeError as error {
++        rejected = 'custom __jac_access__' in str(error);
++    }
++    assert rejected;
++}
++
++test "Persisted typed and untyped paths cannot traverse a private intermediate node" {
++    import from jaclang.runtime.graph_query { GraphQuery, QHop }
++    import from jaclang.data.query_planner { resolve_query }
++    import from unittest.mock { patch }
+     with TemporaryDirectory() as td {
+         old = JacRuntime.exec_ctx;
+         ctx = _ctx(td);
+         JacRuntime.exec_ctx = ctx;
+         try {
++            reader = _mk_root(ctx.mem);
+             owner = _mk_root(ctx.mem);
+-            other = _mk_root(ctx.mem);
+-            c = CustomDoc(label="custom").__jac__;
+-            c.persistent = True;
+-            setattr(c, "root", owner.id);
+-            ctx.mem.put(c);
+-            e = EdgeAnchor(
+-                archetype=GenericEdge(), source=other, target=c, is_undirected=False
+-            );
+-            e.persistent = True;
+-            other.edges.append(e);
+-            c.edges.append(e);
+-            ctx.mem.put(e);
++            middle: any = Doc(label='private-middle').__jac__;
++            leaf: any = Doc(label='public-leaf').__jac__;
++            for a in [middle, leaf] {
++                a.persistent = True;
++                setattr(a, 'root', owner.id);
++                ctx.mem.put(a);
++            }
++            leaf.own_access().all = AccessLevel.READ;
++            ctx.mem.put(leaf);
++            for (src, dst) in [(reader, middle), (middle, leaf)] {
++                link = EdgeAnchor(
++                    archetype=GenericEdge(), source=src, target=dst, is_undirected=False
++                );
++                link.persistent = True;
++                src.edges.append(link);
++                dst.edges.append(link);
++                ctx.mem.put(link);
++            }
+             ctx.mem.commit();
+-
+-            ctx.set_user_root(str(other.id));
+-            seen = [
+-                _as_any(x).label for x in [_as_any(other.archetype)-->[?:CustomDoc]]
+-            ];
+-            assert seen == ["custom"] , (
+-                f"__jac_access__ grants READ, so it must still be visible: {seen}"
+-            );
++            reader_id = reader.id;
++            middle_id = middle.id;
++            leaf_id = leaf.id;
+         } finally {
++            ctx.close();
+             JacRuntime.exec_ctx = old;
++        }
++        ctx = _ctx(td);
++        JacRuntime.exec_ctx = ctx;
++        try {
++            ctx.set_user_root(str(reader_id));
++            reader = ctx.mem.get(reader_id);
++            assert reader is not None;
++            store: any = ctx.mem.store;
++            for target in [None, Doc] {
++                query = GraphQuery(
++                    [reader.archetype],
++                    hops=[QHop(dir=2, nd=target), QHop(dir=2, nd=target)]
++                );
++                with patch.object(store, 'rows', wraps=store.rows) as rows {
++                    assert resolve_query(ctx.mem, query) == [];
++                    assert any(
++                        'n1.root_id' in c[0][0] and 'n2.root_id' in c[0][0]
++                        for c in rows.call_args_list
++                    );
++                }
++            }
++            # Make only the intermediate node public; the very same path now succeeds.
++            ctx.set_user_root(str(owner.id));
++            middle = ctx.mem.get(middle_id);
++            assert middle is not None;
++            middle.own_access().all = AccessLevel.READ;
++            ctx.mem.put(middle);
++            ctx.mem.commit();
++            ctx.set_user_root(str(reader_id));
++            for target in [None, Doc] {
++                query = GraphQuery(
++                    [reader.archetype],
++                    hops=[QHop(dir=2, nd=target), QHop(dir=2, nd=target)]
++                );
++                assert [a.id for a in resolve_query(ctx.mem, query)] == [leaf_id];
++            }
++        } finally {
+             ctx.close();
++            JacRuntime.exec_ctx = old;
+         }
+     }
+ }
+diff --git a/jac/tests/runtimelib/test_jaseci.jac b/jac/tests/runtimelib/test_jaseci.jac
+index 03991e097..cb1102814 100644
+--- a/jac/tests/runtimelib/test_jaseci.jac
++++ b/jac/tests/runtimelib/test_jaseci.jac
+@@ -868,186 +868,22 @@ test "traversing save" {
+     }
+ }
+ 
+-test "custom access validation" {
++test "custom access fixture fails during class loading" {
+     _tmpdir = mkdtemp();
+     _orig_base = Jac.get_base_path_dir();
+     Jac.set_base_path(_tmpdir);
+     try {
+-        ##############################################
+-        #              CREATE OTHER ROOT             #
+-        ##############################################
+-        captured = capture_start();
+-        execution.run(
+-            filename=os.path.join(FIXTURES, "custom_access_validation.jac"),
+-            entry_name="create_other_root",
+-            args=[]
+-        );
+-
+-        other_root = capture_get(captured).strip();
+-
+-        ##############################################
+-        #                 CREATE NODE                #
+-        ##############################################
+-        captured = capture_start();
+-        execution.run(
+-            filename=os.path.join(FIXTURES, "custom_access_validation.jac"),
+-            entry_name="create",
+-            args=[]
+-        );
+-        nd_str = capture_get(captured).strip();
+-
+-        ##############################################
+-        #                 CHECK NODE                 #
+-        ##############################################
+-
+-        # BY OWNER
+-        captured = capture_start();
+-        execution.run(
+-            filename=os.path.join(FIXTURES, "custom_access_validation.jac"),
+-            entry_name="check",
+-            args=[],
+-            nd=nd_str
+-        );
+-
+-        assert capture_get(captured).strip() == "A(val1='NO_ACCESS', val2=0)";
+-
+-        # BY OTHER
+-        captured = capture_start();
+-        execution.run(
+-            filename=os.path.join(FIXTURES, "custom_access_validation.jac"),
+-            entry_name="check",
+-            args=[],
+-            root_id=other_root,
+-            nd=nd_str
+-        );
+-
+-        assert capture_get(captured).strip() == "";
+-
+-        ##############################################
+-        #       UPDATE NODE (GIVE READ ACCESS)       #
+-        ##############################################
+-
+-        # UPDATE BY OWNER
+-        execution.run(
+-            filename=os.path.join(FIXTURES, "custom_access_validation.jac"),
+-            entry_name="update",
+-            args=_as_any(["READ", None]),
+-            nd=nd_str
+-        );
+-
+-        # CHECK BY OTHER
+-        captured = capture_start();
+-        execution.run(
+-            filename=os.path.join(FIXTURES, "custom_access_validation.jac"),
+-            entry_name="check",
+-            args=[],
+-            root_id=other_root,
+-            nd=nd_str
+-        );
+-
+-        assert capture_get(captured).strip() == "A(val1='READ', val2=0)";
+-
+-        ##############################################
+-        #     UPDATE NODE (BUT STILL READ ACCESS)    #
+-        ##############################################
+-
+-        # UPDATE BY OTHER
+-        execution.run(
+-            filename=os.path.join(FIXTURES, "custom_access_validation.jac"),
+-            entry_name="update",
+-            args=_as_any([None, 1]),
+-            root_id=other_root,
+-            nd=nd_str
+-        );
+-
+-        # CHECK BY OTHER
+-        captured = capture_start();
+-        execution.run(
+-            filename=os.path.join(FIXTURES, "custom_access_validation.jac"),
+-            entry_name="check",
+-            args=[],
+-            root_id=other_root,
+-            nd=nd_str
+-        );
+-
+-        assert capture_get(captured).strip() == "A(val1='READ', val2=0)";
+-
+-        ##############################################
+-        #       UPDATE NODE (GIVE WRITE ACCESS)      #
+-        ##############################################
+-
+-        # UPDATE BY OWNER
+-        execution.run(
+-            filename=os.path.join(FIXTURES, "custom_access_validation.jac"),
+-            entry_name="update",
+-            args=_as_any(["WRITE", None]),
+-            nd=nd_str
+-        );
+-
+-        # UPDATE BY OTHER
+-        execution.run(
+-            filename=os.path.join(FIXTURES, "custom_access_validation.jac"),
+-            entry_name="update",
+-            args=_as_any([None, 2]),
+-            root_id=other_root,
+-            nd=nd_str
+-        );
+-
+-        # CHECK BY OTHER
+-        captured = capture_start();
+-        execution.run(
+-            filename=os.path.join(FIXTURES, "custom_access_validation.jac"),
+-            entry_name="check",
+-            args=[],
+-            root_id=other_root,
+-            nd=nd_str
+-        );
+-
+-        assert capture_get(captured).strip() == "A(val1='WRITE', val2=2)";
+-
+-        ##############################################
+-        #         UPDATE NODE (REMOVE ACCESS)        #
+-        ##############################################
+-
+-        # UPDATE BY OWNER
+-        execution.run(
+-            filename=os.path.join(FIXTURES, "custom_access_validation.jac"),
+-            entry_name="update",
+-            args=_as_any(["NO_ACCESS", None]),
+-            nd=nd_str
+-        );
+-
+-        # UPDATE BY OTHER
+-        execution.run(
+-            filename=os.path.join(FIXTURES, "custom_access_validation.jac"),
+-            entry_name="update",
+-            args=_as_any([None, 5]),
+-            root_id=other_root,
+-            nd=nd_str
+-        );
+-
+-        # CHECK BY OTHER
+-        captured = capture_start();
+-        execution.run(
+-            filename=os.path.join(FIXTURES, "custom_access_validation.jac"),
+-            entry_name="check",
+-            args=[],
+-            root_id=other_root,
+-            nd=nd_str
+-        );
+-
+-        assert capture_get(captured).strip() == "";
+-
+-        # CHECK BY OWNER
+-        captured = capture_start();
+-        execution.run(
+-            filename=os.path.join(FIXTURES, "custom_access_validation.jac"),
+-            entry_name="check",
+-            args=[],
+-            nd=nd_str
+-        );
+-
+-        assert capture_get(captured).strip() == "A(val1='NO_ACCESS', val2=2)";
++        rejected = False;
++        try {
++            execution.run(
++                filename=os.path.join(FIXTURES, "custom_access_validation.jac"),
++                entry_name="create_other_root",
++                args=[]
++            );
++        } except Exception as error {
++            rejected = 'custom __jac_access__' in str(error);
++        }
++        assert rejected;
+     } finally {
+         Jac.set_base_path(_orig_base);
+         shutil.rmtree(_tmpdir, ignore_errors=True);
+diff --git a/jac/tests/runtimelib/test_shared_root.jac b/jac/tests/runtimelib/test_shared_root.jac
+index 0204474d5..8615af2f2 100644
+--- a/jac/tests/runtimelib/test_shared_root.jac
++++ b/jac/tests/runtimelib/test_shared_root.jac
+@@ -117,7 +117,7 @@ test "guest and logged-in users share the shared-root graph" {
+ 
+ 
+ test "deleting a commons node takes cross-owner edges with it" {
+-    # The Bin archetype opens WRITE to all via __jac_access__, so bob may
++    # The creator opens WRITE to all with a standard grant, so bob may
+     # delete alice's bin - and the connecting edge alice owns must die with
+     # it rather than dangle off the shared root.
+     with TemporaryDirectory() as tmpdir {
+diff --git a/jac/tests/runtimelib/test_ttg_authenticated_acl.jac b/jac/tests/runtimelib/test_ttg_authenticated_acl.jac
+index 5a2088324..66a450972 100644
+--- a/jac/tests/runtimelib/test_ttg_authenticated_acl.jac
++++ b/jac/tests/runtimelib/test_ttg_authenticated_acl.jac
+@@ -1,4 +1,4 @@
+-"""Authenticated untyped paths use one shared, snapshot-scoped ACL proof."""
++"""Authenticated untyped paths use standard ACLs without a type census."""
+ import from pathlib { Path }
+ import from contextlib { ExitStack }
+ import jaclang.data.query_planner as planner;
+@@ -15,18 +15,12 @@ import from jaclang.runtime.archetype { Root, EdgeAnchor, AccessLevel }
+ import from jaclang.runtime.graph_walk { access_gated }
+ import from jaclang.runtime.graph_query { GraphQuery, QHop }
+ import from jaclang.runtime.ttg_dependency_prefetch { dependency_prefetch }
+-import from jaclang.runtime.ttg_sql { compile_acl_type_catalog }
+ import from jaclang.data.query_planner {
+     _acl_pushdown_root,
+     resolve_query_prefix,
+     resolve_ttg_path
+ }
+ import from .fixtures.ttg_fusion_walkers { FusedItem, FusedNext, FusedWalk }
+-import from .fixtures.ttg_acl_walkers {
+-    CatalogGrant,
+-    reset_access_calls,
+-    access_call_count
+-}
+ 
+ 
+ def acl_context(project: str) -> ExecutionContext {
+@@ -63,16 +57,10 @@ def acl_seed(kind: str = 'standard') -> tuple {
+         ctx.mem.put(owner);
+         items: list = [];
+         for index in range(6) {
+-            arch = CatalogGrant(value=index)
+-                if kind == 'custom' and index == 2
+-                else FusedItem(value=index);
++            arch = FusedItem(value=index);
+             anchor = arch.__jac__;
+             anchor.persistent = True;
+-            setattr(
+-                anchor,
+-                'root',
+-                owner.id if kind == 'custom' and index == 2 else reader.id
+-            );
++            setattr(anchor, 'root', reader.id);
+             anchor.own_access().all = AccessLevel.NO_ACCESS;
+             ctx.mem.put(anchor);
+             items.append(anchor);
+@@ -156,15 +144,6 @@ test "Authenticated heterogeneous untyped paths activate both modes with shared
+                                     )
+                                 )
+                             );
+-                            install_guard(
+-                                patch.object(
+-                                    ttg_sql,
+-                                    'compile_acl_type_catalog',
+-                                    side_effect=AssertionError(
+-                                        'runtime ACL catalog AST builder'
+-                                    )
+-                                )
+-                            );
+                         }
+                         with dependency_prefetch(
+                             ctx, max_length=2048, mode='process', fused_sql=enabled
+@@ -178,9 +157,10 @@ test "Authenticated heterogeneous untyped paths activate both modes with shared
+                     catalog_calls = [
+                         c
+                         for c in rows.call_args_list
+-                        if c[0][0] == compile_acl_type_catalog().sql
++                        if c[0][0].startswith('SELECT DISTINCT')
++                            and 'arch_module' in c[0][0]
+                     ];
+-                    assert len(catalog_calls) == 1 , str(rows.call_args_list);
++                    assert len(catalog_calls) == 0 , str(rows.call_args_list);
+                     assert not any(
+                         c[0][0].startswith('SELECT n1.id, e1.id FROM')
+                         for c in rows.call_args_list
+@@ -243,45 +223,7 @@ test "Authenticated heterogeneous untyped paths activate both modes with shared
+ }
+ 
+ 
+-test "Custom access grant remains native and untyped prefetch declines in both modes without invoking hook" {
+-    old = JacRuntime.exec_ctx;
+-    try {
+-        (project, reader, ids) = acl_seed('custom');
+-        for enabled in [False, True] {
+-            ctx = acl_context(project);
+-            try {
+-                ctx.set_user_root(str(reader));
+-                assert access_gated();
+-                query = GraphQuery([], hops=[QHop(dir=2, `edge=FusedNext)]).`visit();
+-                reset_access_calls();
+-                assert _acl_pushdown_root(query, 1, ctx.mem) is None;
+-                assert access_call_count() == 0;
+-                anchor = ctx.mem.get(ids[0]);
+-                assert anchor is not None;
+-                origin = anchor.archetype;
+-                assert isinstance(origin, FusedItem);
+-                wlk = FusedWalk(limit=6);
+-                with dependency_prefetch(
+-                    ctx, max_length=2048, mode='process', fused_sql=enabled
+-                ) as run {
+-                    origin spawn wlk;
+-                }
+-                assert wlk.reports == [0, 1, 2, 3, 4, 5];
+-                assert access_call_count() > 0;
+-                assert not run.submitted;
+-                assert any(p['status'] == 'acl_unproved' for p in run.plans);
+-                assert run.fusion['queries'] == 0;
+-            } finally {
+-                ctx.close();
+-            }
+-        }
+-    } finally {
+-        JacRuntime.exec_ctx = old;
+-    }
+-}
+-
+-
+-test "Unknown persisted type conservatively declines both modes without narrowing ordinary successors" {
++test "Unrelated unknown persisted type does not force a whole-graph census" {
+     old = JacRuntime.exec_ctx;
+     try {
+         (project, reader, ids) = acl_seed('unknown');
+@@ -300,9 +242,8 @@ test "Unknown persisted type conservatively declines both modes without narrowin
+                     origin spawn wlk;
+                 }
+                 assert wlk.reports == [0, 1, 2, 3, 4, 5];
+-                assert not run.submitted;
+-                assert any(p['status'] == 'acl_unproved' for p in run.plans);
+-                assert run.fusion['queries'] == 0;
++                assert len(run.submitted) == 5;
++                assert not run.errors;
+             } finally {
+                 ctx.close();
+             }
+@@ -313,47 +254,29 @@ test "Unknown persisted type conservatively declines both modes without narrowin
+ }
+ 
+ 
+-test "Catalog proof refreshes on transaction and writes and rechecks raw hook identity" {
++test "Untyped ACL decision performs no SQL before or after transaction changes" {
+     old = JacRuntime.exec_ctx;
+     try {
+         (project, reader, ids) = acl_seed();
+         ctx = acl_context(project);
+         try {
+             ctx.set_user_root(str(reader));
+-            query = GraphQuery([], hops=[QHop(dir=2, `edge=FusedNext)]).`visit();
++            query = GraphQuery(
++                [], hops=[QHop(dir=2, `edge=FusedNext), QHop(dir=2, `edge=FusedNext)]
++            ).`visit();
+             store: any = ctx.mem.store;
+-            with patch.object(store, 'rows', wraps=store.rows) as rows {
+-                assert _acl_pushdown_root(query, 1, ctx.mem) == str(reader);
+-                assert _acl_pushdown_root(query, 1, ctx.mem) == str(reader);
+-                assert sum(
+-                    c[0][0] == compile_acl_type_catalog().sql
+-                    for c in rows.call_args_list
+-                )
+-                    == 1;
+-                def changed_access(self: any) -> any {
+-                    raise RuntimeError('Guard executed an access hook');
+-                }
+-                with patch.object(FusedItem, '__jac_access__', changed_access) {
+-                    assert _acl_pushdown_root(query, 1, ctx.mem) is None;
+-                }
+-                assert _acl_pushdown_root(query, 1, ctx.mem) == str(reader);
+-                ctx.mem.commit();
+-                assert _acl_pushdown_root(query, 1, ctx.mem) == str(reader);
+-                assert sum(
+-                    c[0][0] == compile_acl_type_catalog().sql
+-                    for c in rows.call_args_list
+-                )
+-                    == 2;
+-                extra = CatalogGrant(value=55).__jac__;
+-                extra.persistent = True;
+-                setattr(extra, 'root', reader);
+-                ctx.mem.put(extra);
+-                assert _acl_pushdown_root(query, 1, ctx.mem) is None;
+-                assert sum(
+-                    c[0][0] == compile_acl_type_catalog().sql
+-                    for c in rows.call_args_list
+-                )
+-                    == 3;
++            with patch.object(
++                store, 'rows', side_effect=AssertionError('ACL type census')
++            ) {
++                assert _acl_pushdown_root(query, 2, ctx.mem) == str(reader);
++                ctx.mem.invalidate_query_cache();
++                assert _acl_pushdown_root(query, 2, ctx.mem) == str(reader);
++            }
++            ctx.mem.commit();
++            with patch.object(
++                store, 'rows', side_effect=AssertionError('ACL type census')
++            ) {
++                assert _acl_pushdown_root(query, 2, ctx.mem) == str(reader);
+             }
+         } finally {
+             ctx.close();
+diff --git a/jac/tests/runtimelib/test_ttg_regions_native.jac b/jac/tests/runtimelib/test_ttg_regions_native.jac
+index 06ee05843..db679a8f9 100644
+--- a/jac/tests/runtimelib/test_ttg_regions_native.jac
++++ b/jac/tests/runtimelib/test_ttg_regions_native.jac
+@@ -37,7 +37,6 @@ import from .fixtures.ttg_region_walkers {
+     RegionFrontRight,
+     RegionFrontier,
+     DagFeed,
+-    DagCustomTweet,
+     DagProfile,
+     DagTweet,
+     DagPost,
+@@ -722,71 +721,20 @@ test "DAG overflow and altered entry dispatch never publish partial native paths
+     }
+ }
+ 
+-test "DAG inline descendant ACL proof rejects before publication without invoking hooks" {
+-    import from types { SimpleNamespace }
+-    import from jaclang.runtime.archetype { Root }
+-    old = JacRuntime.exec_ctx;
++test "DAG custom descendant is rejected at class creation before any query" {
++    rejected = False;
+     try {
+-        project = region_project();
+-        ctx = region_context(project);
+-        try {
+-            actor: any = Root().__jac__;
+-            actor.persistent = True;
+-            setattr(actor, 'root', actor.id);
+-            ctx.mem.put(actor);
+-            custom: any = DagCustomTweet().__jac__;
+-            custom.persistent = True;
+-            setattr(custom, 'root', actor.id);
+-            ctx.mem.put(custom);
+-            uid = actor.id;
+-        } finally {
+-            ctx.close();
+-        }
+-        ctx = region_context(project);
+-        try {
+-            ctx.set_user_root(str(uid));
+-            wlk = DagFeed();
+-            arch = JacTTGGenerator._find_walker_ast_node(DagFeed);
+-            assert arch is not None;
+-            spec = compile_checkpoint_plan(arch);
+-            graph = checkpoint_graph(spec, DagFeed);
+-            scope = SimpleNamespace(path=[ctx.mem.get(uid)], ignores=[]);
+-            metrics: dict = {
+-                'queries': 0,
+-                'cache_paths': 0,
+-                'cache_empty_paths': 0,
+-                'regions': []
+-            };
+-            with patch(
+-                'jaclang.runtime.ttg_region_dag.publish_paths',
+-                side_effect=AssertionError('publication')
+-            ) {
+-                result = resolve_interability_region(
+-                    ctx.mem,
+-                    graph,
+-                    wlk,
+-                    scope,
+-                    spec['entries']['run'],
+-                    {'id': uid, 'node_type': Root},
+-                    [],
+-                    ctx.user_root,
+-                    20,
+-                    metrics
+-                );
+-            }
+-            assert result is None
+-                and metrics['queries'] == 1
+-                and metrics['cache_paths'] == 0;
+-            assert 'ACL catalog' in metrics['region_fallback_reason'];
+-        } finally {
+-            ctx.close();
+-        }
+-    } finally {
+-        JacRuntime.exec_ctx = old;
++        type(
++            'ForbiddenTweet',
++            (DagTweet, ),
++            {'__jac_access__': lambda (self: any) { 0; }}
++        );
++    } except TypeError as error {
++        rejected = 'custom __jac_access__' in str(error);
+     }
++    assert rejected;
+ }
+ 
+-
+ test "Access slice native thread preserves output branches identities and rejects borrowed maps" {
+     import sys;
+     if os.environ.get('TTG_REQUIRE_GIL_OFF') == '1' {
+@@ -929,7 +877,13 @@ test "Output tree refuses cycle row overflow and malformed predicate atomically"
+                 'cache_paths': 0,
+                 'cache_empty_paths': 0
+             };
+-            extra_exit = patch.object(OutputTree, '_jac_exit_funcs_', [SimpleNamespace(name='foreign', trigger=OutputFolder)]) if variant == 'foreign_exit' else nullcontext();
++            extra_exit = patch.object(
++                OutputTree,
++                '_jac_exit_funcs_',
++                [SimpleNamespace(name='foreign', trigger=OutputFolder)]
++            )
++                if variant == 'foreign_exit'
++                else nullcontext();
+             with extra_exit, patch(
+                 'jaclang.runtime.ttg_templates.publish_paths',
+                 side_effect=AssertionError('partial publication')
+@@ -955,7 +909,11 @@ test "Output tree refuses cycle row overflow and malformed predicate atomically"
+                     else (
+                         'budget' in reason
+                             if variant == 'overflow'
+-                            else ('exit dispatch' in reason if variant == 'foreign_exit' else 'Malformed' in reason)
++                            else (
++                                'exit dispatch' in reason
++                                    if variant == 'foreign_exit'
++                                    else 'Malformed' in reason
++                            )
+                     )
+             ) , reason;
+             assert metrics['cache_paths'] == 0;

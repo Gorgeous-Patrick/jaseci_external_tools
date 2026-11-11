@@ -1,0 +1,337 @@
+{
+  "kind": "aggressive-conservative-overfetch-comparison",
+  "runtime_commit": "96868d0400a2f91fbfa48112c7ee291c891d2d03",
+  "runtimes": {
+    "aggressive": {
+      "workspace": "/home/baichuan/jaseci/jac-ttg",
+      "profile": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-visit-performance-20261110/aggressive-profile.json",
+        "sha256": "b54616167410d79ce88d6a19ee06c824dd641e92ffab0c1d70c92bf816335ddc"
+      },
+      "clean": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-visit-performance-20261110/clean-manifest.json",
+        "sha256": "959a31dc1dc829f6b81abbdc1995f59bc54c41cc602ba6f0e2001d78585d9da6"
+      },
+      "overlay": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-visit-performance-20261110/overlay-manifest.json",
+        "sha256": "10efb630a47e3872b75f7e64efe1622871c075c4d9e79755fa20d578f8eb00aa"
+      }
+    },
+    "conservative": {
+      "workspace": "/home/baichuan/jaseci/jac-ttg",
+      "profile": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-visit-performance-20261110/conservative-profile.json",
+        "sha256": "bb45c10e0908b1b394d032929430363eb22c8686926e47ce2fc1e9ce402d98b6"
+      },
+      "clean": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-visit-performance-20261110/clean-manifest.json",
+        "sha256": "959a31dc1dc829f6b81abbdc1995f59bc54c41cc602ba6f0e2001d78585d9da6"
+      },
+      "overlay": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-visit-performance-20261110/overlay-manifest.json",
+        "sha256": "10efb630a47e3872b75f7e64efe1622871c075c4d9e79755fa20d578f8eb00aa"
+      }
+    }
+  },
+  "sources": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-visit-performance-20261110/sources.json",
+    "sha256": "d966ad80906585bee9b5f8ff6343c22624848f567c09d874d5cdbd85c60817a0"
+  },
+  "configs": {
+    "aggressive": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "thread",
+      "ttg_prefetch_model": "always",
+      "prefetching": "ttg",
+      "ttg_fused_sql": false
+    },
+    "conservative": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "thread",
+      "ttg_prefetch_model": "always",
+      "prefetching": "ttg_dependency",
+      "ttg_fused_sql": true
+    }
+  },
+  "schedule": [
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "jdrive-aggressive-excluded_warmup--1"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "jdrive-conservative-excluded_warmup--1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "littlex-aggressive-excluded_warmup--1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "littlex-conservative-excluded_warmup--1"
+    },
+    {
+      "case_id": "recipe_pantry",
+      "app": "recipe_pantry",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "recipe_pantry-aggressive-excluded_warmup--1"
+    },
+    {
+      "case_id": "recipe_pantry",
+      "app": "recipe_pantry",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "recipe_pantry-conservative-excluded_warmup--1"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "jdrive-aggressive-measured-0"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "jdrive-conservative-measured-0"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "jdrive-conservative-measured-1"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "jdrive-aggressive-measured-1"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "jdrive-aggressive-measured-2"
+    },
+    {
+      "case_id": "jdrive",
+      "app": "jdrive",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "jdrive-conservative-measured-2"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "littlex-aggressive-measured-0"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "littlex-conservative-measured-0"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "littlex-conservative-measured-1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "littlex-aggressive-measured-1"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "littlex-aggressive-measured-2"
+    },
+    {
+      "case_id": "littlex",
+      "app": "littlex",
+      "scale": "small",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "littlex-conservative-measured-2"
+    },
+    {
+      "case_id": "recipe_pantry",
+      "app": "recipe_pantry",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "recipe_pantry-aggressive-measured-0"
+    },
+    {
+      "case_id": "recipe_pantry",
+      "app": "recipe_pantry",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "recipe_pantry-conservative-measured-0"
+    },
+    {
+      "case_id": "recipe_pantry",
+      "app": "recipe_pantry",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "recipe_pantry-conservative-measured-1"
+    },
+    {
+      "case_id": "recipe_pantry",
+      "app": "recipe_pantry",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "recipe_pantry-aggressive-measured-1"
+    },
+    {
+      "case_id": "recipe_pantry",
+      "app": "recipe_pantry",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "config_id": "aggressive",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "recipe_pantry-aggressive-measured-2"
+    },
+    {
+      "case_id": "recipe_pantry",
+      "app": "recipe_pantry",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "config_id": "conservative",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "recipe_pantry-conservative-measured-2"
+    }
+  ],
+  "seed": 42,
+  "statistics": "ANALYZE anchors and graph_types once after setup, before primary HTTP/reset",
+  "storage": {
+    "startup": 805306368,
+    "between": 671088640,
+    "stop": 536870912
+  },
+  "selection": "Fixed JDrive small, LittleX small, and RecipePantry smoke with the same two additional read-only ShoppingList checks; identical native workflows, standard-only runtime and GIL-off thread executor. New Access-demand compiler/runtime enabled for conservative. All cases retained.",
+  "scope": "Precision diagnostic, not uninstrumented latency benchmark. Request-bound payload delivery/demand/OSP entry instrumentation identical in both modes. 24 fresh workflows: six excluded warmups, eighteen measured, n3 per six cells. Full native correctness and physical-state replay per case; actual GIL-off at SQL boundaries; setup, steady reads and restart excluded."
+}

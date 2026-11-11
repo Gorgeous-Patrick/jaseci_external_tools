@@ -1,0 +1,21 @@
+2026-11-10 15:01:44.783 EST [491791] LOG:  starting PostgreSQL 18.6 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+2026-11-10 15:01:44.783 EST [491791] LOG:  listening on IPv4 address "127.0.0.1", port 44617
+2026-11-10 15:01:44.788 EST [491797] LOG:  database system was shut down at 2026-11-10 15:01:43 EST
+2026-11-10 15:01:44.795 EST [491791] LOG:  database system is ready to accept connections
+2026-11-10 15:01:45.749 EST [491833] ERROR:  relation "kv_state" does not exist at character 28
+2026-11-10 15:01:45.749 EST [491833] STATEMENT:  
+	        SELECT value FROM kv_state
+	        WHERE key = $1 AND (expires_at IS NULL OR expires_at > now())
+	        
+2026-11-10 15:01:45.750 EST [491833] ERROR:  relation "kv_state" does not exist at character 28
+2026-11-10 15:01:45.750 EST [491833] STATEMENT:  
+	        SELECT value FROM kv_state
+	        WHERE key = $1 AND (expires_at IS NULL OR expires_at > now())
+	        
+2026-11-10 15:01:48.796 EST [491791] LOG:  received fast shutdown request
+2026-11-10 15:01:48.799 EST [491791] LOG:  aborting any active transactions
+2026-11-10 15:01:48.799 EST [491791] LOG:  background worker "logical replication launcher" (PID 491800) exited with exit code 1
+2026-11-10 15:01:48.799 EST [491795] LOG:  shutting down
+2026-11-10 15:01:48.801 EST [491795] LOG:  checkpoint starting: shutdown immediate
+2026-11-10 15:01:48.878 EST [491795] LOG:  checkpoint complete: wrote 88 buffers (2.1%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.005 s, sync=0.063 s, total=0.080 s; sync files=62, longest=0.006 s, average=0.001 s; distance=487 kB, estimate=487 kB; lsn=0/17CB660, redo lsn=0/17CB660
+2026-11-10 15:01:48.885 EST [491791] LOG:  database system is shut down

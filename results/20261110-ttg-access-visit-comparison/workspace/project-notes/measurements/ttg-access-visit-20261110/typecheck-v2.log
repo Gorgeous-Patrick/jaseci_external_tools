@@ -1,0 +1,45 @@
+[dev] jac dev mode - using compiler source at /home/baichuan/jaseci/jac-ttg/jac
+  Checking jac/tests/runtimelib/test_ttg_access_native.jac...
+jac/tests/runtimelib/test_ttg_access_native.jac ok [100%]
+
+=================================== FAILURES ===================================
+_______________ jac/tests/runtimelib/test_ttg_access_native.jac ________________
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_access_native.jac:15:37
+   13 | }
+   14 | 
+   15 | def access_context(project: str) -> any {
+      |                                     ^^^
+   16 |     ctx = ExecutionContext(base_path_dir=project, full_target_path=str(Path(project, 'access.jac')));
+   17 |     JacRuntime.exec_ctx = ctx;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_access_native.jac:38:46
+   36 | }
+   37 | 
+   38 | def access_run(project: str, uid: UUID, wlk: any, enabled: bool, limit: int = 32) -> dict {
+      |                                              ^^^
+   39 |     ctx = access_context(project);
+   40 |     try {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/tests/runtimelib/test_ttg_access_native.jac:43:13
+   41 |         origin = ctx.mem.get(uid).archetype;
+   42 |         with dependency_prefetch(ctx, max_length=limit, mode='thread', workers=1, fused_sql=enabled) as run {
+   43 |             origin spawn wlk;
+      |             ^^^^^^^^^^^^^^^^
+   44 |         }
+   45 |         assert not run.errors , str(run.errors);
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/tests/runtimelib/test_ttg_access_native.jac:38:86
+   36 | }
+   37 | 
+   38 | def access_run(project: str, uid: UUID, wlk: any, enabled: bool, limit: int = 32) -> dict {
+      |                                                                                      ^^^^
+   39 |     ctx = access_context(project);
+   40 |     try {
+  → run 'jac guide jac-types' for guidance
+
+============================== 1 passed in 2.56s ===============================

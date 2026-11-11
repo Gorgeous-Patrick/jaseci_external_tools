@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-visit-performance-20261110/run-v1/cases/recipe_pantry-aggressive-measured-1/artifacts.json",
+    "sha256": "26ff49b19a5f8bf25b5119726b8e01393b22f41d7782777e00d3ab6f303eef6f",
+    "files_checked": 32
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_frozen_domain_scenario_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-visit-performance-20261110/run-v1/cases/recipe_pantry-aggressive-measured-1/artifacts.json",
+      "sha256": "26ff49b19a5f8bf25b5119726b8e01393b22f41d7782777e00d3ab6f303eef6f",
+      "files_checked": 32
+    },
+    "proof_sha256": "9467b325a546dcaefae07c86f0348fef7f11555f98c4d76cdc6e5888cd0e001b",
+    "actual_operations_checked": 23,
+    "selected_oracle": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-access-visit-performance-20261110/recipe_scenario.py",
+      "sha256": "9649456aab4e08caac202cb68228b6a276a2ac71007fcc1a90872cf510efdc9d"
+    },
+    "final_logical_state_sha256": "b610a9584ef41a69ce5d47d5383f4518f8819388c80c0e0b18af6a2a9c173c28",
+    "full_response": {
+      "full_actions_sha256": "874693993ba0ca5fde5bd299ac41b81da740ff24311bde8b33c3667f3f3c6b5e",
+      "full_semantic_sha256": "b58331229ea99b055d6f89dc0f3cfb677fc5b5e5e93c3a9e131787644d1c5d0b"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-visit-performance-20261110/run-v1/cases/recipe_pantry-aggressive-measured-1/plus-proof.json",
+    "sha256": "9467b325a546dcaefae07c86f0348fef7f11555f98c4d76cdc6e5888cd0e001b"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-visit-performance-20261110/run-v1/cases/recipe_pantry-aggressive-measured-1/cleanup-target.json",
+    "sha256": "4b77356e0107fb34db48647e15387a40192ebfb30054ebf70c3d2ff578260352"
+  },
+  "database_state": {
+    "database": "continuation_12142f47ab6c46759d37ffdfc51a474f",
+    "cluster_owner": "ae99adf5-a65f-443a-bff8-75fdf9739349",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "e60f3e738b62c168335bd35b43cc4ad9248ecafefd3907b501408d8e00426da3",
+    "actual_row_count": 40,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('Ingredient','Recipe','Requirement','Meal','Purchase','Consumption','Needs','IngredientRef','RecipeRef','Bought','Consumed')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-visit-performance-20261110/sources.json",
+    "sha256": "d966ad80906585bee9b5f8ff6343c22624848f567c09d874d5cdbd85c60817a0"
+  }
+}
