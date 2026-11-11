@@ -1,0 +1,131 @@
+[dev] jac dev mode - using compiler source at /home/baichuan/jaseci/jac-ttg/jac
+  Checking jac/tests/runtimelib/test_ttg_access_native.jac...
+jac/tests/runtimelib/test_ttg_access_native.jac ok [50%]
+  Checking jac/tests/runtimelib/fixtures/ttg_access_walkers.jac...
+jac/tests/runtimelib/fixtures/ttg_access_walkers.jac ok [100%]
+
+=================================== FAILURES ===================================
+_______________ jac/tests/runtimelib/test_ttg_access_native.jac ________________
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_access_native.jac:19:37
+   17 | }
+   18 | 
+   19 | def access_context(project: str) -> any {
+      |                                     ^^^
+   20 |     ctx = ExecutionContext(base_path_dir=project, full_target_path=str(Path(project, 'access.jac')));
+   21 |     JacRuntime.exec_ctx = ctx;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_access_native.jac:42:46
+   40 | }
+   41 | 
+   42 | def access_run(project: str, uid: UUID, wlk: any, enabled: bool, limit: int = 32, user_root: str = '') -> dict {
+      |                                              ^^^
+   43 |     ctx = access_context(project);
+   44 |     try {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/tests/runtimelib/test_ttg_access_native.jac:50:13
+   48 |         origin = ctx.mem.get(uid).archetype;
+   49 |         with dependency_prefetch(ctx, max_length=limit, mode='thread', workers=1, fused_sql=enabled) as run {
+   50 |             origin spawn wlk;
+      |             ^^^^^^^^^^^^^^^^
+   51 |         }
+   52 |         assert not run.errors , str(run.errors);
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/tests/runtimelib/test_ttg_access_native.jac:42:107
+   40 | }
+   41 | 
+   42 | def access_run(project: str, uid: UUID, wlk: any, enabled: bool, limit: int = 32, user_root: str = '') -> dict {
+      |                                                                                                           ^^^^
+   43 |     ctx = access_context(project);
+   44 |     try {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_access_native.jac:222:16
+  220 |     ctx = access_context(project);
+  221 |     try {
+  222 |         actor: any = Root().__jac__;
+      |                ^^^
+  223 |         actor.persistent = True;
+  224 |         setattr(actor, 'root', actor.id);
+  → run 'jac guide jac-types' for guidance
+
+_____________ jac/tests/runtimelib/fixtures/ttg_access_walkers.jac _____________
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/tests/runtimelib/fixtures/ttg_access_walkers.jac:31:74
+   29 |         if self.enabled {
+   30 |             self.seen = [
+   31 |                 p.value for p in [here->:AccessFollow:->[?:AccessPerson, active == True]]
+      |                                                                          ^^^^^^
+   32 |             ];
+   33 |         }
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/fixtures/ttg_access_walkers.jac:93:30
+   91 | 
+   92 | # The planner deliberately cannot summarize this function's effects.
+   93 | def access_resume_allowed(w: any, target: any) -> bool {
+      |                              ^^^
+   94 |     w.condition_calls += 1;
+   95 |     if w.raise_guard {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/fixtures/ttg_access_walkers.jac:93:43
+   91 | 
+   92 | # The planner deliberately cannot summarize this function's effects.
+   93 | def access_resume_allowed(w: any, target: any) -> bool {
+      |                                           ^^^
+   94 |     w.condition_calls += 1;
+   95 |     if w.raise_guard {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/fixtures/ttg_access_walkers.jac:101:30
+   99 | }
+  100 | 
+  101 | def access_resume_replace(w: any, target: any) -> any {
+      |                              ^^^
+  102 |     if w.replacement_id {
+  103 |         return jobj(w.replacement_id);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/fixtures/ttg_access_walkers.jac:101:43
+   99 | }
+  100 | 
+  101 | def access_resume_replace(w: any, target: any) -> any {
+      |                                           ^^^
+  102 |     if w.replacement_id {
+  103 |         return jobj(w.replacement_id);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/fixtures/ttg_access_walkers.jac:101:51
+   99 | }
+  100 | 
+  101 | def access_resume_replace(w: any, target: any) -> any {
+      |                                                   ^^^
+  102 |     if w.replacement_id {
+  103 |         return jobj(w.replacement_id);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W2003]: 'again' is defined but never used
+  --> jac/tests/runtimelib/fixtures/ttg_access_walkers.jac:56:9
+   54 |         key = self.target_id;
+   55 |         found = jobj(id=key);
+   56 |         again = jobj(key);
+      |         ^^^^^
+   57 |         self.seen = access_lookup_posts(cast(AccessProfile, found));
+   58 |     }
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W2075]: Redundant comparison to boolean literal — use the expression directly
+  --> jac/tests/runtimelib/fixtures/ttg_access_walkers.jac:31:74
+   29 |         if self.enabled {
+   30 |             self.seen = [
+   31 |                 p.value for p in [here->:AccessFollow:->[?:AccessPerson, active == True]]
+      |                                                                          ^^^^^^^^^^^^^^
+   32 |             ];
+   33 |         }
+  → run 'jac guide jac-sv-persistence' for guidance
+
+============================== 2 passed in 3.29s ===============================

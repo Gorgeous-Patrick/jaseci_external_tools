@@ -1,58 +1,55 @@
-# Aggressive vs. Conservative TTG: Access, coverage and unnecessary fetches
+# Aggressive vs. Conservative TTG: Access coverage and unnecessary fetches
 
-[Open the updated 12-page English slides](slides/report-v2/ttg-access-visit-comparison.pdf) · [Combined comparison table — page 4](slides/report-v2/slide-04.png) · [Editable renderer](slides/render_v2.py) · [Source-bound slide data](slides/slide-data.json)
+[Open the updated 12-page English slides](slides/report-v3/ttg-access-visit-comparison.pdf) · [Summary table — page 4](slides/report-v3/slide-04.png) · [Editable renderer](slides/render_v3.py)
 
-Version 2 puts the combined Aggressive/Conservative hit-rate and unnecessary-fetch table on **page 4**, with the definitions directly below it. The other eleven slides and all measurement data are unchanged. The [original version](slides/report/ttg-access-visit-comparison.pdf) is preserved.
+The slides show the latest accepted results, without a repair-history or before/after progression. RecipePantry Conservative now includes unified Access extraction for ordinary calls and condition calls. Its current result is **118/164 = 71.95% coverage**, with **118 prefetched and used objects, 0 unused prefetches**, and **213 data + 166 control SQL calls**. All three measured repetitions agree; business outputs and persisted state pass.
 
-This report compares the legacy Aggressive policy with Conservative plus the new Access-demand implementation. Both policies use the same tested current runtime, GIL-off Python and thread executor. The fixed JDrive, LittleX and RecipePantry workflows ran 24 fresh cases: 6 excluded warmups and 18 measured cases, n=3 per app/policy. All business responses and state checks passed. Counts are identical in all three measured repetitions.
+The RecipePantry Conservative result comes from November 11. Aggressive and the JDrive/LittleX results retain their November 10 captures; they were not rerun with this repair. The table is an explicitly versioned summary, not a simultaneous new three-app comparison.
+
+| App | Aggressive coverage | Conservative coverage | Aggressive unnecessary fetches | Conservative unnecessary fetches |
+|---|---:|---:|---:|---:|
+| JDrive | 319/349 = 91.40% | 265/288 = 92.01% | At least 832 | 0 confirmed |
+| LittleX | 357/384 = 92.97% | 357/384 = 92.97% | 0 confirmed | 0 confirmed |
+| RecipePantry | 112/167 = 67.07% | **118/164 = 71.95%** | At least 3 | **Not audited** |
 
 ## Definitions
 
-**Observed demand coverage (the hit rate shown here)** is the number of request/session-local foreground-demand IDs also returned by prefetch, divided by all foreground-demand IDs. It includes root reads and memory hits. It is not a PostgreSQL cache-hit rate or a proof of the minimum semantically required demand.
+**Observed demand coverage**, called hit rate in the slides, is foreground-demand IDs returned by prefetch divided by all successful foreground-demand IDs. Counts are unique within each HTTP request / Session and summed over the workflow. The denominator includes roots and memory hits; this is not a PostgreSQL cache-hit rate.
 
-**Unnecessary full-node payload** means a payload that need not be transferred/materialized at the client to preserve the measured business result. A node may be useful without being visited. Conversely, reading a node only to reject it by a predicate does not make fetching the entire payload necessary: the database can evaluate that predicate without returning the node.
+**Unnecessary full-node payload** is a payload that need not be transferred/materialized at the client to preserve the business result. A helper can need a node without visiting it. Conversely, a predicate or identity check can touch a node whose complete payload need not have been fetched.
 
-The confirmed unnecessary count below is a **lower bound**: unused prefetches plus a disjoint set of source/state-validated filter-only prefetches. Zero means no examples were found in those two audited classes, not that a complete semantic-minimality proof has established zero unnecessary reads. Database predicate evaluation and scanned rows are outside this payload count.
+The previously audited unnecessary counts are lower bounds: unused prefetches plus disjoint filter-only payloads. JDrive's 832 comprise 771 unused and 61 rejected trashed Folder candidates. RecipePantry Aggressive's 3 are cooked Meal candidates rejected in ShoppingList. “0 confirmed” means none found in those audited classes. **The updated RecipePantry Conservative run has zero unused prefetches, but its semantic unnecessary-payload count has not been re-audited.** Ownership membership may need only IDs rather than full neighbor payloads.
 
-All node counts are unique **within each request/session**, then summed over a workflow; they are not globally unique graph-node counts.
+## Slide guide
 
-| App / policy | Prefetched | Used | Observed coverage | Unused | Filter-only | Confirmed unnecessary (lower bound) |
-|---|---:|---:|---:|---:|---:|---:|
-| JDrive / Aggressive | 1,090 | 319 | 319/349 = 91.40% | 771 | 61 | 832 |
-| JDrive / Conservative | 265 | 265 | 265/288 = 92.01% | 0 | 0 | 0 found |
-| LittleX / Aggressive | 357 | 357 | 357/384 = 92.97% | 0 | 0 | 0 found |
-| LittleX / Conservative | 357 | 357 | 357/384 = 92.97% | 0 | 0 | 0 found |
-| RecipePantry / Aggressive | 112 | 112 | 112/167 = 67.07% | 0 | 3 | 3 |
-| RecipePantry / Conservative | 51 | 51 | 51/164 = 31.10% | 0 | 0 | 0 found |
+- Page 4: Aggressive / Conservative coverage and unnecessary-fetch table.
+- Page 5: Prefetched, used, unused and audited filter-only counts.
+- Page 8: Current RecipePantry Conservative results.
+- Page 9: Unified helper/condition Access analysis, native bindings and short-circuit guards.
+- Page 10: Data and control SQL counts.
+- Pages 11–12: Next steps and evidence scope.
 
-JDrive's extra 61 are trashed Folder candidates in `VisibleFolderTree`; RecipePantry's extra 3 are cooked Meal candidates in `ShoppingList`. Paired request ID sets, original predicates and actual state establish that Conservative avoids their full payload while retaining the same business result. All three repetitions agree. These counts refine the earlier “unused only” table without rewriting the earlier evidence.
+## Evidence and reproduction
 
-RecipePantry has 39 root-demand counts in each policy. Excluding roots gives 112/128 = **87.50%** for Aggressive and 51/125 = **40.80%** for Conservative. This separate view still leaves a substantial Conservative coverage gap. The current Access compiler stops at `jobj` and does not insert a new Access checkpoint after that origin becomes known. The report retains this limitation and the higher Conservative data-SQL count.
+The original package retains 24 exact case archives (6 warmups + 18 measurements), runtime/instrumentation inputs, accepted semantic/physical/GIL/lifecycle proofs and source-bound derivation. Those original archives and earlier PDFs are unchanged.
 
-LittleX now matches 357 useful prefetches in both modes, including 70 objects used without a Visit. Historical same-workflow Conservative counts were 287. Historical numbers are clearly separated from this run, and no cross-run latency claim is made.
+The November 11 validation ran 8 fresh RecipePantry workflows (2 warmups + 6 measurements); the deck presents only repaired results. It passed 61 pure tests and 89 native regression tests, plus all application and cleanup gates. `slides/update-20261111/` contains copied accepted derived results, index, validation records, tests and original path/hash references. Its eight raw case archives remain in the measurement workspace and are **not** added to this package. The original workspace audit checked all 256 new sealed case files. All owned services and PostgreSQL stopped.
 
-## Contents and verification
-
-- `slides/`: English PDF, PNG previews, editable renderer, definition/numeric inputs and read-only derivation script.
-- `raw/`: 24 exact case archives, including original compressed event bytes and seals.
-- `workspace/`: accepted results/CSV/index, metrics, acceptance/physical/GIL/lifecycle evidence, test evidence and execution/source inputs.
-- `runtime-delta/`, `instrumentation/`: captured runtime changes and effective instrumentation copies. The tested working tree is not represented as a new clean runtime commit.
-- `manifests/`: original-to-packaged path mapping, archive member hashes, file inventory and explicit external runtime identities.
-
-Run from any directory using Python 3:
+Portable verification (Python standard library, no DB):
 
 ```bash
 python3 verify_package.py
 ```
 
-This verifies all package files, all 24 archive member sets and hashes, every mapped derivation input, and the reported arithmetic. It requires no PostgreSQL, Jac import, network access or original workspace. It verifies preserved evidence; it does not re-execute the applications.
+This checks package contents, the original 24 archives, mapped inputs, updated result arithmetic and report bindings. It does not re-execute applications or re-audit the eight new raw cases.
 
-To regenerate the PDF from the packaged data (Matplotlib required):
+Regenerate in a copy of the package (Matplotlib required):
 
 ```bash
-python3 slides/render_v2.py
+python3 slides/derive_update.py
+python3 slides/render_v3.py
 ```
 
-Regeneration changes output hashes/metadata; use a copy of the package. The PDF's numerical source is `slides/slide-data.json`. `slides/derive.py` shows the original raw-to-slide derivation; original absolute paths are preserved in evidence and resolved through `manifests/path-mapping.json` by the verifier. Re-executing the benchmark needs the recorded interpreter/runtime dependencies and workspace layout; full installed runtimes, PostgreSQL clusters and caches are excluded.
+The current renderer consumes `slides/slide-data.json` for the retained original configurations and `slides/slide-data-v3.json` for repaired RecipePantry. `slides/derive_update.py` validates and derives the update from copied accepted results. Regeneration changes output metadata/hashes; resealing is required afterward.
 
-No new DB workload was run to create these slides. All 24 owned test databases were validated and dropped, and the owned PostgreSQL cluster stopped. This precision-instrumented study establishes coverage and payload use, not an uninstrumented latency speedup.
+Coverage and payload-use findings alone do not establish a latency speedup or minimum semantically required demand.

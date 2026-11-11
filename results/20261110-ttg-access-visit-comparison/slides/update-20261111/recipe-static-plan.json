@@ -1,0 +1,984 @@
+{
+  "source": {
+    "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+    "sha256": "c9be1cf67ba71b678f9b39cb6cb9f040647a65602878a55889bae549418dd44b"
+  },
+  "plans": {
+    "Seed": {
+      "version": 4,
+      "abilities": {
+        "seed": {
+          "trigger": "Root",
+          "demands": [
+            {
+              "kind": "Access",
+              "access_kind": "graph_query",
+              "id": 0,
+              "path": {
+                "origin": "here",
+                "node_type": "Recipe",
+                "hops": [
+                  {
+                    "edge": null,
+                    "node": "Recipe",
+                    "direction": 2,
+                    "predicates": []
+                  }
+                ]
+              },
+              "guards": [],
+              "calls": [],
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 45,
+              "column": 12,
+              "scheduling": "ordinary_access"
+            }
+          ],
+          "rejections": [
+            {
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 45,
+              "reason": "Unsupported scalar syntax",
+              "calls": []
+            }
+          ],
+          "resumed_regions": []
+        }
+      },
+      "contract": "Access decides payload demand; Visit scheduling is separate. Unknown effects terminate speculative regions. Later native branch/body/join hooks bind live locals, without evaluating unknown conditions or reusing stale pre-call bindings. Loops and exception regions are not resumed yet."
+    },
+    "PantryBoard": {
+      "version": 4,
+      "abilities": {
+        "start": {
+          "trigger": "Root",
+          "demands": [
+            {
+              "kind": "Access",
+              "access_kind": "graph_query",
+              "id": 0,
+              "path": {
+                "origin": "here",
+                "node_type": "Ingredient",
+                "hops": [
+                  {
+                    "edge": null,
+                    "node": "Ingredient",
+                    "direction": 2,
+                    "predicates": []
+                  }
+                ]
+              },
+              "guards": [],
+              "calls": [],
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 75,
+              "column": 15,
+              "scheduling": "visit_projection"
+            },
+            {
+              "kind": "Access",
+              "access_kind": "graph_query",
+              "id": 1,
+              "path": {
+                "origin": "here",
+                "node_type": "Recipe",
+                "hops": [
+                  {
+                    "edge": null,
+                    "node": "Recipe",
+                    "direction": 2,
+                    "predicates": []
+                  }
+                ]
+              },
+              "guards": [],
+              "calls": [],
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 76,
+              "column": 15,
+              "scheduling": "visit_projection"
+            },
+            {
+              "kind": "Access",
+              "access_kind": "graph_query",
+              "id": 2,
+              "path": {
+                "origin": "here",
+                "node_type": "Meal",
+                "hops": [
+                  {
+                    "edge": null,
+                    "node": "Meal",
+                    "direction": 2,
+                    "predicates": []
+                  }
+                ]
+              },
+              "guards": [],
+              "calls": [],
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 77,
+              "column": 15,
+              "scheduling": "visit_projection"
+            }
+          ],
+          "rejections": [],
+          "resumed_regions": []
+        },
+        "ingredient": {
+          "trigger": "Ingredient",
+          "demands": [
+            {
+              "kind": "Access",
+              "access_kind": "graph_query",
+              "id": 0,
+              "path": {
+                "origin": "here",
+                "node_type": "Purchase",
+                "hops": [
+                  {
+                    "edge": "Bought",
+                    "node": "Purchase",
+                    "direction": 2,
+                    "predicates": []
+                  }
+                ]
+              },
+              "guards": [],
+              "calls": [],
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 86,
+              "column": 51,
+              "scheduling": "ordinary_access"
+            },
+            {
+              "kind": "Access",
+              "access_kind": "graph_query",
+              "id": 1,
+              "path": {
+                "origin": "here",
+                "node_type": "Consumption",
+                "hops": [
+                  {
+                    "edge": "Consumed",
+                    "node": "Consumption",
+                    "direction": 2,
+                    "predicates": []
+                  }
+                ]
+              },
+              "guards": [],
+              "calls": [],
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 87,
+              "column": 50,
+              "scheduling": "ordinary_access"
+            }
+          ],
+          "rejections": [
+            {
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 80,
+              "reason": "Unresolved receiver/method: self . ingredients . append",
+              "calls": []
+            }
+          ],
+          "resumed_regions": []
+        },
+        "recipe": {
+          "trigger": "Recipe",
+          "demands": [],
+          "rejections": [
+            {
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 93,
+              "reason": "Unresolved receiver/method: self . recipes . append",
+              "calls": []
+            }
+          ],
+          "resumed_regions": []
+        },
+        "meal": {
+          "trigger": "Meal",
+          "demands": [],
+          "rejections": [
+            {
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 96,
+              "reason": "Unresolved receiver/method: self . meals . append",
+              "calls": []
+            }
+          ],
+          "resumed_regions": []
+        },
+        "finish": {
+          "trigger": "Root",
+          "demands": [],
+          "rejections": [],
+          "resumed_regions": []
+        }
+      },
+      "contract": "Access decides payload demand; Visit scheduling is separate. Unknown effects terminate speculative regions. Later native branch/body/join hooks bind live locals, without evaluating unknown conditions or reusing stale pre-call bindings. Loops and exception regions are not resumed yet."
+    },
+    "PlanMeal": {
+      "version": 4,
+      "abilities": {
+        "plan": {
+          "trigger": "Root",
+          "demands": [
+            {
+              "kind": "Access",
+              "access_kind": "lookup_by_id",
+              "id": 0,
+              "path": {
+                "origin": "lookup",
+                "node_type": null,
+                "hops": [],
+                "lookup_id": [
+                  "field",
+                  "self",
+                  "recipe_id"
+                ]
+              },
+              "guards": [],
+              "calls": [],
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 120,
+              "column": 18,
+              "scheduling": "ordinary_access"
+            },
+            {
+              "kind": "Access",
+              "access_kind": "graph_query",
+              "id": 1,
+              "path": {
+                "origin": "root",
+                "node_type": null,
+                "hops": [
+                  {
+                    "edge": null,
+                    "node": null,
+                    "direction": 2,
+                    "predicates": []
+                  }
+                ]
+              },
+              "guards": [
+                [
+                  [
+                    "node_isinstance",
+                    {
+                      "origin": "lookup",
+                      "node_type": null,
+                      "hops": [],
+                      "lookup_id": [
+                        "field",
+                        "self",
+                        "recipe_id"
+                      ]
+                    },
+                    "Recipe"
+                  ],
+                  true
+                ]
+              ],
+              "calls": [
+                "_owns"
+              ],
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 31,
+              "column": 69,
+              "scheduling": "ordinary_access"
+            }
+          ],
+          "rejections": [
+            {
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 121,
+              "reason": "Scalar depends on unresolved local/call/effect",
+              "calls": []
+            }
+          ],
+          "resumed_regions": [
+            {
+              "id": 0,
+              "ability": "plan",
+              "trigger": "Root",
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 121,
+              "column": 9,
+              "placement": "before_statement",
+              "binding": "live_locals_after_native_control",
+              "demands": [
+                {
+                  "kind": "Access",
+                  "access_kind": "graph_query",
+                  "id": 0,
+                  "path": {
+                    "origin": "root",
+                    "node_type": null,
+                    "hops": [
+                      {
+                        "edge": null,
+                        "node": null,
+                        "direction": 2,
+                        "predicates": []
+                      }
+                    ]
+                  },
+                  "guards": [
+                    [
+                      [
+                        "node_isinstance",
+                        {
+                          "origin": "local",
+                          "node_type": null,
+                          "hops": [],
+                          "local_name": "recipe",
+                          "scalar": [
+                            "local",
+                            "recipe"
+                          ]
+                        },
+                        "Recipe"
+                      ],
+                      true
+                    ]
+                  ],
+                  "calls": [
+                    "_owns"
+                  ],
+                  "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+                  "line": 31,
+                  "column": 69,
+                  "scheduling": "ordinary_access"
+                }
+              ],
+              "rejections": [
+                {
+                  "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+                  "line": 121,
+                  "reason": "Scalar depends on unresolved local/call/effect",
+                  "calls": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "contract": "Access decides payload demand; Visit scheduling is separate. Unknown effects terminate speculative regions. Later native branch/body/join hooks bind live locals, without evaluating unknown conditions or reusing stale pre-call bindings. Loops and exception regions are not resumed yet."
+    },
+    "ShoppingList": {
+      "version": 4,
+      "abilities": {
+        "start": {
+          "trigger": "Root",
+          "demands": [
+            {
+              "kind": "Access",
+              "access_kind": "graph_query",
+              "id": 0,
+              "path": {
+                "origin": "here",
+                "node_type": "Meal",
+                "hops": [
+                  {
+                    "edge": null,
+                    "node": "Meal",
+                    "direction": 2,
+                    "predicates": [
+                      [
+                        "status",
+                        "==",
+                        "planned"
+                      ]
+                    ]
+                  }
+                ]
+              },
+              "guards": [],
+              "calls": [],
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 138,
+              "column": 15,
+              "scheduling": "visit_projection"
+            }
+          ],
+          "rejections": [],
+          "resumed_regions": []
+        },
+        "meal": {
+          "trigger": "Meal",
+          "demands": [
+            {
+              "kind": "Access",
+              "access_kind": "graph_query",
+              "id": 0,
+              "path": {
+                "origin": "here",
+                "node_type": "Recipe",
+                "hops": [
+                  {
+                    "edge": "RecipeRef",
+                    "node": "Recipe",
+                    "direction": 2,
+                    "predicates": []
+                  }
+                ]
+              },
+              "guards": [],
+              "calls": [
+                "_requirements"
+              ],
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 34,
+              "column": 14,
+              "scheduling": "ordinary_access"
+            },
+            {
+              "kind": "Access",
+              "access_kind": "graph_query",
+              "id": 1,
+              "path": {
+                "origin": "here",
+                "node_type": "Requirement",
+                "hops": [
+                  {
+                    "edge": "RecipeRef",
+                    "node": "Recipe",
+                    "direction": 2,
+                    "predicates": []
+                  },
+                  {
+                    "edge": "Needs",
+                    "node": "Requirement",
+                    "direction": 2,
+                    "predicates": []
+                  }
+                ],
+                "singletons": [
+                  1
+                ]
+              },
+              "guards": [],
+              "calls": [
+                "_requirements"
+              ],
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 37,
+              "column": 18,
+              "scheduling": "ordinary_access"
+            },
+            {
+              "kind": "Access",
+              "access_kind": "graph_query",
+              "id": 2,
+              "path": {
+                "origin": "here",
+                "node_type": "Ingredient",
+                "hops": [
+                  {
+                    "edge": "RecipeRef",
+                    "node": "Recipe",
+                    "direction": 2,
+                    "predicates": []
+                  },
+                  {
+                    "edge": "Needs",
+                    "node": "Requirement",
+                    "direction": 2,
+                    "predicates": []
+                  },
+                  {
+                    "edge": "IngredientRef",
+                    "node": "Ingredient",
+                    "direction": 2,
+                    "predicates": []
+                  }
+                ],
+                "singletons": [
+                  1
+                ]
+              },
+              "guards": [],
+              "calls": [
+                "_requirements"
+              ],
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 36,
+              "column": 10,
+              "scheduling": "ordinary_access"
+            }
+          ],
+          "rejections": [
+            {
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 141,
+              "reason": "Destructured/else loop",
+              "calls": []
+            }
+          ],
+          "resumed_regions": []
+        },
+        "finish": {
+          "trigger": "Root",
+          "demands": [
+            {
+              "kind": "Access",
+              "access_kind": "graph_query",
+              "id": 0,
+              "path": {
+                "origin": "root",
+                "node_type": "Ingredient",
+                "hops": [
+                  {
+                    "edge": null,
+                    "node": "Ingredient",
+                    "direction": 2,
+                    "predicates": []
+                  }
+                ]
+              },
+              "guards": [],
+              "calls": [],
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 153,
+              "column": 24,
+              "scheduling": "ordinary_access"
+            }
+          ],
+          "rejections": [
+            {
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 147,
+              "reason": "Unresolved receiver/method: self . required . get",
+              "calls": []
+            }
+          ],
+          "resumed_regions": []
+        }
+      },
+      "contract": "Access decides payload demand; Visit scheduling is separate. Unknown effects terminate speculative regions. Later native branch/body/join hooks bind live locals, without evaluating unknown conditions or reusing stale pre-call bindings. Loops and exception regions are not resumed yet."
+    },
+    "BuyIngredient": {
+      "version": 4,
+      "abilities": {
+        "buy": {
+          "trigger": "Root",
+          "demands": [
+            {
+              "kind": "Access",
+              "access_kind": "lookup_by_id",
+              "id": 0,
+              "path": {
+                "origin": "lookup",
+                "node_type": null,
+                "hops": [],
+                "lookup_id": [
+                  "field",
+                  "self",
+                  "ingredient_id"
+                ]
+              },
+              "guards": [],
+              "calls": [],
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 163,
+              "column": 22,
+              "scheduling": "ordinary_access"
+            },
+            {
+              "kind": "Access",
+              "access_kind": "graph_query",
+              "id": 1,
+              "path": {
+                "origin": "root",
+                "node_type": null,
+                "hops": [
+                  {
+                    "edge": null,
+                    "node": null,
+                    "direction": 2,
+                    "predicates": []
+                  }
+                ]
+              },
+              "guards": [
+                [
+                  [
+                    "node_isinstance",
+                    {
+                      "origin": "lookup",
+                      "node_type": null,
+                      "hops": [],
+                      "lookup_id": [
+                        "field",
+                        "self",
+                        "ingredient_id"
+                      ]
+                    },
+                    "Ingredient"
+                  ],
+                  true
+                ]
+              ],
+              "calls": [
+                "_owns"
+              ],
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 31,
+              "column": 69,
+              "scheduling": "ordinary_access"
+            }
+          ],
+          "rejections": [
+            {
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 164,
+              "reason": "Scalar depends on unresolved local/call/effect",
+              "calls": []
+            }
+          ],
+          "resumed_regions": [
+            {
+              "id": 0,
+              "ability": "buy",
+              "trigger": "Root",
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 164,
+              "column": 9,
+              "placement": "before_statement",
+              "binding": "live_locals_after_native_control",
+              "demands": [
+                {
+                  "kind": "Access",
+                  "access_kind": "graph_query",
+                  "id": 0,
+                  "path": {
+                    "origin": "root",
+                    "node_type": null,
+                    "hops": [
+                      {
+                        "edge": null,
+                        "node": null,
+                        "direction": 2,
+                        "predicates": []
+                      }
+                    ]
+                  },
+                  "guards": [
+                    [
+                      [
+                        "node_isinstance",
+                        {
+                          "origin": "local",
+                          "node_type": null,
+                          "hops": [],
+                          "local_name": "ingredient",
+                          "scalar": [
+                            "local",
+                            "ingredient"
+                          ]
+                        },
+                        "Ingredient"
+                      ],
+                      true
+                    ]
+                  ],
+                  "calls": [
+                    "_owns"
+                  ],
+                  "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+                  "line": 31,
+                  "column": 69,
+                  "scheduling": "ordinary_access"
+                }
+              ],
+              "rejections": [
+                {
+                  "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+                  "line": 164,
+                  "reason": "Scalar depends on unresolved local/call/effect",
+                  "calls": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "contract": "Access decides payload demand; Visit scheduling is separate. Unknown effects terminate speculative regions. Later native branch/body/join hooks bind live locals, without evaluating unknown conditions or reusing stale pre-call bindings. Loops and exception regions are not resumed yet."
+    },
+    "CookMeal": {
+      "version": 4,
+      "abilities": {
+        "cook": {
+          "trigger": "Root",
+          "demands": [
+            {
+              "kind": "Access",
+              "access_kind": "lookup_by_id",
+              "id": 0,
+              "path": {
+                "origin": "lookup",
+                "node_type": null,
+                "hops": [],
+                "lookup_id": [
+                  "field",
+                  "self",
+                  "meal_id"
+                ]
+              },
+              "guards": [],
+              "calls": [],
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 182,
+              "column": 16,
+              "scheduling": "ordinary_access"
+            },
+            {
+              "kind": "Access",
+              "access_kind": "graph_query",
+              "id": 1,
+              "path": {
+                "origin": "root",
+                "node_type": null,
+                "hops": [
+                  {
+                    "edge": null,
+                    "node": null,
+                    "direction": 2,
+                    "predicates": []
+                  }
+                ]
+              },
+              "guards": [
+                [
+                  [
+                    "node_isinstance",
+                    {
+                      "origin": "lookup",
+                      "node_type": null,
+                      "hops": [],
+                      "lookup_id": [
+                        "field",
+                        "self",
+                        "meal_id"
+                      ]
+                    },
+                    "Meal"
+                  ],
+                  true
+                ]
+              ],
+              "calls": [
+                "_owns"
+              ],
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 31,
+              "column": 69,
+              "scheduling": "ordinary_access"
+            }
+          ],
+          "rejections": [
+            {
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 183,
+              "reason": "Scalar depends on unresolved local/call/effect",
+              "calls": []
+            }
+          ],
+          "resumed_regions": [
+            {
+              "id": 0,
+              "ability": "cook",
+              "trigger": "Root",
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 183,
+              "column": 9,
+              "placement": "before_statement",
+              "binding": "live_locals_after_native_control",
+              "demands": [
+                {
+                  "kind": "Access",
+                  "access_kind": "graph_query",
+                  "id": 0,
+                  "path": {
+                    "origin": "root",
+                    "node_type": null,
+                    "hops": [
+                      {
+                        "edge": null,
+                        "node": null,
+                        "direction": 2,
+                        "predicates": []
+                      }
+                    ]
+                  },
+                  "guards": [
+                    [
+                      [
+                        "node_isinstance",
+                        {
+                          "origin": "local",
+                          "node_type": null,
+                          "hops": [],
+                          "local_name": "meal",
+                          "scalar": [
+                            "local",
+                            "meal"
+                          ]
+                        },
+                        "Meal"
+                      ],
+                      true
+                    ]
+                  ],
+                  "calls": [
+                    "_owns"
+                  ],
+                  "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+                  "line": 31,
+                  "column": 69,
+                  "scheduling": "ordinary_access"
+                }
+              ],
+              "rejections": [
+                {
+                  "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+                  "line": 183,
+                  "reason": "Scalar depends on unresolved local/call/effect",
+                  "calls": []
+                }
+              ]
+            },
+            {
+              "id": 1,
+              "ability": "cook",
+              "trigger": "Root",
+              "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+              "line": 192,
+              "column": 9,
+              "placement": "before_statement",
+              "binding": "live_locals_after_native_control",
+              "demands": [
+                {
+                  "kind": "Access",
+                  "access_kind": "graph_query",
+                  "id": 0,
+                  "path": {
+                    "origin": "local",
+                    "node_type": "Recipe",
+                    "hops": [
+                      {
+                        "edge": "RecipeRef",
+                        "node": "Recipe",
+                        "direction": 2,
+                        "predicates": []
+                      }
+                    ],
+                    "local_name": "meal"
+                  },
+                  "guards": [],
+                  "calls": [
+                    "_requirements"
+                  ],
+                  "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+                  "line": 34,
+                  "column": 14,
+                  "scheduling": "ordinary_access"
+                },
+                {
+                  "kind": "Access",
+                  "access_kind": "graph_query",
+                  "id": 1,
+                  "path": {
+                    "origin": "local",
+                    "node_type": "Requirement",
+                    "hops": [
+                      {
+                        "edge": "RecipeRef",
+                        "node": "Recipe",
+                        "direction": 2,
+                        "predicates": []
+                      },
+                      {
+                        "edge": "Needs",
+                        "node": "Requirement",
+                        "direction": 2,
+                        "predicates": []
+                      }
+                    ],
+                    "local_name": "meal",
+                    "singletons": [
+                      1
+                    ]
+                  },
+                  "guards": [],
+                  "calls": [
+                    "_requirements"
+                  ],
+                  "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+                  "line": 37,
+                  "column": 18,
+                  "scheduling": "ordinary_access"
+                },
+                {
+                  "kind": "Access",
+                  "access_kind": "graph_query",
+                  "id": 2,
+                  "path": {
+                    "origin": "local",
+                    "node_type": "Ingredient",
+                    "hops": [
+                      {
+                        "edge": "RecipeRef",
+                        "node": "Recipe",
+                        "direction": 2,
+                        "predicates": []
+                      },
+                      {
+                        "edge": "Needs",
+                        "node": "Requirement",
+                        "direction": 2,
+                        "predicates": []
+                      },
+                      {
+                        "edge": "IngredientRef",
+                        "node": "Ingredient",
+                        "direction": 2,
+                        "predicates": []
+                      }
+                    ],
+                    "local_name": "meal",
+                    "singletons": [
+                      1
+                    ]
+                  },
+                  "guards": [],
+                  "calls": [
+                    "_requirements"
+                  ],
+                  "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+                  "line": 36,
+                  "column": 10,
+                  "scheduling": "ordinary_access"
+                }
+              ],
+              "rejections": [
+                {
+                  "file": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+                  "line": 193,
+                  "reason": "Conditional/destructuring comprehension",
+                  "calls": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "contract": "Access decides payload demand; Visit scheduling is separate. Unknown effects terminate speculative regions. Later native branch/body/join hooks bind live locals, without evaluating unknown conditions or reusing stale pre-call bindings. Loops and exception regions are not resumed yet."
+    }
+  },
+  "contract": "Conditions and value expressions use the same Access/call traversal. Known short-circuit conditions guard right-side Access. Builtin isinstance waits for the actual existing node; no user function or property evaluation. The final membership boolean is still evaluated by native code. Unknown left-operand predicates do not allow right-side hoisting."
+}

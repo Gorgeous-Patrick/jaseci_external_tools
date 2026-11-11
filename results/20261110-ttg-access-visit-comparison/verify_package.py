@@ -1,6 +1,7 @@
 """Portable package/evidence verification; standard library, no Jac or DB."""
 import hashlib
 import json
+import runpy
 import tarfile
 from pathlib import Path
 
@@ -49,9 +50,15 @@ for g in d['groups']:
 for r in d['recipe_root_rates']:
  assert r['root_demand']==39 and r['nonroot_demand']==r['all_demand']-39
  assert r['nonroot_coverage']==r['covered']/r['nonroot_demand']
-for version in ('report','report-v2'):
+update=read(P/'slides/slide-data-v3.json')
+assert runpy.run_path(str(P/'slides/derive_update.py'))['build']()==update
+current=update['current']
+assert current['coverage']==current['demanded_prefetch_objects']/current['successful_demand_objects']
+assert current['total_sql']==current['sql_data']+current['sql_control']
+assert sum(update['covered_by_walker'].values())==current['demanded_prefetch_objects']
+for version in ('report','report-v2','report-v3'):
  report=read(P/'slides'/version/'report-manifest.json');assert report['pages']==12
- for r in [report['source'],report['data'],*report['outputs']]:
+ for r in [report['source'],report['data'],*([report['update']] if 'update' in report else []),*report['outputs']]:
   assert mapping[r['path']]['sha256']==r['sha256'],r
 assert sha(P/'slides/derive.py')==d['derive_source_sha256']
 print(json.dumps(dict(passed=True,files=len(actual),archives=len(archives),sealed_files=sealed,
