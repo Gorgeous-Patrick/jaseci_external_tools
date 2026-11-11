@@ -56,9 +56,23 @@ current=update['current']
 assert current['coverage']==current['demanded_prefetch_objects']/current['successful_demand_objects']
 assert current['total_sql']==current['sql_data']+current['sql_control']
 assert sum(update['covered_by_walker'].values())==current['demanded_prefetch_objects']
-for version in ('report','report-v2','report-v3'):
+audited=read(P/'slides/slide-data-v4.json')
+audit=read(P/'slides/update-20261111/necessity-audit.json')
+assert audit['passed'] and audit['n']==3
+assert audit['results']['sha256']==sha(P/'slides/update-20261111/results.json')
+assert audit['audit_source']['sha256']==sha(P/'slides/update-20261111/necessity-audit.py')
+assert audited['necessity_audit']['sha256']==sha(P/'slides/update-20261111/necessity-audit.json')
+for s in audit['samples']:
+ assert s['prefetched']==s['used']==118 and s['unused']==s['excluded_graph_filter_payloads']==s['confirmed_unnecessary']==0
+ assert sum(r['prefetched'] for r in s['requests'])==118
+ for r in s['requests']:
+  assert r['prefetched']==r['used']==len(r['objects']) and r['unused']==r['excluded_graph_filter_payloads']==0
+  assert all(o['payload_refs'] and o['later_demand_refs'] for o in r['objects'])
+  if r['walker']=='ShoppingList':assert not any(o['type']=='Meal' for o in r['objects'])
+assert audited['current']==dict(current,confirmed_filter_only=0,confirmed_unnecessary_lower_bound=0)
+for version in ('report','report-v2','report-v3','report-v4'):
  report=read(P/'slides'/version/'report-manifest.json');assert report['pages']==12
- for r in [report['source'],report['data'],*([report['update']] if 'update' in report else []),*report['outputs']]:
+ for r in [report['source'],report['data'],*([report['update']] if 'update' in report else []),*([report['audit']] if 'audit' in report else []),*report['outputs']]:
   assert mapping[r['path']]['sha256']==r['sha256'],r
 assert sha(P/'slides/derive.py')==d['derive_source_sha256']
 print(json.dumps(dict(passed=True,files=len(actual),archives=len(archives),sealed_files=sealed,
