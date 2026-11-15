@@ -1,0 +1,106 @@
+{
+  "status": "PASS: final metadata-only binding, no additional launch prerequisite",
+  "plan": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-restoration-performance-20261115/plan-v1/plan.json",
+    "sha256": "0405fd15172e209dadc1d144e5e92ed86e4f8cf534f2445bfd5d26be1ae60209"
+  },
+  "sources": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-restoration-performance-20261115/plan-v1/sources.json",
+    "sha256": "1a0dd8042d14acfb69c4e199c040452cf27d8242854639e0476a2c96d6a758ba"
+  },
+  "runtime_by_policy": {
+    "off": "restored",
+    "conservative": "previous_background",
+    "background": "previous_background",
+    "restored": "restored"
+  },
+  "runtimes": {
+    "previous_background": {
+      "clean": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-performance-20261115/runtime-v1/clean-manifest.json",
+        "sha256": "ec64d6061d5822c6c49c99f0e892dd978e510ad872ae6f18eb1ffad4fb6429fa"
+      },
+      "overlay": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-performance-20261115/runtime-v1/overlay-manifest.json",
+        "sha256": "6d060211fc8e52830cbbee340534d200e5edaca70421d3b9fc94353dc6d181fc"
+      }
+    },
+    "restored": {
+      "clean": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-restoration-performance-20261115/runtime-v1/clean-manifest.json",
+        "sha256": "6a21cb2fa698350db184f09428142b36818645b7bc5818fbe4e2e2294e8e504b"
+      },
+      "overlay": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-restoration-performance-20261115/runtime-v1/overlay-manifest.json",
+        "sha256": "05ea3beac131a08b03a80d766cc65f16a57d33135101457df72e369281fd2e2f"
+      }
+    }
+  },
+  "runtime_verification": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-restoration-20261115/verification.json",
+    "sha256": "b1153c217bc8a85613cf5c1017dde2f78d5cd8b9db90813c855de8131e3ca080"
+  },
+  "disabled_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-restoration-20261115/disabled-path-proof-v1.json",
+    "sha256": "b2795981929a0271d2db3ac5e366899802dc2333f1b5923340c6de6d0bfe3389"
+  },
+  "accepted_runtime_review": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/background-pushdown-restoration-review-20261115/final-runtime-native-binding-review.json",
+    "sha256": "7012e9124721a3471053ad1741889999224e2c277608ee1c996de22f204aa1f9"
+  },
+  "carried_harness_review": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/background-pushdown-restoration-review-20261115/performance-source-v1-review.json",
+    "sha256": "5b1d349b1389e1129d8bf3165907dd2f07d779d2423248bc045d4c750792d42c"
+  },
+  "actual_runtime_key_source": {
+    "path": "/home/baichuan/jaseci/reproduction/ttg-background-pushdown-restoration-performance-20261115/ia_config.py",
+    "sha256": "f97e18708a947ebfc34cba738439d545ca5b7c5bd725abf1adcb6ef50533723c"
+  },
+  "counts": {
+    "correctness": 16,
+    "excluded_warmups": 4,
+    "measured": 20,
+    "total": 40
+  },
+  "bootstrap": [
+    {
+      "ref": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-restoration-performance-20261115/bootstrap-v1-clean.log",
+        "sha256": "b2eba33940db7f9f18b4efa806be53c587b2ec7ed3f5af01cc6dd1900675c8a6"
+      },
+      "observed": {
+        "passed": true,
+        "GIL_enabled": false,
+        "jaclang": "/home/baichuan/jaseci/reproduction/ttg-background-pushdown-restoration-performance-20261115/runtime-clean-runtime-v1/jac/jaclang/__init__.py",
+        "pool_state": {},
+        "scope": "Import only; no DB/compiler workload or application executed"
+      }
+    },
+    {
+      "ref": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-restoration-performance-20261115/bootstrap-v1-overlay.log",
+        "sha256": "1eae34a3ca0df1ec416a16d45e1aed3454187de96928b1aeb7dfafdb0ffe50de"
+      },
+      "observed": {
+        "passed": true,
+        "GIL_enabled": false,
+        "jaclang": "/home/baichuan/jaseci/reproduction/ttg-background-pushdown-restoration-performance-20261115/runtime-direct-runtime-v1/jac/jaclang/__init__.py",
+        "pool_state": {},
+        "scope": "Import only; no DB/compiler workload or application executed"
+      }
+    }
+  ],
+  "checks": [
+    "OldConservative+previousBackground select exact original711d clean/DIRECT pair. Off+restoredBackground select new93ea/b1153 pair. Actual controller runtime_key source agrees with metadata.",
+    "New clean declared map binds exact41 tested files; DIRECT exact3accepted instrumentation components; both version inventories present in source guard. No new whole-tree disk rehash.",
+    "Oldcontrol andpreviousBG configs unchanged; restoredBG config equals previousBG; allthread1/2048 and originaltimers/stats/oracles/observer reused.",
+    "Exact16samefour correctness and24freshJDrive(4warm+20measured n5),40unique slots, no historical timing pooling.",
+    "Both newruntime imports report GILfalse/pool{}; import only, no application acceptance."
+  ],
+  "limits": [
+    "Legacy resolver is not byte-equal after parser extraction; this control uses immutable711d, not an equivalence assertion.",
+    "Four-app correctness, recursive activation and later measured capture remain separate evidence."
+  ],
+  "activity": "Small manifest/source-map/schedule/bootstrap comparison only; no tests/Jac/compiler/DB/raw scans or heavy runtime-tree checks.",
+  "remaining_concrete_findings": []
+}
