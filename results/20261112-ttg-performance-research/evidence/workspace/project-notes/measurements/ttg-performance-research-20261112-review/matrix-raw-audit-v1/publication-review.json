@@ -1,0 +1,155 @@
+{
+  "kind": "bounded_final_postprocessor_and_actual_matrix_review",
+  "recorded_date": "2026-11-12",
+  "passed": true,
+  "scope": "Observed399comparison timing workflows plus57separate precision workflows; no diagnostic/CPU/slide acceptance",
+  "raw_audit": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112-review/matrix-raw-audit-v1/summary.json",
+    "sha256": "4a8f3562492f583481ebb0f05216f67ea45db300fec237812d8a8aec58e1c57d"
+  },
+  "denominator_audit": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112-review/matrix-raw-audit-v1/precision-denominator-review-v2.json",
+    "sha256": "44968b657192bfb5aa995564869ed525bc76cd58e663f36097fe3ca910e19c92"
+  },
+  "outputs": {
+    "timing": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112-review/matrix-raw-audit-v1/timing-derivatives.json",
+      "sha256": "22457dcce7cccaa119ea41c13a3f2c0d42653eb5dbef95110aa18fd66be85d0c"
+    },
+    "precision": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112-review/matrix-raw-audit-v1/precision-derivatives.json",
+      "sha256": "cca4cab363cace2a4a1b9a642184edc8dd5f1eccbc2225412a2923e3b6450f66"
+    },
+    "sql_catalog": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112-review/matrix-raw-audit-v1/sql-catalog.json",
+      "sha256": "a3c7a15bec324b9ab28f5c2421ecfb1b48d6f0cee5d3899020a83f49231fe2d6"
+    }
+  },
+  "frozen_postprocessor_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/postprocessors-v2-manifest.json",
+    "sha256": "f45e48e66d5849e429acaa7f8cc577d691ecca8c0a3b9dc8cd785ac7f97c3305"
+  },
+  "reviewed_sources": [
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/postprocess_lineage_v2.py",
+      "sha256": "395409f0c6fc7a2c339016511e4b7e47eaa770f3f27fa05a9577a9e5e6b8d508"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/precision_postprocess_v1.py",
+      "sha256": "6ab0f392848023fb40d35cdd2b326ac8e9538ac1c8630b7edd87affeb0c1022c"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/postprocess_v1.py",
+      "sha256": "25e06959da811b6d5d9de34b5abd1e6516ad3367ad34da17d7e1fa6f47bff87d"
+    }
+  ],
+  "owner_checks": "11 DB-free postprocessor checks reported; actual frozen exports independently reproduced from consumed raw/explicit carry. Reviewer did not rerun owner tests.",
+  "accepted": {
+    "comparison_workflows": 399,
+    "correctness": 57,
+    "excluded_warmups": 57,
+    "primary_measured": 285,
+    "comparison_fixtures": 19,
+    "applications": 17,
+    "primary_cells": 57,
+    "primary_n": 5,
+    "full_inventory_fixtures": 20,
+    "full_inventory_cells": 60,
+    "precision_cases": 57,
+    "precision_n": 1
+  },
+  "terminal_inventory": [
+    {
+      "case_id": "linked_list-1000",
+      "config_id": "off",
+      "completed": false,
+      "status": "correctness_only",
+      "terminal_evidence": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/larger-v1-failure-preservation.json",
+        "sha256": "017658a5dfcaee8db9a5de74eb78e76620c1e70283a19ac8155a7ea4145a6e36"
+      }
+    },
+    {
+      "case_id": "linked_list-1000",
+      "config_id": "aggressive",
+      "completed": false,
+      "status": "failed_isolation_gate",
+      "terminal_evidence": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/larger-v1-failure-preservation.json",
+        "sha256": "017658a5dfcaee8db9a5de74eb78e76620c1e70283a19ac8155a7ea4145a6e36"
+      }
+    },
+    {
+      "case_id": "linked_list-1000",
+      "config_id": "conservative",
+      "completed": false,
+      "status": "not_run_after_first_failure",
+      "terminal_evidence": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/larger-v1-failure-preservation.json",
+        "sha256": "017658a5dfcaee8db9a5de74eb78e76620c1e70283a19ac8155a7ea4145a6e36"
+      }
+    }
+  ],
+  "validation": [
+    "Postprocessor lineage restricts old accepted prefixes to45+210+30 and new114 exact repeats3/4. All60inventory cells retained with3distinct LL1000statuses; failed cell never accepted or pooled.",
+    "New354timing cases and57precision cases consumed in a single raw pass,45timing cases carried only by unchanged original index/result/GIL/source lineage refs and prior raw audit439433ae.",
+    "Consumed compressed SQL/event/GIL and HTTP/statistics files matched their raw seals. Real database/owner/connection, request/generation/PID/thread links checked, actual GIL disabled at all recorded boundaries, foreground/background backend gate preserved.",
+    "Raw all-role total/data/control SQL, send-to-ready sum/union and per-role/per-RPC totals matched accepted metrics. All grouped n5vectors,median/range/mean/stdev and57CSV rows reproduced.",
+    "HTTP start/end, response-read sums/unions/spans and explicit post-response drain reproduced; admin ANALYZE before first primary/reset; precision observer absent primary/present precision.",
+    "Compact raw native-work summaries matched metrics for new cases. Carried45fingerprints/native-work explicitly use unchanged accepted metrics rather than a second raw check.",
+    "All57precision cells recomputed by actual request+Session nonce: P,D,intersection,post-return overlap,raw-promotion service,before-call subset,late,unused,node counts and ratios. Every reported promotion service witness resolved to exact returned/promotion/demand raw line+record hashes and valid ordering,UID/Session,nonplanningFG role.",
+    "Paired fixture/action/output hashes, independent semantic/physical-state acceptance refs,freshSession natural closes,restart proof links and unique case databases checked. Business algorithms and host census were not reexecuted."
+  ],
+  "required_labels": [
+    "Instrumented primary protocol/HTTP wall, not clean CPU or pure DB execution. JSON decoding/drain excluded response interval; workflow span includes client/control gaps. No HTTP-minus-DB CPU inference.",
+    "Precision n1 is a separate regime, not pooled into primary n5 or latency. Successful Session accesses include memory/root/ownership/auxiliary operations; not a static proof of business necessity.",
+    "Original overlap_coverage/promotion_service_coverage are ALL-anchor denominators. Node-only ratios are separately named in44968b; IssueDesk162ALL/161node and HelpQueue188ALL/186node. No generic Anchor demand observed here, though source would not prove generic/unprefetched node kind in other workloads.",
+    "P intersects D is observed overlap, not timely hit. Promotion-backed service proves the declared raw-cache promotion witness, not exact insertion readiness,saved latency or semantic necessity.",
+    "Observed D differs by policy in JDrive/Recipe; node-ratio relabeling does not make D policy-independent. Preserve absolute counts and request/session aggregation; avoid necessary-business-read or policy-independent demand-coverage claims.",
+    "Unused returned node count is an observational lower bound under measured access definition. No source-backed filter-only/semantic not-needed quantity was established; unknown remains unknown.",
+    "Report all17applications and full20fixture/60cell inventory.19fixtures/57cells completed n5; LL1000Off correctness-only,Aggressive isolation gate failure/no acceptance,Conservative not run. Preserve regressions and the observed post-failure comparison scope."
+  ],
+  "policy_dependent_D_examples": [
+    {
+      "case_id": "jdrive-smoke",
+      "D": {
+        "off": 69,
+        "aggressive": 85,
+        "conservative": 69
+      }
+    },
+    {
+      "case_id": "jdrive-depth5",
+      "D": {
+        "off": 288,
+        "aggressive": 349,
+        "conservative": 288
+      }
+    },
+    {
+      "case_id": "recipe_pantry-smoke",
+      "D": {
+        "off": 164,
+        "aggressive": 167,
+        "conservative": 164
+      }
+    }
+  ],
+  "findings": [],
+  "heavy_IO": {
+    "complete": true,
+    "pass_seconds": 58.52777573605999,
+    "quiet_signalled_before_writeup": true,
+    "no_further_raw_reads": true,
+    "counts": {
+      "carried_timing_cases": 45,
+      "event_records": 125654,
+      "GIL_records": 445515,
+      "SQL_records": 422030,
+      "excluded_SQL_error_messages": 822,
+      "fresh_timing_cases": 354,
+      "fresh_precision_cases": 57
+    }
+  },
+  "no_new_runtime_or_source_framework": true
+}

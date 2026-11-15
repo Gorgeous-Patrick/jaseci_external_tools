@@ -1,0 +1,17 @@
+.....E
+======================================================================
+ERROR: test_zero_prefetch_precision (__main__.Checks.test_zero_prefetch_precision)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/baichuan/jaseci/reproduction/ttg-performance-research-20261112/test_plan.py", line 26, in test_zero_prefetch_precision
+    proof=validate_case(d);self.assertEqual(proof['batches'],0);self.assertEqual(proof['payload_row_deliveries'],0)
+          ^^^^^^^^^^^^^^^^
+  File "/home/baichuan/jaseci/reproduction/ttg-performance-research-20261112/precision_observer.py", line 132, in validate_case
+    selected = [e for e in events if (str(e['server_generation']),e.get('origin_request_id')) in keys]
+                                          ~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'server_generation'
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.027s
+
+FAILED (errors=1)

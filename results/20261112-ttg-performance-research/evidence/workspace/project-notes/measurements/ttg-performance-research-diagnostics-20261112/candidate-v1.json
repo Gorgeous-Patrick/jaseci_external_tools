@@ -1,0 +1,134 @@
+{
+  "status": "Source frozen; ready for main exact bounded DB release",
+  "selection": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-diagnostics-20261112/selection-v3.json",
+    "sha256": "2663b3124e32f2af5812c4caae937b54156d88f1ecb06afd4b74fadc484f2c51"
+  },
+  "sources": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-diagnostics-20261112/selection-v3-sources.json",
+    "sha256": "ea1941d6bf7c9079eab764eb72aaab92bfe9d79c0b6eb3e24fdba08868d4227b"
+  },
+  "files": [
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-performance-research-diagnostics-20261112/storage.py",
+      "sha256": "adb70f8ce50671a815e83a951fc1f0daf701f7bbb7392949c1fa7042f1495b31"
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-performance-research-diagnostics-20261112/cpu_profile.py",
+      "sha256": "2875d1e7d4c58719b77f72dd33f36df9ac79ceedc7d3603f305f63444fc14048"
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-performance-research-diagnostics-20261112/serve.py",
+      "sha256": "b50f0298b4768fc850addc4766f7b8ccfc06cfdd096908c4ee49a57120ef3021"
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-performance-research-diagnostics-20261112/run_cpu.py",
+      "sha256": "65ebf3c7e5e2ce99ce918f5c7537f487e630ea49468f50223bdd4db3f3c85bf7"
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-performance-research-diagnostics-20261112/check_integration.py",
+      "sha256": "a74e6d7c49b42232bf071c604965bad521d62db4230c78cf189a7995c342dd6b"
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-performance-research-diagnostics-20261112/check_cpu_helper.py",
+      "sha256": "63c3724b6eca77d187ce33c80f454931b795b6fa67b9fc882f4d24999b62914e"
+    }
+  ],
+  "import_hook_controls": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-diagnostics-20261112/import-clock-v1/outcome.json",
+    "sha256": "14be567f973b049d2e60225f97d34cf4d338b2765f3adf1b79cf48163672d2fd"
+  },
+  "current_clock_controls": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-diagnostics-20261112/clock-controls-v2.json",
+    "sha256": "eb48e1cc0e6f2dde849a4e96e23bf4c1c5e24a6156e779c66788a63fd1743232"
+  },
+  "integration": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-diagnostics-20261112/integration-preflight-v4.json",
+    "sha256": "f70a03468e78363ce450280340f70eb7022a9c4803d09dee9c86e6e284a1753d"
+  },
+  "command": "python3 -B reproduction/ttg-performance-research-diagnostics-20261112/run_cpu.py run --selection project-notes/measurements/ttg-performance-research-diagnostics-20261112/selection-v3.json --output project-notes/measurements/ttg-performance-research-diagnostics-20261112/cpu-native-v1 --cluster reproduction/ttg-performance-research-diagnostics-20261112/pg-cpu-v1",
+  "workflows": 6,
+  "selected_RPCs": 12,
+  "available_controls": [
+    {
+      "case": "linked_list-smoke",
+      "mode": "off",
+      "repeats": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "native_basis": "No dependency context under none/ttg policy; counters unavailable, not zero. Actual SQL activation remains checked."
+    },
+    {
+      "case": "linked_list-smoke",
+      "mode": "aggressive",
+      "repeats": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "native_basis": "No dependency context under none/ttg policy; counters unavailable, not zero. Actual SQL activation remains checked."
+    },
+    {
+      "case": "linked_list-smoke",
+      "mode": "conservative",
+      "repeats": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "native_basis": "Complete recorded dependency outcomes"
+    },
+    {
+      "case": "recipe_pantry-smoke",
+      "mode": "off",
+      "repeats": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "native_basis": "No dependency context under none/ttg policy; counters unavailable, not zero. Actual SQL activation remains checked."
+    },
+    {
+      "case": "recipe_pantry-smoke",
+      "mode": "aggressive",
+      "repeats": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "native_basis": "No dependency context under none/ttg policy; counters unavailable, not zero. Actual SQL activation remains checked."
+    },
+    {
+      "case": "recipe_pantry-smoke",
+      "mode": "conservative",
+      "repeats": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "native_basis": "Complete recorded dependency outcomes"
+    }
+  ],
+  "limitations": [
+    "Same-native-spawn-thread CPU only; off-thread planners/payload CPU unmeasured, no totalCPU saving claim",
+    "Native activation must match one complete actual same-repeat joint control; no independent range matching",
+    "Missing conservative native counters are unavailable and excluded, never default None/zero",
+    "Off/ttg policies emit no dependency outcomes by source/config; SQL activation checked, nativeplan counters not measured"
+  ],
+  "source_delta": "New diagnostic entry/helper/controller/storage routing only; frozen runtime, application, primary source and strict validator unchanged",
+  "free_bytes": 6730379264
+}

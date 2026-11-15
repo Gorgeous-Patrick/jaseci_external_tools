@@ -1,0 +1,118 @@
+{
+  "kind": "bounded_v2_metadata_lineage_source_review",
+  "recorded_date": "2026-11-12",
+  "passed": true,
+  "scope": "V2 controller/lineage/metadata changes only; no final export or new actual sample acceptance",
+  "refs": [
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/plan-v2/plan.json",
+      "sha256": "62f9bc942105d79c5df678d31b0960e4de03b6a8c1b1eec98218750d00d7447d"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/plan-v2/manifest.json",
+      "sha256": "f26a77e410a82cd04b7b8ea273d1dc78efb973055a7bb62716f73627b6dd8451"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/plan-v1/plan.json",
+      "sha256": "143ecc1e397a3f9b4c1ca3a2284c7f2a86ca2fd10dd1f62cd31e04b348634866"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/larger-v1-failure-preservation.json",
+      "sha256": "017658a5dfcaee8db9a5de74eb78e76620c1e70283a19ac8155a7ea4145a6e36"
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-performance-research-20261112/runner.py",
+      "sha256": "d86a72da6fec4fa94b33b1209180d46289a41bb77f1c83c481dd5ea9945299ad"
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-performance-research-20261112/runner_v2.py",
+      "sha256": "f837d84b8983f73158c538310bbc04c4245b878bb91b88e3c27c3da7ab0f2aba"
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-performance-research-20261112/lineage_v2.py",
+      "sha256": "c6826f94ea3b1de9f8ba3325d075412171b122b005f0ce3610c09ca4dacb4aef"
+    }
+  ],
+  "checks": [
+    "Runner body unchanged except import/use validate_lineage, new controller self-hash check, and replacement of original kind/schedule assertion. Original runtime, source manifest, native gates, timers, configuration and trial body retained.",
+    "Only original plan fields kind/stages/counts/execution changed; all other original fields byte-value equal. New controller/validator hashes explicit in plan and manifest.",
+    "Extension schedule is exactly original extension with only linked_list-1000 removed. Order, trial IDs, seed, policy config and repeats retained:114 =19fixtures x3policies x2repeats(3/4).",
+    "Precision schedule is exactly original precision with only linked_list-1000 removed:57=19fixtures x3policies.",
+    "Frozen accepted prefixes checked via their exact index hashes and original plan reference:45complete first+210complete small-rest+30accepted larger prefix. All285rows pass and exactly match their original stage prefixes, unique trial IDs.",
+    "Preserved285rows =57correctness+57warmup+171measured. Combined114 scheduled rows yield57cells each with repeats0..4/n5 and399comparison workflows total.",
+    "Failed larger index remains failed with31accepted rows. Its final accepted LL1000Off correctness row is not pooled into comparison timing; failed Aggressive has no independent acceptance, Conservative not run.",
+    "Lineage source validates exact excluded-cell statuses and preserved failed-stage source/host/retained DB proof, original index/plan relationship and31accepted-row prefix. Gate is not relaxed or retried."
+  ],
+  "accepted_prefixes": [
+    {
+      "index": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/first-v1/index.json",
+        "sha256": "46eba79b2d002740635a085964caa168a20794fa6696bb206dd4f4e1d34ffae0"
+      },
+      "start": 0,
+      "end": 45,
+      "status": "complete"
+    },
+    {
+      "index": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/small-rest-v1/index.json",
+        "sha256": "80e8df41a6f3ecea3de0633b69827cc0284059b93771de0b9e875f85e4213c24"
+      },
+      "start": 0,
+      "end": 210,
+      "status": "complete"
+    },
+    {
+      "index": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/larger-v1/index.json",
+        "sha256": "92b144d71e2ef4427f25dfd6e405aa466e10a9e04f771f825c251efe542e99c8"
+      },
+      "start": 0,
+      "end": 30,
+      "status": "accepted_prefix_of_failed_stage"
+    }
+  ],
+  "denominator": {
+    "original_applications": 17,
+    "original_fixture_inventory": 20,
+    "original_policy_cell_inventory": 60,
+    "comparison_applications": 17,
+    "comparison_fixtures": 19,
+    "comparison_policy_cells": 57,
+    "terminal_inventory_cells": 3,
+    "comparison_measured_n5": 285,
+    "comparison_correctness": 57,
+    "comparison_warmups": 57,
+    "comparison_total": 399,
+    "retained_LL1000_off_correctness_extra": 1
+  },
+  "terminal_inventory": [
+    {
+      "case_id": "linked_list-1000",
+      "config_id": "off",
+      "status": "correctness_only"
+    },
+    {
+      "case_id": "linked_list-1000",
+      "config_id": "aggressive",
+      "status": "failed_isolation_gate"
+    },
+    {
+      "case_id": "linked_list-1000",
+      "config_id": "conservative",
+      "status": "not_run_after_first_failure"
+    }
+  ],
+  "findings": [],
+  "pending": [
+    "Owner tiny metadata negative checks/log binding when supplied",
+    "Export-lineage adapter must retain all60inventory cells and distinct LL1000statuses, consume only30successful larger prefix timing rows and reject mixed lineage/duplicate or missing repetitions. This review does not accept an unseen exporter."
+  ],
+  "limits": [
+    "No DB/runtime/compiler/tests/full-tree reads run.",
+    "Schedule/source PASS introduces no new release gate; main retains authorization and operational coordination.",
+    "N5 samples still prospective; no final numeric/performance or precision conclusion.",
+    "Observed post-failure19fixture comparison must be reported alongside full20fixture inventory and failure, not called an originally complete20fixture study.",
+    "No source fix, retry, safety/corruption inference or favorable replacement from the failed-cell explanation."
+  ]
+}

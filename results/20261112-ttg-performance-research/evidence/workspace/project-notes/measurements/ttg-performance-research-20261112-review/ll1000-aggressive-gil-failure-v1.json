@@ -1,0 +1,515 @@
+{
+  "kind": "exact_failed_GIL_assertion_raw_witness",
+  "scope": "Failed LL1000 Aggressive correctness cell only; no runtime/lifecycle diagnosis or business/native acceptance",
+  "recorded_date": "2026-11-12",
+  "refs": [
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/larger-v1/index.json",
+      "sha256": "92b144d71e2ef4427f25dfd6e405aa466e10a9e04f771f825c251efe542e99c8"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/larger-v1/cases/linked_list-1000-aggressive-correctness-0/artifacts.json",
+      "sha256": "ba2df9247ae2ca6d7c60095233a04fa4ffd4195e87015299818c4e44b8a9ab17"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/larger-v1/cases/linked_list-1000-aggressive-correctness-0/requests.json",
+      "sha256": "ed759949a6b24b59b38947a6c9624aa52d4ed14b8f8f9ad9c048183d5ef60bb8"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/larger-v1/cases/linked_list-1000-aggressive-correctness-0/http-raw.jsonl",
+      "sha256": "1782ac30953051da809073180c0d22dfe877251eb28da573c3b3f11ff40af778"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/larger-v1/cases/linked_list-1000-aggressive-correctness-0/server-2-process-1149040.calls.jsonl",
+      "sha256": "a3393e5276a549b4c18a077aa0f928ce5b3231f315e3fba035b6f02177ce5367"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/larger-v1/cases/linked_list-1000-aggressive-correctness-0/server-2-process-1149040.events.jsonl",
+      "sha256": "7534c19931374ecc80b0e278ee63a3d7f83fdef2b1bf9cbe5b8be8bd7b7f0c2a"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/larger-v1/cases/linked_list-1000-aggressive-correctness-0/gil-proof-1149040.jsonl",
+      "sha256": "a5d6e419752a2ea99a0d7dad47f6457994e8fc445c271b7b1b899ba72b76af2d"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/larger-v1/cases/linked_list-1000-aggressive-correctness-0/summary.json",
+      "sha256": "3eb12bb5d66866caa172c7511329de5b713a7ae34a3185b262a925d1e78b413b"
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-performance-research-20261112/gil_audit.py",
+      "sha256": "65e3de6a1702ab4f15a204b912b1980c1118b6a2f6920104973241f25374c229"
+    }
+  ],
+  "existing_seal_matches": {
+    "requests.json": true,
+    "http-raw.jsonl": true,
+    "server-2-process-1149040.calls.jsonl": true,
+    "server-2-process-1149040.events.jsonl": true,
+    "gil-proof-1149040.jsonl": true,
+    "summary.json": true
+  },
+  "validator": "gil_audit.py:44 requires every background call backend differ from every foreground peer backend in request. Actual witness is same generation2/request2:7, not cross-request/gen misjoin.",
+  "request": {
+    "request": "2:7",
+    "phase": "workflow",
+    "path": "/walker/Find/b3ad9bbd9fbd4ed484df7ae2ec1d9c37",
+    "input": {
+      "target": 0
+    },
+    "output": {
+      "ok": true,
+      "type": "response",
+      "data": {
+        "result": {
+          "_jac_type": "Find",
+          "_jac_id": "1515d89d54bc4826989acc89834d1a6c",
+          "_jac_archetype": "walker",
+          "found": true,
+          "reports": [
+            {
+              "_jac_type": "Item",
+              "_jac_id": "b3ad9bbd9fbd4ed484df7ae2ec1d9c37",
+              "_jac_archetype": "node",
+              "index": 0,
+              "value": 0
+            }
+          ],
+          "target": 0
+        },
+        "reports": [
+          {
+            "_jac_type": "Item",
+            "_jac_id": "b3ad9bbd9fbd4ed484df7ae2ec1d9c37",
+            "_jac_archetype": "node",
+            "index": 0,
+            "value": 0
+          }
+        ]
+      },
+      "error": null
+    },
+    "http_status": 200,
+    "http_e2e_ms": 125.78382,
+    "start_ns": 3004806988245620,
+    "end_ns": 3004807114029440,
+    "wall_start": 1794468436.9025364,
+    "wall_end": 1794468437.028321,
+    "post_response_drain": {
+      "origin_request_id": "2:7",
+      "start_ns": 3004807114656147,
+      "end_ns": 3004807134264073,
+      "observed_threads": 1,
+      "pending": 0,
+      "flush": {
+        "calls": 18,
+        "events": 2,
+        "client_process_pid": 1149040
+      }
+    },
+    "server_generation": 2
+  },
+  "sequence": [
+    {
+      "line": 1064,
+      "role": "foreground",
+      "actual_executor": "none",
+      "thread_id": 124806031853376,
+      "backend_pid": 1149056,
+      "connection": 3988225661840,
+      "send_ns": 3004806988719824,
+      "ready_ns": 3004806988902360,
+      "sql_sha256": "7c031ced90a8996d01c59b32767e278e58f7dc3f5f52cfba746b97de050b59a3",
+      "sql_prefix": "SELECT doc FROM identity_users WHERE user_id = $1",
+      "returned_rows": 1
+    },
+    {
+      "line": 1065,
+      "role": "foreground",
+      "actual_executor": "none",
+      "thread_id": 124806031853376,
+      "backend_pid": 1149158,
+      "connection": 3988616441872,
+      "send_ns": 3004806989220510,
+      "ready_ns": 3004806989311057,
+      "sql_sha256": "884b307eaf68c26c0ee2c95bfebc014c633d0d00e03a5e60391e7b2efc4dcd48",
+      "sql_prefix": "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY",
+      "returned_rows": 0
+    },
+    {
+      "line": 1066,
+      "role": "foreground",
+      "actual_executor": "none",
+      "thread_id": 124806031853376,
+      "backend_pid": 1149158,
+      "connection": 3988616441872,
+      "send_ns": 3004806989331105,
+      "ready_ns": 3004806989407041,
+      "sql_sha256": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+      "sql_prefix": "SET LOCAL lock_timeout = '10s'",
+      "returned_rows": 0
+    },
+    {
+      "line": 1067,
+      "role": "foreground",
+      "actual_executor": "none",
+      "thread_id": 124806031853376,
+      "backend_pid": 1149158,
+      "connection": 3988616441872,
+      "send_ns": 3004806989473930,
+      "ready_ns": 3004806989776523,
+      "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+      "sql_prefix": "SELECT a.id, a.kind, a.arch_type, a.arch_module, a.fingerprint,\n               a.root_id, a.src, a.d",
+      "returned_rows": 1
+    },
+    {
+      "line": 1068,
+      "role": "foreground",
+      "actual_executor": "none",
+      "thread_id": 124806031853376,
+      "backend_pid": 1149158,
+      "connection": 3988616441872,
+      "send_ns": 3004806989988763,
+      "ready_ns": 3004806990248629,
+      "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+      "sql_prefix": "SELECT a.id, a.kind, a.arch_type, a.arch_module, a.fingerprint,\n               a.root_id, a.src, a.d",
+      "returned_rows": 1
+    },
+    {
+      "line": 1069,
+      "role": "foreground",
+      "actual_executor": "none",
+      "thread_id": 124806031853376,
+      "backend_pid": 1149158,
+      "connection": 3988616441872,
+      "send_ns": 3004806990390528,
+      "ready_ns": 3004806990473247,
+      "sql_sha256": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+      "sql_prefix": "COMMIT",
+      "returned_rows": 0
+    },
+    {
+      "line": 1070,
+      "role": "foreground",
+      "actual_executor": "none",
+      "thread_id": 124806031853376,
+      "backend_pid": 1149158,
+      "connection": 3988616441872,
+      "send_ns": 3004806990860806,
+      "ready_ns": 3004806990937981,
+      "sql_sha256": "547004d6c33e887b6fe478e1d23004ef14c3fa1c8c4756ec52aea4a3933e7fb0",
+      "sql_prefix": "BEGIN ISOLATION LEVEL SERIALIZABLE",
+      "returned_rows": 0
+    },
+    {
+      "line": 1071,
+      "role": "foreground",
+      "actual_executor": "none",
+      "thread_id": 124806031853376,
+      "backend_pid": 1149158,
+      "connection": 3988616441872,
+      "send_ns": 3004806990958417,
+      "ready_ns": 3004806991033702,
+      "sql_sha256": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+      "sql_prefix": "SET LOCAL lock_timeout = '10s'",
+      "returned_rows": 0
+    },
+    {
+      "line": 1072,
+      "role": "foreground",
+      "actual_executor": "none",
+      "thread_id": 124806031853376,
+      "backend_pid": 1149158,
+      "connection": 3988616441872,
+      "send_ns": 3004806991094938,
+      "ready_ns": 3004806991350545,
+      "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+      "sql_prefix": "SELECT a.id, a.kind, a.arch_type, a.arch_module, a.fingerprint,\n               a.root_id, a.src, a.d",
+      "returned_rows": 1
+    },
+    {
+      "line": 1073,
+      "role": "foreground",
+      "actual_executor": "none",
+      "thread_id": 124806031853376,
+      "backend_pid": 1149158,
+      "connection": 3988616441872,
+      "send_ns": 3004806991572988,
+      "ready_ns": 3004806991834665,
+      "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+      "sql_prefix": "SELECT a.id, a.kind, a.arch_type, a.arch_module, a.fingerprint,\n               a.root_id, a.src, a.d",
+      "returned_rows": 1
+    },
+    {
+      "line": 1074,
+      "role": "foreground",
+      "actual_executor": "none",
+      "thread_id": 124806013904448,
+      "backend_pid": 1149158,
+      "connection": 3988616441872,
+      "send_ns": 3004806994612208,
+      "ready_ns": 3004807098417251,
+      "sql_sha256": "280f96b2d26b8081739cedcda73a7eb024a25f647406b5422e3d405ab516c6c2",
+      "sql_prefix": "WITH RECURSIVE \"_cte0\" (\"depth\", \"bfs_ord\", \"node_id\", \"arch_type\", \"parent_depth\", \"parent_bfs_ord\"",
+      "returned_rows": 2998
+    },
+    {
+      "line": 1075,
+      "role": "foreground",
+      "actual_executor": "none",
+      "thread_id": 124806013904448,
+      "backend_pid": 1149158,
+      "connection": 3988616441872,
+      "send_ns": 3004807112204245,
+      "ready_ns": 3004807112577370,
+      "sql_sha256": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+      "sql_prefix": "COMMIT",
+      "returned_rows": 0
+    },
+    {
+      "line": 1076,
+      "role": "background_prefetch",
+      "actual_executor": "thread",
+      "thread_id": 124805997119040,
+      "backend_pid": 1149158,
+      "connection": 3988616441872,
+      "send_ns": 3004807112733806,
+      "ready_ns": 3004807112836248,
+      "sql_sha256": "884b307eaf68c26c0ee2c95bfebc014c633d0d00e03a5e60391e7b2efc4dcd48",
+      "sql_prefix": "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY",
+      "returned_rows": 0
+    },
+    {
+      "line": 1077,
+      "role": "background_prefetch",
+      "actual_executor": "thread",
+      "thread_id": 124805997119040,
+      "backend_pid": 1149158,
+      "connection": 3988616441872,
+      "send_ns": 3004807112861203,
+      "ready_ns": 3004807112936061,
+      "sql_sha256": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+      "sql_prefix": "SET LOCAL lock_timeout = '10s'",
+      "returned_rows": 0
+    },
+    {
+      "line": 1078,
+      "role": "foreground",
+      "actual_executor": "none",
+      "thread_id": 124806031853376,
+      "backend_pid": 1149158,
+      "connection": 3988616441872,
+      "send_ns": 3004807113091064,
+      "ready_ns": 3004807113209758,
+      "sql_sha256": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+      "sql_prefix": "COMMIT",
+      "returned_rows": 0
+    },
+    {
+      "line": 1079,
+      "role": "foreground",
+      "actual_executor": "none",
+      "thread_id": 124806031853376,
+      "backend_pid": 1149158,
+      "connection": 3988616441872,
+      "send_ns": 3004807113548357,
+      "ready_ns": 3004807113666144,
+      "sql_sha256": "98f36323c6bcf3d04d4b423d63caa325d692376ef457a4c1b41c27023a19ebf4",
+      "sql_prefix": "DISCARD ALL",
+      "returned_rows": 0
+    },
+    {
+      "line": 1080,
+      "role": "background_prefetch",
+      "actual_executor": "thread",
+      "thread_id": 124805997119040,
+      "backend_pid": 1149191,
+      "connection": 3988683621008,
+      "send_ns": 3004807113852790,
+      "ready_ns": 3004807122437623,
+      "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+      "sql_prefix": "SELECT a.id, a.kind, a.arch_type, a.arch_module, a.fingerprint,\n               a.root_id, a.src, a.d",
+      "returned_rows": 999
+    },
+    {
+      "line": 1081,
+      "role": "background_prefetch",
+      "actual_executor": "thread",
+      "thread_id": 124805997119040,
+      "backend_pid": 1149191,
+      "connection": 3988683621008,
+      "send_ns": 3004807133155296,
+      "ready_ns": 3004807133253304,
+      "sql_sha256": "98f36323c6bcf3d04d4b423d63caa325d692376ef457a4c1b41c27023a19ebf4",
+      "sql_prefix": "DISCARD ALL",
+      "returned_rows": 0
+    }
+  ],
+  "backend_equality_violations": [
+    {
+      "background_line": 1076,
+      "background_sql": "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY",
+      "same_backend_foreground_lines": [
+        1065,
+        1066,
+        1067,
+        1068,
+        1069,
+        1070,
+        1071,
+        1072,
+        1073,
+        1074,
+        1075,
+        1078,
+        1079
+      ]
+    },
+    {
+      "background_line": 1077,
+      "background_sql": "SET LOCAL lock_timeout = '10s'",
+      "same_backend_foreground_lines": [
+        1065,
+        1066,
+        1067,
+        1068,
+        1069,
+        1070,
+        1071,
+        1072,
+        1073,
+        1074,
+        1075,
+        1078,
+        1079
+      ]
+    }
+  ],
+  "foreground_background_protocol_overlaps": [],
+  "source_events": [
+    {
+      "line": 1,
+      "cell_id": "linked_list-1000/aggressive",
+      "trial_id": "linked_list-1000-aggressive-correctness-0",
+      "server_generation": "2",
+      "postgres_instance_id": "14e61363-ff66-4e35-b397-f47bece8eff4",
+      "clock_domain": "same-host-perf_counter_ns",
+      "origin_request_id": null,
+      "client_process_pid": 1149040,
+      "parent_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "kind": "connection",
+      "timestamp_ns": 3004802147356917,
+      "connection": 3988213886736,
+      "backend_pid": 1149055,
+      "database": "continuation_7d4b3c7415b24b0f9314ce40e10f734b",
+      "application_name": "jac:1149040:run"
+    },
+    {
+      "line": 2,
+      "cell_id": "linked_list-1000/aggressive",
+      "trial_id": "linked_list-1000-aggressive-correctness-0",
+      "server_generation": "2",
+      "postgres_instance_id": "14e61363-ff66-4e35-b397-f47bece8eff4",
+      "clock_domain": "same-host-perf_counter_ns",
+      "origin_request_id": null,
+      "client_process_pid": 1149040,
+      "parent_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "kind": "connection",
+      "timestamp_ns": 3004802203027191,
+      "connection": 3988225661840,
+      "backend_pid": 1149056,
+      "database": "continuation_7d4b3c7415b24b0f9314ce40e10f734b",
+      "application_name": "jac:1149040:run"
+    },
+    {
+      "line": 4,
+      "cell_id": "linked_list-1000/aggressive",
+      "trial_id": "linked_list-1000-aggressive-correctness-0",
+      "server_generation": "2",
+      "postgres_instance_id": "14e61363-ff66-4e35-b397-f47bece8eff4",
+      "clock_domain": "same-host-perf_counter_ns",
+      "origin_request_id": "2:4",
+      "client_process_pid": 1149040,
+      "parent_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "kind": "connection",
+      "timestamp_ns": 3004805544725294,
+      "connection": 3988616441872,
+      "backend_pid": 1149158,
+      "database": "continuation_7d4b3c7415b24b0f9314ce40e10f734b",
+      "application_name": "jac:1149040:run"
+    },
+    {
+      "line": 8,
+      "cell_id": "linked_list-1000/aggressive",
+      "trial_id": "linked_list-1000-aggressive-correctness-0",
+      "server_generation": "2",
+      "postgres_instance_id": "14e61363-ff66-4e35-b397-f47bece8eff4",
+      "clock_domain": "same-host-perf_counter_ns",
+      "origin_request_id": "2:5",
+      "client_process_pid": 1149040,
+      "parent_process_pid": 1149040,
+      "role": "background_prefetch",
+      "actual_executor": "thread",
+      "kind": "connection",
+      "timestamp_ns": 3004806290972660,
+      "connection": 3988683621008,
+      "backend_pid": 1149191,
+      "database": "continuation_7d4b3c7415b24b0f9314ce40e10f734b",
+      "application_name": "jac:1149040:run"
+    },
+    {
+      "line": 13,
+      "cell_id": "linked_list-1000/aggressive",
+      "trial_id": "linked_list-1000-aggressive-correctness-0",
+      "server_generation": "2",
+      "postgres_instance_id": "14e61363-ff66-4e35-b397-f47bece8eff4",
+      "clock_domain": "same-host-perf_counter_ns",
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "parent_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "kind": "native_context_close",
+      "timestamp_ns": 3004807113716602,
+      "start_ns": 3004807113439181,
+      "end_ns": 3004807113704877,
+      "session_nonce": "39771eda-ee03-4b7c-b43a-eaff2aa5a321",
+      "session_object_id": 3988621891216,
+      "natural_close_completed": true
+    },
+    {
+      "line": 14,
+      "cell_id": "linked_list-1000/aggressive",
+      "trial_id": "linked_list-1000-aggressive-correctness-0",
+      "server_generation": "2",
+      "postgres_instance_id": "14e61363-ff66-4e35-b397-f47bece8eff4",
+      "clock_domain": "same-host-perf_counter_ns",
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "parent_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "kind": "native_dispatch_complete",
+      "timestamp_ns": 3004807113740716,
+      "path": "/walker/Find/b3ad9bbd9fbd4ed484df7ae2ec1d9c37",
+      "start_ns": 3004806988644982,
+      "end_ns": 3004807113736472
+    }
+  ],
+  "SQL_GIL_join_complete": true,
+  "GIL_false_at_all_recorded_boundaries": true,
+  "observations": [
+    "BG BEGIN and SET LOCAL use conn3988616441872/backend1149158, earlier used by FG planning and main threads.",
+    "FG planner recursive SELECT then COMMIT end3004807112577370 precedes BG BEGIN3004807112733806.",
+    "FG main COMMIT+DISCARD follow BG SET before BG SELECT; payload999rows uses conn3988683621008/backend1149191.",
+    "No FG/BG send-to-ready overlap in this request. This does not establish transaction isolation, valid leasing or harmless control interleaving.",
+    "Native context close/HTTP response precede late BG completion; explicit drain retains it.",
+    "t13 owns narrow read-only runtime lifecycle/role interpretation. No assertion waiver or runtime fix recommended without that evidence."
+  ],
+  "disposition": "Assertion correctly detects its declared all-peer-backend-difference contract; underlying shared-backend/control cause unresolved. Preserve failed cell and prefix, no acceptance inflation."
+}

@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/small-rest-v1/cases/help_queue-smoke-aggressive-measured-1/artifacts.json",
+    "sha256": "e44cfec3513b35f35bc145872414b05751c6508e7ba8111d9708cee5f5002180",
+    "files_checked": 32
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_frozen_domain_scenario_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/small-rest-v1/cases/help_queue-smoke-aggressive-measured-1/artifacts.json",
+      "sha256": "e44cfec3513b35f35bc145872414b05751c6508e7ba8111d9708cee5f5002180",
+      "files_checked": 32
+    },
+    "proof_sha256": "b781747297e9e0a91265dc821298b967744c084a830be562d43f841014f568f4",
+    "actual_operations_checked": 32,
+    "selected_oracle": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/scenarios.py",
+      "sha256": "0f14dc8327012fb3e4e0360b41563b53578415607590b17f4e46cd7a21531c68"
+    },
+    "final_logical_state_sha256": "0ec0b71adb9b8232eaab38547c54eab5ddedb1541052b742419e73fca552eded",
+    "full_response": {
+      "full_actions_sha256": "b1e2e8ccff62e38a4092ef821601b0ab56f4db05203e8606fca2c5e7d00df98e",
+      "full_semantic_sha256": "056cb1f430c4378429ceee9d138c93abb8ad8ae74a5efa7e5c9e83b2988ed410"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/small-rest-v1/cases/help_queue-smoke-aggressive-measured-1/plus-proof.json",
+    "sha256": "b781747297e9e0a91265dc821298b967744c084a830be562d43f841014f568f4"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/small-rest-v1/cases/help_queue-smoke-aggressive-measured-1/cleanup-target.json",
+    "sha256": "6115cd5d1fbd7f0af01d6ad99edd2215a29d9fa2e45631e8c6b9097f0c8358dc"
+  },
+  "database_state": {
+    "database": "continuation_bfff37c072384ae895e37785c512d242",
+    "cluster_owner": "dc53e03c-331d-4fab-ad8f-1a1d6a4f7824",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "ba3c2dd46d7407916cf32ccdf7e308fd21bf4be3d12a0c2abbbede7acc9ba61e",
+    "actual_row_count": 34,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('SupportDesk','Customer','Agent','SLA','Ticket','Reply','HasCustomer','HasAgent','HasSLA','HasTicket','OpenedBy','AssignedAgent','UsesSLA','HasReply')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/plan-v1/sources.json",
+    "sha256": "8d3c3e3afaded659aca55d28110304e22d86afa1069e723d5566c413d4c8a047"
+  }
+}

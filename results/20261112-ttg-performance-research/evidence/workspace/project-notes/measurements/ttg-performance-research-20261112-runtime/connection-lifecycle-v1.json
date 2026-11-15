@@ -1,0 +1,579 @@
+{
+  "kind": "Read-only bounded source and raw connection lifecycle explanation",
+  "recorded_date": "2026-11-12",
+  "no_DB_tests_compiler_or_source_edits": true,
+  "scope": "Only gen2/request2:7 and specified frozen source call paths; not a whole-study concurrency audit",
+  "case": "linked_list-1000-aggressive-correctness-0",
+  "operation": {
+    "path": "/walker/Find/b3ad9bbd9fbd4ed484df7ae2ec1d9c37",
+    "input": {
+      "target": 0
+    },
+    "http_status": 200
+  },
+  "raw_calls": {
+    "path": "project-notes/measurements/ttg-performance-research-20261112/larger-v1/cases/linked_list-1000-aggressive-correctness-0/server-2-process-1149040.calls.jsonl",
+    "sha256": "a3393e5276a549b4c18a077aa0f928ce5b3231f315e3fba035b6f02177ce5367"
+  },
+  "raw_events": {
+    "path": "project-notes/measurements/ttg-performance-research-20261112/larger-v1/cases/linked_list-1000-aggressive-correctness-0/server-2-process-1149040.events.jsonl",
+    "sha256": "7534c19931374ecc80b0e278ee63a3d7f83fdef2b1bf9cbe5b8be8bd7b7f0c2a"
+  },
+  "requests": {
+    "path": "project-notes/measurements/ttg-performance-research-20261112/larger-v1/cases/linked_list-1000-aggressive-correctness-0/requests.json",
+    "sha256": "ed759949a6b24b59b38947a6c9624aa52d4ed14b8f8f9ad9c048183d5ef60bb8"
+  },
+  "threads": {
+    "server_main_from_GIL_startup": 124806031853376,
+    "native_spawn_and_planner_foreground": 124806013904448,
+    "explicit_payload_background": 124805997119040
+  },
+  "main_connection": {
+    "object_id": 3988616441872,
+    "backend_pid": 1149158
+  },
+  "payload_reader": {
+    "object_id": 3988683621008,
+    "backend_pid": 1149191
+  },
+  "selected_SQL_records": [
+    {
+      "line": 1064,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "connection": 3988225661840,
+      "backend_pid": 1149056,
+      "thread_id": 124806031853376,
+      "driver_start_ns": 3004806988704301,
+      "send_ns": 3004806988719824,
+      "ready_ns": 3004806988902360,
+      "driver_end_ns": 3004806988902602,
+      "data_rows": 1,
+      "error": null,
+      "sql_sha256": "7c031ced90a8996d01c59b32767e278e58f7dc3f5f52cfba746b97de050b59a3",
+      "sql_prefix": "SELECT doc FROM identity_users WHERE user_id = $1"
+    },
+    {
+      "line": 1065,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "connection": 3988616441872,
+      "backend_pid": 1149158,
+      "thread_id": 124806031853376,
+      "driver_start_ns": 3004806989209207,
+      "send_ns": 3004806989220510,
+      "ready_ns": 3004806989311057,
+      "driver_end_ns": 3004806989311217,
+      "data_rows": 0,
+      "error": null,
+      "sql_sha256": "884b307eaf68c26c0ee2c95bfebc014c633d0d00e03a5e60391e7b2efc4dcd48",
+      "sql_prefix": "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY"
+    },
+    {
+      "line": 1066,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "connection": 3988616441872,
+      "backend_pid": 1149158,
+      "thread_id": 124806031853376,
+      "driver_start_ns": 3004806989323714,
+      "send_ns": 3004806989331105,
+      "ready_ns": 3004806989407041,
+      "driver_end_ns": 3004806989407176,
+      "data_rows": 0,
+      "error": null,
+      "sql_sha256": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+      "sql_prefix": "SET LOCAL lock_timeout = '10s'"
+    },
+    {
+      "line": 1067,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "connection": 3988616441872,
+      "backend_pid": 1149158,
+      "thread_id": 124806031853376,
+      "driver_start_ns": 3004806989427828,
+      "send_ns": 3004806989473930,
+      "ready_ns": 3004806989776523,
+      "driver_end_ns": 3004806989776693,
+      "data_rows": 1,
+      "error": null,
+      "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+      "sql_prefix": "         SELECT a.id, a.kind, a.arch_type, a.arch_module, a.fingerprint,                a.root_id, a.src, a.ds"
+    },
+    {
+      "line": 1068,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "connection": 3988616441872,
+      "backend_pid": 1149158,
+      "thread_id": 124806031853376,
+      "driver_start_ns": 3004806989942924,
+      "send_ns": 3004806989988763,
+      "ready_ns": 3004806990248629,
+      "driver_end_ns": 3004806990248853,
+      "data_rows": 1,
+      "error": null,
+      "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+      "sql_prefix": "         SELECT a.id, a.kind, a.arch_type, a.arch_module, a.fingerprint,                a.root_id, a.src, a.ds"
+    },
+    {
+      "line": 1069,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "connection": 3988616441872,
+      "backend_pid": 1149158,
+      "thread_id": 124806031853376,
+      "driver_start_ns": 3004806990383566,
+      "send_ns": 3004806990390528,
+      "ready_ns": 3004806990473247,
+      "driver_end_ns": 3004806990473402,
+      "data_rows": 0,
+      "error": null,
+      "sql_sha256": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+      "sql_prefix": "COMMIT"
+    },
+    {
+      "line": 1070,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "connection": 3988616441872,
+      "backend_pid": 1149158,
+      "thread_id": 124806031853376,
+      "driver_start_ns": 3004806990849615,
+      "send_ns": 3004806990860806,
+      "ready_ns": 3004806990937981,
+      "driver_end_ns": 3004806990938145,
+      "data_rows": 0,
+      "error": null,
+      "sql_sha256": "547004d6c33e887b6fe478e1d23004ef14c3fa1c8c4756ec52aea4a3933e7fb0",
+      "sql_prefix": "BEGIN ISOLATION LEVEL SERIALIZABLE"
+    },
+    {
+      "line": 1071,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "connection": 3988616441872,
+      "backend_pid": 1149158,
+      "thread_id": 124806031853376,
+      "driver_start_ns": 3004806990951087,
+      "send_ns": 3004806990958417,
+      "ready_ns": 3004806991033702,
+      "driver_end_ns": 3004806991033872,
+      "data_rows": 0,
+      "error": null,
+      "sql_sha256": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+      "sql_prefix": "SET LOCAL lock_timeout = '10s'"
+    },
+    {
+      "line": 1072,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "connection": 3988616441872,
+      "backend_pid": 1149158,
+      "thread_id": 124806031853376,
+      "driver_start_ns": 3004806991051549,
+      "send_ns": 3004806991094938,
+      "ready_ns": 3004806991350545,
+      "driver_end_ns": 3004806991350731,
+      "data_rows": 1,
+      "error": null,
+      "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+      "sql_prefix": "         SELECT a.id, a.kind, a.arch_type, a.arch_module, a.fingerprint,                a.root_id, a.src, a.ds"
+    },
+    {
+      "line": 1073,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "connection": 3988616441872,
+      "backend_pid": 1149158,
+      "thread_id": 124806031853376,
+      "driver_start_ns": 3004806991528364,
+      "send_ns": 3004806991572988,
+      "ready_ns": 3004806991834665,
+      "driver_end_ns": 3004806991834851,
+      "data_rows": 1,
+      "error": null,
+      "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+      "sql_prefix": "         SELECT a.id, a.kind, a.arch_type, a.arch_module, a.fingerprint,                a.root_id, a.src, a.ds"
+    },
+    {
+      "line": 1074,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "connection": 3988616441872,
+      "backend_pid": 1149158,
+      "thread_id": 124806013904448,
+      "driver_start_ns": 3004806992441112,
+      "send_ns": 3004806994612208,
+      "ready_ns": 3004807098417251,
+      "driver_end_ns": 3004807098417583,
+      "data_rows": 2998,
+      "error": null,
+      "sql_sha256": "280f96b2d26b8081739cedcda73a7eb024a25f647406b5422e3d405ab516c6c2",
+      "sql_prefix": "WITH RECURSIVE \"_cte0\" (\"depth\", \"bfs_ord\", \"node_id\", \"arch_type\", \"parent_depth\", \"parent_bfs_ord\", \"parent_"
+    },
+    {
+      "line": 1075,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "connection": 3988616441872,
+      "backend_pid": 1149158,
+      "thread_id": 124806013904448,
+      "driver_start_ns": 3004807112193049,
+      "send_ns": 3004807112204245,
+      "ready_ns": 3004807112577370,
+      "driver_end_ns": 3004807112577830,
+      "data_rows": 0,
+      "error": null,
+      "sql_sha256": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+      "sql_prefix": "COMMIT"
+    },
+    {
+      "line": 1076,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "background_prefetch",
+      "actual_executor": "thread",
+      "connection": 3988616441872,
+      "backend_pid": 1149158,
+      "thread_id": 124805997119040,
+      "driver_start_ns": 3004807112716376,
+      "send_ns": 3004807112733806,
+      "ready_ns": 3004807112836248,
+      "driver_end_ns": 3004807112836903,
+      "data_rows": 0,
+      "error": null,
+      "sql_sha256": "884b307eaf68c26c0ee2c95bfebc014c633d0d00e03a5e60391e7b2efc4dcd48",
+      "sql_prefix": "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY"
+    },
+    {
+      "line": 1077,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "background_prefetch",
+      "actual_executor": "thread",
+      "connection": 3988616441872,
+      "backend_pid": 1149158,
+      "thread_id": 124805997119040,
+      "driver_start_ns": 3004807112853044,
+      "send_ns": 3004807112861203,
+      "ready_ns": 3004807112936061,
+      "driver_end_ns": 3004807112936184,
+      "data_rows": 0,
+      "error": null,
+      "sql_sha256": "e7b550770798107fb825a3826ebbb050a540358e905b1a751b9e8f736ebfd7d4",
+      "sql_prefix": "SET LOCAL lock_timeout = '10s'"
+    },
+    {
+      "line": 1078,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "connection": 3988616441872,
+      "backend_pid": 1149158,
+      "thread_id": 124806031853376,
+      "driver_start_ns": 3004807113080870,
+      "send_ns": 3004807113091064,
+      "ready_ns": 3004807113209758,
+      "driver_end_ns": 3004807113209992,
+      "data_rows": 0,
+      "error": null,
+      "sql_sha256": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+      "sql_prefix": "COMMIT"
+    },
+    {
+      "line": 1079,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "connection": 3988616441872,
+      "backend_pid": 1149158,
+      "thread_id": 124806031853376,
+      "driver_start_ns": 3004807113538678,
+      "send_ns": 3004807113548357,
+      "ready_ns": 3004807113666144,
+      "driver_end_ns": 3004807113666356,
+      "data_rows": 0,
+      "error": null,
+      "sql_sha256": "98f36323c6bcf3d04d4b423d63caa325d692376ef457a4c1b41c27023a19ebf4",
+      "sql_prefix": "DISCARD ALL"
+    },
+    {
+      "line": 1080,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "background_prefetch",
+      "actual_executor": "thread",
+      "connection": 3988683621008,
+      "backend_pid": 1149191,
+      "thread_id": 124805997119040,
+      "driver_start_ns": 3004807113592851,
+      "send_ns": 3004807113852790,
+      "ready_ns": 3004807122437623,
+      "driver_end_ns": 3004807122437887,
+      "data_rows": 999,
+      "error": null,
+      "sql_sha256": "37859cce2d322f450e1522b2f004075b64800d760141b0c3fe908b3cad536e39",
+      "sql_prefix": "         SELECT a.id, a.kind, a.arch_type, a.arch_module, a.fingerprint,                a.root_id, a.src, a.ds"
+    },
+    {
+      "line": 1081,
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "role": "background_prefetch",
+      "actual_executor": "thread",
+      "connection": 3988683621008,
+      "backend_pid": 1149191,
+      "thread_id": 124805997119040,
+      "driver_start_ns": 3004807133145234,
+      "send_ns": 3004807133155296,
+      "ready_ns": 3004807133253304,
+      "driver_end_ns": 3004807133253487,
+      "data_rows": 0,
+      "error": null,
+      "sql_sha256": "98f36323c6bcf3d04d4b423d63caa325d692376ef457a4c1b41c27023a19ebf4",
+      "sql_prefix": "DISCARD ALL"
+    }
+  ],
+  "selected_context_events": [
+    {
+      "line": 13,
+      "cell_id": "linked_list-1000/aggressive",
+      "trial_id": "linked_list-1000-aggressive-correctness-0",
+      "server_generation": "2",
+      "postgres_instance_id": "14e61363-ff66-4e35-b397-f47bece8eff4",
+      "clock_domain": "same-host-perf_counter_ns",
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "parent_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "kind": "native_context_close",
+      "timestamp_ns": 3004807113716602,
+      "start_ns": 3004807113439181,
+      "end_ns": 3004807113704877,
+      "session_nonce": "39771eda-ee03-4b7c-b43a-eaff2aa5a321",
+      "session_object_id": 3988621891216,
+      "natural_close_completed": true
+    },
+    {
+      "line": 14,
+      "cell_id": "linked_list-1000/aggressive",
+      "trial_id": "linked_list-1000-aggressive-correctness-0",
+      "server_generation": "2",
+      "postgres_instance_id": "14e61363-ff66-4e35-b397-f47bece8eff4",
+      "clock_domain": "same-host-perf_counter_ns",
+      "origin_request_id": "2:7",
+      "client_process_pid": 1149040,
+      "parent_process_pid": 1149040,
+      "role": "foreground",
+      "actual_executor": "none",
+      "kind": "native_dispatch_complete",
+      "timestamp_ns": 3004807113740716,
+      "path": "/walker/Find/b3ad9bbd9fbd4ed484df7ae2ec1d9c37",
+      "start_ns": 3004806988644982,
+      "end_ns": 3004807113736472
+    }
+  ],
+  "cross_thread_SQL_interval_overlaps_on_selected_connection": [],
+  "source_refs": [
+    {
+      "path": "reproduction/ttg-condition-access-performance-20261111/runtime-overlay-v1/jac/jaclang/server/impl/server.impl.jac",
+      "sha256": "d1db92d24a7a3392c0d878e006ab8e18f19ce590666335e757d541172488aae2",
+      "line_ranges": [
+        [
+          445,
+          463
+        ],
+        [
+          469,
+          499
+        ],
+        [
+          625,
+          678
+        ]
+      ]
+    },
+    {
+      "path": "reproduction/ttg-condition-access-performance-20261111/runtime-overlay-v1/jac/jaclang/server/impl/session.impl.jac",
+      "sha256": "f0b781aef69197b1682e54e724073efb07cbf875da7b82d7c264f29c12dfbe18",
+      "line_ranges": [
+        [
+          749,
+          773
+        ],
+        [
+          954,
+          1002
+        ],
+        [
+          1143,
+          1164
+        ],
+        [
+          1285,
+          1300
+        ],
+        [
+          1510,
+          1532
+        ]
+      ]
+    },
+    {
+      "path": "reproduction/ttg-condition-access-performance-20261111/runtime-overlay-v1/jac/jaclang/data/impl/store.impl.jac",
+      "sha256": "a42598ada8e84226766d3881b29914dcd5b763be6010be9bdf58f5d4311de165",
+      "line_ranges": [
+        [
+          317,
+          370
+        ],
+        [
+          397,
+          444
+        ],
+        [
+          769,
+          833
+        ],
+        [
+          1387,
+          1409
+        ]
+      ]
+    },
+    {
+      "path": "reproduction/ttg-condition-access-performance-20261111/runtime-overlay-v1/jac/jaclang/data/pgpool.jac",
+      "sha256": "5da163d31e864410dbe91fb4e921ac65ea933c7fbd8228da91fdc7be852e106b",
+      "line_ranges": [
+        [
+          76,
+          98
+        ],
+        [
+          100,
+          131
+        ]
+      ]
+    },
+    {
+      "path": "reproduction/ttg-condition-access-performance-20261111/runtime-overlay-v1/jac/jaclang/runtime/prefetch.jac",
+      "sha256": "4ac6a21f0adef7ee8d79b7a6521f75be81dfc354af4f2e487e7cef8b7acbaf72",
+      "line_ranges": [
+        [
+          88,
+          105
+        ],
+        [
+          161,
+          184
+        ]
+      ]
+    },
+    {
+      "path": "reproduction/ttg-condition-access-performance-20261111/runtime-overlay-v1/jac/jaclang/runtime/ttg_dependency_prefetch.jac",
+      "sha256": "470db22ff6ac2a02db1f974d277a1628dd2ac1b059f9c07e76631122e2e30b32",
+      "line_ranges": [
+        [
+          155,
+          164
+        ]
+      ]
+    },
+    {
+      "path": "reproduction/ttg-condition-access-performance-20261111/runtime-overlay-v1/jac/jaclang/data/impl/pgwire.impl.jac",
+      "sha256": "131d51d3caca9fe26ea282cba7329c08b5267e5185656b9058ff395fa2cf4e5b",
+      "line_ranges": [
+        [
+          615,
+          621
+        ]
+      ]
+    },
+    {
+      "path": "reproduction/ttg-littlex-freethreaded/sitecustomize.py",
+      "sha256": "0475b1f79e09944dd26ffe35ad31d33dc9a0193e00429736a72499ef98aa8665",
+      "line_ranges": [
+        [
+          30,
+          37
+        ]
+      ]
+    },
+    {
+      "path": "reproduction/ttg-continuation-performance/continuation_probe.py",
+      "sha256": "a4da9fccb1141c2d7148f5d5da377a6f95511517e2fce06353c43f743bd8b485",
+      "line_ranges": [
+        [
+          38,
+          59
+        ],
+        [
+          113,
+          122
+        ]
+      ]
+    },
+    {
+      "path": "reproduction/ttg-performance-research-20261112/gil_audit.py",
+      "sha256": "65e3de6a1702ab4f15a204b912b1980c1118b6a2f6920104973241f25374c229",
+      "line_ranges": [
+        [
+          44,
+          50
+        ]
+      ]
+    }
+  ],
+  "findings": [
+    "Foreground is a request/planning-role label, not an assertion that code runs on the server main thread. The spawn worker inherits the foreground request ContextVar; explicitly bound prefetch threads override it.",
+    "Session.prefetch calls self.read_barrier on the original shared Session before constructing store.reader_clone. That barrier can start a transaction on the main PgStore from the background thread.",
+    "Observed BG BEGIN/SET on1149158 happens before main DISCARD ALL and thus is not a simple already-released pooled handoff. PgStore per-instance RLock serializes the observed shared-store statements.",
+    "Original request-thread COMMIT then DISCARD is consistent with response finalization/Session close. Native context_close interval contains the DISCARD. The exact caller stack for COMMIT is not retained; finalization calls acommit as well as Session.close committing.",
+    "Actual background payload SELECT is on the distinct clone connection/backend1149191 after main DISCARD. No cross-thread SQL send-to-ready overlap is found on1149158 within this selected request.",
+    "Session.close waits for process readers only, while ordinary aggressive thread workers may remain active through native context close. Pool reuse is possible in general; no checkout/lease events were captured, so backend identity alone does not establish lease ownership."
+  ],
+  "disposition": {
+    "main_decision": "No runtime fix or audit relaxation. Preserve failure; retain LL1000 as explicit isolation-gate outcome.",
+    "inventory": {
+      "off": "correctness_only",
+      "aggressive": "failed_isolation_gate",
+      "conservative": "not_run"
+    },
+    "performance": "No LL1000 n5/precision samples invented; successful19 fixtures continue via separately released metadata lineage.",
+    "business": "This isolation-gate failure is not evidence of incorrect native business values. The failed cell has no independent acceptance; do not promote it to passed.",
+    "safety_limit": "This trace/source match does not establish whole-Session close/prefetch safety under arbitrary schedules or concurrent mutation, nor general observed data corruption."
+  },
+  "failure_preservation": {
+    "path": "project-notes/measurements/ttg-performance-research-20261112/larger-v1-failure-preservation.json",
+    "sha256": "017658a5dfcaee8db9a5de74eb78e76620c1e70283a19ac8155a7ea4145a6e36"
+  }
+}

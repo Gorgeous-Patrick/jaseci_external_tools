@@ -1,0 +1,161 @@
+{
+  "kind": "condition-call-access-before-after-recipe-comparison",
+  "runtime_commit": "96868d0400a2f91fbfa48112c7ee291c891d2d03",
+  "runtimes": {
+    "before": {
+      "workspace": "/home/baichuan/jaseci/jac-ttg",
+      "profile": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-condition-access-performance-20261111/before-profile.json",
+        "sha256": "bb45c10e0908b1b394d032929430363eb22c8686926e47ce2fc1e9ce402d98b6"
+      },
+      "clean": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-resume-performance-20261111/clean-manifest.json",
+        "sha256": "299c1382625f34cf5fe80972643f80cd669d02c559a62f9cd59e4427093e52fe"
+      },
+      "overlay": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-access-resume-performance-20261111/overlay-manifest.json",
+        "sha256": "81de5693b3e1a8bb0f1d0a310eb9434be9d17c9e0b20e75c57545f9d4e4835e3"
+      }
+    },
+    "after": {
+      "workspace": "/home/baichuan/jaseci/jac-ttg",
+      "profile": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-condition-access-performance-20261111/after-profile.json",
+        "sha256": "bb45c10e0908b1b394d032929430363eb22c8686926e47ce2fc1e9ce402d98b6"
+      },
+      "clean": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-condition-access-performance-20261111/clean-manifest.json",
+        "sha256": "39ab46b843377eb5ecabe077c3b9ea0b40194ff9ef07129233a37af6a0e3d033"
+      },
+      "overlay": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-condition-access-performance-20261111/overlay-manifest.json",
+        "sha256": "4deaf0ea8ec25e7b71e49e75d8bbd9efb29dade1413ab4e6893a54d09f8a2e18"
+      }
+    }
+  },
+  "sources": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-condition-access-performance-20261111/sources.json",
+    "sha256": "570c29d9fd1a63a4d7bd69d3ed69b270c81294f23ca900c6b3fe98c4ff4f9c05"
+  },
+  "configs": {
+    "before": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "thread",
+      "ttg_prefetch_model": "always",
+      "prefetching": "ttg_dependency",
+      "ttg_fused_sql": true
+    },
+    "after": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "thread",
+      "ttg_prefetch_model": "always",
+      "prefetching": "ttg_dependency",
+      "ttg_fused_sql": true
+    }
+  },
+  "schedule": [
+    {
+      "case_id": "recipe_pantry",
+      "app": "recipe_pantry",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "config_id": "before",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "recipe_pantry-before-excluded_warmup--1"
+    },
+    {
+      "case_id": "recipe_pantry",
+      "app": "recipe_pantry",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "config_id": "after",
+      "phase": "excluded_warmup",
+      "repeat": -1,
+      "trial_id": "recipe_pantry-after-excluded_warmup--1"
+    },
+    {
+      "case_id": "recipe_pantry",
+      "app": "recipe_pantry",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "config_id": "before",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "recipe_pantry-before-measured-0"
+    },
+    {
+      "case_id": "recipe_pantry",
+      "app": "recipe_pantry",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "config_id": "after",
+      "phase": "measured",
+      "repeat": 0,
+      "trial_id": "recipe_pantry-after-measured-0"
+    },
+    {
+      "case_id": "recipe_pantry",
+      "app": "recipe_pantry",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "config_id": "after",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "recipe_pantry-after-measured-1"
+    },
+    {
+      "case_id": "recipe_pantry",
+      "app": "recipe_pantry",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "config_id": "before",
+      "phase": "measured",
+      "repeat": 1,
+      "trial_id": "recipe_pantry-before-measured-1"
+    },
+    {
+      "case_id": "recipe_pantry",
+      "app": "recipe_pantry",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "config_id": "before",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "recipe_pantry-before-measured-2"
+    },
+    {
+      "case_id": "recipe_pantry",
+      "app": "recipe_pantry",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "config_id": "after",
+      "phase": "measured",
+      "repeat": 2,
+      "trial_id": "recipe_pantry-after-measured-2"
+    }
+  ],
+  "seed": 42,
+  "statistics": "ANALYZE anchors and graph_types once after setup, before primary HTTP/reset",
+  "storage": {
+    "startup": 805306368,
+    "between": 671088640,
+    "stop": 536870912
+  },
+  "selection": "Unchanged RecipePantry smoke with accepted two read-only ShoppingList checks. Before is the accepted resumed-Access runtime; after uses unified conditional-call Access extraction and safe short-circuit guards. Both use Conservative, GIL-off threads, same scenarios and independent oracles.",
+  "scope": "Eight fresh workflows: two excluded warmups and six measured, n3 per mode. Counts/coverage diagnostic only; identical precision observer; all native output/state/restart/session/physical checks before owned DROP."
+}

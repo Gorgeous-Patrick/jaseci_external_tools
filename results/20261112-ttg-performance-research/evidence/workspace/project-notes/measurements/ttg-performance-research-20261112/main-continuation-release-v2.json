@@ -1,0 +1,82 @@
+{
+  "authorized": true,
+  "time_utc": "2026-11-12T07:43:37.658414+00:00",
+  "scope": "114 fresh n5-extension workflows then57 separate precision workflows; exact plan-v2, no LL1000 retry.",
+  "plan": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/plan-v2/plan.json",
+    "sha256": "62f9bc942105d79c5df678d31b0960e4de03b6a8c1b1eec98218750d00d7447d"
+  },
+  "controller": {
+    "path": "/home/baichuan/jaseci/reproduction/ttg-performance-research-20261112/runner_v2.py",
+    "sha256": "f837d84b8983f73158c538310bbc04c4245b878bb91b88e3c27c3da7ab0f2aba"
+  },
+  "validator": {
+    "path": "/home/baichuan/jaseci/reproduction/ttg-performance-research-20261112/lineage_v2.py",
+    "sha256": "c6826f94ea3b1de9f8ba3325d075412171b122b005f0ce3610c09ca4dacb4aef"
+  },
+  "original_sources": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/plan-v1/sources.json",
+    "sha256": "8d3c3e3afaded659aca55d28110304e22d86afa1069e723d5566c413d4c8a047"
+  },
+  "preservation": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/larger-v1-failure-preservation.json",
+    "sha256": "017658a5dfcaee8db9a5de74eb78e76620c1e70283a19ac8155a7ea4145a6e36"
+  },
+  "main_checks": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/main-lineage-v2-checks.json",
+    "sha256": "bedbc47067a85e432e6b23912ac599fef3f487e21cc885026d9228995ef93d08"
+  },
+  "review": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112-review/v2-lineage-schedule-review-v1.json",
+    "sha256": "f4ef56065059b9b611c886399c38fd1f4b4a37bb11a733a33eb7189e3e4ef68c"
+  },
+  "disposition": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/main-larger-failure-disposition-v1.json",
+    "sha256": "a1a503118e29d38d32d7a01805c5d2cbbb8a8632b527c2efef71e112040610d1"
+  },
+  "commands": [
+    {
+      "stage": "extend-n5",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/baichuan/jaseci/reproduction/ttg-performance-research-20261112/runner_v2.py",
+        "--plan",
+        "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/plan-v2/plan.json",
+        "--stage",
+        "extend-n5",
+        "--output",
+        "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/extend-n5-v2",
+        "--cluster",
+        "/home/baichuan/jaseci/reproduction/ttg-performance-research-20261112/pg-extend-n5-v2"
+      ],
+      "log": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/extend-n5-v2.log"
+    },
+    {
+      "stage": "precision",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/baichuan/jaseci/reproduction/ttg-performance-research-20261112/runner_v2.py",
+        "--plan",
+        "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/plan-v2/plan.json",
+        "--stage",
+        "precision",
+        "--output",
+        "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/precision-v2",
+        "--cluster",
+        "/home/baichuan/jaseci/reproduction/ttg-performance-research-20261112/pg-precision-v2"
+      ],
+      "log": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/precision-v2.log"
+    }
+  ],
+  "conditions": [
+    "Original18/runtime/measurement/GIL/oracle remain unchanged",
+    "New controller and validator exact hashes at launch and completion",
+    "First failure preserves evidence and DB and stops next stage",
+    "Original storage floors remain in force",
+    "Precision begins only after n5 complete source/stopped/capacity proof",
+    "No concurrent DB/compiler/timedCPU/render/heavyaudit during timing",
+    "Postprocessing lineage adapter independently reviewed before publication; not a launch dependency"
+  ]
+}

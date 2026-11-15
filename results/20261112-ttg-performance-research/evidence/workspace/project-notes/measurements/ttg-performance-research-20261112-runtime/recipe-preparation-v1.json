@@ -1,0 +1,99 @@
+{
+  "kind": "RecipePantry pure graph-scale preparation",
+  "passed": true,
+  "native_acceptance": false,
+  "performance_measured": false,
+  "recorded_date": "2026-11-12",
+  "source_files": [
+    {
+      "path": "reproduction/ttg-performance-research-fixtures-20261112/README.md",
+      "sha256": "a7e1730916989a157ddcac38eac2e3ad96ae4c8b1f0d2b25f71dd29a1578fbb2"
+    },
+    {
+      "path": "reproduction/ttg-performance-research-fixtures-20261112/recipe_fixture.py",
+      "sha256": "7c4f73257df38120d9753ee883c4aba7636d8a626b561285f932480c2f9af184"
+    },
+    {
+      "path": "reproduction/ttg-performance-research-fixtures-20261112/test_recipe_fixture.py",
+      "sha256": "0dbc6291eee5c7f4f6ca182e143fe8256ad3b6c74f7cddb6aad99a660f998934"
+    }
+  ],
+  "pure_tests": {
+    "passed": 11,
+    "command": "python3 -B -m unittest discover -s reproduction/ttg-performance-research-fixtures-20261112 -p test_recipe_fixture.py -v",
+    "log": {
+      "path": "project-notes/measurements/ttg-performance-research-20261112-runtime/recipe-pure-v2.log",
+      "sha256": "c4d4cbf21312eeb04b5965a9dab9728952707da8f06b467eecd3bb16ee3eb382"
+    }
+  },
+  "initial_test_failure": {
+    "path": "project-notes/measurements/ttg-performance-research-20261112-runtime/recipe-pure-v1-failure.json",
+    "sha256": "6ff27c73fbdbe801e42a3792a1bec13a96d6d58aa09c8ac98cdd97ac6208760d"
+  },
+  "application_source": {
+    "path": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+    "sha256": "c9be1cf67ba71b678f9b39cb6cb9f040647a65602878a55889bae549418dd44b"
+  },
+  "application_source_changes": [],
+  "fixtures": [
+    {
+      "manifest": {
+        "path": "project-notes/measurements/ttg-performance-research-20261112-runtime/recipe-small-v1/manifest.json",
+        "sha256": "9d99fb8725d364057bfcf4a25f957cd07b2288293d7f19122fd42589b00117ff"
+      },
+      "shape": {
+        "cooked": 8,
+        "edge_types": {
+          "Consumed": 24,
+          "IngredientRef": 24,
+          "Needs": 24,
+          "RecipeRef": 24
+        },
+        "logical_edges": 96,
+        "logical_nodes": 92,
+        "node_types": {
+          "Consumption": 24,
+          "Ingredient": 12,
+          "Meal": 24,
+          "Recipe": 8,
+          "Requirement": 24
+        },
+        "passed": true,
+        "planned": 16,
+        "root_edges": 44
+      }
+    },
+    {
+      "manifest": {
+        "path": "project-notes/measurements/ttg-performance-research-20261112-runtime/recipe-large-v1/manifest.json",
+        "sha256": "e5bd908a1b6936c5e7f1b0ef0de8fe1d42e4f4f9278cd4e092893a30e35f6d61"
+      },
+      "shape": {
+        "cooked": 80,
+        "edge_types": {
+          "Consumed": 240,
+          "IngredientRef": 240,
+          "Needs": 240,
+          "RecipeRef": 240
+        },
+        "logical_edges": 960,
+        "logical_nodes": 920,
+        "node_types": {
+          "Consumption": 240,
+          "Ingredient": 120,
+          "Meal": 240,
+          "Recipe": 80,
+          "Requirement": 240
+        },
+        "passed": true,
+        "planned": 160,
+        "root_edges": 440
+      }
+    }
+  ],
+  "remaining": [
+    "New source-preserving Recipe native importer/inspector in perf-owned adapter",
+    "Real HTTP/native identity binding, report/poststate/rollback and restart correctness in all three policies",
+    "Independent review before accepted timing"
+  ]
+}

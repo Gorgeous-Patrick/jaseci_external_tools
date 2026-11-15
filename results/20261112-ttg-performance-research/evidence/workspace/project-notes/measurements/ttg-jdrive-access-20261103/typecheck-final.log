@@ -1,0 +1,2216 @@
+[dev] jac dev mode - using compiler source at /home/baichuan/jaseci/jac-ttg
+  Checking jac/jaclang/runtime/ttg_dependencies.jac...
+jac/jaclang/runtime/ttg_dependencies.jac ok [16%]
+  Checking jac/jaclang/runtime/ttg_regions.jac...
+jac/jaclang/runtime/ttg_regions.jac ok [33%]
+  Checking jac/jaclang/runtime/ttg_templates.jac...
+jac/jaclang/runtime/ttg_templates.jac ok [50%]
+  Checking jac/tests/runtimelib/fixtures/ttg_region_walkers.jac...
+jac/tests/runtimelib/fixtures/ttg_region_walkers.jac ok [66%]
+  Checking jac/tests/runtimelib/test_ttg_output_tree.jac...
+jac/tests/runtimelib/test_ttg_output_tree.jac ok [83%]
+  Checking jac/tests/runtimelib/test_ttg_regions_native.jac...
+jac/tests/runtimelib/test_ttg_regions_native.jac ok [100%]
+
+=================================== FAILURES ===================================
+___________________ jac/jaclang/runtime/ttg_dependencies.jac ___________________
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:6:10
+    4 | import from jaclang.runtime.ttg { JacTTGGenerator }
+    5 | 
+    6 | glob pa: any = pyast,
+      |          ^^^
+    7 |      ops: any = operator;
+    8 | 
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:7:11
+    5 | 
+    6 | glob pa: any = pyast,
+    7 |      ops: any = operator;
+      |           ^^^
+    8 | 
+    9 | obj TraceEvent {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_dependencies.jac:17:27
+   15 |         expression: str = '',
+   16 |         writes: str = '',
+   17 |         reads: tuple[str, ...] = (),
+      |                           ^^^
+   18 |         targets: tuple[str, ...] = (),
+   19 |         hop_chain: tuple = (),
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_dependencies.jac:18:29
+   16 |         writes: str = '',
+   17 |         reads: tuple[str, ...] = (),
+   18 |         targets: tuple[str, ...] = (),
+      |                             ^^^
+   19 |         hop_chain: tuple = (),
+   20 |         origin: str = 'here',
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "tuple" used without type arguments, defaulting to "tuple[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_dependencies.jac:19:20
+   17 |         reads: tuple[str, ...] = (),
+   18 |         targets: tuple[str, ...] = (),
+   19 |         hop_chain: tuple = (),
+      |                    ^^^^^
+   20 |         origin: str = 'here',
+   21 |         next_id: int = -1,
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_dependencies.jac:25:17
+   23 |         false_id: int = -1,
+   24 |         definitions: dict[str, int] = {},
+   25 |         effect: dict = {};
+      |                 ^^^^
+   26 | }
+   27 | 
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_dependencies.jac:55:34
+   53 | 
+   54 | obj QueueTraceDecision {
+   55 |     has dependencies: tuple[str, ...] = (),
+      |                                  ^^^
+   56 |         intervening_writes: tuple[str, ...] = (),
+   57 |         stable: bool = False,
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_dependencies.jac:56:40
+   54 | obj QueueTraceDecision {
+   55 |     has dependencies: tuple[str, ...] = (),
+   56 |         intervening_writes: tuple[str, ...] = (),
+      |                                        ^^^
+   57 |         stable: bool = False,
+   58 |         path_determined: bool = False,
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_dependencies.jac:72:24
+   70 |         handlers: dict[str, list[str]] = {},
+   71 |         dispatch: dict[int, list[str]] = {},
+   72 |         sql_templates: dict = {},
+      |                        ^^^^
+   73 |         interability_regions: dict = {};
+   74 | 
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_dependencies.jac:73:31
+   71 |         dispatch: dict[int, list[str]] = {},
+   72 |         sql_templates: dict = {},
+   73 |         interability_regions: dict = {};
+      |                               ^^^^
+   74 | 
+   75 |     def dependencies(event_id: int) -> list[TraceDependency] {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:84:43
+   82 | 
+   83 |     def predict_handler(
+   84 |         ability: str, snapshot: dict[str, any], max_steps: int = 1000
+      |                                           ^^^
+   85 |     ) -> TracePrediction {
+   86 |         result = TracePrediction();
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:145:29
+  143 |         target_index: int,
+  144 |         ability: str,
+  145 |         snapshot: dict[str, any],
+      |                             ^^^
+  146 |         point: int | None = None,
+  147 |         current_type: type | None = None
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:235:29
+  233 |     def predict_after(
+  234 |         point: int,
+  235 |         snapshot: dict[str, any],
+      |                             ^^^
+  236 |         isolated: bool = False,
+  237 |         max_steps: int = 1000
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:252:27
+  250 |         }
+  251 | 
+  252 |         values: dict[str, any] = {};
+      |                           ^^^
+  253 |         for (key, value) in snapshot.items() {
+  254 |             if type(value) not in (bool, int, float, str, type(None)) {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:346:27
+  344 | }
+  345 | 
+  346 | def _trace_text(ast_node: any) -> str {
+      |                           ^^^
+  347 |     if isinstance(ast_node, uni.Token) {
+  348 |         return ast_node.value;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:363:32
+  361 | }
+  362 | 
+  363 | def _trace_attribute(ast_node: any) -> str {
+      |                                ^^^
+  364 |     if isinstance(ast_node, pa.Name) {
+  365 |         return ast_node.id;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:373:27
+  371 | }
+  372 | 
+  373 | def _trace_expr(ast_node: any, ability: str) -> tuple[str, tuple[str, ...]] {
+      |                           ^^^
+  374 |     text = _trace_text(ast_node);
+  375 |     tree = pa.parse(text, mode='eval').body;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_dependencies.jac:373:71
+  371 | }
+  372 | 
+  373 | def _trace_expr(ast_node: any, ability: str) -> tuple[str, tuple[str, ...]] {
+      |                                                                       ^^^
+  374 |     text = _trace_text(ast_node);
+  375 |     tree = pa.parse(text, mode='eval').body;
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:381:28
+  379 | }
+  380 | 
+  381 | def _trace_check(ast_node: any, ability: str, reads: set[str]) {
+      |                            ^^^
+  382 |     if isinstance(ast_node, pa.Constant) {
+  383 |         if type(ast_node.value) not in (bool, int, float, str, type(None)) {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:419:46
+  417 | }
+  418 | 
+  419 | def _trace_eval(text: str, values: dict[str, any], ability: str) -> any {
+      |                                              ^^^
+  420 |     return _trace_value(pa.parse(text, mode='eval').body, values, ability);
+  421 | }
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:419:69
+  417 | }
+  418 | 
+  419 | def _trace_eval(text: str, values: dict[str, any], ability: str) -> any {
+      |                                                                     ^^^
+  420 |     return _trace_value(pa.parse(text, mode='eval').body, values, ability);
+  421 | }
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:423:28
+  421 | }
+  422 | 
+  423 | def _trace_value(ast_node: any, values: dict[str, any], ability: str) -> any {
+      |                            ^^^
+  424 |     if isinstance(ast_node, pa.Constant) {
+  425 |         return ast_node.value;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:423:51
+  421 | }
+  422 | 
+  423 | def _trace_value(ast_node: any, values: dict[str, any], ability: str) -> any {
+      |                                                   ^^^
+  424 |     if isinstance(ast_node, pa.Constant) {
+  425 |         return ast_node.value;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:423:74
+  421 | }
+  422 | 
+  423 | def _trace_value(ast_node: any, values: dict[str, any], ability: str) -> any {
+      |                                                                          ^^^
+  424 |     if isinstance(ast_node, pa.Constant) {
+  425 |         return ast_node.value;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:495:19
+  493 |         kind: str,
+  494 |         ability: str,
+  495 |         ast_node: any,
+      |                   ^^^
+  496 |         expression: str = '',
+  497 |         reads: tuple[str, ...] = (),
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_dependencies.jac:497:27
+  495 |         ast_node: any,
+  496 |         expression: str = '',
+  497 |         reads: tuple[str, ...] = (),
+      |                           ^^^
+  498 |         writes: str = ''
+  499 |     ) -> TraceEvent {
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:515:15
+  513 | 
+  514 |     def block(
+  515 |         body: any, ability: str, env: dict[str, int], controls: list[tuple[int, str]]
+      |               ^^^
+  516 |     ) -> tuple[int, int, dict[str, int]] {
+  517 |         first = -1;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:554:19
+  552 | 
+  553 |     def statement(
+  554 |         ast_node: any,
+      |                   ^^^
+  555 |         ability: str,
+  556 |         env: dict[str, int],
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:960:41
+  958 | }
+  959 | 
+  960 | def _trace_snapshot(snapshot: dict[str, any]) -> dict[str, any] {
+      |                                         ^^^
+  961 |     values: dict[str, any] = {};
+  962 |     for (key, value) in snapshot.items() {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:961:23
+  959 | 
+  960 | def _trace_snapshot(snapshot: dict[str, any]) -> dict[str, any] {
+  961 |     values: dict[str, any] = {};
+      |                       ^^^
+  962 |     for (key, value) in snapshot.items() {
+  963 |         if type(value) not in (bool, int, float, str, type(None)) {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:960:60
+  958 | }
+  959 | 
+  960 | def _trace_snapshot(snapshot: dict[str, any]) -> dict[str, any] {
+      |                                                            ^^^
+  961 |     values: dict[str, any] = {};
+  962 |     for (key, value) in snapshot.items() {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_dependencies.jac:1127:23
+ 1125 |         );
+ 1126 |     }
+ 1127 |     values: dict[str, any] = {};
+      |                       ^^^
+ 1128 |     for (name, value) in vars(scope.wlk).items() {
+ 1129 |         if type(value) in (bool, int, float, str, type(None)) {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_dependencies.jac:1213:9
+ 1211 |     output_tree = compile_effect_certificate(arch);
+ 1212 |     if output_tree is not None {
+ 1213 |         output_tree['entry'] = graph.entries[output_tree['ability']];
+      |         ^^^^^^^^^^^^^^^^^^^^
+ 1214 |         regions['regions'][str(output_tree['entry'])] = compile_tree_templates(
+ 1215 |             output_tree
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_dependencies.jac:1213:46
+ 1211 |     output_tree = compile_effect_certificate(arch);
+ 1212 |     if output_tree is not None {
+ 1213 |         output_tree['entry'] = graph.entries[output_tree['ability']];
+      |                                              ^^^^^^^^^^^^^^^^^^^^^^
+ 1214 |         regions['regions'][str(output_tree['entry'])] = compile_tree_templates(
+ 1215 |             output_tree
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_dependencies.jac:1213:32
+ 1211 |     output_tree = compile_effect_certificate(arch);
+ 1212 |     if output_tree is not None {
+ 1213 |         output_tree['entry'] = graph.entries[output_tree['ability']];
+      |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 1214 |         regions['regions'][str(output_tree['entry'])] = compile_tree_templates(
+ 1215 |             output_tree
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_dependencies.jac:1214:32
+ 1212 |     if output_tree is not None {
+ 1213 |         output_tree['entry'] = graph.entries[output_tree['ability']];
+ 1214 |         regions['regions'][str(output_tree['entry'])] = compile_tree_templates(
+      |                                ^^^^^^^^^^^^^^^^^^^^
+ 1215 |             output_tree
+ 1216 |         );
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_dependencies.jac:1181:53
+ 1179 | 
+ 1180 | 
+ 1181 | def compile_checkpoint_plan(arch: uni.Archetype) -> dict {
+      |                                                     ^^^^
+ 1182 |     import from jaclang.runtime.ttg_templates { compile_templates }
+ 1183 |     graph = analyze_walker_ast(arch);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_dependencies.jac:1260:28
+ 1258 | }
+ 1259 | 
+ 1260 | def checkpoint_graph(spec: dict, walker_type: type) -> WalkerDependencyGraph {
+      |                            ^^^^
+ 1261 |     if spec['version'] not in (1, 2) {
+ 1262 |         raise ValueError('Unsupported dependency checkpoint plan');
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W6002]: Use of JS-idiomatic method '.parse()' — use 'json.loads()' for cross-codespace portability
+  --> jac/jaclang/runtime/ttg_dependencies.jac:375:15
+  373 | def _trace_expr(ast_node: any, ability: str) -> tuple[str, tuple[str, ...]] {
+  374 |     text = _trace_text(ast_node);
+  375 |     tree = pa.parse(text, mode='eval').body;
+      |               ^^^^^
+  376 |     reads: set[str] = set();
+  377 |     _trace_check(tree, ability, reads);
+help: Use Jac common primitives instead of JS-specific methods.
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W6002]: Use of JS-idiomatic method '.parse()' — use 'json.loads()' for cross-codespace portability
+  --> jac/jaclang/runtime/ttg_dependencies.jac:420:28
+  418 | 
+  419 | def _trace_eval(text: str, values: dict[str, any], ability: str) -> any {
+  420 |     return _trace_value(pa.parse(text, mode='eval').body, values, ability);
+      |                            ^^^^^
+  421 | }
+  422 | 
+help: Use Jac common primitives instead of JS-specific methods.
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W6002]: Use of JS-idiomatic method '.parse()' — use 'json.loads()' for cross-codespace portability
+  --> jac/jaclang/runtime/ttg_dependencies.jac:560:23
+  558 |     ) -> tuple[int, int, dict[str, int]] {
+  559 |         try {
+  560 |             call = pa.parse(
+      |                       ^^^^^
+  561 |                 _trace_text(ast_node).strip().rstrip(';'), mode='eval'
+  562 |             ).body;
+help: Use Jac common primitives instead of JS-specific methods.
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W6002]: Use of JS-idiomatic method '.parse()' — use 'json.loads()' for cross-codespace portability
+  --> jac/jaclang/runtime/ttg_dependencies.jac:591:24
+  589 |                 (text, reads) = _trace_expr(ast_node.value, ability);
+  590 |                 name = _trace_attribute(
+  591 |                     pa.parse(_trace_text(ast_node.target[0]), mode='eval').body
+      |                        ^^^^^
+  592 |                 );
+  593 |                 if '.' in name
+help: Use Jac common primitives instead of JS-specific methods.
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W6002]: Use of JS-idiomatic method '.parse()' — use 'json.loads()' for cross-codespace portability
+  --> jac/jaclang/runtime/ttg_dependencies.jac:623:27
+  621 |                 (text, reads) = _trace_expr(ast_node.expr, ability);
+  622 | 
+  623 |                 leaf = pa.parse(text, mode='eval').body;
+      |                           ^^^^^
+  624 |                 if not isinstance(leaf, (pa.Constant, pa.Name, pa.Attribute)) {
+  625 |                     raise ValueError('Output expression requires evaluation');
+help: Use Jac common primitives instead of JS-specific methods.
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W6002]: Use of JS-idiomatic method '.parse()' — use 'json.loads()' for cross-codespace portability
+  --> jac/jaclang/runtime/ttg_dependencies.jac:768:27
+  766 |             and ast_node.aug_op is None {
+  767 |             try {
+  768 |                 left = pa.parse(_trace_text(ast_node.target[0]), mode='eval').body;
+      |                           ^^^^^
+  769 |                 right = pa.parse(_trace_text(ast_node.value), mode='eval').body;
+  770 |                 if isinstance(left, pa.Attribute)
+help: Use Jac common primitives instead of JS-specific methods.
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W6002]: Use of JS-idiomatic method '.parse()' — use 'json.loads()' for cross-codespace portability
+  --> jac/jaclang/runtime/ttg_dependencies.jac:769:28
+  767 |             try {
+  768 |                 left = pa.parse(_trace_text(ast_node.target[0]), mode='eval').body;
+  769 |                 right = pa.parse(_trace_text(ast_node.value), mode='eval').body;
+      |                            ^^^^^
+  770 |                 if isinstance(left, pa.Attribute)
+  771 |                     and isinstance(left.value, pa.Name)
+help: Use Jac common primitives instead of JS-specific methods.
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W3050]: Comment can be removed [strip-comments]
+  --> jac/jaclang/runtime/ttg_dependencies.jac:761:9
+  759 |         }
+  760 |         event = self.event('barrier', ability, ast_node);
+  761 |         # Summaries are conditional contracts, never an unconditional bypass
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  762 |         # in the legacy statement interpreter.
+  763 |         if isinstance(ast_node, uni.Assignment)
+help: Opt-in 'deslop' rule. Enable by adding "strip-comments" to [check.lint] select in jac.toml. `jac fmt --lintfix` then removes all comments; it never fires under select = ["all"] or ["default"].
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W3050]: Comment can be removed [strip-comments]
+  --> jac/jaclang/runtime/ttg_dependencies.jac:762:9
+  760 |         event = self.event('barrier', ability, ast_node);
+  761 |         # Summaries are conditional contracts, never an unconditional bypass
+  762 |         # in the legacy statement interpreter.
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  763 |         if isinstance(ast_node, uni.Assignment)
+  764 |             and len(ast_node.target) == 1
+help: Opt-in 'deslop' rule. Enable by adding "strip-comments" to [check.lint] select in jac.toml. `jac fmt --lintfix` then removes all comments; it never fires under select = ["all"] or ["default"].
+  → run 'jac guide reference/diagnostics' for guidance
+
+_____________________ jac/jaclang/runtime/ttg_regions.jac ______________________
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:15:28
+   13 | def _boolean_guard(expression: str) -> any {
+   14 |     tree = pa.parse(expression, mode='eval').body;
+   15 |     def lower(node_source: any) -> any {
+      |                            ^^^
+   16 |         if isinstance(node_source, pa.Attribute)
+   17 |             and isinstance(node_source.value, pa.Name)
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:15:36
+   13 | def _boolean_guard(expression: str) -> any {
+   14 |     tree = pa.parse(expression, mode='eval').body;
+   15 |     def lower(node_source: any) -> any {
+      |                                    ^^^
+   16 |         if isinstance(node_source, pa.Attribute)
+   17 |             and isinstance(node_source.value, pa.Name)
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:13:40
+   11 | 
+   12 | 
+   13 | def _boolean_guard(expression: str) -> any {
+      |                                        ^^^
+   14 |     tree = pa.parse(expression, mode='eval').body;
+   15 |     def lower(node_source: any) -> any {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:53:30
+   51 | 
+   52 | 
+   53 | def _guard_fields(predicate: dict) -> list[str] {
+      |                              ^^^^
+   54 |     if 'field' in predicate {
+   55 |         return [predicate['field']];
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:72:28
+   70 | 
+   71 | def _integer_output(expression: str) -> bool {
+   72 |     def check(node_source: any) -> bool {
+      |                            ^^^
+   73 |         if isinstance(node_source, pa.Constant) {
+   74 |             return type(node_source.value) is int;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:94:32
+   92 | 
+   93 | 
+   94 | def summarize_abilities(graph: any) -> dict {
+      |                                ^^^
+   95 |     # Effect and guarded-visit summaries are computed once by the compiler.
+   96 |     import from jaclang.runtime.ttg_access_slice { access_slice }
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:97:13
+   95 |     # Effect and guarded-visit summaries are computed once by the compiler.
+   96 |     import from jaclang.runtime.ttg_access_slice { access_slice }
+   97 |     sliced: dict = access_slice(
+      |             ^^^^
+   98 |         [
+   99 |             {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "set" used without type arguments, defaulting to "set[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:111:19
+  109 |     );
+  110 |     ignored = set(sliced['output_only']);
+  111 |     access_reads: set = set(sliced['shared_access_reads']);
+      |                   ^^^
+  112 |     integer_fields: set = set();
+  113 |     for e in graph.events {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "set" used without type arguments, defaulting to "set[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:112:21
+  110 |     ignored = set(sliced['output_only']);
+  111 |     access_reads: set = set(sliced['shared_access_reads']);
+  112 |     integer_fields: set = set();
+      |                     ^^^
+  113 |     for e in graph.events {
+  114 |         if e.kind in ('assign', 'scalar_update', 'append') {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:128:16
+  126 |         }
+  127 |     }
+  128 |     summaries: dict = {};
+      |                ^^^^
+  129 |     for (ability, entry_id) in graph.entries.items() {
+  130 |         events = [
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_regions.jac:133:29
+  131 |             e
+  132 |             for e in graph.events
+  133 |             if e.ability == ability
+      |                             ^^^^^^^
+  134 |         ];
+  135 |         types = [
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_regions.jac:138:16
+  136 |             name
+  137 |             for (name, handlers) in graph.handlers.items()
+  138 |             if ability in handlers
+      |                ^^^^^^^
+  139 |         ];
+  140 |         visits = [
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_regions.jac:138:27
+  136 |             name
+  137 |             for (name, handlers) in graph.handlers.items()
+  138 |             if ability in handlers
+      |                           ^^^^^^^^
+  139 |         ];
+  140 |         visits = [
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_regions.jac:136:13
+  134 |         ];
+  135 |         types = [
+  136 |             name
+      |             ^^^^
+  137 |             for (name, handlers) in graph.handlers.items()
+  138 |             if ability in handlers
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:145:19
+  143 |             if e.kind == 'visit'
+  144 |         ];
+  145 |         rejected: list = [];
+      |                   ^^^^
+  146 |         outputs: list = [];
+  147 |         for event in events {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:146:18
+  144 |         ];
+  145 |         rejected: list = [];
+  146 |         outputs: list = [];
+      |                  ^^^^
+  147 |         for event in events {
+  148 |             if event.kind == 'barrier' and event.id in ignored and event.effect {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_regions.jac:219:30
+  217 |             rejected.append(
+  218 |                 {
+  219 |                     'event': entry_id,
+      |                              ^^^^^^^^
+  220 |                     'reason': 'Region requires one exact dispatch type and at most one visit site'
+  221 |                 }
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:224:16
+  222 |             );
+  223 |         }
+  224 |         guard: dict = {'constant': True};
+      |                ^^^^
+  225 |         if visits {
+  226 |             visit_event = visits[0];
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:238:21
+  236 |                 );
+  237 |             }
+  238 |             guards: list = [];
+      |                     ^^^^
+  239 |             for edge_type in graph.edges {
+  240 |                 if edge_type.kind == 'control' and edge_type.target == visit_event.id {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_regions.jac:301:19
+  299 |             }
+  300 |         }
+  301 |         summaries[ability] = {
+      |                   ^^^^^^^
+  302 |             'ability': ability,
+  303 |             'access_slice': sliced,
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_regions.jac:302:24
+  300 |         }
+  301 |         summaries[ability] = {
+  302 |             'ability': ability,
+      |                        ^^^^^^^
+  303 |             'access_slice': sliced,
+  304 |             'entry': entry_id,
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_regions.jac:304:22
+  302 |             'ability': ability,
+  303 |             'access_slice': sliced,
+  304 |             'entry': entry_id,
+      |                      ^^^^^^^^
+  305 |             'source_type': types[0] if len(types) == 1 else '',
+  306 |             'eligible': not rejected,
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_regions.jac:129:10
+  127 |     }
+  128 |     summaries: dict = {};
+  129 |     for (ability, entry_id) in graph.entries.items() {
+      |          ^^^^^^^
+  130 |         events = [
+  131 |             e
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_regions.jac:129:19
+  127 |     }
+  128 |     summaries: dict = {};
+  129 |     for (ability, entry_id) in graph.entries.items() {
+      |                   ^^^^^^^^
+  130 |         events = [
+  131 |             e
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:94:40
+   92 | 
+   93 | 
+   94 | def summarize_abilities(graph: any) -> dict {
+      |                                        ^^^^
+   95 |     # Effect and guarded-visit summaries are computed once by the compiler.
+   96 |     import from jaclang.runtime.ttg_access_slice { access_slice }
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:340:41
+  338 | 
+  339 | 
+  340 | def compile_interability_regions(graph: any) -> dict {
+      |                                         ^^^
+  341 |     summaries = summarize_abilities(graph);
+  342 |     regions: dict = {};
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:342:14
+  340 | def compile_interability_regions(graph: any) -> dict {
+  341 |     summaries = summarize_abilities(graph);
+  342 |     regions: dict = {};
+      |              ^^^^
+  343 |     for (ability, summary) in summaries.items() {
+  344 |         if not summary['eligible'] or summary['visit'] < 0 {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:347:16
+  345 |             continue;
+  346 |         }
+  347 |         rules: list = [];
+      |                ^^^^
+  348 |         seen: dict = {};
+  349 |         active = ability;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:348:15
+  346 |         }
+  347 |         rules: list = [];
+  348 |         seen: dict = {};
+      |               ^^^^
+  349 |         active = ability;
+  350 |         while active not in seen {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:400:22
+  398 |             continue;
+  399 |         }
+  400 |         certificate: dict = {
+      |                      ^^^^
+  401 |             'version': 1,
+  402 |             'id': 'entry:' + str(summary['entry']),
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:340:49
+  338 | 
+  339 | 
+  340 | def compile_interability_regions(graph: any) -> dict {
+      |                                                 ^^^^
+  341 |     summaries = summarize_abilities(graph);
+  342 |     regions: dict = {};
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:437:27
+  435 | 
+  436 | 
+  437 | def _sql_guard(predicate: dict, props: any) -> any {
+      |                           ^^^^
+  438 |     if 'constant' in predicate {
+  439 |         return q.boolean(predicate['constant']);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_regions.jac:437:33
+  435 | 
+  436 | 
+  437 | def _sql_guard(predicate: dict, props: any) -> any {
+      |                                 ^^^^^
+  438 |     if 'constant' in predicate {
+  439 |         return q.boolean(predicate['constant']);
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:437:40
+  435 | 
+  436 | 
+  437 | def _sql_guard(predicate: dict, props: any) -> any {
+      |                                        ^^^
+  438 |     if 'constant' in predicate {
+  439 |         return q.boolean(predicate['constant']);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:437:48
+  435 | 
+  436 | 
+  437 | def _sql_guard(predicate: dict, props: any) -> any {
+      |                                                ^^^
+  438 |     if 'constant' in predicate {
+  439 |         return q.boolean(predicate['constant']);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:464:24
+  462 | 
+  463 | 
+  464 | def _region_rows(cols: any, walk: any, rules: list, actor: any) -> any {
+      |                        ^^^
+  465 |     bodies: list = [];
+  466 |     for rule in rules {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:464:35
+  462 | 
+  463 | 
+  464 | def _region_rows(cols: any, walk: any, rules: list, actor: any) -> any {
+      |                                   ^^^
+  465 |     bodies: list = [];
+  466 |     for rule in rules {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:464:47
+  462 | 
+  463 | 
+  464 | def _region_rows(cols: any, walk: any, rules: list, actor: any) -> any {
+      |                                               ^^^^
+  465 |     bodies: list = [];
+  466 |     for rule in rules {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:464:60
+  462 | 
+  463 | 
+  464 | def _region_rows(cols: any, walk: any, rules: list, actor: any) -> any {
+      |                                                            ^^^
+  465 |     bodies: list = [];
+  466 |     for rule in rules {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:465:13
+  463 | 
+  464 | def _region_rows(cols: any, walk: any, rules: list, actor: any) -> any {
+  465 |     bodies: list = [];
+      |             ^^^^
+  466 |     for rule in rules {
+  467 |         phase = rule['phase'];
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:464:68
+  462 | 
+  463 | 
+  464 | def _region_rows(cols: any, walk: any, rules: list, actor: any) -> any {
+      |                                                                    ^^^
+  465 |     bodies: list = [];
+  466 |     for rule in rules {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:563:31
+  561 | 
+  562 | 
+  563 | def compile_region_sql(rules: list, gated: bool) -> any {
+      |                               ^^^^
+  564 |     cols = _BuildColumns();
+  565 |     actor = {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:589:13
+  587 |     recursive = len(rules) == 1 and rules[0]['next_phase'] == 0;
+  588 |     walk = q.cte_ref(schema);
+  589 |     bodies: list = [];
+      |             ^^^^
+  590 |     for (phase, rule) in enumerate(rules) {
+  591 |         emitted = _region_rows(cols, walk, [rule], actor);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:563:53
+  561 | 
+  562 | 
+  563 | def compile_region_sql(rules: list, gated: bool) -> any {
+      |                                                     ^^^
+  564 |     cols = _BuildColumns();
+  565 |     actor = {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:669:12
+  667 | 
+  668 | def region_coverage_key(
+  669 |     graph: any,
+      |            ^^^
+  670 |     scope: any,
+  671 |     wlk: any,
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:670:12
+  668 | def region_coverage_key(
+  669 |     graph: any,
+  670 |     scope: any,
+      |            ^^^
+  671 |     wlk: any,
+  672 |     ability: str,
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:671:10
+  669 |     graph: any,
+  670 |     scope: any,
+  671 |     wlk: any,
+      |          ^^^
+  672 |     ability: str,
+  673 |     origin: any,
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:673:13
+  671 |     wlk: any,
+  672 |     ability: str,
+  673 |     origin: any,
+      |             ^^^
+  674 |     user_root: any,
+  675 |     cache_token: str
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:674:16
+  672 |     ability: str,
+  673 |     origin: any,
+  674 |     user_root: any,
+      |                ^^^
+  675 |     cache_token: str
+  676 | ) -> tuple {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "tuple" used without type arguments, defaulting to "tuple[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:676:6
+  674 |     user_root: any,
+  675 |     cache_token: str
+  676 | ) -> tuple {
+      |      ^^^^^
+  677 |     import from jaclang.runtime.graph_walk { access_gated }
+  678 |     actor = str(user_root.id) if access_gated() and user_root is not None else None;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:693:10
+  691 | 
+  692 | def resolve_interability_region(
+  693 |     mem: any,
+      |          ^^^
+  694 |     graph: any,
+  695 |     wlk: any,
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:694:12
+  692 | def resolve_interability_region(
+  693 |     mem: any,
+  694 |     graph: any,
+      |            ^^^
+  695 |     wlk: any,
+  696 |     scope: any,
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:695:10
+  693 |     mem: any,
+  694 |     graph: any,
+  695 |     wlk: any,
+      |          ^^^
+  696 |     scope: any,
+  697 |     point: int,
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:696:12
+  694 |     graph: any,
+  695 |     wlk: any,
+  696 |     scope: any,
+      |            ^^^
+  697 |     point: int,
+  698 |     current: dict,
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:698:14
+  696 |     scope: any,
+  697 |     point: int,
+  698 |     current: dict,
+      |              ^^^^
+  699 |     pending: list,
+  700 |     user_root: any,
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:699:14
+  697 |     point: int,
+  698 |     current: dict,
+  699 |     pending: list,
+      |              ^^^^
+  700 |     user_root: any,
+  701 |     max_rows: int,
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:700:16
+  698 |     current: dict,
+  699 |     pending: list,
+  700 |     user_root: any,
+      |                ^^^
+  701 |     max_rows: int,
+  702 |     metrics: dict,
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:702:14
+  700 |     user_root: any,
+  701 |     max_rows: int,
+  702 |     metrics: dict,
+      |              ^^^^
+  703 |     cache_token: str = ''
+  704 | ) -> any {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:761:33
+  759 |         );
+  760 |     }
+  761 |     def decline(reason: str) -> any {
+      |                                 ^^^
+  762 |         metrics['region_fallbacks'] = metrics.get('region_fallbacks', 0) + 1;
+  763 |         metrics['region_fallback_reason'] = reason;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:790:14
+  788 |         return decline('Walker field descriptors are unresolved');
+  789 |     }
+  790 |     queries: list = [];
+      |              ^^^^
+  791 |     values: dict = {'origin': UUID(str(current['id'])), 'row_limit': max_rows + 1};
+  792 |     if any(rule['next_phase'] >= 0 for rule in rules) {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:791:13
+  789 |     }
+  790 |     queries: list = [];
+  791 |     values: dict = {'origin': UUID(str(current['id'])), 'row_limit': max_rows + 1};
+      |             ^^^^
+  792 |     if any(rule['next_phase'] >= 0 for rule in rules) {
+  793 |         values['max_depth'] = max_rows;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:795:12
+  793 |         values['max_depth'] = max_rows;
+  794 |     }
+  795 |     actor: any = None;
+      |            ^^^
+  796 |     for (phase, rule) in enumerate(rules) {
+  797 |         source = continuation_type(wlk, rule['source_type']);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:982:17
+  980 |             return decline('Static region origin/dispatch is missing');
+  981 |         }
+  982 |         staged: list = [];
+      |                 ^^^^
+  983 |         payload: list = [];
+  984 |         paths: list = [];
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:983:18
+  981 |         }
+  982 |         staged: list = [];
+  983 |         payload: list = [];
+      |                  ^^^^
+  984 |         paths: list = [];
+  985 |         covered: list = [];
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:984:16
+  982 |         staged: list = [];
+  983 |         payload: list = [];
+  984 |         paths: list = [];
+      |                ^^^^
+  985 |         covered: list = [];
+  986 |         expected: tuple[int, int, UUID] | None = (0, 0, UUID(str(current['id'])));
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:985:18
+  983 |         payload: list = [];
+  984 |         paths: list = [];
+  985 |         covered: list = [];
+      |                  ^^^^
+  986 |         expected: tuple[int, int, UUID] | None = (0, 0, UUID(str(current['id'])));
+  987 |         for row in rows {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_regions.jac:1026:20
+ 1024 |                 return decline('Invalid static guard result');
+ 1025 |             }
+ 1026 |             pairs: list = [];
+      |                    ^^^^
+ 1027 |             if row[3] is not None {
+ 1028 |                 if int(row[8]) != 1 or int(row[7]) != 1 {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_regions.jac:704:6
+  702 |     metrics: dict,
+  703 |     cache_token: str = ''
+  704 | ) -> any {
+      |      ^^^
+  705 |     import from uuid { UUID }
+  706 |     import from jaclang.runtime.ttg_continuation {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W3030]: Function has 11 parameters (threshold is 7) [too-many-params]
+  --> jac/jaclang/runtime/ttg_regions.jac:692:32
+  690 | 
+  691 | 
+  692 | def resolve_interability_region(
+      |                                ^
+  693 |     mem: any,
+  694 |     graph: any,
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W3050]: Comment can be removed [strip-comments]
+  --> jac/jaclang/runtime/ttg_regions.jac:95:5
+   93 | 
+   94 | def summarize_abilities(graph: any) -> dict {
+   95 |     # Effect and guarded-visit summaries are computed once by the compiler.
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   96 |     import from jaclang.runtime.ttg_access_slice { access_slice }
+   97 |     sliced: dict = access_slice(
+help: Opt-in 'deslop' rule. Enable by adding "strip-comments" to [check.lint] select in jac.toml. `jac fmt --lintfix` then removes all comments; it never fires under select = ["all"] or ["default"].
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W3050]: Comment can be removed [strip-comments]
+  --> jac/jaclang/runtime/ttg_regions.jac:259:9
+  257 |             guard = {'and': guards} if guards else guard;
+  258 |         }
+  259 |         # Every branch must be representable, even if it only guards output.
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  260 |         for event in events {
+  261 |             if event.kind == 'branch' and event.id in ignored {
+help: Opt-in 'deslop' rule. Enable by adding "strip-comments" to [check.lint] select in jac.toml. `jac fmt --lintfix` then removes all comments; it never fires under select = ["all"] or ["default"].
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W3050]: Comment can be removed [strip-comments]
+  --> jac/jaclang/runtime/ttg_regions.jac:262:17
+  260 |         for event in events {
+  261 |             if event.kind == 'branch' and event.id in ignored {
+  262 |                 # Dependency independence is not permission to invoke a custom
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  263 |                 # truthiness/comparison hook. The runtime checks exact scalars.
+  264 |                 expression = pa.parse(event.expression, mode='eval').body;
+help: Opt-in 'deslop' rule. Enable by adding "strip-comments" to [check.lint] select in jac.toml. `jac fmt --lintfix` then removes all comments; it never fires under select = ["all"] or ["default"].
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W3050]: Comment can be removed [strip-comments]
+  --> jac/jaclang/runtime/ttg_regions.jac:263:17
+  261 |             if event.kind == 'branch' and event.id in ignored {
+  262 |                 # Dependency independence is not permission to invoke a custom
+  263 |                 # truthiness/comparison hook. The runtime checks exact scalars.
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  264 |                 expression = pa.parse(event.expression, mode='eval').body;
+  265 |                 if any(
+help: Opt-in 'deslop' rule. Enable by adding "strip-comments" to [check.lint] select in jac.toml. `jac fmt --lintfix` then removes all comments; it never fires under select = ["all"] or ["default"].
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W3050]: Comment can be removed [strip-comments]
+  --> jac/jaclang/runtime/ttg_regions.jac:965:9
+  963 |         }
+  964 |         descriptor = certificate['templates']['gated' if actor is not None else 'open'];
+  965 |         # Finite terminal regions have no depth slot; use the emitted contract exactly.
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  966 |         slots = {slot[0] for slot in descriptor['slots']};
+  967 |         values = {
+help: Opt-in 'deslop' rule. Enable by adding "strip-comments" to [check.lint] select in jac.toml. `jac fmt --lintfix` then removes all comments; it never fires under select = ["all"] or ["default"].
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W3051]: Docstring can be removed [strip-docstrings]
+  --> jac/jaclang/runtime/ttg_regions.jac:1:1
+    1 | """Compile-time, single-successor interability regions; no FIFO SQL interpreter."""
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    2 | import ast as pa;
+    3 | import from jaclang.runtime.ttg_templates {
+    4 |     sql_descriptor,
+    5 |     bind_template,
+help: Opt-in 'deslop' rule. Enable by adding "strip-docstrings" to [check.lint] select in jac.toml. `jac fmt --lintfix` then removes all docstrings; it never fires under select = ["all"] or ["default"].
+  → run 'jac guide reference/diagnostics' for guidance
+
+____________________ jac/jaclang/runtime/ttg_templates.jac _____________________
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:6:16
+    4 | import from time { perf_counter_ns, thread_time_ns }
+    5 | 
+    6 | glob _metrics: dict = {},
+      |                ^^^^
+    7 |      _profile: dict = {'enabled': False};
+    8 | 
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:7:16
+    5 | 
+    6 | glob _metrics: dict = {},
+    7 |      _profile: dict = {'enabled': False};
+      |                ^^^^
+    8 | 
+    9 | 
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:10:75
+    8 | 
+    9 | 
+   10 | def template_metrics(reset: bool = False, enabled: bool | None = None) -> dict {
+      |                                                                           ^^^^
+   11 |     if enabled is not None {
+   12 |         _profile['enabled'] = enabled;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/sql.jac:293:79
+  291 |                     | UUID
+  292 |                     | Decimal
+  293 |                     | tuple[bool | int | float | str | UUID | Decimal | None, ...]
+      |                                                                               ^^^
+  294 |                     | None
+  295 |             ],
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/sql.jac:296:44
+  294 |                     | None
+  295 |             ],
+  296 |         slots: tuple[tuple[str, DataType], ...] = (),
+      |                                            ^^^
+  297 |         nonnegative_slots: tuple[str, ...] = ();
+  298 | 
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/sql.jac:297:39
+  295 |             ],
+  296 |         slots: tuple[tuple[str, DataType], ...] = (),
+  297 |         nonnegative_slots: tuple[str, ...] = ();
+      |                                       ^^^
+  298 | 
+  299 |     def bind(
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:35:48
+   33 | 
+   34 | 
+   35 | def sql_descriptor(compiled: q.CompiledSQL) -> dict {
+      |                                                ^^^^
+   36 |     return {
+   37 |         'sql': compiled.sql,
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:47:36
+   45 | 
+   46 | 
+   47 | def hydrate_descriptor(descriptor: dict) -> any {
+      |                                    ^^^^
+   48 |     compiled = q.CompiledSQL(
+   49 |         sql=descriptor['sql'],
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_templates.jac:47:45
+   45 | 
+   46 | 
+   47 | def hydrate_descriptor(descriptor: dict) -> any {
+      |                                             ^^^
+   48 |     compiled = q.CompiledSQL(
+   49 |         sql=descriptor['sql'],
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_templates.jac:62:30
+   60 | 
+   61 | 
+   62 | def hydrate_templates(value: any) -> any {
+      |                              ^^^
+   63 |     if type(value) is dict {
+   64 |         result = {key: hydrate_templates(item) for (key, item) in value.items()};
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_templates.jac:64:42
+   62 | def hydrate_templates(value: any) -> any {
+   63 |     if type(value) is dict {
+   64 |         result = {key: hydrate_templates(item) for (key, item) in value.items()};
+      |                                          ^^^^
+   65 |         if 'sql' in result and 'slots' in result {
+   66 |             hydrate_descriptor(result);
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_templates.jac:64:53
+   62 | def hydrate_templates(value: any) -> any {
+   63 |     if type(value) is dict {
+   64 |         result = {key: hydrate_templates(item) for (key, item) in value.items()};
+      |                                                     ^^^
+   65 |         if 'sql' in result and 'slots' in result {
+   66 |             hydrate_descriptor(result);
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_templates.jac:64:58
+   62 | def hydrate_templates(value: any) -> any {
+   63 |     if type(value) is dict {
+   64 |         result = {key: hydrate_templates(item) for (key, item) in value.items()};
+      |                                                          ^^^^
+   65 |         if 'sql' in result and 'slots' in result {
+   66 |             hydrate_descriptor(result);
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_templates.jac:64:19
+   62 | def hydrate_templates(value: any) -> any {
+   63 |     if type(value) is dict {
+   64 |         result = {key: hydrate_templates(item) for (key, item) in value.items()};
+      |                   ^^^
+   65 |         if 'sql' in result and 'slots' in result {
+   66 |             hydrate_descriptor(result);
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_templates.jac:62:38
+   60 | 
+   61 | 
+   62 | def hydrate_templates(value: any) -> any {
+      |                                      ^^^
+   63 |     if type(value) is dict {
+   64 |         result = {key: hydrate_templates(item) for (key, item) in value.items()};
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:77:31
+   75 | 
+   76 | 
+   77 | def bind_template(descriptor: dict, values: dict) -> any {
+      |                               ^^^^
+   78 |     wall = perf_counter_ns() if _profile['enabled'] else 0;
+   79 |     cpu = thread_time_ns() if _profile['enabled'] else 0;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:77:45
+   75 | 
+   76 | 
+   77 | def bind_template(descriptor: dict, values: dict) -> any {
+      |                                             ^^^^
+   78 |     wall = perf_counter_ns() if _profile['enabled'] else 0;
+   79 |     cpu = thread_time_ns() if _profile['enabled'] else 0;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_templates.jac:77:54
+   75 | 
+   76 | 
+   77 | def bind_template(descriptor: dict, values: dict) -> any {
+      |                                                      ^^^
+   78 |     wall = perf_counter_ns() if _profile['enabled'] else 0;
+   79 |     cpu = thread_time_ns() if _profile['enabled'] else 0;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:92:29
+   90 | 
+   91 | 
+   92 | def select_template(bundle: dict, kind: str, gated: bool, event: int = -1) -> any {
+      |                             ^^^^
+   93 |     wall = perf_counter_ns() if _profile['enabled'] else 0;
+   94 |     cpu = thread_time_ns() if _profile['enabled'] else 0;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_templates.jac:92:79
+   90 | 
+   91 | 
+   92 | def select_template(bundle: dict, kind: str, gated: bool, event: int = -1) -> any {
+      |                                                                               ^^^
+   93 |     wall = perf_counter_ns() if _profile['enabled'] else 0;
+   94 |     cpu = thread_time_ns() if _profile['enabled'] else 0;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:107:31
+  105 | 
+  106 | 
+  107 | def compile_templates(events: list) -> dict {
+      |                               ^^^^
+  108 |     # Called by compile_checkpoint_plan, before serialized checkpoint emission.
+  109 |     import json;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:125:17
+  123 |                 and all(h[2] in (1, 2, 3) for h in e.hop_chain)
+  124 |         ];
+  125 |         bundle: dict = {
+      |                 ^^^^
+  126 |             'version': 1,
+  127 |             'sites': sites,
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:165:25
+  163 |                     ) for h in site['hops']
+  164 |                 ];
+  165 |                 native: dict = {};
+      |                         ^^^^
+  166 |                 for typed in (False, True) {
+  167 |                     cq = compile_query(
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:175:28
+  173 |                     params = dict(cq.params);
+  174 |                     params.pop('origin');
+  175 |                     slots: list = [['origin', 'text[]', False]];
+      |                            ^^^^
+  176 |                     for name in list(params) {
+  177 |                         if name.endswith('amu') or name.endswith('amt') {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:107:40
+  105 | 
+  106 | 
+  107 | def compile_templates(events: list) -> dict {
+      |                                        ^^^^
+  108 |     # Called by compile_checkpoint_plan, before serialized checkpoint emission.
+  109 |     import json;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_templates.jac:213:25
+  211 | 
+  212 | 
+  213 | def native_shape(query: any, upto: int) -> any {
+      |                         ^^^
+  214 |     if upto != len(query.hops)
+  215 |         or query.edges_only
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:223:12
+  221 |         return None;
+  222 |     }
+  223 |     shape: list = [];
+      |            ^^^^
+  224 |     for hop in query.hops {
+  225 |         if hop.epreds or hop.only is not None or isinstance(hop.nd, tuple) {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:228:21
+  226 |             return None;
+  227 |         }
+  228 |         predicates: list = [];
+      |                     ^^^^
+  229 |         for predicate in hop.preds {
+  230 |             if type(predicate.field) is not str
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_templates.jac:213:44
+  211 | 
+  212 | 
+  213 | def native_shape(query: any, upto: int) -> any {
+      |                                            ^^^
+  214 |     if upto != len(query.hops)
+  215 |         or query.edges_only
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_templates.jac:247:22
+  245 | 
+  246 | 
+  247 | def cache_key(query: any, origin_ids: list, actor: any) -> any {
+      |                      ^^^
+  248 |     shape = native_shape(query, len(query.hops));
+  249 |     if shape is None {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:247:39
+  245 | 
+  246 | 
+  247 | def cache_key(query: any, origin_ids: list, actor: any) -> any {
+      |                                       ^^^^
+  248 |     shape = native_shape(query, len(query.hops));
+  249 |     if shape is None {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_templates.jac:247:52
+  245 | 
+  246 | 
+  247 | def cache_key(query: any, origin_ids: list, actor: any) -> any {
+      |                                                    ^^^
+  248 |     shape = native_shape(query, len(query.hops));
+  249 |     if shape is None {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_templates.jac:247:60
+  245 | 
+  246 | 
+  247 | def cache_key(query: any, origin_ids: list, actor: any) -> any {
+      |                                                            ^^^
+  248 |     shape = native_shape(query, len(query.hops));
+  249 |     if shape is None {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_templates.jac:256:24
+  254 | 
+  255 | 
+  256 | def publish_paths(mem: any, staged: list) -> bool {
+      |                        ^^^
+  257 |     # Atomic publication into the same transaction epoch as native consumers.
+  258 |     import from jaclang.data.query_planner { _acl_pushdown_root, _query_cache_key }
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:256:37
+  254 | 
+  255 | 
+  256 | def publish_paths(mem: any, staged: list) -> bool {
+      |                                     ^^^^
+  257 |     # Atomic publication into the same transaction epoch as native consumers.
+  258 |     import from jaclang.data.query_planner { _acl_pushdown_root, _query_cache_key }
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:260:11
+  258 |     import from jaclang.data.query_planner { _acl_pushdown_root, _query_cache_key }
+  259 |     import from jaclang.runtime.graph_walk { access_gated }
+  260 |     puts: list = [];
+      |           ^^^^
+  261 |     for (query, origin_id, rows, descriptors) in staged {
+  262 |         actor = _acl_pushdown_root(query, len(query.hops), mem);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:276:21
+  274 |         for name in ('typed', 'pairs') {
+  275 |             desc = descriptors[name];
+  276 |             values: dict = {'origin': (str(origin_id), )};
+      |                     ^^^^
+  277 |             for (slot, dtype, nullable) in desc['slots'] {
+  278 |                 if slot != 'origin' {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_templates.jac:279:28
+  277 |             for (slot, dtype, nullable) in desc['slots'] {
+  278 |                 if slot != 'origin' {
+  279 |                     values[slot] = actor;
+      |                            ^^^^
+  280 |                 }
+  281 |             }
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_templates.jac:278:20
+  276 |             values: dict = {'origin': (str(origin_id), )};
+  277 |             for (slot, dtype, nullable) in desc['slots'] {
+  278 |                 if slot != 'origin' {
+      |                    ^^^^
+  279 |                     values[slot] = actor;
+  280 |                 }
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_templates.jac:277:18
+  275 |             desc = descriptors[name];
+  276 |             values: dict = {'origin': (str(origin_id), )};
+  277 |             for (slot, dtype, nullable) in desc['slots'] {
+      |                  ^^^^
+  278 |                 if slot != 'origin' {
+  279 |                     values[slot] = actor;
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_templates.jac:277:24
+  275 |             desc = descriptors[name];
+  276 |             values: dict = {'origin': (str(origin_id), )};
+  277 |             for (slot, dtype, nullable) in desc['slots'] {
+      |                        ^^^^^
+  278 |                 if slot != 'origin' {
+  279 |                     values[slot] = actor;
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_templates.jac:277:31
+  275 |             desc = descriptors[name];
+  276 |             values: dict = {'origin': (str(origin_id), )};
+  277 |             for (slot, dtype, nullable) in desc['slots'] {
+      |                               ^^^^^^^^
+  278 |                 if slot != 'origin' {
+  279 |                     values[slot] = actor;
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_templates.jac:309:10
+  307 | 
+  308 | def cached_emitted_path(
+  309 |     mem: any, query: any, origin_id: any, bundle: dict, event: int
+      |          ^^^
+  310 | ) -> any {
+  311 |     # Reuse a complete typed native path without constructing an AST or issuing SQL.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_templates.jac:309:22
+  307 | 
+  308 | def cached_emitted_path(
+  309 |     mem: any, query: any, origin_id: any, bundle: dict, event: int
+      |                      ^^^
+  310 | ) -> any {
+  311 |     # Reuse a complete typed native path without constructing an AST or issuing SQL.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_templates.jac:309:38
+  307 | 
+  308 | def cached_emitted_path(
+  309 |     mem: any, query: any, origin_id: any, bundle: dict, event: int
+      |                                      ^^^
+  310 | ) -> any {
+  311 |     # Reuse a complete typed native path without constructing an AST or issuing SQL.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:309:51
+  307 | 
+  308 | def cached_emitted_path(
+  309 |     mem: any, query: any, origin_id: any, bundle: dict, event: int
+      |                                                   ^^^^
+  310 | ) -> any {
+  311 |     # Reuse a complete typed native path without constructing an AST or issuing SQL.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/jaclang/runtime/ttg_templates.jac:328:17
+  326 |         }
+  327 |         descriptor = native['typed'];
+  328 |         values: dict = {'origin': (str(origin_id), )};
+      |                 ^^^^
+  329 |         for (name, dtype, nullable) in descriptor['slots'] {
+  330 |             if name != 'origin' {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_templates.jac:331:24
+  329 |         for (name, dtype, nullable) in descriptor['slots'] {
+  330 |             if name != 'origin' {
+  331 |                 values[name] = actor;
+      |                        ^^^^
+  332 |             }
+  333 |         }
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_templates.jac:330:16
+  328 |         values: dict = {'origin': (str(origin_id), )};
+  329 |         for (name, dtype, nullable) in descriptor['slots'] {
+  330 |             if name != 'origin' {
+      |                ^^^^
+  331 |                 values[name] = actor;
+  332 |             }
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_templates.jac:329:14
+  327 |         descriptor = native['typed'];
+  328 |         values: dict = {'origin': (str(origin_id), )};
+  329 |         for (name, dtype, nullable) in descriptor['slots'] {
+      |              ^^^^
+  330 |             if name != 'origin' {
+  331 |                 values[name] = actor;
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_templates.jac:329:20
+  327 |         descriptor = native['typed'];
+  328 |         values: dict = {'origin': (str(origin_id), )};
+  329 |         for (name, dtype, nullable) in descriptor['slots'] {
+      |                    ^^^^^
+  330 |             if name != 'origin' {
+  331 |                 values[name] = actor;
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/jaclang/runtime/ttg_templates.jac:329:27
+  327 |         descriptor = native['typed'];
+  328 |         values: dict = {'origin': (str(origin_id), )};
+  329 |         for (name, dtype, nullable) in descriptor['slots'] {
+      |                           ^^^^^^^^
+  330 |             if name != 'origin' {
+  331 |                 values[name] = actor;
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/jaclang/runtime/ttg_templates.jac:310:6
+  308 | def cached_emitted_path(
+  309 |     mem: any, query: any, origin_id: any, bundle: dict, event: int
+  310 | ) -> any {
+      |      ^^^
+  311 |     # Reuse a complete typed native path without constructing an AST or issuing SQL.
+  312 |     import from jaclang.data.query_planner { _acl_pushdown_root, _query_cache_key }
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W3050]: Comment can be removed [strip-comments]
+  --> jac/jaclang/runtime/ttg_templates.jac:108:5
+  106 | 
+  107 | def compile_templates(events: list) -> dict {
+  108 |     # Called by compile_checkpoint_plan, before serialized checkpoint emission.
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  109 |     import json;
+  110 |     import from jaclang.runtime.ttg_fusion_sql { compile_fused_region }
+help: Opt-in 'deslop' rule. Enable by adding "strip-comments" to [check.lint] select in jac.toml. `jac fmt --lintfix` then removes all comments; it never fires under select = ["all"] or ["default"].
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W3050]: Comment can be removed [strip-comments]
+  --> jac/jaclang/runtime/ttg_templates.jac:257:5
+  255 | 
+  256 | def publish_paths(mem: any, staged: list) -> bool {
+  257 |     # Atomic publication into the same transaction epoch as native consumers.
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  258 |     import from jaclang.data.query_planner { _acl_pushdown_root, _query_cache_key }
+  259 |     import from jaclang.runtime.graph_walk { access_gated }
+help: Opt-in 'deslop' rule. Enable by adding "strip-comments" to [check.lint] select in jac.toml. `jac fmt --lintfix` then removes all comments; it never fires under select = ["all"] or ["default"].
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W3050]: Comment can be removed [strip-comments]
+  --> jac/jaclang/runtime/ttg_templates.jac:283:13
+  281 |             }
+  282 |             compiled = bind_template(desc, values);
+  283 |             # Native legacy keys use lists; the cache freezer canonicalizes both.
+      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  284 |             legacy = _query_cache_key(
+  285 |                 'ttg_path' if name == 'typed' else 'pairs',
+help: Opt-in 'deslop' rule. Enable by adding "strip-comments" to [check.lint] select in jac.toml. `jac fmt --lintfix` then removes all comments; it never fires under select = ["all"] or ["default"].
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W3050]: Comment can be removed [strip-comments]
+  --> jac/jaclang/runtime/ttg_templates.jac:311:5
+  309 |     mem: any, query: any, origin_id: any, bundle: dict, event: int
+  310 | ) -> any {
+  311 |     # Reuse a complete typed native path without constructing an AST or issuing SQL.
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  312 |     import from jaclang.data.query_planner { _acl_pushdown_root, _query_cache_key }
+  313 |     import from jaclang.runtime.graph_walk { access_gated }
+help: Opt-in 'deslop' rule. Enable by adding "strip-comments" to [check.lint] select in jac.toml. `jac fmt --lintfix` then removes all comments; it never fires under select = ["all"] or ["default"].
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W3051]: Docstring can be removed [strip-docstrings]
+  --> jac/jaclang/runtime/ttg_templates.jac:1:1
+    1 | """Compiler-emitted SQL descriptors. Runtime selection and binding build no SQL AST."""
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    2 | import jaclang.sql as q;
+    3 | import from uuid { UUID }
+    4 | import from time { perf_counter_ns, thread_time_ns }
+    5 | 
+help: Opt-in 'deslop' rule. Enable by adding "strip-docstrings" to [check.lint] select in jac.toml. `jac fmt --lintfix` then removes all docstrings; it never fires under select = ["all"] or ["default"].
+  → run 'jac guide reference/diagnostics' for guidance
+
+_____________ jac/tests/runtimelib/fixtures/ttg_region_walkers.jac _____________
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/fixtures/ttg_region_walkers.jac:140:27
+  138 | 
+  139 | node DagCustomTweet(DagTweet) {
+  140 |     def __jac_access__ -> any {
+      |                           ^^^
+  141 |         raise AssertionError('Access hook must not run during certification');
+  142 |     }
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/tests/runtimelib/fixtures/ttg_region_walkers.jac:277:64
+  275 |             OutputRow(id=cur_id, name=here.name, depth=depth, path=path)
+  276 |         );
+  277 |         for child in [here->:OutputContains:->[?:OutputFolder, trashed==False]] {
+      |                                                                ^^^^^^^
+  278 |             child_id = jid(child);
+  279 |             self.depths[child_id] = depth + 1;
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/tests/runtimelib/fixtures/ttg_region_walkers.jac:282:57
+  280 |             self.paths[child_id] = path + '/' + child.name;
+  281 |         }
+  282 |         visit [here->:OutputContains:->[?:OutputFolder, trashed==False]];
+      |                                                         ^^^^^^^
+  283 |     }
+  284 | 
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W2075]: Redundant comparison to boolean literal — use the expression directly
+  --> jac/tests/runtimelib/fixtures/ttg_region_walkers.jac:277:64
+  275 |             OutputRow(id=cur_id, name=here.name, depth=depth, path=path)
+  276 |         );
+  277 |         for child in [here->:OutputContains:->[?:OutputFolder, trashed==False]] {
+      |                                                                ^^^^^^^^^^^^^^
+  278 |             child_id = jid(child);
+  279 |             self.depths[child_id] = depth + 1;
+  → run 'jac guide jac-sv-persistence' for guidance
+[WARNING] warning[W2075]: Redundant comparison to boolean literal — use the expression directly
+  --> jac/tests/runtimelib/fixtures/ttg_region_walkers.jac:282:57
+  280 |             self.paths[child_id] = path + '/' + child.name;
+  281 |         }
+  282 |         visit [here->:OutputContains:->[?:OutputFolder, trashed==False]];
+      |                                                         ^^^^^^^^^^^^^^
+  283 |     }
+  284 | 
+  → run 'jac guide jac-sv-persistence' for guidance
+
+________________ jac/tests/runtimelib/test_ttg_output_tree.jac _________________
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/tests/runtimelib/test_ttg_output_tree.jac:19:12
+   17 |     certificate = compile_effect_certificate(arch);
+   18 |     assert certificate is not None;
+   19 |     assert certificate['predicates'] == [['trashed', '==', False]];
+      |            ^^^^^^^^^^^^^^^^^^^^^^^^^
+   20 |     assert certificate['node_fields'] == ['name', 'trashed'];
+   21 |     spec = compile_checkpoint_plan(arch);
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/tests/runtimelib/test_ttg_output_tree.jac:20:12
+   18 |     assert certificate is not None;
+   19 |     assert certificate['predicates'] == [['trashed', '==', False]];
+   20 |     assert certificate['node_fields'] == ['name', 'trashed'];
+      |            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   21 |     spec = compile_checkpoint_plan(arch);
+   22 |     regions = spec['interability_regions']['regions'];
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> /home/baichuan/jaseci/jac-ttg/jac/jaclang/runtime/graph_query.jac:12:33
+   10 | 
+   11 | obj QPred {
+   12 |     has field: str | tuple[str, ...],
+      |                                 ^^^
+   13 |         op: str,
+   14 |         value: any;
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_output_tree.jac:67:13
+   65 |     certificate = compile_effect_certificate(arch);
+   66 |     wlk = OutputTree();
+   67 |     memory: any = SimpleNamespace(__mem__={});
+      |             ^^^
+   68 |     assert validate_effects(certificate, wlk, OutputFolder, memory, None)
+   69 |         == {'name': 'str', 'trashed': 'bool'};
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_output_tree.jac:87:13
+   85 |     certificate = compile_effect_certificate(arch);
+   86 |     wlk = OutputTree();
+   87 |     memory: any = SimpleNamespace(__mem__={});
+      |             ^^^
+   88 |     calls: list = [];
+   89 |     def unsafe(*args: any, **kwargs: any) -> any {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_output_tree.jac:89:23
+   87 |     memory: any = SimpleNamespace(__mem__={});
+   88 |     calls: list = [];
+   89 |     def unsafe(*args: any, **kwargs: any) -> any {
+      |                       ^^^
+   90 |         calls.append(True);
+   91 |         raise AssertionError('Unknown code executed');
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_output_tree.jac:89:38
+   87 |     memory: any = SimpleNamespace(__mem__={});
+   88 |     calls: list = [];
+   89 |     def unsafe(*args: any, **kwargs: any) -> any {
+      |                                      ^^^
+   90 |         calls.append(True);
+   91 |         raise AssertionError('Unknown code executed');
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_output_tree.jac:89:46
+   87 |     memory: any = SimpleNamespace(__mem__={});
+   88 |     calls: list = [];
+   89 |     def unsafe(*args: any, **kwargs: any) -> any {
+      |                                              ^^^
+   90 |         calls.append(True);
+   91 |         raise AssertionError('Unknown code executed');
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W2003]: 'args' is defined but never used
+  --> jac/tests/runtimelib/test_ttg_output_tree.jac:89:17
+   87 |     memory: any = SimpleNamespace(__mem__={});
+   88 |     calls: list = [];
+   89 |     def unsafe(*args: any, **kwargs: any) -> any {
+      |                 ^^^^
+   90 |         calls.append(True);
+   91 |         raise AssertionError('Unknown code executed');
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W2003]: 'kwargs' is defined but never used
+  --> jac/tests/runtimelib/test_ttg_output_tree.jac:89:30
+   87 |     memory: any = SimpleNamespace(__mem__={});
+   88 |     calls: list = [];
+   89 |     def unsafe(*args: any, **kwargs: any) -> any {
+      |                              ^^^^^^
+   90 |         calls.append(True);
+   91 |         raise AssertionError('Unknown code executed');
+  → run 'jac guide reference/diagnostics' for guidance
+
+_______________ jac/tests/runtimelib/test_ttg_regions_native.jac _______________
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:55:37
+   53 | 
+   54 | 
+   55 | def region_context(project: str) -> any {
+      |                                     ^^^
+   56 |     ctx = ExecutionContext(
+   57 |         base_path_dir=project, full_target_path=str(Path(project, 'region.jac'))
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:66:6
+   64 | def region_chain(
+   65 |     project: str, count: int, fanout: bool = False, cycle: bool = False
+   66 | ) -> list {
+      |      ^^^^
+   67 |     ctx = region_context(project);
+   68 |     try {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:90:10
+   88 |     project: str,
+   89 |     uid: UUID,
+   90 |     wlk: any,
+      |          ^^^
+   91 |     enabled: bool,
+   92 |     strict_cache: bool = False,
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:102:16
+  100 |         }
+  101 |         origin = ctx.mem.get(uid).archetype;
+  102 |         calls: list = [];
+      |                ^^^^
+  103 |         store: any = ctx.mem.store;
+  104 |         original: any = store.rows;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:103:16
+  101 |         origin = ctx.mem.get(uid).archetype;
+  102 |         calls: list = [];
+  103 |         store: any = ctx.mem.store;
+      |                ^^^
+  104 |         original: any = store.rows;
+  105 |         def capture(sql: str, params: dict) -> list {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:104:19
+  102 |         calls: list = [];
+  103 |         store: any = ctx.mem.store;
+  104 |         original: any = store.rows;
+      |                   ^^^
+  105 |         def capture(sql: str, params: dict) -> list {
+  106 |             rows = original(sql, params);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:105:39
+  103 |         store: any = ctx.mem.store;
+  104 |         original: any = store.rows;
+  105 |         def capture(sql: str, params: dict) -> list {
+      |                                       ^^^^
+  106 |             rows = original(sql, params);
+  107 |             calls.append({'sql': sql, 'params': params, 'rows': len(rows)});
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:105:48
+  103 |         store: any = ctx.mem.store;
+  104 |         original: any = store.rows;
+  105 |         def capture(sql: str, params: dict) -> list {
+      |                                                ^^^^
+  106 |             rows = original(sql, params);
+  107 |             calls.append({'sql': sql, 'params': params, 'rows': len(rows)});
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:112:23
+  110 |         import jaclang.data.query_planner as planner;
+  111 |         import from contextlib { nullcontext }
+  112 |         native_reads: list = [];
+      |                       ^^^^
+  113 |         original_pairs: any = planner._sql_pairs;
+  114 |         def pairs(mem: any, origin_ids: list, query: any, upto: int) -> any {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:113:25
+  111 |         import from contextlib { nullcontext }
+  112 |         native_reads: list = [];
+  113 |         original_pairs: any = planner._sql_pairs;
+      |                         ^^^
+  114 |         def pairs(mem: any, origin_ids: list, query: any, upto: int) -> any {
+  115 |             before = len(calls);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:114:24
+  112 |         native_reads: list = [];
+  113 |         original_pairs: any = planner._sql_pairs;
+  114 |         def pairs(mem: any, origin_ids: list, query: any, upto: int) -> any {
+      |                        ^^^
+  115 |             before = len(calls);
+  116 |             result = original_pairs(mem, origin_ids, query, upto);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:114:41
+  112 |         native_reads: list = [];
+  113 |         original_pairs: any = planner._sql_pairs;
+  114 |         def pairs(mem: any, origin_ids: list, query: any, upto: int) -> any {
+      |                                         ^^^^
+  115 |             before = len(calls);
+  116 |             result = original_pairs(mem, origin_ids, query, upto);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:114:54
+  112 |         native_reads: list = [];
+  113 |         original_pairs: any = planner._sql_pairs;
+  114 |         def pairs(mem: any, origin_ids: list, query: any, upto: int) -> any {
+      |                                                      ^^^
+  115 |             before = len(calls);
+  116 |             result = original_pairs(mem, origin_ids, query, upto);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:114:73
+  112 |         native_reads: list = [];
+  113 |         original_pairs: any = planner._sql_pairs;
+  114 |         def pairs(mem: any, origin_ids: list, query: any, upto: int) -> any {
+      |                                                                         ^^^
+  115 |             before = len(calls);
+  116 |             result = original_pairs(mem, origin_ids, query, upto);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1051]: Expression type could not be resolved (Unknown)
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:140:17
+  138 |                 ctx, max_length=2048, mode=executor, workers=1, fused_sql=enabled
+  139 |             ) as run {
+  140 |                 origin spawn wlk;
+      |                 ^^^^^^^^^^^^^^^^
+  141 |             }
+  142 |         }
+help: Often fixed by adding a more specific type annotation to the relevant declaration (e.g., 'list[Task]' instead of bare 'list', or annotating an unannotated parameter or attribute). Can also indicate an unresolved import, a forward reference the checker cannot bind, or fallout from an upstream error.
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "tuple" used without type arguments, defaulting to "tuple[any]"; consider adding explicit type arguments
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:95:6
+   93 |     actor: str = '',
+   94 |     executor: str = 'process'
+   95 | ) -> tuple {
+      |      ^^^^^
+   96 |     ctx = region_context(project);
+   97 |     try {
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:269:26
+  267 |                 graph = checkpoint_graph(spec, RegionTraverse);
+  268 |                 scope = SimpleNamespace(path=[origin], ignores=[]);
+  269 |                 metrics: dict = {
+      |                          ^^^^
+  270 |                     'queries': 0,
+  271 |                     'regions': [],
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:327:24
+  325 |             try {
+  326 |                 ctx.mem.read_barrier();
+  327 |                 store: any = ctx.mem.store;
+      |                        ^^^
+  328 |                 if variant == 'missing' {
+  329 |                     store.rows(
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:349:24
+  347 |             try {
+  348 |                 ctx.mem.read_barrier();
+  349 |                 store: any = ctx.mem.store;
+      |                        ^^^
+  350 |                 if variant == 'missing' {
+  351 |                     store.rows(
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:389:22
+  387 |             for mode in ('setter', 'exit') {
+  388 |                 wlk = RegionAssign() if mode == 'setter' else RegionTraverse();
+  389 |                 cls: any = type(wlk);
+      |                      ^^^
+  390 |                 arch = JacTTGGenerator._find_walker_ast_node(cls);
+  391 |                 assert arch is not None;
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:395:26
+  393 |                 graph = checkpoint_graph(spec, cls);
+  394 |                 scope = SimpleNamespace(path=[origin], ignores=[]);
+  395 |                 metrics: dict = {
+      |                          ^^^^
+  396 |                     'queries': 0,
+  397 |                     'regions': [],
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "list" used without type arguments, defaulting to "list[any]"; consider adding explicit type arguments
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:401:24
+  399 |                     'cache_empty_paths': 0
+  400 |                 };
+  401 |                 calls: list = [];
+      |                        ^^^^
+  402 |                 def forbidden(value: any) -> any {
+  403 |                     calls.append(value);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:402:38
+  400 |                 };
+  401 |                 calls: list = [];
+  402 |                 def forbidden(value: any) -> any {
+      |                                      ^^^
+  403 |                     calls.append(value);
+  404 |                     raise AssertionError('descriptor called');
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:402:46
+  400 |                 };
+  401 |                 calls: list = [];
+  402 |                 def forbidden(value: any) -> any {
+      |                                              ^^^
+  403 |                     calls.append(value);
+  404 |                     raise AssertionError('descriptor called');
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:499:21
+  497 |         ctx = region_context(project);
+  498 |         try {
+  499 |             reader: any = Root().__jac__;
+      |                     ^^^
+  500 |             reader.persistent = True;
+  501 |             setattr(reader, 'root', reader.id);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:505:25
+  503 |             nodes = [RegionItem(value=i) for i in range(3)];
+  504 |             for item in nodes {
+  505 |                 anchor: any = item.__jac__;
+      |                         ^^^
+  506 |                 anchor.persistent = True;
+  507 |                 setattr(anchor, 'root', reader.id);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:530:22
+  528 |             graph = checkpoint_graph(spec, RegionTraverse);
+  529 |             scope = SimpleNamespace(path=[anchors[0]], ignores=[]);
+  530 |             metrics: dict = {
+      |                      ^^^^
+  531 |                 'queries': 0,
+  532 |                 'regions': [],
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:552:24
+  550 |                 );
+  551 |                 assert result is not None , str(metrics);
+  552 |                 store: any = ctx.mem.store;
+      |                        ^^^
+  553 |                 with patch.object(
+  554 |                     store, 'rows', side_effect=AssertionError('native cache requery')
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:617:25
+  615 |             try {
+  616 |                 origin = Root();
+  617 |                 anchor: any = origin.__jac__;
+      |                         ^^^
+  618 |                 anchor.persistent = True;
+  619 |                 setattr(anchor, 'root', anchor.id);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:634:25
+  632 |                 }
+  633 |                 hidden = DagTweet(value=999);
+  634 |                 denied: any = hidden.__jac__;
+      |                         ^^^
+  635 |                 denied.persistent = True;
+  636 |                 setattr(denied, 'root', UUID(int=123456));
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:684:26
+  682 |             for altered in (False, True) {
+  683 |                 import from contextlib { nullcontext }
+  684 |                 metrics: dict = {
+      |                          ^^^^
+  685 |                     'queries': 0,
+  686 |                     'cache_paths': 0,
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:733:20
+  731 |         ctx = region_context(project);
+  732 |         try {
+  733 |             actor: any = Root().__jac__;
+      |                    ^^^
+  734 |             actor.persistent = True;
+  735 |             setattr(actor, 'root', actor.id);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:737:21
+  735 |             setattr(actor, 'root', actor.id);
+  736 |             ctx.mem.put(actor);
+  737 |             custom: any = DagCustomTweet().__jac__;
+      |                     ^^^
+  738 |             custom.persistent = True;
+  739 |             setattr(custom, 'root', actor.id);
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:754:22
+  752 |             graph = checkpoint_graph(spec, DagFeed);
+  753 |             scope = SimpleNamespace(path=[ctx.mem.get(uid)], ignores=[]);
+  754 |             metrics: dict = {
+      |                      ^^^^
+  755 |                 'queries': 0,
+  756 |                 'cache_paths': 0,
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:827:29
+  825 |         assert 'Output map ownership is unproved; a fresh dominating allocation is required'
+  826 |             in observed[1]['fusion']['region_fallback_reasons'];
+  827 |         def fake_jid(value: any) -> str {
+      |                             ^^^
+  828 |             return 'shadowed';
+  829 |         }
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:913:24
+  911 |             if variant == 'malformed' {
+  912 |                 ctx.mem.read_barrier();
+  913 |                 store: any = ctx.mem.store;
+      |                        ^^^
+  914 |                 store.rows(
+  915 |                     "UPDATE anchors SET props=jsonb_set(props,'{archetype,trashed}',CAST(:value AS jsonb)) WHERE id=:id",
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1037]: Explicit 'any' type annotation disables type checking here; consider a more specific type
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:925:20
+  923 |             spec = compile_checkpoint_plan(arch);
+  924 |             graph = checkpoint_graph(spec, OutputTree);
+  925 |             scope: any = SimpleNamespace(path=[origin], ignores=[]);
+      |                    ^^^
+  926 |             metrics: dict = {
+  927 |                 'queries': 0,
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W1036]: Generic type "dict" used without type arguments, defaulting to "dict[any]"; consider adding explicit type arguments
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:926:22
+  924 |             graph = checkpoint_graph(spec, OutputTree);
+  925 |             scope: any = SimpleNamespace(path=[origin], ignores=[]);
+  926 |             metrics: dict = {
+      |                      ^^^^
+  927 |                 'queries': 0,
+  928 |                 'regions': [],
+  → run 'jac guide jac-types' for guidance
+[WARNING] warning[W2003]: 'value' is defined but never used
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:827:22
+  825 |         assert 'Output map ownership is unproved; a fresh dominating allocation is required'
+  826 |             in observed[1]['fusion']['region_fallback_reasons'];
+  827 |         def fake_jid(value: any) -> str {
+      |                      ^^^^^
+  828 |             return 'shadowed';
+  829 |         }
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W2003]: 'baseline_result' is defined but never used
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:870:5
+  868 |     ctx.close();
+  869 |     baseline = OutputTree();
+  870 |     baseline_result = region_run(project, uid, baseline, False, executor='thread');
+      |     ^^^^^^^^^^^^^^^
+  871 |     fused = OutputTree();
+  872 |     result = region_run(project, uid, fused, True, executor='thread');
+  → run 'jac guide reference/diagnostics' for guidance
+[WARNING] warning[W2075]: Redundant comparison to boolean literal — use the expression directly
+  --> jac/tests/runtimelib/test_ttg_regions_native.jac:806:16
+  804 |         );
+  805 |         assert optimized.total == plain.total == 5;
+  806 |         assert optimized.first == plain.first == False;
+      |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  807 |         assert observed[1]['fusion']['region_queries'] == 1;
+  808 |         first = SliceIdentityMap();
+  → run 'jac guide jac-sv-persistence' for guidance
+
+============================== 6 passed in 10.74s ==============================

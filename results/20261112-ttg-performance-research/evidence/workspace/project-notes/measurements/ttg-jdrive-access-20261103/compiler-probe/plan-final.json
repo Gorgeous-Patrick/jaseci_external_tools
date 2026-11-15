@@ -1,0 +1,1113 @@
+{
+  "version": 2,
+  "sql_templates": {
+    "version": 1,
+    "sites": [],
+    "batch": {},
+    "linear": {},
+    "native": {}
+  },
+  "interability_regions": {
+    "version": 1,
+    "summaries": {
+      "walk": {
+        "ability": "walk",
+        "access_slice": {
+          "version": 1,
+          "roots": [
+            7,
+            11,
+            12,
+            13,
+            14,
+            15,
+            18
+          ],
+          "relevant": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            18
+          ],
+          "output_only": [],
+          "shared_access_reads": [
+            "self.start_id"
+          ],
+          "unresolved_effects": [
+            7,
+            11,
+            12,
+            13,
+            14,
+            15,
+            18
+          ],
+          "conditional_contracts": {
+            "1": {
+              "contract": "node_identity",
+              "binding": "jid"
+            },
+            "6": {
+              "contract": "identity_map_write",
+              "field": "self.depths",
+              "fresh": false
+            }
+          },
+          "contract": "Output-only is a dependency fact, not an effect-safety proof; retain native execution and validate descriptors, aliases and exceptions before predictive use."
+        },
+        "entry": 0,
+        "source_type": "Folder",
+        "eligible": false,
+        "rejections": [
+          {
+            "event": 1,
+            "reason": "Unknown effect, loop, helper call, write or cancellation"
+          },
+          {
+            "event": 5,
+            "reason": "Shared access state or non-output assignment"
+          },
+          {
+            "event": 6,
+            "reason": "Unknown effect, loop, helper call, write or cancellation"
+          },
+          {
+            "event": 7,
+            "reason": "Unknown effect, loop, helper call, write or cancellation"
+          },
+          {
+            "event": 11,
+            "reason": "Unknown effect, loop, helper call, write or cancellation"
+          },
+          {
+            "event": 12,
+            "reason": "Unknown effect, loop, helper call, write or cancellation"
+          },
+          {
+            "event": 13,
+            "reason": "Unknown effect, loop, helper call, write or cancellation"
+          },
+          {
+            "event": 14,
+            "reason": "Unknown effect, loop, helper call, write or cancellation"
+          },
+          {
+            "event": 15,
+            "reason": "Unknown effect, loop, helper call, write or cancellation"
+          },
+          {
+            "event": 3,
+            "reason": "Shared or unsupported branch"
+          }
+        ],
+        "outputs": [],
+        "frontier_independent_prefix": false,
+        "shared_access_reads": [
+          "self.start_id"
+        ],
+        "visit": -1,
+        "guard": {
+          "constant": true
+        },
+        "guard_fields": [],
+        "dispatch": [],
+        "external_dependencies": [
+          "origin identity",
+          "exact runtime dispatch",
+          "actor/ACL context"
+        ],
+        "sql_internal_dependencies": [],
+        "checkpoint_proof": "Entry follows origin/context binding; no shared guard input or mutable external threshold is admitted"
+      },
+      "done": {
+        "ability": "done",
+        "access_slice": {
+          "version": 1,
+          "roots": [
+            7,
+            11,
+            12,
+            13,
+            14,
+            15,
+            18
+          ],
+          "relevant": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            18
+          ],
+          "output_only": [],
+          "shared_access_reads": [
+            "self.start_id"
+          ],
+          "unresolved_effects": [
+            7,
+            11,
+            12,
+            13,
+            14,
+            15,
+            18
+          ],
+          "conditional_contracts": {
+            "1": {
+              "contract": "node_identity",
+              "binding": "jid"
+            },
+            "6": {
+              "contract": "identity_map_write",
+              "field": "self.depths",
+              "fresh": false
+            }
+          },
+          "contract": "Output-only is a dependency fact, not an effect-safety proof; retain native execution and validate descriptors, aliases and exceptions before predictive use."
+        },
+        "entry": 17,
+        "source_type": "Folder",
+        "eligible": false,
+        "rejections": [
+          {
+            "event": 18,
+            "reason": "Unknown effect, loop, helper call, write or cancellation"
+          }
+        ],
+        "outputs": [],
+        "frontier_independent_prefix": false,
+        "shared_access_reads": [
+          "self.start_id"
+        ],
+        "visit": -1,
+        "guard": {
+          "constant": true
+        },
+        "guard_fields": [],
+        "dispatch": [],
+        "external_dependencies": [
+          "origin identity",
+          "exact runtime dispatch",
+          "actor/ACL context"
+        ],
+        "sql_internal_dependencies": [],
+        "checkpoint_proof": "Entry follows origin/context binding; no shared guard input or mutable external threshold is admitted"
+      }
+    },
+    "regions": {
+      "0": {
+        "version": 1,
+        "kind": "output_tree",
+        "ability": "walk",
+        "source_type": "Folder",
+        "hops": [
+          [
+            "Contains",
+            "Folder",
+            2
+          ]
+        ],
+        "predicates": [
+          [
+            "trashed",
+            "==",
+            false
+          ]
+        ],
+        "effects": [
+          {
+            "kind": "assign",
+            "left": "cur_id",
+            "right": "jid(here)"
+          },
+          {
+            "kind": "if",
+            "condition": "not self.start_id",
+            "body": [
+              {
+                "kind": "assign",
+                "left": "self.start_id",
+                "right": "cur_id"
+              },
+              {
+                "kind": "assign",
+                "left": "self.depths[cur_id]",
+                "right": "0"
+              },
+              {
+                "kind": "assign",
+                "left": "self.paths[cur_id]",
+                "right": "here.name"
+              }
+            ]
+          },
+          {
+            "kind": "assign",
+            "left": "depth",
+            "right": "self.depths.get(cur_id, 0)"
+          },
+          {
+            "kind": "assign",
+            "left": "path",
+            "right": "self.paths.get(cur_id, here.name)"
+          },
+          {
+            "kind": "append",
+            "field": "entries",
+            "value": "self.entries.append(FolderTreeEntry(id=cur_id, name=here.name, depth=depth, path=path))"
+          },
+          {
+            "kind": "for",
+            "target": "child",
+            "body": [
+              {
+                "kind": "assign",
+                "left": "child_id",
+                "right": "jid(child)"
+              },
+              {
+                "kind": "assign",
+                "left": "self.depths[child_id]",
+                "right": "depth + 1"
+              },
+              {
+                "kind": "assign",
+                "left": "self.paths[child_id]",
+                "right": "path + '/' + child.name"
+              }
+            ]
+          }
+        ],
+        "exits": [
+          {
+            "kind": "if",
+            "condition": "jid(here) == self.start_id",
+            "body": [
+              {
+                "kind": "sort",
+                "field": "entries",
+                "key": "path"
+              },
+              {
+                "kind": "report",
+                "value": "FolderTreeView(id=self.start_id, entries=self.entries)"
+              }
+            ]
+          }
+        ],
+        "exit_abilities": [
+          "done"
+        ],
+        "node_fields": [
+          "name",
+          "trashed"
+        ],
+        "self_fields": [
+          "depths",
+          "entries",
+          "paths",
+          "start_id"
+        ],
+        "constructors": [
+          "FolderTreeEntry",
+          "FolderTreeView"
+        ],
+        "visit_line": 61,
+        "dependency_proof": "Unconditional trailing visit has only origin/type/constant-predicate inputs; checked output grammar has no graph/queue writes. Runtime ownership, field and constructor contracts remain mandatory.",
+        "entry": 0,
+        "templates": {
+          "open": {
+            "sql": "WITH RECURSIVE \"_cte0\" (\"origin_id\") AS (SELECT * FROM (SELECT CAST(:origin AS uuid) AS \"origin_id\") AS \"_recursive_anchor\" UNION SELECT \"_t10\".\"target_id\" AS \"origin_id\" FROM \"_cte0\" AS \"_t0\" CROSS JOIN LATERAL (SELECT \"_t12\".\"id\" AS \"target_id\", \"_t11\".\"id\" AS \"edge_id\", \"_t12\".\"arch_type\" AS \"arch_type\", \"_t12\".\"arch_module\" AS \"arch_module\", ROW_NUMBER() OVER (ORDER BY \"_t11\".\"seq\" ASC, \"_t11\".\"id\" ASC) AS \"ord\", COUNT(*) OVER () AS \"arity\" FROM \"anchors\" AS \"_t11\" INNER JOIN \"anchors\" AS \"_t12\" ON ((\"_t12\".\"id\" = (CASE WHEN (\"_t11\".\"src\" = \"_t0\".\"origin_id\") THEN \"_t11\".\"dst\" ELSE \"_t11\".\"src\" END)) AND (\"_t12\".\"kind\" = CAST(:p0 AS text)) AND ((CAST(:p1 AS text) IS NULL) OR (\"_t12\".\"arch_type\" = CAST(:p1 AS text)) OR (\"_t12\".\"arch_type\" IN (SELECT \"_t13\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t13\" WHERE (\"_t13\".\"ancestor\" = CAST(:p1 AS text))))) AND CAST(:p2 AS boolean)) WHERE (((\"_t11\".\"kind\" = CAST(:p3 AS text)) AND ((\"_t11\".\"src\" = \"_t0\".\"origin_id\") OR (\"_t11\".\"undirected\" AND (\"_t11\".\"dst\" = \"_t0\".\"origin_id\"))) AND ((CAST(:p4 AS text) IS NULL) OR (\"_t11\".\"arch_type\" = CAST(:p4 AS text)) OR (\"_t11\".\"arch_type\" IN (SELECT \"_t14\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t14\" WHERE (\"_t14\".\"ancestor\" = CAST(:p4 AS text)))))))) AS \"_t10\" INNER JOIN \"anchors\" AS \"_t15\" ON (\"_t15\".\"id\" = \"_t10\".\"target_id\") WHERE ((\"_t10\".\"arch_type\" = CAST(:p5 AS text)) AND (\"_t10\".\"arch_module\" = CAST(:node_module AS text)) AND (jsonb_typeof(((\"_t15\".\"props\" -> CAST(:p6 AS text)) -> CAST(:p7 AS text))) = CAST(:p8 AS text)) AND (((\"_t15\".\"props\" -> CAST(:p6 AS text)) ->> CAST(:p9 AS text)) = CAST(:p10 AS text)))) SELECT * FROM (SELECT \"_t0\".\"origin_id\" AS \"origin_id\", \"_t2\".\"target_id\" AS \"target_id\", \"_t2\".\"edge_id\" AS \"edge_id\", \"_t2\".\"arch_type\" AS \"arch_type\", \"_t2\".\"arch_module\" AS \"arch_module\", \"_t2\".\"ord\" AS \"ord\", \"_t2\".\"arity\" AS \"arity\", \"_t1\".\"props\" AS \"source_props\", \"_t8\".\"props\" AS \"target_props\", \"_t1\".\"arch_type\" AS \"source_type\", \"_t1\".\"arch_module\" AS \"source_module\" FROM \"_cte0\" AS \"_t0\" INNER JOIN \"anchors\" AS \"_t1\" ON (\"_t1\".\"id\" = \"_t0\".\"origin_id\") LEFT JOIN LATERAL (SELECT \"_t5\".\"id\" AS \"target_id\", \"_t4\".\"id\" AS \"edge_id\", \"_t5\".\"arch_type\" AS \"arch_type\", \"_t5\".\"arch_module\" AS \"arch_module\", ROW_NUMBER() OVER (ORDER BY \"_t4\".\"seq\" ASC, \"_t4\".\"id\" ASC) AS \"ord\", COUNT(*) OVER () AS \"arity\" FROM \"anchors\" AS \"_t4\" INNER JOIN \"anchors\" AS \"_t5\" ON ((\"_t5\".\"id\" = (CASE WHEN (\"_t4\".\"src\" = \"_t0\".\"origin_id\") THEN \"_t4\".\"dst\" ELSE \"_t4\".\"src\" END)) AND (\"_t5\".\"kind\" = CAST(:p12 AS text)) AND ((CAST(:p13 AS text) IS NULL) OR (\"_t5\".\"arch_type\" = CAST(:p13 AS text)) OR (\"_t5\".\"arch_type\" IN (SELECT \"_t6\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t6\" WHERE (\"_t6\".\"ancestor\" = CAST(:p13 AS text))))) AND CAST(:p14 AS boolean)) WHERE (((\"_t4\".\"kind\" = CAST(:p15 AS text)) AND ((\"_t4\".\"src\" = \"_t0\".\"origin_id\") OR (\"_t4\".\"undirected\" AND (\"_t4\".\"dst\" = \"_t0\".\"origin_id\"))) AND ((CAST(:p16 AS text) IS NULL) OR (\"_t4\".\"arch_type\" = CAST(:p16 AS text)) OR (\"_t4\".\"arch_type\" IN (SELECT \"_t7\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t7\" WHERE (\"_t7\".\"ancestor\" = CAST(:p16 AS text)))))))) AS \"_t2\" ON CAST(:p11 AS boolean) LEFT JOIN \"anchors\" AS \"_t8\" ON (\"_t8\".\"id\" = \"_t2\".\"target_id\")) AS \"_set\" (\"origin_id\", \"target_id\", \"edge_id\", \"arch_type\", \"arch_module\", \"ord\", \"arity\", \"source_props\", \"target_props\", \"source_type\", \"source_module\") ORDER BY \"origin_id\" ASC, \"ord\" ASC LIMIT CAST(:row_limit AS bigint)",
+            "params": {
+              "p0": "NodeAnchor",
+              "p1": "Folder",
+              "p2": true,
+              "p3": "EdgeAnchor",
+              "p4": "Contains",
+              "p5": "Folder",
+              "p6": "archetype",
+              "p7": "trashed",
+              "p8": "boolean",
+              "p9": "trashed",
+              "p10": "false",
+              "p11": true,
+              "p12": "NodeAnchor",
+              "p13": "Folder",
+              "p14": true,
+              "p15": "EdgeAnchor",
+              "p16": "Contains"
+            },
+            "slots": [
+              [
+                "row_limit",
+                "bigint",
+                false
+              ],
+              [
+                "origin",
+                "uuid",
+                false
+              ],
+              [
+                "node_module",
+                "text",
+                false
+              ]
+            ],
+            "nonnegative_slots": [
+              "row_limit"
+            ]
+          },
+          "gated": {
+            "sql": "WITH RECURSIVE \"_cte0\" (\"origin_id\") AS (SELECT * FROM (SELECT CAST(:origin AS uuid) AS \"origin_id\") AS \"_recursive_anchor\" UNION SELECT \"_t11\".\"target_id\" AS \"origin_id\" FROM \"_cte0\" AS \"_t0\" CROSS JOIN LATERAL (SELECT \"_t13\".\"id\" AS \"target_id\", \"_t12\".\"id\" AS \"edge_id\", \"_t13\".\"arch_type\" AS \"arch_type\", \"_t13\".\"arch_module\" AS \"arch_module\", ROW_NUMBER() OVER (ORDER BY \"_t12\".\"seq\" ASC, \"_t12\".\"id\" ASC) AS \"ord\", COUNT(*) OVER () AS \"arity\" FROM \"anchors\" AS \"_t12\" INNER JOIN \"anchors\" AS \"_t13\" ON ((\"_t13\".\"id\" = (CASE WHEN (\"_t12\".\"src\" = \"_t0\".\"origin_id\") THEN \"_t12\".\"dst\" ELSE \"_t12\".\"src\" END)) AND (\"_t13\".\"kind\" = CAST(:p0 AS text)) AND ((CAST(:p1 AS text) IS NULL) OR (\"_t13\".\"arch_type\" = CAST(:p1 AS text)) OR (\"_t13\".\"arch_type\" IN (SELECT \"_t14\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t14\" WHERE (\"_t14\".\"ancestor\" = CAST(:p1 AS text))))) AND ((\"_t13\".\"root_id\" = CAST(:actor_uuid AS uuid)) OR (CAST(((\"_t13\".\"props\" -> CAST(:p2 AS text)) ->> CAST(:p3 AS text)) AS bigint) > CAST(:p4 AS bigint)) OR ((((\"_t13\".\"props\" -> CAST(:p2 AS text)) -> CAST(:p5 AS text)) -> CAST(:p6 AS text)) ? CAST(:actor_text AS text)) OR EXISTS (SELECT CAST(:p7 AS bigint) AS \"one\" FROM \"anchors\" AS \"_t15\" WHERE ((\"_t15\".\"kind\" = CAST(:p8 AS text)) AND (\"_t15\".\"src\" = CAST(:actor_uuid AS uuid)) AND ((((\"_t13\".\"props\" -> CAST(:p2 AS text)) -> CAST(:p9 AS text)) -> CAST(:p10 AS text)) ? CAST(\"_t15\".\"dst\" AS text)))))) WHERE (((\"_t12\".\"kind\" = CAST(:p11 AS text)) AND ((\"_t12\".\"src\" = \"_t0\".\"origin_id\") OR (\"_t12\".\"undirected\" AND (\"_t12\".\"dst\" = \"_t0\".\"origin_id\"))) AND ((CAST(:p12 AS text) IS NULL) OR (\"_t12\".\"arch_type\" = CAST(:p12 AS text)) OR (\"_t12\".\"arch_type\" IN (SELECT \"_t16\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t16\" WHERE (\"_t16\".\"ancestor\" = CAST(:p12 AS text)))))))) AS \"_t11\" INNER JOIN \"anchors\" AS \"_t17\" ON (\"_t17\".\"id\" = \"_t11\".\"target_id\") WHERE ((\"_t11\".\"arch_type\" = CAST(:p13 AS text)) AND (\"_t11\".\"arch_module\" = CAST(:node_module AS text)) AND (jsonb_typeof(((\"_t17\".\"props\" -> CAST(:p14 AS text)) -> CAST(:p15 AS text))) = CAST(:p16 AS text)) AND (((\"_t17\".\"props\" -> CAST(:p14 AS text)) ->> CAST(:p17 AS text)) = CAST(:p18 AS text)))) SELECT * FROM (SELECT \"_t0\".\"origin_id\" AS \"origin_id\", \"_t2\".\"target_id\" AS \"target_id\", \"_t2\".\"edge_id\" AS \"edge_id\", \"_t2\".\"arch_type\" AS \"arch_type\", \"_t2\".\"arch_module\" AS \"arch_module\", \"_t2\".\"ord\" AS \"ord\", \"_t2\".\"arity\" AS \"arity\", \"_t1\".\"props\" AS \"source_props\", \"_t9\".\"props\" AS \"target_props\", \"_t1\".\"arch_type\" AS \"source_type\", \"_t1\".\"arch_module\" AS \"source_module\" FROM \"_cte0\" AS \"_t0\" INNER JOIN \"anchors\" AS \"_t1\" ON (\"_t1\".\"id\" = \"_t0\".\"origin_id\") LEFT JOIN LATERAL (SELECT \"_t5\".\"id\" AS \"target_id\", \"_t4\".\"id\" AS \"edge_id\", \"_t5\".\"arch_type\" AS \"arch_type\", \"_t5\".\"arch_module\" AS \"arch_module\", ROW_NUMBER() OVER (ORDER BY \"_t4\".\"seq\" ASC, \"_t4\".\"id\" ASC) AS \"ord\", COUNT(*) OVER () AS \"arity\" FROM \"anchors\" AS \"_t4\" INNER JOIN \"anchors\" AS \"_t5\" ON ((\"_t5\".\"id\" = (CASE WHEN (\"_t4\".\"src\" = \"_t0\".\"origin_id\") THEN \"_t4\".\"dst\" ELSE \"_t4\".\"src\" END)) AND (\"_t5\".\"kind\" = CAST(:p20 AS text)) AND ((CAST(:p21 AS text) IS NULL) OR (\"_t5\".\"arch_type\" = CAST(:p21 AS text)) OR (\"_t5\".\"arch_type\" IN (SELECT \"_t6\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t6\" WHERE (\"_t6\".\"ancestor\" = CAST(:p21 AS text))))) AND ((\"_t5\".\"root_id\" = CAST(:actor_uuid AS uuid)) OR (CAST(((\"_t5\".\"props\" -> CAST(:p22 AS text)) ->> CAST(:p23 AS text)) AS bigint) > CAST(:p24 AS bigint)) OR ((((\"_t5\".\"props\" -> CAST(:p22 AS text)) -> CAST(:p25 AS text)) -> CAST(:p26 AS text)) ? CAST(:actor_text AS text)) OR EXISTS (SELECT CAST(:p27 AS bigint) AS \"one\" FROM \"anchors\" AS \"_t7\" WHERE ((\"_t7\".\"kind\" = CAST(:p28 AS text)) AND (\"_t7\".\"src\" = CAST(:actor_uuid AS uuid)) AND ((((\"_t5\".\"props\" -> CAST(:p22 AS text)) -> CAST(:p29 AS text)) -> CAST(:p30 AS text)) ? CAST(\"_t7\".\"dst\" AS text)))))) WHERE (((\"_t4\".\"kind\" = CAST(:p31 AS text)) AND ((\"_t4\".\"src\" = \"_t0\".\"origin_id\") OR (\"_t4\".\"undirected\" AND (\"_t4\".\"dst\" = \"_t0\".\"origin_id\"))) AND ((CAST(:p32 AS text) IS NULL) OR (\"_t4\".\"arch_type\" = CAST(:p32 AS text)) OR (\"_t4\".\"arch_type\" IN (SELECT \"_t8\".\"type_name\" AS \"type_name\" FROM \"graph_types\" AS \"_t8\" WHERE (\"_t8\".\"ancestor\" = CAST(:p32 AS text)))))))) AS \"_t2\" ON CAST(:p19 AS boolean) LEFT JOIN \"anchors\" AS \"_t9\" ON (\"_t9\".\"id\" = \"_t2\".\"target_id\")) AS \"_set\" (\"origin_id\", \"target_id\", \"edge_id\", \"arch_type\", \"arch_module\", \"ord\", \"arity\", \"source_props\", \"target_props\", \"source_type\", \"source_module\") ORDER BY \"origin_id\" ASC, \"ord\" ASC LIMIT CAST(:row_limit AS bigint)",
+            "params": {
+              "p0": "NodeAnchor",
+              "p1": "Folder",
+              "p2": "access",
+              "p3": "all",
+              "p4": -1,
+              "p5": "roots",
+              "p6": "anchors",
+              "p7": 1,
+              "p8": "EdgeAnchor",
+              "p9": "groups",
+              "p10": "anchors",
+              "p11": "EdgeAnchor",
+              "p12": "Contains",
+              "p13": "Folder",
+              "p14": "archetype",
+              "p15": "trashed",
+              "p16": "boolean",
+              "p17": "trashed",
+              "p18": "false",
+              "p19": true,
+              "p20": "NodeAnchor",
+              "p21": "Folder",
+              "p22": "access",
+              "p23": "all",
+              "p24": -1,
+              "p25": "roots",
+              "p26": "anchors",
+              "p27": 1,
+              "p28": "EdgeAnchor",
+              "p29": "groups",
+              "p30": "anchors",
+              "p31": "EdgeAnchor",
+              "p32": "Contains"
+            },
+            "slots": [
+              [
+                "actor_uuid",
+                "uuid",
+                false
+              ],
+              [
+                "actor_text",
+                "text",
+                false
+              ],
+              [
+                "row_limit",
+                "bigint",
+                false
+              ],
+              [
+                "origin",
+                "uuid",
+                false
+              ],
+              [
+                "node_module",
+                "text",
+                false
+              ]
+            ],
+            "nonnegative_slots": [
+              "row_limit"
+            ]
+          }
+        },
+        "native": {
+          "open": {
+            "pairs": {
+              "sql": "SELECT n1.id, e1.id FROM unnest(CAST(:origin AS uuid[])) WITH ORDINALITY AS f0(id, ord) LEFT JOIN anchors s1 ON s1.id = f0.id JOIN anchors e1 ON e1.kind = 'EdgeAnchor' AND (e1.src = f0.id OR (e1.undirected AND e1.dst = f0.id)) AND (e1.arch_type = :h1et OR e1.arch_type IN (SELECT type_name FROM graph_types WHERE ancestor = :h1et)) JOIN anchors n1 ON n1.id = CASE WHEN e1.src = f0.id THEN e1.dst ELSE e1.src END AND n1.kind = 'NodeAnchor' AND (n1.arch_type = :h1n0t OR n1.arch_type IN (SELECT type_name FROM graph_types WHERE ancestor = :h1n0t)) AND n1.props->'archetype'->'trashed' = to_jsonb(CAST(:h1np0v AS boolean)) ORDER BY f0.ord, e1.seq, e1.id",
+              "params": {
+                "h1et": "Contains",
+                "h1n0t": "Folder",
+                "h1np0v": false
+              },
+              "slots": [
+                [
+                  "origin",
+                  "text[]",
+                  false
+                ]
+              ],
+              "nonnegative_slots": []
+            },
+            "typed": {
+              "sql": "SELECT n1.id, e1.id, n1.arch_type, n1.arch_module FROM unnest(CAST(:origin AS uuid[])) WITH ORDINALITY AS f0(id, ord) LEFT JOIN anchors s1 ON s1.id = f0.id JOIN anchors e1 ON e1.kind = 'EdgeAnchor' AND (e1.src = f0.id OR (e1.undirected AND e1.dst = f0.id)) AND (e1.arch_type = :h1et OR e1.arch_type IN (SELECT type_name FROM graph_types WHERE ancestor = :h1et)) JOIN anchors n1 ON n1.id = CASE WHEN e1.src = f0.id THEN e1.dst ELSE e1.src END AND n1.kind = 'NodeAnchor' AND (n1.arch_type = :h1n0t OR n1.arch_type IN (SELECT type_name FROM graph_types WHERE ancestor = :h1n0t)) AND n1.props->'archetype'->'trashed' = to_jsonb(CAST(:h1np0v AS boolean)) ORDER BY f0.ord, e1.seq, e1.id",
+              "params": {
+                "h1et": "Contains",
+                "h1n0t": "Folder",
+                "h1np0v": false
+              },
+              "slots": [
+                [
+                  "origin",
+                  "text[]",
+                  false
+                ]
+              ],
+              "nonnegative_slots": []
+            }
+          },
+          "gated": {
+            "pairs": {
+              "sql": "SELECT n1.id, e1.id FROM unnest(CAST(:origin AS uuid[])) WITH ORDINALITY AS f0(id, ord) LEFT JOIN anchors s1 ON s1.id = f0.id JOIN anchors e1 ON e1.kind = 'EdgeAnchor' AND (e1.src = f0.id OR (e1.undirected AND e1.dst = f0.id)) AND (e1.arch_type = :h1et OR e1.arch_type IN (SELECT type_name FROM graph_types WHERE ancestor = :h1et)) JOIN anchors n1 ON n1.id = CASE WHEN e1.src = f0.id THEN e1.dst ELSE e1.src END AND n1.kind = 'NodeAnchor' AND (n1.arch_type = :h1n0t OR n1.arch_type IN (SELECT type_name FROM graph_types WHERE ancestor = :h1n0t)) AND n1.props->'archetype'->'trashed' = to_jsonb(CAST(:h1np0v AS boolean)) AND (n1.root_id = CAST(:h1amu AS uuid) OR (n1.props->'access'->>'all')::int > -1 OR (n1.props->'access'->'roots'->'anchors') ? CAST(:h1amt AS text) OR EXISTS (SELECT 1 FROM anchors ge WHERE ge.kind = 'EdgeAnchor' AND ge.src = CAST(:h1amu AS uuid) AND (n1.props->'access'->'groups'->'anchors') ? CAST(ge.dst AS text))) ORDER BY f0.ord, e1.seq, e1.id",
+              "params": {
+                "h1et": "Contains",
+                "h1n0t": "Folder",
+                "h1np0v": false
+              },
+              "slots": [
+                [
+                  "origin",
+                  "text[]",
+                  false
+                ],
+                [
+                  "h1amu",
+                  "text",
+                  false
+                ],
+                [
+                  "h1amt",
+                  "text",
+                  false
+                ]
+              ],
+              "nonnegative_slots": []
+            },
+            "typed": {
+              "sql": "SELECT n1.id, e1.id, n1.arch_type, n1.arch_module FROM unnest(CAST(:origin AS uuid[])) WITH ORDINALITY AS f0(id, ord) LEFT JOIN anchors s1 ON s1.id = f0.id JOIN anchors e1 ON e1.kind = 'EdgeAnchor' AND (e1.src = f0.id OR (e1.undirected AND e1.dst = f0.id)) AND (e1.arch_type = :h1et OR e1.arch_type IN (SELECT type_name FROM graph_types WHERE ancestor = :h1et)) JOIN anchors n1 ON n1.id = CASE WHEN e1.src = f0.id THEN e1.dst ELSE e1.src END AND n1.kind = 'NodeAnchor' AND (n1.arch_type = :h1n0t OR n1.arch_type IN (SELECT type_name FROM graph_types WHERE ancestor = :h1n0t)) AND n1.props->'archetype'->'trashed' = to_jsonb(CAST(:h1np0v AS boolean)) AND (n1.root_id = CAST(:h1amu AS uuid) OR (n1.props->'access'->>'all')::int > -1 OR (n1.props->'access'->'roots'->'anchors') ? CAST(:h1amt AS text) OR EXISTS (SELECT 1 FROM anchors ge WHERE ge.kind = 'EdgeAnchor' AND ge.src = CAST(:h1amu AS uuid) AND (n1.props->'access'->'groups'->'anchors') ? CAST(ge.dst AS text))) ORDER BY f0.ord, e1.seq, e1.id",
+              "params": {
+                "h1et": "Contains",
+                "h1n0t": "Folder",
+                "h1np0v": false
+              },
+              "slots": [
+                [
+                  "origin",
+                  "text[]",
+                  false
+                ],
+                [
+                  "h1amu",
+                  "text",
+                  false
+                ],
+                [
+                  "h1amt",
+                  "text",
+                  false
+                ]
+              ],
+              "nonnegative_slots": []
+            }
+          }
+        }
+      }
+    },
+    "helper_policy": "Unresolved helpers are explicit barrier effects; no opaque call is assumed pure"
+  },
+  "walker_name": "VisibleFolderTree",
+  "entries": {
+    "walk": 0,
+    "done": 17
+  },
+  "handlers": {
+    "Folder": [
+      "walk",
+      "done"
+    ]
+  },
+  "dispatch": {},
+  "candidates": [
+    "walk"
+  ],
+  "points": [
+    5
+  ],
+  "events": [
+    {
+      "id": 0,
+      "kind": "entry",
+      "ability": "walk",
+      "line": 110,
+      "column": 5,
+      "expression": "",
+      "writes": "",
+      "reads": [],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": 1,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {},
+      "definitions": {}
+    },
+    {
+      "id": 1,
+      "kind": "barrier",
+      "ability": "walk",
+      "line": 45,
+      "column": 5,
+      "expression": "jid(here)",
+      "writes": "walk::cur_id",
+      "reads": [
+        "walk::here"
+      ],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": 3,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {
+        "contract": "node_identity",
+        "binding": "jid"
+      },
+      "definitions": {}
+    },
+    {
+      "id": 2,
+      "kind": "input",
+      "ability": "walk",
+      "line": 45,
+      "column": 0,
+      "expression": "",
+      "writes": "walk::here",
+      "reads": [],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": -1,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {},
+      "definitions": {}
+    },
+    {
+      "id": 3,
+      "kind": "branch",
+      "ability": "walk",
+      "line": 46,
+      "column": 5,
+      "expression": "not self . start_id",
+      "writes": "",
+      "reads": [
+        "self.start_id"
+      ],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": -1,
+      "true_id": 5,
+      "false_id": 8,
+      "effect": {},
+      "definitions": {}
+    },
+    {
+      "id": 4,
+      "kind": "input",
+      "ability": "walk",
+      "line": 46,
+      "column": 0,
+      "expression": "",
+      "writes": "self.start_id",
+      "reads": [],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": -1,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {},
+      "definitions": {}
+    },
+    {
+      "id": 5,
+      "kind": "assign",
+      "ability": "walk",
+      "line": 47,
+      "column": 9,
+      "expression": "cur_id",
+      "writes": "self.start_id",
+      "reads": [
+        "walk::cur_id"
+      ],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": 6,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {},
+      "definitions": {}
+    },
+    {
+      "id": 6,
+      "kind": "barrier",
+      "ability": "walk",
+      "line": 48,
+      "column": 9,
+      "expression": "0",
+      "writes": "self.depths",
+      "reads": [
+        "walk::cur_id"
+      ],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": 7,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {
+        "contract": "identity_map_write",
+        "field": "self.depths",
+        "fresh": false
+      },
+      "definitions": {}
+    },
+    {
+      "id": 7,
+      "kind": "barrier",
+      "ability": "walk",
+      "line": 49,
+      "column": 9,
+      "expression": "",
+      "writes": "",
+      "reads": [],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": 8,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {},
+      "definitions": {}
+    },
+    {
+      "id": 8,
+      "kind": "join",
+      "ability": "walk",
+      "line": 46,
+      "column": 5,
+      "expression": "",
+      "writes": "",
+      "reads": [],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": 11,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {},
+      "definitions": {}
+    },
+    {
+      "id": 9,
+      "kind": "phi",
+      "ability": "walk",
+      "line": 46,
+      "column": 5,
+      "expression": "",
+      "writes": "self.start_id",
+      "reads": [],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": -1,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {},
+      "definitions": {}
+    },
+    {
+      "id": 10,
+      "kind": "phi",
+      "ability": "walk",
+      "line": 46,
+      "column": 5,
+      "expression": "",
+      "writes": "self.depths",
+      "reads": [],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": -1,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {},
+      "definitions": {}
+    },
+    {
+      "id": 11,
+      "kind": "barrier",
+      "ability": "walk",
+      "line": 51,
+      "column": 5,
+      "expression": "",
+      "writes": "",
+      "reads": [],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": 12,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {},
+      "definitions": {}
+    },
+    {
+      "id": 12,
+      "kind": "barrier",
+      "ability": "walk",
+      "line": 52,
+      "column": 5,
+      "expression": "",
+      "writes": "",
+      "reads": [],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": 13,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {},
+      "definitions": {}
+    },
+    {
+      "id": 13,
+      "kind": "barrier",
+      "ability": "walk",
+      "line": 53,
+      "column": 5,
+      "expression": "",
+      "writes": "",
+      "reads": [],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": 14,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {},
+      "definitions": {}
+    },
+    {
+      "id": 14,
+      "kind": "barrier",
+      "ability": "walk",
+      "line": 56,
+      "column": 5,
+      "expression": "",
+      "writes": "",
+      "reads": [],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": 15,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {},
+      "definitions": {}
+    },
+    {
+      "id": 15,
+      "kind": "barrier",
+      "ability": "walk",
+      "line": 61,
+      "column": 5,
+      "expression": "",
+      "writes": "",
+      "reads": [],
+      "targets": [
+        "Folder"
+      ],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": 16,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {},
+      "definitions": {
+        "walk::cur_id": 1,
+        "walk::here": 2,
+        "self.start_id": 9,
+        "self.depths": 10
+      }
+    },
+    {
+      "id": 16,
+      "kind": "exit",
+      "ability": "walk",
+      "line": 110,
+      "column": 5,
+      "expression": "",
+      "writes": "",
+      "reads": [],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": -1,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {},
+      "definitions": {}
+    },
+    {
+      "id": 17,
+      "kind": "entry",
+      "ability": "done",
+      "line": 111,
+      "column": 5,
+      "expression": "",
+      "writes": "",
+      "reads": [],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": 18,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {},
+      "definitions": {}
+    },
+    {
+      "id": 18,
+      "kind": "barrier",
+      "ability": "done",
+      "line": 111,
+      "column": 5,
+      "expression": "",
+      "writes": "",
+      "reads": [],
+      "targets": [],
+      "hop_chain": [],
+      "origin": "here",
+      "next_id": -1,
+      "true_id": -1,
+      "false_id": -1,
+      "effect": {},
+      "definitions": {}
+    }
+  ],
+  "edges": [
+    {
+      "source": 2,
+      "target": 1,
+      "kind": "data",
+      "label": "walk::here",
+      "context": -1
+    },
+    {
+      "source": 4,
+      "target": 3,
+      "kind": "data",
+      "label": "self.start_id",
+      "context": -1
+    },
+    {
+      "source": 1,
+      "target": 5,
+      "kind": "data",
+      "label": "walk::cur_id",
+      "context": -1
+    },
+    {
+      "source": 3,
+      "target": 5,
+      "kind": "control",
+      "label": "true",
+      "context": -1
+    },
+    {
+      "source": 1,
+      "target": 6,
+      "kind": "data",
+      "label": "walk::cur_id",
+      "context": -1
+    },
+    {
+      "source": 3,
+      "target": 6,
+      "kind": "control",
+      "label": "true",
+      "context": -1
+    },
+    {
+      "source": 3,
+      "target": 7,
+      "kind": "control",
+      "label": "true",
+      "context": -1
+    },
+    {
+      "source": 5,
+      "target": 9,
+      "kind": "data",
+      "label": "true",
+      "context": -1
+    },
+    {
+      "source": 4,
+      "target": 9,
+      "kind": "data",
+      "label": "false",
+      "context": -1
+    },
+    {
+      "source": 3,
+      "target": 9,
+      "kind": "control",
+      "label": "merge",
+      "context": -1
+    },
+    {
+      "source": 6,
+      "target": 10,
+      "kind": "data",
+      "label": "true",
+      "context": -1
+    },
+    {
+      "source": 3,
+      "target": 10,
+      "kind": "control",
+      "label": "merge",
+      "context": -1
+    },
+    {
+      "source": 0,
+      "target": 1,
+      "kind": "order",
+      "label": "",
+      "context": -1
+    },
+    {
+      "source": 1,
+      "target": 3,
+      "kind": "order",
+      "label": "",
+      "context": -1
+    },
+    {
+      "source": 3,
+      "target": 5,
+      "kind": "order",
+      "label": "",
+      "context": -1
+    },
+    {
+      "source": 3,
+      "target": 8,
+      "kind": "order",
+      "label": "",
+      "context": -1
+    },
+    {
+      "source": 5,
+      "target": 6,
+      "kind": "order",
+      "label": "",
+      "context": -1
+    },
+    {
+      "source": 6,
+      "target": 7,
+      "kind": "order",
+      "label": "",
+      "context": -1
+    },
+    {
+      "source": 7,
+      "target": 8,
+      "kind": "order",
+      "label": "",
+      "context": -1
+    },
+    {
+      "source": 8,
+      "target": 11,
+      "kind": "order",
+      "label": "",
+      "context": -1
+    },
+    {
+      "source": 11,
+      "target": 12,
+      "kind": "order",
+      "label": "",
+      "context": -1
+    },
+    {
+      "source": 12,
+      "target": 13,
+      "kind": "order",
+      "label": "",
+      "context": -1
+    },
+    {
+      "source": 13,
+      "target": 14,
+      "kind": "order",
+      "label": "",
+      "context": -1
+    },
+    {
+      "source": 14,
+      "target": 15,
+      "kind": "order",
+      "label": "",
+      "context": -1
+    },
+    {
+      "source": 15,
+      "target": 16,
+      "kind": "order",
+      "label": "",
+      "context": -1
+    },
+    {
+      "source": 17,
+      "target": 18,
+      "kind": "order",
+      "label": "",
+      "context": -1
+    }
+  ]
+}

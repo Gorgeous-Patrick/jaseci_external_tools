@@ -1,0 +1,1322 @@
+{
+  "recorded_date": "2026-11-12",
+  "selection": "Preserve prior15 and add RecipePantry + LinkedList =17 distinct applications; no performance-based pruning",
+  "rows": [
+    {
+      "app": "jdrive",
+      "source": "reproduction/ttg-app-performance/suite-final-20261030-v1/originals/jdrive/server.jac",
+      "sha256": "10a7f455d7ad63c44a05e7b3667d76f017f717968e6a89bae76cdcccd5859942",
+      "characteristics": "Typed visible Folder recursion, boolean trash pruning, depth/path output; ListFolder Access without Visit; trash/mkdir mutations.",
+      "source_sites": [
+        {
+          "line": 37,
+          "text": "def now() -> str {"
+        },
+        {
+          "line": 95,
+          "text": "walker GetRoot {"
+        },
+        {
+          "line": 99,
+          "text": "walker ListFolder {"
+        },
+        {
+          "line": 103,
+          "text": "walker VisibleFolderTree {"
+        },
+        {
+          "line": 114,
+          "text": "walker NewFolder {"
+        },
+        {
+          "line": 119,
+          "text": "walker TrashFolder {"
+        },
+        {
+          "line": 123,
+          "text": "walker Upload {"
+        },
+        {
+          "line": 128,
+          "text": "walker Download {"
+        },
+        {
+          "line": 132,
+          "text": "def _dbridge_like_store() -> any {"
+        },
+        {
+          "line": 142,
+          "text": "def _dbridge_like_jac_id(value: any) -> str {"
+        },
+        {
+          "line": 146,
+          "text": "def _dbridge_like_uuid_hex(value: any) -> str {"
+        },
+        {
+          "line": 150,
+          "text": "def _dbridge_like_remember(order: list[str], seen: set[str], uid: str) -> None {"
+        },
+        {
+          "line": 157,
+          "text": "def _dbridge_like_write_uuid_list(path: str, ids: list[str]) -> None {"
+        },
+        {
+          "line": 166,
+          "text": "def _dbridge_like_quality(actual_order: list[str], prefetched_order: list[str]) -> dict {"
+        },
+        {
+          "line": 183,
+          "text": "def _dbridge_like_profile_paths -> dict[str, str] {"
+        },
+        {
+          "line": 192,
+          "text": "def _dbridge_like_write_profile("
+        },
+        {
+          "line": 222,
+          "text": "def _dbridge_like_batch_get(ids: list[str]) -> dict[str, any] {"
+        },
+        {
+          "line": 252,
+          "text": "def _dbridge_like_batch_folders(ids: list[str], context: str) -> dict[str, Folder] {"
+        },
+        {
+          "line": 265,
+          "text": "def _dbridge_like_child_folder_ids(parent_id: str) -> list[str] {"
+        },
+        {
+          "line": 289,
+          "text": "def _dbridge_like_prefetch_jdrive_parent(parent_id: str) -> dict[str, any] {"
+        },
+        {
+          "line": 308,
+          "text": "def _submit_dbridge_like_jdrive_parent(parent_id: str) -> any {"
+        },
+        {
+          "line": 318,
+          "text": "def dbridge_like_visible_folder_tree(folder_id: str) -> dict[str, any] {"
+        }
+      ],
+      "baseline": "small",
+      "oracle": "Frozen datasets/ttg/build.py logical model + app_suite/native.py + exact full-response/state/restart checks",
+      "support_control": false
+    },
+    {
+      "app": "littlex",
+      "source": "reproduction/ttg-app-performance/suite-final-20261030-v1/originals/littlex/server.jac",
+      "sha256": "806b475b5168d7f2f35d340358a00d5368feaa53edf34f298dbea23478926357",
+      "characteristics": "Feed root/profile and two ordered Post/Follow paths; ordinary to_profile_view graph reads; like/follow/create mutations.",
+      "source_sites": [
+        {
+          "line": 35,
+          "text": "def _now -> str {"
+        },
+        {
+          "line": 165,
+          "text": "walker setup_profile {"
+        },
+        {
+          "line": 173,
+          "text": "visit existing;"
+        },
+        {
+          "line": 177,
+          "text": "visit fresh;"
+        },
+        {
+          "line": 192,
+          "text": "walker get_profile {"
+        },
+        {
+          "line": 196,
+          "text": "visit [-->[?:Profile]];"
+        },
+        {
+          "line": 211,
+          "text": "visit [r-->[?:Profile]];"
+        },
+        {
+          "line": 224,
+          "text": "walker get_trending {"
+        },
+        {
+          "line": 227,
+          "text": "# bare per-visit tally would double-count. Dedupe by tweet jid."
+        },
+        {
+          "line": 234,
+          "text": "visit [r-->[?:Profile]-->[?:Tweet]];"
+        },
+        {
+          "line": 259,
+          "text": "walker load_feed {"
+        },
+        {
+          "line": 265,
+          "text": "visit [-->[?:Profile]];"
+        },
+        {
+          "line": 272,
+          "text": "visit [->:Post:->[?:Tweet]];"
+        },
+        {
+          "line": 273,
+          "text": "visit [->:Follow:->[?:Profile]->:Post:->[?:Tweet]];"
+        },
+        {
+          "line": 295,
+          "text": "walker load_feed_stepwise {"
+        },
+        {
+          "line": 304,
+          "text": "visit [-->[?:Profile]];"
+        },
+        {
+          "line": 314,
+          "text": "visit [->:Post:->[?:Tweet]];"
+        },
+        {
+          "line": 317,
+          "text": "visit [->:Follow:->[?:Profile]];"
+        },
+        {
+          "line": 345,
+          "text": "walker get_channels {"
+        },
+        {
+          "line": 352,
+          "text": "visit [r-->[?:Profile]-->[?:Channel]];"
+        },
+        {
+          "line": 372,
+          "text": "walker create_tweet {"
+        },
+        {
+          "line": 376,
+          "text": "visit [-->[?:Profile]];"
+        },
+        {
+          "line": 388,
+          "text": "walker create_channel {"
+        },
+        {
+          "line": 393,
+          "text": "visit [-->[?:Profile]];"
+        },
+        {
+          "line": 409,
+          "text": "#     and visit it directly. Action subclasses just react on entry. ---"
+        },
+        {
+          "line": 410,
+          "text": "walker find_profile {"
+        },
+        {
+          "line": 417,
+          "text": "visit [target];"
+        },
+        {
+          "line": 423,
+          "text": "walker follow_user(find_profile) {"
+        },
+        {
+          "line": 429,
+          "text": "disengage;"
+        },
+        {
+          "line": 434,
+          "text": "walker unfollow_user(find_profile) {"
+        },
+        {
+          "line": 443,
+          "text": "disengage;"
+        },
+        {
+          "line": 449,
+          "text": "walker find_tweet {"
+        },
+        {
+          "line": 461,
+          "text": "visit [target];"
+        },
+        {
+          "line": 467,
+          "text": "walker like_tweet(find_tweet) {"
+        },
+        {
+          "line": 481,
+          "text": "disengage;"
+        },
+        {
+          "line": 486,
+          "text": "walker delete_tweet(find_tweet) {"
+        },
+        {
+          "line": 491,
+          "text": "disengage;"
+        },
+        {
+          "line": 496,
+          "text": "walker add_comment(find_tweet) {"
+        },
+        {
+          "line": 508,
+          "text": "disengage;"
+        },
+        {
+          "line": 513,
+          "text": "walker find_channel {"
+        },
+        {
+          "line": 520,
+          "text": "visit [target];"
+        },
+        {
+          "line": 526,
+          "text": "walker join_channel(find_channel) {"
+        },
+        {
+          "line": 534,
+          "text": "disengage;"
+        },
+        {
+          "line": 539,
+          "text": "walker leave_channel(find_channel) {"
+        },
+        {
+          "line": 548,
+          "text": "disengage;"
+        },
+        {
+          "line": 553,
+          "text": "walker get_channel_detail(find_channel) {"
+        },
+        {
+          "line": 559,
+          "text": "disengage;"
+        },
+        {
+          "line": 564,
+          "text": "walker create_channel_tweet(find_channel) {"
+        },
+        {
+          "line": 577,
+          "text": "disengage;"
+        },
+        {
+          "line": 582,
+          "text": "def _dbridge_like_store() -> any {"
+        },
+        {
+          "line": 592,
+          "text": "def _dbridge_like_jac_id(value: any) -> str {"
+        },
+        {
+          "line": 596,
+          "text": "def _dbridge_like_remember(order: list[str], seen: set[str], uid: str) -> None {"
+        },
+        {
+          "line": 603,
+          "text": "def _dbridge_like_write_uuid_list(path: str, ids: list[str]) -> None {"
+        },
+        {
+          "line": 612,
+          "text": "def _dbridge_like_quality(actual_order: list[str], prefetched_order: list[str]) -> dict {"
+        },
+        {
+          "line": 629,
+          "text": "def _dbridge_like_profile_paths -> dict[str, str] {"
+        },
+        {
+          "line": 638,
+          "text": "def _dbridge_like_write_profile("
+        },
+        {
+          "line": 668,
+          "text": "def _dbridge_like_batch_get(ids: list[str]) -> dict[str, any] {"
+        },
+        {
+          "line": 698,
+          "text": "def _dbridge_like_batch_tweets(ids: list[str], context: str) -> dict[str, Tweet] {"
+        },
+        {
+          "line": 711,
+          "text": "def _dbridge_like_empty_feed_result("
+        },
+        {
+          "line": 759,
+          "text": "def _dbridge_like_root_profile_id(root_id: str) -> str {"
+        },
+        {
+          "line": 777,
+          "text": "def _dbridge_like_feed_tweet_ids(profile_id: str) -> list[str] {"
+        },
+        {
+          "line": 829,
+          "text": "def _dbridge_like_prefetch_feed_tweets(profile_id: str) -> dict[str, any] {"
+        },
+        {
+          "line": 849,
+          "text": "def _submit_dbridge_like_feed_tweets(profile_id: str) -> any {"
+        },
+        {
+          "line": 859,
+          "text": "def dbridge_like_load_feed(search_query: str = \"\") -> dict[str, any] {"
+        }
+      ],
+      "baseline": "small",
+      "oracle": "Frozen datasets/ttg/build.py logical model + app_suite/native.py + exact full-response/state/restart checks",
+      "support_control": false
+    },
+    {
+      "app": "issue_desk",
+      "source": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/issue_desk/server.jac",
+      "sha256": "74ac636a0832e616302eaba0b67f4c563003f55192ed25e6326444d1fa85300a",
+      "characteristics": "Root->Project->Engineer/Issue branches; Blocks reachability with seen set and disengage; assign/comment/close/reopen invariants.",
+      "source_sites": [
+        {
+          "line": 28,
+          "text": "def _owned_project(project: any) -> bool {"
+        },
+        {
+          "line": 33,
+          "text": "def _owned_issue(issue: any) -> bool {"
+        },
+        {
+          "line": 40,
+          "text": "def _issue_view(issue: Issue) -> dict {"
+        },
+        {
+          "line": 61,
+          "text": "walker Seed {"
+        },
+        {
+          "line": 89,
+          "text": "walker ProjectBoard {"
+        },
+        {
+          "line": 95,
+          "text": "visit [-->[?:Project]];"
+        },
+        {
+          "line": 99,
+          "text": "visit [->:HasEngineer:->[?:Engineer]];"
+        },
+        {
+          "line": 100,
+          "text": "visit [->:HasIssue:->[?:Issue]];"
+        },
+        {
+          "line": 120,
+          "text": "walker CreateIssue {"
+        },
+        {
+          "line": 143,
+          "text": "walker AssignIssue {"
+        },
+        {
+          "line": 178,
+          "text": "walker CommentIssue {"
+        },
+        {
+          "line": 198,
+          "text": "walker ReachIssue {"
+        },
+        {
+          "line": 210,
+          "text": "disengage;"
+        },
+        {
+          "line": 212,
+          "text": "visit [->:Blocks:->[?:Issue]];"
+        },
+        {
+          "line": 216,
+          "text": "walker BlockIssue {"
+        },
+        {
+          "line": 249,
+          "text": "walker CloseIssue {"
+        },
+        {
+          "line": 277,
+          "text": "walker ReopenIssue {"
+        }
+      ],
+      "baseline": "smoke",
+      "oracle": "Frozen scenarios.py/evaluate.py SCENARIOS plus independent stored transcript replay and exact physical state; retain negative and private-user checks",
+      "support_control": false
+    },
+    {
+      "app": "stock_room",
+      "source": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/stock_room/server.jac",
+      "sha256": "bdeeb3706db0b8de1c3b453f6a22c48603eb2c07c6165b510866c0c3731a5e6d",
+      "characteristics": "Warehouse->SKU/Lot/Reservation/Dispatch branches; ordered allocation, reserve/release/dispatch writes.",
+      "source_sites": [
+        {
+          "line": 39,
+          "text": "def _warehouse() -> Warehouse | None {"
+        },
+        {
+          "line": 44,
+          "text": "def _owned_sku(sku: object) -> bool {"
+        },
+        {
+          "line": 51,
+          "text": "def _owned_reservation(reservation: object) -> bool {"
+        },
+        {
+          "line": 59,
+          "text": "def _reservation_view(reservation: Reservation) -> dict {"
+        },
+        {
+          "line": 82,
+          "text": "walker Seed {"
+        },
+        {
+          "line": 105,
+          "text": "walker Inventory {"
+        },
+        {
+          "line": 113,
+          "text": "visit [-->[?:Warehouse]];"
+        },
+        {
+          "line": 117,
+          "text": "visit [->:HasSKU:->[?:SKU]];"
+        },
+        {
+          "line": 118,
+          "text": "visit [->:Stocks:->[?:Lot]];"
+        },
+        {
+          "line": 119,
+          "text": "visit [->:Holds:->[?:Reservation]];"
+        },
+        {
+          "line": 120,
+          "text": "visit [->:HasDispatch:->[?:Dispatch]];"
+        },
+        {
+          "line": 166,
+          "text": "walker ReceiveStock {"
+        },
+        {
+          "line": 189,
+          "text": "walker ReserveStock {"
+        },
+        {
+          "line": 239,
+          "text": "walker ReleaseReservation {"
+        },
+        {
+          "line": 253,
+          "text": "visit [reservation];"
+        },
+        {
+          "line": 257,
+          "text": "visit [->:HasAllocation:->[?:Allocation]];"
+        },
+        {
+          "line": 270,
+          "text": "walker DispatchReservation {"
+        },
+        {
+          "line": 284,
+          "text": "visit [reservation];"
+        },
+        {
+          "line": 288,
+          "text": "visit [->:HasAllocation:->[?:Allocation]];"
+        }
+      ],
+      "baseline": "smoke",
+      "oracle": "Frozen scenarios.py/evaluate.py SCENARIOS plus independent stored transcript replay and exact physical state; retain negative and private-user checks",
+      "support_control": false
+    },
+    {
+      "app": "clinic_queue",
+      "source": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/clinic_queue/server.jac",
+      "sha256": "2850aca7323dffc2e59f42df703cec49fd5fb19dae02d771ad35c535b3e9749f",
+      "characteristics": "Clinic->Practitioner->Slot; booking availability and cancellation.",
+      "source_sites": [
+        {
+          "line": 25,
+          "text": "def _clinic -> Clinic | None {"
+        },
+        {
+          "line": 30,
+          "text": "def _owned_slot(slot: object) -> bool {"
+        },
+        {
+          "line": 42,
+          "text": "walker Seed {"
+        },
+        {
+          "line": 67,
+          "text": "walker ClinicSchedule {"
+        },
+        {
+          "line": 73,
+          "text": "visit [-->[?:Clinic]];"
+        },
+        {
+          "line": 77,
+          "text": "visit [->:HasPractitioner:->[?:Practitioner]];"
+        },
+        {
+          "line": 84,
+          "text": "visit [->:OffersSlot:->[?:Slot]];"
+        },
+        {
+          "line": 112,
+          "text": "walker AddSlot {"
+        },
+        {
+          "line": 153,
+          "text": "walker BookAppointment {"
+        },
+        {
+          "line": 190,
+          "text": "walker CancelAppointment {"
+        }
+      ],
+      "baseline": "smoke",
+      "oracle": "Frozen scenarios.py/evaluate.py SCENARIOS plus independent stored transcript replay and exact physical state; retain negative and private-user checks",
+      "support_control": false
+    },
+    {
+      "app": "budget_ledger",
+      "source": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/budget_ledger/server.jac",
+      "sha256": "51699e86f1e07e7db56240ce82b6507e0418fbdb640469f7e35295a79aa75227",
+      "characteristics": "Budget->Envelope/Category/Transfer; conserved transfers and spending limits.",
+      "source_sites": [
+        {
+          "line": 30,
+          "text": "def _budget -> Budget | None {"
+        },
+        {
+          "line": 34,
+          "text": "def _envelope(e: object) -> bool {"
+        },
+        {
+          "line": 40,
+          "text": "walker Seed {"
+        },
+        {
+          "line": 58,
+          "text": "walker BudgetBoard {"
+        },
+        {
+          "line": 65,
+          "text": "visit [-->[?:Budget]];"
+        },
+        {
+          "line": 76,
+          "text": "visit [->:HasEnvelope:->[?:Envelope]];"
+        },
+        {
+          "line": 77,
+          "text": "visit [->:HasCategory:->[?:Category]];"
+        },
+        {
+          "line": 78,
+          "text": "visit [->:HasTransfer:->[?:Transfer]];"
+        },
+        {
+          "line": 109,
+          "text": "walker AllocateBudget {"
+        },
+        {
+          "line": 131,
+          "text": "walker SpendEnvelope {"
+        },
+        {
+          "line": 160,
+          "text": "walker TransferBudget {"
+        }
+      ],
+      "baseline": "smoke",
+      "oracle": "Frozen scenarios.py/evaluate.py SCENARIOS plus independent stored transcript replay and exact physical state; retain negative and private-user checks",
+      "support_control": false
+    },
+    {
+      "app": "knowledge_map",
+      "source": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/knowledge_map/server.jac",
+      "sha256": "a5aca633b659617cbb8156580eb08be9523e65be31af80d0f0d22a89ab80ca2c",
+      "characteristics": "Article reader/helper revisions; ExploreLinks uses visited set and LinksTo cycle boundary.",
+      "source_sites": [
+        {
+          "line": 22,
+          "text": "def _article(a: object) -> bool {"
+        },
+        {
+          "line": 25,
+          "text": "walker Seed {"
+        },
+        {
+          "line": 45,
+          "text": "walker KnowledgeBoard {"
+        },
+        {
+          "line": 49,
+          "text": "visit [-->[?:Article]];"
+        },
+        {
+          "line": 76,
+          "text": "walker ReviseArticle {"
+        },
+        {
+          "line": 94,
+          "text": "walker ReviewRevision {"
+        },
+        {
+          "line": 116,
+          "text": "walker PublishArticle {"
+        },
+        {
+          "line": 139,
+          "text": "walker LinkArticles {"
+        },
+        {
+          "line": 159,
+          "text": "walker ExploreLinks {"
+        },
+        {
+          "line": 167,
+          "text": "visit [a];"
+        },
+        {
+          "line": 176,
+          "text": "visit [->:LinksTo:->[?:Article]];"
+        }
+      ],
+      "baseline": "smoke",
+      "oracle": "Frozen scenarios.py/evaluate.py SCENARIOS plus independent stored transcript replay and exact physical state; retain negative and private-user checks",
+      "support_control": true
+    },
+    {
+      "app": "course_path",
+      "source": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/course_path/server.jac",
+      "sha256": "23f34229dbd614b3abe9ac4790778e72a59702cf2f13f2e873a29ed6738258b1",
+      "characteristics": "Root->Course and Enrollment; helper graph reads, prerequisites/completion changes.",
+      "source_sites": [
+        {
+          "line": 30,
+          "text": "def _owned_course(course: object) -> bool {"
+        },
+        {
+          "line": 35,
+          "text": "def _course_lessons(course: Course) -> list[Lesson] {"
+        },
+        {
+          "line": 43,
+          "text": "def _enrollment_view(enrollment: Enrollment) -> dict {"
+        },
+        {
+          "line": 59,
+          "text": "walker Seed {"
+        },
+        {
+          "line": 89,
+          "text": "walker LearningDashboard {"
+        },
+        {
+          "line": 94,
+          "text": "visit [-->[?:Course]];"
+        },
+        {
+          "line": 95,
+          "text": "visit [-->[?:Enrollment]];"
+        },
+        {
+          "line": 134,
+          "text": "walker Enroll {"
+        },
+        {
+          "line": 169,
+          "text": "walker CompleteLesson {"
+        },
+        {
+          "line": 225,
+          "text": "walker AddLesson {"
+        }
+      ],
+      "baseline": "smoke",
+      "oracle": "Frozen scenarios.py/evaluate.py SCENARIOS plus independent stored transcript replay and exact physical state; retain negative and private-user checks",
+      "support_control": false
+    },
+    {
+      "app": "approval_desk",
+      "source": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/approval_desk/server.jac",
+      "sha256": "5239cd1d3650b6e4126f66f19dfec97472ea0ec85681f0e1ac9a6c1e98d0922c",
+      "characteristics": "Expense reader/helper; SubmitExpense->LineItem traversal then approval routing; line aggregation and payment writes.",
+      "source_sites": [
+        {
+          "line": 32,
+          "text": "def _owns(expense: object) -> bool {"
+        },
+        {
+          "line": 37,
+          "text": "def _expense_view(expense: Expense) -> dict {"
+        },
+        {
+          "line": 76,
+          "text": "walker Seed {"
+        },
+        {
+          "line": 100,
+          "text": "walker ExpenseBoard {"
+        },
+        {
+          "line": 104,
+          "text": "visit [-->[?:Expense]];"
+        },
+        {
+          "line": 114,
+          "text": "walker CreateExpense {"
+        },
+        {
+          "line": 127,
+          "text": "walker AddLineItem {"
+        },
+        {
+          "line": 164,
+          "text": "walker SubmitExpense {"
+        },
+        {
+          "line": 179,
+          "text": "visit [expense];"
+        },
+        {
+          "line": 183,
+          "text": "visit [->:HasLine:->[?:LineItem]];"
+        },
+        {
+          "line": 212,
+          "text": "walker DecideApproval {"
+        },
+        {
+          "line": 253,
+          "text": "walker PayExpense {"
+        }
+      ],
+      "baseline": "smoke",
+      "oracle": "Frozen scenarios.py/evaluate.py SCENARIOS plus independent stored transcript replay and exact physical state; retain negative and private-user checks",
+      "support_control": true
+    },
+    {
+      "app": "library_loans",
+      "source": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/library_loans/server.jac",
+      "sha256": "a0a53342e4f54bb3b1059858dadf218b7f9d5910656a10ab520b7b0c09d091c8",
+      "characteristics": "Library->Patron/Title/Loan; copy/hold graph reads and loan queue writes.",
+      "source_sites": [
+        {
+          "line": 35,
+          "text": "def _library -> Library | None {"
+        },
+        {
+          "line": 40,
+          "text": "def _owns_title(title: object) -> bool {"
+        },
+        {
+          "line": 47,
+          "text": "def _owns_patron(patron: object) -> bool {"
+        },
+        {
+          "line": 54,
+          "text": "def _borrowed_title(patron: Patron, title: Title) -> bool {"
+        },
+        {
+          "line": 66,
+          "text": "def _lend(library: Library, copy: Copy, patron: Patron) -> str {"
+        },
+        {
+          "line": 74,
+          "text": "walker Seed {"
+        },
+        {
+          "line": 99,
+          "text": "walker LibraryCatalog {"
+        },
+        {
+          "line": 106,
+          "text": "visit [-->[?:Library]];"
+        },
+        {
+          "line": 110,
+          "text": "visit [->:HasPatron:->[?:Patron]];"
+        },
+        {
+          "line": 111,
+          "text": "visit [->:HasTitle:->[?:Title]];"
+        },
+        {
+          "line": 112,
+          "text": "visit [->:HasLoan:->[?:Loan]];"
+        },
+        {
+          "line": 176,
+          "text": "walker BorrowTitle {"
+        },
+        {
+          "line": 212,
+          "text": "walker PlaceHold {"
+        },
+        {
+          "line": 251,
+          "text": "walker CancelHold {"
+        },
+        {
+          "line": 274,
+          "text": "walker ReturnLoan {"
+        }
+      ],
+      "baseline": "smoke",
+      "oracle": "Frozen scenarios.py/evaluate.py SCENARIOS plus independent stored transcript replay and exact physical state; retain negative and private-user checks",
+      "support_control": false
+    },
+    {
+      "app": "event_seats",
+      "source": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/event_seats/server.jac",
+      "sha256": "6a2d72da95cecd4eb7c80b90858f6bea15f889adc39248542e32d7fa80febe7f",
+      "characteristics": "Venue->Event; helper Seat/Booking graph reads and hold/confirm/cancel state.",
+      "source_sites": [
+        {
+          "line": 34,
+          "text": "def _owned_event(event: object) -> bool {"
+        },
+        {
+          "line": 44,
+          "text": "def _seats(event: Event) -> list[Seat] {"
+        },
+        {
+          "line": 52,
+          "text": "def _owned_booking(booking: object) -> bool {"
+        },
+        {
+          "line": 57,
+          "text": "def _booking_view(booking: Booking) -> dict {"
+        },
+        {
+          "line": 71,
+          "text": "walker Seed {"
+        },
+        {
+          "line": 94,
+          "text": "walker EventCatalog {"
+        },
+        {
+          "line": 99,
+          "text": "visit [-->[?:Venue]];"
+        },
+        {
+          "line": 103,
+          "text": "visit [->:Hosts:->[?:Event]];"
+        },
+        {
+          "line": 141,
+          "text": "walker HoldSeats {"
+        },
+        {
+          "line": 192,
+          "text": "walker ConfirmBooking {"
+        },
+        {
+          "line": 214,
+          "text": "walker CancelBooking {"
+        }
+      ],
+      "baseline": "smoke",
+      "oracle": "Frozen scenarios.py/evaluate.py SCENARIOS plus independent stored transcript replay and exact physical state; retain negative and private-user checks",
+      "support_control": false
+    },
+    {
+      "app": "help_queue",
+      "source": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/help_queue/server.jac",
+      "sha256": "9af7b8b2183db45fe200d1ececdc84c8887f41a0c8741cc0ce62a5d44f3348eb",
+      "characteristics": "Desk->Customer/Agent/Ticket; EvaluateSLA traverses tickets and _escalate writes.",
+      "source_sites": [
+        {
+          "line": 40,
+          "text": "def _desk -> SupportDesk | None {"
+        },
+        {
+          "line": 45,
+          "text": "def _owned_ticket(ticket: object) -> bool {"
+        },
+        {
+          "line": 52,
+          "text": "def _escalate(ticket: Ticket) -> None {"
+        },
+        {
+          "line": 62,
+          "text": "def _ticket_view(ticket: Ticket) -> dict {"
+        },
+        {
+          "line": 86,
+          "text": "walker Seed {"
+        },
+        {
+          "line": 112,
+          "text": "walker DeskBoard {"
+        },
+        {
+          "line": 119,
+          "text": "visit [-->[?:SupportDesk]];"
+        },
+        {
+          "line": 123,
+          "text": "visit [->:HasCustomer:->[?:Customer]];"
+        },
+        {
+          "line": 124,
+          "text": "visit [->:HasAgent:->[?:Agent]];"
+        },
+        {
+          "line": 125,
+          "text": "visit [->:HasTicket:->[?:Ticket]];"
+        },
+        {
+          "line": 147,
+          "text": "walker CreateTicket {"
+        },
+        {
+          "line": 183,
+          "text": "walker AssignTicket {"
+        },
+        {
+          "line": 215,
+          "text": "walker AdvanceClock {"
+        },
+        {
+          "line": 229,
+          "text": "walker EvaluateSLA {"
+        },
+        {
+          "line": 234,
+          "text": "visit [-->[?:SupportDesk]];"
+        },
+        {
+          "line": 238,
+          "text": "visit [->:HasTicket:->[?:Ticket]];"
+        },
+        {
+          "line": 255,
+          "text": "walker ReplyTicket {"
+        },
+        {
+          "line": 285,
+          "text": "walker ResolveTicket {"
+        }
+      ],
+      "baseline": "smoke",
+      "oracle": "Frozen scenarios.py/evaluate.py SCENARIOS plus independent stored transcript replay and exact physical state; retain negative and private-user checks",
+      "support_control": true
+    },
+    {
+      "app": "delivery_route",
+      "source": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/delivery_route/server.jac",
+      "sha256": "7bd7db2b123b9124a7a0f0224b193424670c88b1bf2aece78919ae2465923275",
+      "characteristics": "Depot->Route/Parcel; stop/attempt helper reads, load/deliver/retry state.",
+      "source_sites": [
+        {
+          "line": 29,
+          "text": "def _depot -> Depot | None {"
+        },
+        {
+          "line": 33,
+          "text": "def _owns_route(route: object) -> bool {"
+        },
+        {
+          "line": 39,
+          "text": "walker Seed {"
+        },
+        {
+          "line": 56,
+          "text": "walker RouteBoard {"
+        },
+        {
+          "line": 62,
+          "text": "visit [-->[?:Depot]];"
+        },
+        {
+          "line": 66,
+          "text": "visit [->:HasRoute:->[?:Route]];"
+        },
+        {
+          "line": 67,
+          "text": "visit [->:HasParcel:->[?:Parcel]];"
+        },
+        {
+          "line": 113,
+          "text": "walker CreateRoute {"
+        },
+        {
+          "line": 130,
+          "text": "walker AssignParcel {"
+        },
+        {
+          "line": 166,
+          "text": "walker LoadRoute {"
+        },
+        {
+          "line": 194,
+          "text": "walker DeliveryAttempt {"
+        },
+        {
+          "line": 232,
+          "text": "walker RetryStop {"
+        }
+      ],
+      "baseline": "smoke",
+      "oracle": "Frozen scenarios.py/evaluate.py SCENARIOS plus independent stored transcript replay and exact physical state; retain negative and private-user checks",
+      "support_control": false
+    },
+    {
+      "app": "volunteer_shift",
+      "source": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/volunteer_shift/server.jac",
+      "sha256": "a3c4c4b9980d257c0f63788371bd8f4ee3de302e9ac7f89f5cd990821162c89b",
+      "characteristics": "Organization->Volunteer/Shift; capacity/waitlist signup/cancellation.",
+      "source_sites": [
+        {
+          "line": 26,
+          "text": "def _shift(s: object) -> bool {"
+        },
+        {
+          "line": 33,
+          "text": "walker Seed {"
+        },
+        {
+          "line": 58,
+          "text": "walker VolunteerBoard {"
+        },
+        {
+          "line": 64,
+          "text": "visit [-->[?:Organization]];"
+        },
+        {
+          "line": 68,
+          "text": "visit [->:HasVolunteer:->[?:Volunteer]];"
+        },
+        {
+          "line": 69,
+          "text": "visit [->:HasShift:->[?:Shift]];"
+        },
+        {
+          "line": 106,
+          "text": "walker JoinShift {"
+        },
+        {
+          "line": 155,
+          "text": "walker CancelSignup {"
+        }
+      ],
+      "baseline": "smoke",
+      "oracle": "Frozen scenarios.py/evaluate.py SCENARIOS plus independent stored transcript replay and exact physical state; retain negative and private-user checks",
+      "support_control": false
+    },
+    {
+      "app": "incident_room",
+      "source": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/incident_room/server.jac",
+      "sha256": "cefa1f5d60f30500509acba67672492e627d6aa38dd9d701d526842d8fa74058",
+      "characteristics": "Root->Service/Incident; ImpactTrace follows reverse DependsOn with shared seen set; acknowledge/resolve state.",
+      "source_sites": [
+        {
+          "line": 22,
+          "text": "def _service(s: object) -> bool {"
+        },
+        {
+          "line": 25,
+          "text": "def _incident(i: object) -> bool {"
+        },
+        {
+          "line": 29,
+          "text": "walker ImpactTrace {"
+        },
+        {
+          "line": 39,
+          "text": "visit [<-:DependsOn:<-[?:Service]];"
+        },
+        {
+          "line": 43,
+          "text": "walker Seed {"
+        },
+        {
+          "line": 61,
+          "text": "walker IncidentBoard {"
+        },
+        {
+          "line": 66,
+          "text": "visit [-->[?:Service]];"
+        },
+        {
+          "line": 67,
+          "text": "visit [-->[?:Incident]];"
+        },
+        {
+          "line": 103,
+          "text": "walker OpenIncident {"
+        },
+        {
+          "line": 130,
+          "text": "walker AcknowledgeAlert {"
+        },
+        {
+          "line": 145,
+          "text": "walker AddAction {"
+        },
+        {
+          "line": 165,
+          "text": "walker CompleteAction {"
+        },
+        {
+          "line": 184,
+          "text": "walker ResolveIncident {"
+        }
+      ],
+      "baseline": "smoke",
+      "oracle": "Frozen scenarios.py/evaluate.py SCENARIOS plus independent stored transcript replay and exact physical state; retain negative and private-user checks",
+      "support_control": true
+    },
+    {
+      "app": "recipe_pantry",
+      "source": "reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+      "sha256": "c9be1cf67ba71b678f9b39cb6cb9f040647a65602878a55889bae549418dd44b",
+      "characteristics": "Root Ingredient/Recipe/Meal branches; _requirements joins and _owns root-neighbor Access; shopping reduction and conserved inventory.",
+      "source_sites": [
+        {
+          "line": 30,
+          "text": "def _owns(item: object, kind: type) -> bool {"
+        },
+        {
+          "line": 33,
+          "text": "def _requirements(meal: Meal) -> list[tuple[Ingredient, int]] {"
+        },
+        {
+          "line": 41,
+          "text": "walker Seed {"
+        },
+        {
+          "line": 69,
+          "text": "walker PantryBoard {"
+        },
+        {
+          "line": 75,
+          "text": "visit [-->[?:Ingredient]];"
+        },
+        {
+          "line": 76,
+          "text": "visit [-->[?:Recipe]];"
+        },
+        {
+          "line": 77,
+          "text": "visit [-->[?:Meal]];"
+        },
+        {
+          "line": 114,
+          "text": "walker PlanMeal {"
+        },
+        {
+          "line": 134,
+          "text": "walker ShoppingList {"
+        },
+        {
+          "line": 138,
+          "text": "visit [-->[?:Meal, status==\"planned\"]];"
+        },
+        {
+          "line": 158,
+          "text": "walker BuyIngredient {"
+        },
+        {
+          "line": 178,
+          "text": "walker CookMeal {"
+        }
+      ],
+      "baseline": "smoke",
+      "oracle": "Frozen scenarios.py/evaluate.py SCENARIOS plus independent stored transcript replay and exact physical state; retain negative and private-user checks",
+      "support_control": false
+    },
+    {
+      "app": "linked_list",
+      "source": "reproduction/ttg-app-performance/suite-final-20261030-v1/originals/linked_list/main.jac",
+      "sha256": "59c9664c3cc533f2942af9a9cc7945e159a6e447d009bc76c03ec5113b62320c",
+      "characteristics": "Unmodified Traverse count cutoff10000, Sum reduction, Find early cancellation; single-successor fixture separately proven.",
+      "source_sites": [
+        {
+          "line": 31,
+          "text": "walker Traverse {"
+        },
+        {
+          "line": 38,
+          "text": "disengage;"
+        },
+        {
+          "line": 40,
+          "text": "visit [->:Next:->];"
+        },
+        {
+          "line": 45,
+          "text": "walker Sum {"
+        },
+        {
+          "line": 50,
+          "text": "visit [->:Next:->];"
+        },
+        {
+          "line": 59,
+          "text": "walker Find {"
+        },
+        {
+          "line": 67,
+          "text": "disengage;"
+        },
+        {
+          "line": 69,
+          "text": "visit [->:Next:->];"
+        },
+        {
+          "line": 73,
+          "text": "def setup_graph() -> list[str] {"
+        },
+        {
+          "line": 99,
+          "text": "def _jac_id(value: any) -> str {"
+        },
+        {
+          "line": 103,
+          "text": "def _write_uuid_list(path: str, ids: list[str]) -> None {"
+        },
+        {
+          "line": 112,
+          "text": "def _quality(actual_order: list[str], prefetched_order: list[str]) -> dict {"
+        },
+        {
+          "line": 129,
+          "text": "def _next_item_id(current_id: str, next_cache: dict[str, str]) -> str {"
+        },
+        {
+          "line": 159,
+          "text": "def _dbridge_like_prefetch_next(current_id: str, next_cache: dict[str, str]) -> dict[str, any] {"
+        },
+        {
+          "line": 187,
+          "text": "def _submit_dbridge_like_prefetch(current_id: str, next_cache: dict[str, str]) -> any {"
+        },
+        {
+          "line": 197,
+          "text": "def _write_oop_profile("
+        },
+        {
+          "line": 229,
+          "text": "def oop_traverse(start_id: str) -> any {"
+        }
+      ],
+      "baseline": "smoke",
+      "oracle": "Frozen datasets/ttg/build.py logical model + app_suite/native.py + exact full-response/state/restart checks",
+      "support_control": true
+    }
+  ],
+  "status": "Source preparation only. No new fixtures executed or accepted."
+}

@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/extend-n5-v2/cases/littlex-50x20-aggressive-measured-4/artifacts.json",
+    "sha256": "b6beb5b034ebfbb4375d6d7b43f7d436d411387800404c06015c5b96a8dc1af8",
+    "files_checked": 43
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_native_semantic_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/extend-n5-v2/cases/littlex-50x20-aggressive-measured-4/artifacts.json",
+      "sha256": "b6beb5b034ebfbb4375d6d7b43f7d436d411387800404c06015c5b96a8dc1af8",
+      "files_checked": 43
+    },
+    "proof_sha256": "805ac8973ddec4714558291967ce15f0c395338536a3dc7cabc4a4b6352a76c7",
+    "actual_operations_checked": 15,
+    "final_logical_state_sha256": "c451de447009366732c5b888e703c498abd6b1845d37414fb35517afdd37cd6f",
+    "verifier_sources": {
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/native.py": "f44bf3905bd248df2f7c2fe10db3c926a847d170c963e889bffac94d51435228",
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/datasets/ttg/build.py": "a617dd95626a60babcf56dc10fba0ed3dc4a5c24ceca3033fea0b97401c129b9"
+    },
+    "full_response": {
+      "full_actions_sha256": "6631c577db0bee4381fd1461d52b91cda06af4e1a97d82d61cf7bf723c6186c4",
+      "full_semantic_sha256": "6dcad7b412ec9ff28122852c3635a12f36138dd16230b1c994a27ffa56392f8d"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/extend-n5-v2/cases/littlex-50x20-aggressive-measured-4/plus-proof.json",
+    "sha256": "805ac8973ddec4714558291967ce15f0c395338536a3dc7cabc4a4b6352a76c7"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/extend-n5-v2/cases/littlex-50x20-aggressive-measured-4/cleanup-target.json",
+    "sha256": "480c9d1ae65501adeb363a0248ebc8546e4cd49b741e4ebc84b911c732da1221"
+  },
+  "database_state": {
+    "database": "continuation_6e61c11ec8b44800b8b79b7cd94ed6a1",
+    "cluster_owner": "46ad19ab-82ca-49bf-acdc-c1ee0262f3c8",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "6fa382812572f24e2ac0fe259922cb6058688a0c0eb5433b6c5b00b04977c922",
+    "actual_row_count": 2249,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('Profile','Tweet','Follow','Post')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/plan-v1/sources.json",
+    "sha256": "8d3c3e3afaded659aca55d28110304e22d86afa1069e723d5566c413d4c8a047"
+  }
+}

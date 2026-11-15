@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-diagnostics-20261112/cpu-native-v1/cases/linked_list-smoke-off-CPU-diagnostic-0/artifacts.json",
+    "sha256": "08ee58e457d45b9f668d1ec9832b4eaa3471e430c6ed140436dbf3d0d4429407",
+    "files_checked": 45
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_native_semantic_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-diagnostics-20261112/cpu-native-v1/cases/linked_list-smoke-off-CPU-diagnostic-0/artifacts.json",
+      "sha256": "08ee58e457d45b9f668d1ec9832b4eaa3471e430c6ed140436dbf3d0d4429407",
+      "files_checked": 45
+    },
+    "proof_sha256": "e337b5a16861c40e984f43ae683388029f3c31ec98096f84c04adddd0572fde6",
+    "actual_operations_checked": 12,
+    "final_logical_state_sha256": "93d1654ed648cc014a965b64c591592ae17e2849027b2418d297f9a339f6acc6",
+    "verifier_sources": {
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/native.py": "f44bf3905bd248df2f7c2fe10db3c926a847d170c963e889bffac94d51435228",
+      "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/datasets/ttg/build.py": "a617dd95626a60babcf56dc10fba0ed3dc4a5c24ceca3033fea0b97401c129b9"
+    },
+    "full_response": {
+      "full_actions_sha256": "e3e881a39514c09ae0688a803b041eea3c7bd324c0807c47714d6208fbb6fa47",
+      "full_semantic_sha256": "4d59c441753655740797a4b0313ae6855c96c3c600db8c7549400a11658fffd6"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-diagnostics-20261112/cpu-native-v1/cases/linked_list-smoke-off-CPU-diagnostic-0/plus-proof.json",
+    "sha256": "e337b5a16861c40e984f43ae683388029f3c31ec98096f84c04adddd0572fde6"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-diagnostics-20261112/cpu-native-v1/cases/linked_list-smoke-off-CPU-diagnostic-0/cleanup-target.json",
+    "sha256": "e158dabde47bc2a91c73984857a53fb9b7e1cf92ed28ad2e06bb03f5d72f9e57"
+  },
+  "database_state": {
+    "database": "continuation_be2874d6dd814d75aac6975b0ea26307",
+    "cluster_owner": "18b36937-4377-4a49-bf87-2b645fc65ae6",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "224128b67a18424c6ade4fc95fa4ee8493ac62174fe09e66f335fd0fb4ce5e9e",
+    "actual_row_count": 64,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('Item','Next')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-diagnostics-20261112/selection-v4-sources.json",
+    "sha256": "ce768788f3b492e56abc8be462d05ffbcb2222bab4953c458386c1502ea7fa53"
+  }
+}

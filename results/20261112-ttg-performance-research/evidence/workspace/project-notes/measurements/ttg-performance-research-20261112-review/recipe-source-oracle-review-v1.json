@@ -1,0 +1,121 @@
+{
+  "kind": "bounded_recipe_source_oracle_review",
+  "recorded_date": "2026-11-12",
+  "passed": true,
+  "scope": "Pure preparation source and small serialized fixtures only; no native or timing acceptance",
+  "refs": [
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112-runtime/recipe-preparation-v1.json",
+      "sha256": "af04b3c1551af390fa7bcb683fc1cf722114bcec4e82a0944db8cd11e72bf408"
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-performance-research-fixtures-20261112/README.md",
+      "sha256": "a7e1730916989a157ddcac38eac2e3ad96ae4c8b1f0d2b25f71dd29a1578fbb2"
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-performance-research-fixtures-20261112/recipe_fixture.py",
+      "sha256": "7c4f73257df38120d9753ee883c4aba7636d8a626b561285f932480c2f9af184"
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-performance-research-fixtures-20261112/test_recipe_fixture.py",
+      "sha256": "0dbc6291eee5c7f4f6ca182e143fe8256ad3b6c74f7cddb6aad99a660f998934"
+    },
+    {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/app_suite/apps/recipe_pantry/server.jac",
+      "sha256": "c9be1cf67ba71b678f9b39cb6cb9f040647a65602878a55889bae549418dd44b"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112-runtime/recipe-small-v1/manifest.json",
+      "sha256": "9d99fb8725d364057bfcf4a25f957cd07b2288293d7f19122fd42589b00117ff"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112-runtime/recipe-small-v1/fixture.json",
+      "sha256": "8bb727267594bb411cc7f68c82c2602a612baa0987ed139d13460ff58f4591ea"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112-runtime/recipe-small-v1/oracle-workload.json",
+      "sha256": "97ac965d06d6df0d38d982fa2a1f90fa9324325f5f43735bd93ba277b2e5a73a"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112-runtime/recipe-large-v1/manifest.json",
+      "sha256": "e5bd908a1b6936c5e7f1b0ef0de8fe1d42e4f4f9278cd4e092893a30e35f6d61"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112-runtime/recipe-large-v1/fixture.json",
+      "sha256": "4a3eba6aa4835176fdf3d6152606cda5abb9e55fe41156bc8bb911b564570e52"
+    },
+    {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112-runtime/recipe-large-v1/oracle-workload.json",
+      "sha256": "a130dcb7ade6875330c0116da4832a06c7a3c650a90dbf96cad0998b8b4e367a"
+    }
+  ],
+  "observed_shapes": [
+    {
+      "scale": "small",
+      "logical_domain_nodes": 92,
+      "typed_domain_edges": 96,
+      "root_links": 44,
+      "planned_meals": 16,
+      "planned_reachable_recipes": 8,
+      "planned_reachable_requirements": 24,
+      "planned_reachable_ingredients": 12,
+      "operations": 14
+    },
+    {
+      "scale": "large",
+      "logical_domain_nodes": 920,
+      "typed_domain_edges": 960,
+      "root_links": 440,
+      "planned_meals": 160,
+      "planned_reachable_recipes": 80,
+      "planned_reachable_requirements": 240,
+      "planned_reachable_ingredients": 120,
+      "operations": 14
+    }
+  ],
+  "evidence": [
+    {
+      "source": "recipe_fixture.py:52-108; server.jac:74-110,137-154",
+      "conclusion": "Actual persistent initial graph grows10x; Board enumerates all root tables and ShoppingList reaches all8/80 Recipes and12/120 Ingredients through16/160 planned Meals. Both workflows14 operations; growth is not repeated sessions."
+    },
+    {
+      "source": "recipe_fixture.py:111-166",
+      "conclusion": "Typed endpoints, nonempty distinct requirements, single RecipeRef, exactly-one history ownership, root attachment membership/multiplicity and ingredient conservation are explicitly checked. Native adapter still must compare complete actual graph, not rely on this logical proof."
+    },
+    {
+      "source": "recipe_fixture.py:185-212; server.jac:33-38,79-110,140-154",
+      "conclusion": "Relational join/quantity aggregate matches requirement-times-servings, planned-only shopping, all-Ingredient zero defaults, shortage clamp, and purchased/consumed history sums."
+    },
+    {
+      "source": "recipe_fixture.py:227-268; server.jac:119-130,162-174,181-202",
+      "conclusion": "Plan trim/servings, Purchase positivity, ownership-before-cooked-before-stock ordering, prechecked stock mutation, exact business reports and statuses match for declared fixtures/typed requests."
+    },
+    {
+      "source": "test_recipe_fixture.py:test_independent_closed_form_quantity",
+      "conclusion": "Hand arithmetic independently checks tiny planned demand[18,30,24] and initial/consumed[9,14,7] from servings[3,4,1,2,3,4], cooked indices2/5. No native-derived expected outputs."
+    },
+    {
+      "source": "recipe_fixture.py:302-337",
+      "conclusion": "Normalization limited to declared PantryBoard tables and ShoppingList unique-ID rows. Exact field sets/types and duplicate ID rejection; other reports/lists retain exact encoded order/value/type equality. No global sorting/stripping."
+    },
+    {
+      "source": "README.md:Integration contract; recipe_fixture.py:273-299",
+      "conclusion": "Workflow preserves stock, zero purchase, blank name, duplicate cook and foreign-owner rejections, valid PlanMeal,3 purchases, Cook and final scaled reads. Native identity/mapping/error envelope/poststate/restart acceptance is explicitly pending."
+    }
+  ],
+  "findings": [],
+  "owner_checks": {
+    "reported_pure_tests": 11,
+    "reviewer_reran_tests": false
+  },
+  "remaining_native_contracts": [
+    "Source-preserving setup and full graph import with root attachments and actual identity bijection",
+    "Real separate-authenticated-user rejection with business report rather than transport/auth failure or client mapping error",
+    "Exact current reports/typed complete poststate after success and rejection, added history multiplicity, fresh-session/restart and physical checks across all three policies"
+  ],
+  "limits": [
+    "No Jac/runtime imports, DB, native execution, tests or timers run.",
+    "PASS applies to reviewed preparation bytes and generated logical graphs, not arbitrary malformed inputs, native permissions, UUID import or measured performance.",
+    "No new framework or extra approval layer required."
+  ]
+}

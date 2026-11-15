@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/precision-v2/cases/recipe_pantry-smoke-conservative-precision-0/artifacts.json",
+    "sha256": "cf52ea7bae499fb23748cdc94138aad10ac5e0bb749d041ddacb0fec246d23e7",
+    "files_checked": 32
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_frozen_domain_scenario_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/precision-v2/cases/recipe_pantry-smoke-conservative-precision-0/artifacts.json",
+      "sha256": "cf52ea7bae499fb23748cdc94138aad10ac5e0bb749d041ddacb0fec246d23e7",
+      "files_checked": 32
+    },
+    "proof_sha256": "003bf36f7229920cd3c619c8ee73189c918bdda3dfe42b677e3f3c504be42066",
+    "actual_operations_checked": 23,
+    "selected_oracle": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-performance-research-20261112/recipe_scenario.py",
+      "sha256": "9649456aab4e08caac202cb68228b6a276a2ac71007fcc1a90872cf510efdc9d"
+    },
+    "final_logical_state_sha256": "b610a9584ef41a69ce5d47d5383f4518f8819388c80c0e0b18af6a2a9c173c28",
+    "full_response": {
+      "full_actions_sha256": "874693993ba0ca5fde5bd299ac41b81da740ff24311bde8b33c3667f3f3c6b5e",
+      "full_semantic_sha256": "b58331229ea99b055d6f89dc0f3cfb677fc5b5e5e93c3a9e131787644d1c5d0b"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/precision-v2/cases/recipe_pantry-smoke-conservative-precision-0/plus-proof.json",
+    "sha256": "003bf36f7229920cd3c619c8ee73189c918bdda3dfe42b677e3f3c504be42066"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/precision-v2/cases/recipe_pantry-smoke-conservative-precision-0/cleanup-target.json",
+    "sha256": "cab192f503fc6dcb1a28288b7a100fd63713fc5aa0d26e816fc475056ea49923"
+  },
+  "database_state": {
+    "database": "continuation_2941bb82526043b9b5a001391e00ecff",
+    "cluster_owner": "8b47a0bd-2314-4b7b-a2d5-f65eecd64184",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "29e8870e99838247ac7280e4466083d7d809f08b96d0f1db4c17ff6f8bec3aee",
+    "actual_row_count": 40,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('Ingredient','Recipe','Requirement','Meal','Purchase','Consumption','Needs','IngredientRef','RecipeRef','Bought','Consumed')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-performance-research-20261112/plan-v1/sources.json",
+    "sha256": "8d3c3e3afaded659aca55d28110304e22d86afa1069e723d5566c413d4c8a047"
+  }
+}

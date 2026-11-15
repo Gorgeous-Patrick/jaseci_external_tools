@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "raw_seal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-condition-access-performance-20261111/run-v1/cases/recipe_pantry-before-measured-2/artifacts.json",
+    "sha256": "7e04e9cf7db8f1f6664b087558537bd4ecb67ab6ca1ec052ac4e8da8fca9c1e0",
+    "files_checked": 32
+  },
+  "semantic": {
+    "passed": true,
+    "kind": "independent_frozen_domain_scenario_replay",
+    "raw_seal": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-condition-access-performance-20261111/run-v1/cases/recipe_pantry-before-measured-2/artifacts.json",
+      "sha256": "7e04e9cf7db8f1f6664b087558537bd4ecb67ab6ca1ec052ac4e8da8fca9c1e0",
+      "files_checked": 32
+    },
+    "proof_sha256": "705050eebc4035702b45e8a7d2f3e56810c455c303cd18f58d54c1b0fc2bfdd2",
+    "actual_operations_checked": 23,
+    "selected_oracle": {
+      "path": "/home/baichuan/jaseci/reproduction/ttg-condition-access-performance-20261111/recipe_scenario.py",
+      "sha256": "9649456aab4e08caac202cb68228b6a276a2ac71007fcc1a90872cf510efdc9d"
+    },
+    "final_logical_state_sha256": "b610a9584ef41a69ce5d47d5383f4518f8819388c80c0e0b18af6a2a9c173c28",
+    "full_response": {
+      "full_actions_sha256": "874693993ba0ca5fde5bd299ac41b81da740ff24311bde8b33c3667f3f3c6b5e",
+      "full_semantic_sha256": "b58331229ea99b055d6f89dc0f3cfb677fc5b5e5e93c3a9e131787644d1c5d0b"
+    }
+  },
+  "semantic_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-condition-access-performance-20261111/run-v1/cases/recipe_pantry-before-measured-2/plus-proof.json",
+    "sha256": "705050eebc4035702b45e8a7d2f3e56810c455c303cd18f58d54c1b0fc2bfdd2"
+  },
+  "target": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-condition-access-performance-20261111/run-v1/cases/recipe_pantry-before-measured-2/cleanup-target.json",
+    "sha256": "10e6baae22d23aa76dfed4f284b9e4a7c2f06f0f69ab64706c81d0282c4a30f9"
+  },
+  "database_state": {
+    "database": "continuation_c1d1417a86cf4b93a683b92c8aa04821",
+    "cluster_owner": "ddd7129c-145d-4a3f-bda4-4b1c1abd0338",
+    "matches_sealed_final_graph": true,
+    "final_graph_sha256": "4c1574854a5dd386c1d0607c2b2f881b140fa1deb09db0ebbc5fa0693e589b6e",
+    "actual_row_count": 40,
+    "SQL": "WITH domain AS (SELECT id FROM anchors WHERE arch_type IN ('Ingredient','Recipe','Requirement','Meal','Purchase','Consumption','Needs','IngredientRef','RecipeRef','Bought','Consumed')) SELECT coalesce(json_agg(row_to_json(q)), '[]'::json) FROM (SELECT id,kind,arch_type,root_id,src,dst,undirected,props FROM anchors WHERE id IN (SELECT id FROM domain) OR (kind='EdgeAnchor' AND (src IN (SELECT id FROM domain) OR dst IN (SELECT id FROM domain))) ORDER BY seq) q"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-condition-access-performance-20261111/sources.json",
+    "sha256": "570c29d9fd1a63a4d7bd69d3ed69b270c81294f23ca900c6b3fe98c4ff4f9c05"
+  }
+}
