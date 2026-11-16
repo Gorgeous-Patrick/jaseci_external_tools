@@ -1,0 +1,398 @@
+{
+  "schema": "ttg-interability-method-inputs-v1",
+  "runtime_commit": "addd3a4fb08819699d88afcf9a4ef8f1744d1ae4",
+  "source_files": {
+    "jac/jaclang/impl/sql.impl.jac": "0775fbbbb9f8c45e44575355416521ef6e18cabcd31ce5df3f3fde11fde800d9",
+    "jac/jaclang/runtime/ttg_dependencies.jac": "44e58ca2e934bbcbc8539584467ed63b002215161c9e3c111c89be7de2479ba3",
+    "jac/jaclang/runtime/ttg_dependency_prefetch.jac": "0a63ba372ab1846ade3bd3e9a216101629aee617444b9e89aceb21cad568ada0",
+    "jac/jaclang/runtime/ttg_templates.jac": "283e9aa070a6ed4f63fb5713389959ad956481cedd81917d64291d36d5447055",
+    "jac/jaclang/sql.jac": "35c39dbdcebf3f67490c76cdd14860198ffb8c522efb6f9caed63f66aab0e2c8",
+    "jac/tests/runtimelib/test_ttg_dependency_prefetch.jac": "7f913efb09393ca5583c515373e544f94dbc1e216824eda615719f23c19afa91",
+    "jac/jaclang/runtime/ttg_regions.jac": "cf383adfcdfc20ac3b98ed3a9d7c087c5aae61f4dcb0d2a9cbd1820c36b6e783",
+    "jac/tests/runtimelib/fixtures/ttg_region_walkers.jac": "7ad5b09d036f110c9b70e64a8af0efdcf3737b75843b90f52a21ae7153918931",
+    "jac/tests/runtimelib/test_ttg_regions.jac": "43e9c41a2ec968353b7e2b06458592b0261b645b5144ff0c5b0c755879c142be",
+    "jac/tests/runtimelib/test_ttg_regions_native.jac": "1a7f3994b856d69a5a82506de76da9e7b011c0edf650c008f1794fbc3480e588"
+  },
+  "created_at_utc": "2026-11-02T05:32:32.444587+00:00",
+  "kind": "Source/evidence explanation; no execution or performance recomputation",
+  "implemented_kernel": {
+    "compile_entry": "ttg_dependencies.jac:1121 compile_checkpoint_plan -> compile_interability_regions -> serialized checkpoint literal",
+    "local_summary_fields": [
+      "ability",
+      "entry",
+      "source_type",
+      "eligible",
+      "rejections",
+      "outputs",
+      "visit",
+      "guard",
+      "guard_fields",
+      "dispatch",
+      "frontier_independent_prefix",
+      "external_dependencies",
+      "sql_internal_dependencies",
+      "checkpoint_proof"
+    ],
+    "shared_access_reads_note": "The implementation uses a conservative walker-wide union of recorded shared branch/visit reads when excluding output writes; it is not a general precise per-helper alias/effect analysis.",
+    "composition": "One exact typed visit per eligible ability; compose existing static dispatch edges. Finite A-B-C uses unrolled CTEs; only homogeneous self-transition uses recursive lowering.",
+    "predicate": "Ordinary declared Boolean here.active and supported Boolean combinations remain SQL-internal. No numeric/shared-threshold guard solver.",
+    "checkpoint": "Entry follows origin/context binding; actor and exact dispatch are validated before binding. Shared thresholds assigned by earlier abilities are rejected rather than claimed to have a general last-definition checkpoint.",
+    "helper_boundary": "Opaque helper calls, ordinary loops, writes and cancellation are unsupported effects. Fetch the immediate boundary target without expanding its unknown ability.",
+    "data_certificate": "Complete SQL rows validate immediate arity <=1, identity history/cycle flags, order, type/module, guard validity and resource completion before atomic publication; acyclicity is not inferred from edge names or a visited counter.",
+    "cache": "Publish ordered typed/native path pairs and real empty markers; a false guard does not invent an empty graph path. Coverage binds invocation token, graph, scope, walker, ability, origin and actor within the query-cache epoch.",
+    "native_execution": "Original handlers, queue append order, duplicates, output and early exit execute natively; payload IDs can be deduplicated independently."
+  },
+  "stage2": {
+    "summary": "Only pure visit-prefix abilities receive additional frontier attempts: entry/exit/input/visit events only.",
+    "identity": "(ability,active origin,event) per continuation, with local/fused/complete emitted-native cache reuse first.",
+    "implementation_boundary": "This reuses the existing collect_frontier continuation safety/barrier logic; it is separate from the new static single-successor region kernel."
+  },
+  "source_anchors": {
+    "summaries": "jac/jaclang/runtime/ttg_regions.jac:94",
+    "dispatch_composition": "jac/jaclang/runtime/ttg_regions.jac:284",
+    "sql_guard": "jac/jaclang/runtime/ttg_regions.jac:374",
+    "sql_lowering": "jac/jaclang/runtime/ttg_regions.jac:500",
+    "coverage": "jac/jaclang/runtime/ttg_regions.jac:605",
+    "runtime_validation": "jac/jaclang/runtime/ttg_regions.jac:629",
+    "atomic_publish": "jac/jaclang/runtime/ttg_templates.jac:247",
+    "native_path_reuse": "jac/jaclang/runtime/ttg_templates.jac:299",
+    "static_fast_path": "jac/jaclang/runtime/ttg_dependency_prefetch.jac:263",
+    "stage2_attempts": "jac/jaclang/runtime/ttg_dependency_prefetch.jac:418"
+  },
+  "accepted_native_examples": {
+    "chain8": {
+      "reports": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "region_queries": 1,
+      "region_cache_paths": 8,
+      "region_origins": 8,
+      "region_reuses": 7,
+      "template_queries": 0,
+      "frontier_region_attempts": 0,
+      "fallback_resolver_calls": 0,
+      "strict_cache": true,
+      "native_pair_call_count": 8,
+      "native_pair_store_rows_calls": 0,
+      "region_records": [
+        {
+          "kind": "static_interability",
+          "certificate_id": "entry:0",
+          "compiled": true,
+          "dispatch_edges": [
+            [
+              3,
+              0
+            ]
+          ],
+          "paths": [
+            {
+              "event": 3,
+              "origin": "8ed750f1-3bf6-49da-9861-bfd19a9ed7b9",
+              "ids": [
+                "a43df850-ec9c-4f83-9907-0b8bcf11f287"
+              ]
+            },
+            {
+              "event": 3,
+              "origin": "a43df850-ec9c-4f83-9907-0b8bcf11f287",
+              "ids": [
+                "d094c238-4cd5-4a03-86d7-7c6c497334b3"
+              ]
+            },
+            {
+              "event": 3,
+              "origin": "d094c238-4cd5-4a03-86d7-7c6c497334b3",
+              "ids": [
+                "10149f57-c26d-4625-844c-194b78fe7128"
+              ]
+            },
+            {
+              "event": 3,
+              "origin": "10149f57-c26d-4625-844c-194b78fe7128",
+              "ids": [
+                "cad87863-f14d-4050-932c-0b0b4adb8a54"
+              ]
+            },
+            {
+              "event": 3,
+              "origin": "cad87863-f14d-4050-932c-0b0b4adb8a54",
+              "ids": [
+                "34f48234-eaa9-43d5-85e7-45ea61f7c673"
+              ]
+            },
+            {
+              "event": 3,
+              "origin": "34f48234-eaa9-43d5-85e7-45ea61f7c673",
+              "ids": [
+                "00dbdeca-ea1e-4bb8-8f03-b07446b9ec38"
+              ]
+            },
+            {
+              "event": 3,
+              "origin": "00dbdeca-ea1e-4bb8-8f03-b07446b9ec38",
+              "ids": [
+                "70cbd141-5535-4a69-aed6-c330332a8a26"
+              ]
+            },
+            {
+              "event": 3,
+              "origin": "70cbd141-5535-4a69-aed6-c330332a8a26",
+              "ids": []
+            }
+          ],
+          "external_dependencies": [
+            "origin identity",
+            "exact runtime dispatch",
+            "actor/ACL context"
+          ],
+          "checkpoint": 0
+        }
+      ]
+    },
+    "guard_true": {
+      "reports": [
+        17
+      ],
+      "region_queries": 1,
+      "region_cache_paths": 2,
+      "region_origins": 2,
+      "region_reuses": 1,
+      "template_queries": 0,
+      "frontier_region_attempts": 0,
+      "fallback_resolver_calls": 0,
+      "strict_cache": true,
+      "native_pair_call_count": 2,
+      "native_pair_store_rows_calls": 0,
+      "region_records": [
+        {
+          "kind": "static_interability",
+          "certificate_id": "entry:0",
+          "compiled": true,
+          "dispatch_edges": [
+            [
+              1,
+              3
+            ],
+            [
+              6,
+              9
+            ]
+          ],
+          "paths": [
+            {
+              "event": 1,
+              "origin": "62338418-ef29-4b41-9612-e3a8034d3704",
+              "ids": [
+                "ec20b8c8-cade-4982-b824-6f153d9456f1"
+              ]
+            },
+            {
+              "event": 6,
+              "origin": "ec20b8c8-cade-4982-b824-6f153d9456f1",
+              "ids": [
+                "4a405f43-598a-48f7-8935-69ccbd03f595"
+              ]
+            }
+          ],
+          "external_dependencies": [
+            "origin identity",
+            "exact runtime dispatch",
+            "actor/ACL context"
+          ],
+          "checkpoint": 0
+        }
+      ]
+    },
+    "guard_false": {
+      "reports": [],
+      "region_queries": 1,
+      "region_cache_paths": 1,
+      "region_origins": 2,
+      "region_reuses": 1,
+      "template_queries": 0,
+      "frontier_region_attempts": 0,
+      "fallback_resolver_calls": 0,
+      "strict_cache": true,
+      "native_pair_call_count": 1,
+      "native_pair_store_rows_calls": 0,
+      "region_records": [
+        {
+          "kind": "static_interability",
+          "certificate_id": "entry:0",
+          "compiled": true,
+          "dispatch_edges": [
+            [
+              1,
+              3
+            ],
+            [
+              6,
+              9
+            ]
+          ],
+          "paths": [
+            {
+              "event": 1,
+              "origin": "023908a2-6a60-432e-8406-162c8df63aec",
+              "ids": [
+                "c2a71893-dfa8-4b84-8793-4a7003500ef5"
+              ]
+            }
+          ],
+          "external_dependencies": [
+            "origin identity",
+            "exact runtime dispatch",
+            "actor/ACL context"
+          ],
+          "checkpoint": 0
+        }
+      ]
+    },
+    "later_collect_duplicate": {
+      "reports": [
+        31,
+        31
+      ],
+      "region_queries": 0,
+      "region_cache_paths": 0,
+      "region_origins": 0,
+      "region_reuses": 0,
+      "template_queries": 2,
+      "frontier_region_attempts": 2,
+      "fallback_resolver_calls": 0,
+      "strict_cache": false,
+      "native_pair_call_count": 3,
+      "native_pair_store_rows_calls": 0,
+      "region_records": [
+        {
+          "kind": "linear",
+          "compiled": true,
+          "demands": [
+            {
+              "event": 1,
+              "origin": "0edf672e-e13f-4244-9974-43f5aa2f546f",
+              "activation": "0edf672e-e13f-4244-9974-43f5aa2f546f",
+              "slot": 0
+            }
+          ],
+          "stop": "",
+          "queued_trigger_assumption": true
+        },
+        {
+          "kind": "batch",
+          "compiled": true,
+          "demands": [
+            {
+              "event": 4,
+              "origin": "31d6b4f3-641d-468e-b77d-5773bbe3914e",
+              "activation": "31d6b4f3-641d-468e-b77d-5773bbe3914e",
+              "slot": 1
+            },
+            {
+              "event": 5,
+              "origin": "31d6b4f3-641d-468e-b77d-5773bbe3914e",
+              "activation": "31d6b4f3-641d-468e-b77d-5773bbe3914e",
+              "slot": 2
+            }
+          ],
+          "stop": "",
+          "queued_trigger_assumption": true
+        }
+      ]
+    }
+  },
+  "actual_guard_query": {
+    "file": "project-notes/measurements/ttg-interability-20261101/method-guard-actual.sql",
+    "sha256": "9112d09d205655b73730a5efe4c322fdbbf88f6b420d4368503b423a5c577a9b",
+    "params": {
+      "p0": 0,
+      "p1": 0,
+      "p2": true,
+      "p3": "NodeAnchor",
+      "p4": "RegionB",
+      "p5": true,
+      "p6": "EdgeAnchor",
+      "p7": "RegionAB",
+      "p8": true,
+      "p9": 0,
+      "p10": true,
+      "p11": "RegionB",
+      "p12": false,
+      "p13": false,
+      "p14": 1,
+      "p15": 0,
+      "p16": "NodeAnchor",
+      "p17": "RegionA",
+      "p18": 1,
+      "p19": 1,
+      "p20": 0,
+      "p21": true,
+      "p22": "NodeAnchor",
+      "p23": "RegionB",
+      "p24": true,
+      "p25": "EdgeAnchor",
+      "p26": "RegionAB",
+      "p27": true,
+      "p28": 0,
+      "p29": true,
+      "p30": "RegionB",
+      "p31": false,
+      "p32": false,
+      "p33": 1,
+      "p34": 0,
+      "p35": "NodeAnchor",
+      "p36": "RegionA",
+      "p37": true,
+      "p38": "NodeAnchor",
+      "p39": "RegionC",
+      "p40": true,
+      "p41": "EdgeAnchor",
+      "p42": "RegionBC",
+      "p43": "archetype",
+      "p44": "active",
+      "p45": "true",
+      "p46": false,
+      "p47": 1,
+      "p48": "active",
+      "p49": "boolean",
+      "p50": "RegionC",
+      "p51": false,
+      "p52": false,
+      "p53": -1,
+      "p54": 1,
+      "p55": "NodeAnchor",
+      "p56": "RegionB",
+      "target_module_0": "_jac_test_pkg_0.fixtures.ttg_region_walkers",
+      "source_module_0": "_jac_test_pkg_0.fixtures.ttg_region_walkers",
+      "target_module_1": "_jac_test_pkg_0.fixtures.ttg_region_walkers",
+      "source_module_1": "_jac_test_pkg_0.fixtures.ttg_region_walkers",
+      "row_limit": 2049,
+      "origin": "62338418-ef29-4b41-9612-e3a8034d3704",
+      "max_depth": 2048
+    },
+    "rows": 2,
+    "source": "native-v5/native.jsonl RegionGuard enabled reports[17]",
+    "provenance": "Actual emitted query observed during accepted native execution; copied without regeneration."
+  },
+  "acceptance_refs": {
+    "verification": "project-notes/measurements/ttg-interability-20261101/verification.json",
+    "verification_sha256": "1db5b36aaf53b6b1107a31d294a0774f8efb1cbe56e649ec79fb83125faecb73",
+    "native_manifest_sha256": "752ad67500ec4c8efa2593644409ff42a0880bd044e8793381c2b51bccd60657",
+    "native_review_sha256": "4d30896b38b2d1342d47764736dbf4f3891d20c94f7e475aac82853edf0b6ca8",
+    "final_regression_review_sha256": "7110b9c1e5743eaa79c1afddbece75cdbd9098221159a477d1e503f8d3d9fcea"
+  },
+  "performance_results": null,
+  "roadmap": [
+    "General helper/alias/heap effect summaries and dominated external guard bindings are future work.",
+    "Region cost admission is future work; exact AlwaysPrefetch currently enables fusion, and shared batch feedback is excluded from model training.",
+    "Server-side prepared-plan reuse was not added or evaluated in this change."
+  ]
+}

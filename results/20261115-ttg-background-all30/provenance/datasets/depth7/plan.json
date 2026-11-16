@@ -1,0 +1,531 @@
+{
+  "kind": "ttg-background-pushdown-large-performance-20261115-v1",
+  "seed": 42,
+  "sources": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-large-performance-20261115/plan-v1/sources.json",
+    "sha256": "47677a189d5be5182a4cb631039f770648cd54ed95f7d57eb9c01f8afd87de44"
+  },
+  "runtimes": {
+    "previous_background": {
+      "clean": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-performance-20261115/runtime-v1/clean-manifest.json",
+        "sha256": "ec64d6061d5822c6c49c99f0e892dd978e510ad872ae6f18eb1ffad4fb6429fa"
+      },
+      "overlay": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-performance-20261115/runtime-v1/overlay-manifest.json",
+        "sha256": "6d060211fc8e52830cbbee340534d200e5edaca70421d3b9fc94353dc6d181fc"
+      }
+    },
+    "restored": {
+      "clean": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-restoration-performance-20261115/runtime-v1/clean-manifest.json",
+        "sha256": "6a21cb2fa698350db184f09428142b36818645b7bc5818fbe4e2e2294e8e504b"
+      },
+      "overlay": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-restoration-performance-20261115/runtime-v1/overlay-manifest.json",
+        "sha256": "05ea3beac131a08b03a80d766cc65f16a57d33135101457df72e369281fd2e2f"
+      }
+    }
+  },
+  "runtime_by_policy": {
+    "off": "restored",
+    "conservative": "previous_background",
+    "background": "previous_background",
+    "restored": "restored"
+  },
+  "runtime_verification": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-restoration-20261115/verification.json",
+    "sha256": "b1153c217bc8a85613cf5c1017dde2f78d5cd8b9db90813c855de8131e3ca080"
+  },
+  "disabled_branch_proof": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-restoration-20261115/disabled-path-proof-v1.json",
+    "sha256": "b2795981929a0271d2db3ac5e366899802dc2333f1b5923340c6de6d0bfe3389"
+  },
+  "previous_tested_source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-20261115/final-source-v1/manifest.json",
+    "sha256": "711df00aaf32b4649877c3b801bfc6a4ca8b5f8cbfb27359f0fcb05c4d9d3b29"
+  },
+  "previous_plan": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-restoration-performance-20261115/plan-v1/plan.json",
+    "sha256": "0405fd15172e209dadc1d144e5e92ed86e4f8cf534f2445bfd5d26be1ae60209"
+  },
+  "app_snapshot": {
+    "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/snapshot.json",
+    "sha256": "ef180e4e3548780779ca6e894a9a3c564d81dbace299ede6c25710ae6456aea7"
+  },
+  "configs": {
+    "off": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "thread",
+      "ttg_prefetch_model": "always",
+      "prefetching": "none",
+      "ttg_fused_sql": false,
+      "ttg_background_sql": false
+    },
+    "conservative": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "thread",
+      "ttg_prefetch_model": "always",
+      "prefetching": "ttg_dependency",
+      "ttg_fused_sql": true,
+      "ttg_background_sql": false
+    },
+    "background": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "thread",
+      "ttg_prefetch_model": "always",
+      "prefetching": "ttg_dependency",
+      "ttg_fused_sql": true,
+      "ttg_background_sql": true
+    },
+    "restored": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "thread",
+      "ttg_prefetch_model": "always",
+      "prefetching": "ttg_dependency",
+      "ttg_fused_sql": true,
+      "ttg_background_sql": true
+    }
+  },
+  "apps": [
+    "jdrive"
+  ],
+  "stages": {
+    "correctness": [
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "off",
+        "phase": "correctness",
+        "repeat": 0,
+        "guard": true,
+        "trial_id": "jdrive-depth7-off-correctness-0"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "conservative",
+        "phase": "correctness",
+        "repeat": 0,
+        "guard": true,
+        "trial_id": "jdrive-depth7-conservative-correctness-0"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "background",
+        "phase": "correctness",
+        "repeat": 0,
+        "guard": true,
+        "trial_id": "jdrive-depth7-background-correctness-0"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "restored",
+        "phase": "correctness",
+        "repeat": 0,
+        "guard": true,
+        "trial_id": "jdrive-depth7-restored-correctness-0"
+      }
+    ],
+    "primary": [
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "off",
+        "phase": "excluded_warmup",
+        "repeat": -1,
+        "guard": true,
+        "trial_id": "jdrive-depth7-off-excluded_warmup--1"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "conservative",
+        "phase": "excluded_warmup",
+        "repeat": -1,
+        "guard": true,
+        "trial_id": "jdrive-depth7-conservative-excluded_warmup--1"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "background",
+        "phase": "excluded_warmup",
+        "repeat": -1,
+        "guard": true,
+        "trial_id": "jdrive-depth7-background-excluded_warmup--1"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "restored",
+        "phase": "excluded_warmup",
+        "repeat": -1,
+        "guard": true,
+        "trial_id": "jdrive-depth7-restored-excluded_warmup--1"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "off",
+        "phase": "measured",
+        "repeat": 0,
+        "guard": true,
+        "trial_id": "jdrive-depth7-off-measured-0"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "conservative",
+        "phase": "measured",
+        "repeat": 0,
+        "guard": true,
+        "trial_id": "jdrive-depth7-conservative-measured-0"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "background",
+        "phase": "measured",
+        "repeat": 0,
+        "guard": true,
+        "trial_id": "jdrive-depth7-background-measured-0"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "restored",
+        "phase": "measured",
+        "repeat": 0,
+        "guard": true,
+        "trial_id": "jdrive-depth7-restored-measured-0"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "conservative",
+        "phase": "measured",
+        "repeat": 1,
+        "guard": true,
+        "trial_id": "jdrive-depth7-conservative-measured-1"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "background",
+        "phase": "measured",
+        "repeat": 1,
+        "guard": true,
+        "trial_id": "jdrive-depth7-background-measured-1"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "restored",
+        "phase": "measured",
+        "repeat": 1,
+        "guard": true,
+        "trial_id": "jdrive-depth7-restored-measured-1"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "off",
+        "phase": "measured",
+        "repeat": 1,
+        "guard": true,
+        "trial_id": "jdrive-depth7-off-measured-1"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "background",
+        "phase": "measured",
+        "repeat": 2,
+        "guard": true,
+        "trial_id": "jdrive-depth7-background-measured-2"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "restored",
+        "phase": "measured",
+        "repeat": 2,
+        "guard": true,
+        "trial_id": "jdrive-depth7-restored-measured-2"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "off",
+        "phase": "measured",
+        "repeat": 2,
+        "guard": true,
+        "trial_id": "jdrive-depth7-off-measured-2"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "conservative",
+        "phase": "measured",
+        "repeat": 2,
+        "guard": true,
+        "trial_id": "jdrive-depth7-conservative-measured-2"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "restored",
+        "phase": "measured",
+        "repeat": 3,
+        "guard": true,
+        "trial_id": "jdrive-depth7-restored-measured-3"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "off",
+        "phase": "measured",
+        "repeat": 3,
+        "guard": true,
+        "trial_id": "jdrive-depth7-off-measured-3"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "conservative",
+        "phase": "measured",
+        "repeat": 3,
+        "guard": true,
+        "trial_id": "jdrive-depth7-conservative-measured-3"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "background",
+        "phase": "measured",
+        "repeat": 3,
+        "guard": true,
+        "trial_id": "jdrive-depth7-background-measured-3"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "off",
+        "phase": "measured",
+        "repeat": 4,
+        "guard": true,
+        "trial_id": "jdrive-depth7-off-measured-4"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "conservative",
+        "phase": "measured",
+        "repeat": 4,
+        "guard": true,
+        "trial_id": "jdrive-depth7-conservative-measured-4"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "background",
+        "phase": "measured",
+        "repeat": 4,
+        "guard": true,
+        "trial_id": "jdrive-depth7-background-measured-4"
+      },
+      {
+        "case_id": "jdrive-depth7",
+        "app": "jdrive",
+        "scale": "medium",
+        "length": null,
+        "config_id": "restored",
+        "phase": "measured",
+        "repeat": 4,
+        "guard": true,
+        "trial_id": "jdrive-depth7-restored-measured-4"
+      }
+    ]
+  },
+  "counts": {
+    "correctness": 4,
+    "excluded_warmups": 4,
+    "measured": 20,
+    "total": 28
+  },
+  "storage": {
+    "startup": 3221225472,
+    "between": 2684354560,
+    "stop": 2147483648,
+    "free_at_build_bytes": 4320833536
+  },
+  "regime": {
+    "workers": 1,
+    "limit": 2048,
+    "steps": 32768,
+    "GIL": "Actual disabled GIL asserted at SQL thread boundaries; strict backend isolation unchanged",
+    "snapshot": "Lazy once/native transaction export on foreground; private job import. Export/import/setup SQL retained in measured all-role totals.",
+    "pool": "Persistent process-global threads only; fresh server/workflow, separate per-job DB contexts. Actual noncreating prebusiness state labels cold/warm; no forced reset/prewarm.",
+    "warmup": "One separate fresh excluded workflow per fixture/policy; it does not warm the next measured-process pool.",
+    "SQL": "Unchanged lexical data/control/TOTAL; independent source-bound setup/path/payload/business-purpose decomposition. Foreground/background and late calls retained.",
+    "HTTP": "Instrumented response-body wall; explicit after-response Future drain separate; no pool-thread joins or native-close intervention.",
+    "statistics": "ANALYZE anchors+graph_types after setup/views before first primary/reset; WAL32/64MB and no SQL statement logging.",
+    "summaries": "n5 full vectors, median and range; no p95 claim, no historic sample pooling",
+    "HTTP_timeout_seconds": 300
+  },
+  "labels": {
+    "off": "Off, restored runtime disabled",
+    "conservative": "Old Conservative, frozen711d tested source",
+    "background": "Previous Background, frozen711d tested source",
+    "restored": "Restored Background, new tested source"
+  },
+  "pending_integration": false,
+  "formal_release": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-large-performance-20261115/formal-run-authorization.json",
+    "contract": "Main exact-plan authorization plus complete passed4 correctness and actual depth7 retained/rawpeak budget. No automatic timing or scale/cap change."
+  },
+  "comparison": "Fresh depth7 matched-state samples only. Same four policies and exact snapshot mapping as accepted restoration study. Previous depth5/old timing samples remain separate.",
+  "mechanism": "JDrive correctness must show actual recursive SQL execution, complete native cache evidence, and all-role data/control/TOTAL comparison. Publication counters alone are not timely-hit evidence.",
+  "size_evidence": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-large-performance-20261115/size-evidence-v1.json",
+    "sha256": "8264f3f82a09b950f187344869fa3a7e713da0b8f043ec78a7927afa8790564a"
+  },
+  "fixture": {
+    "case_id": "jdrive-depth7",
+    "scale": "medium",
+    "seed": 42,
+    "depth": 7,
+    "initial_nodes": 4374,
+    "initial_edges": 4373,
+    "business_requests": 7,
+    "oracle_tree_visits": [
+      701,
+      449,
+      450
+    ],
+    "typed_candidate_rows": [
+      1273,
+      815,
+      817
+    ],
+    "all_child_row_bounds": [
+      1559,
+      998,
+      1000
+    ]
+  },
+  "runtime_identities": {
+    "previous_background": {
+      "commit": "7e9beb7eaefaef30b6134e345728dd3a0d4bee23",
+      "accepted_native_verification": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-20261115/verification.json",
+        "sha256": "bee8e8a93ff17bf2227947c88e96b27c4f4f2dd4159e031872b2002beb587179"
+      },
+      "tested_source_files": 38,
+      "all_commit_blobs_match": true,
+      "scope": "Exact tested dirty/new source map now committed; full immutable runtime manifest remains authoritative, not HEAD alone."
+    },
+    "restored": {
+      "commit": "5cb1e0d0749004fb0a4a7a4b481ee74b089cc4eb",
+      "accepted_native_verification": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-restoration-20261115/verification.json",
+        "sha256": "b1153c217bc8a85613cf5c1017dde2f78d5cd8b9db90813c855de8131e3ca080"
+      },
+      "tested_source_files": 41,
+      "all_commit_blobs_match": true,
+      "scope": "Exact tested dirty/new source map now committed; full immutable runtime manifest remains authoritative, not HEAD alone."
+    }
+  },
+  "SQL_preservation": "Every consumed driver trace is sealed compressed JSONL with literal SQL, parameters, request generation/origin, role, send/ReadyForQuery intervals and native backend identity. Fingerprint/count tables supplement retained SQL text, never replace it.",
+  "capacity": {
+    "correctness_forecast": {
+      "free_bytes": 4327211008,
+      "prior_stop": {
+        "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-restoration-performance-20261115/correctness-v1-stopped-capacity.json",
+        "sha256": "ec434eab96697bf952cad20182e4a4f6bffc8777977ceeeaccc40cfa05a9b64f"
+      },
+      "node_growth_ratio": 9.0,
+      "prior_max_retained_case_bytes": 7848688,
+      "prior_max_trace_expansion_bytes": 9138159,
+      "per_case_linear_125percent_bound_bytes": 88297740,
+      "transient_bound_bytes": 102804288,
+      "cluster_cache_reserve_bytes": 536870912,
+      "correctness4_residual_bound_bytes": 3334344848,
+      "primary24_forecast": "Recalculate from actual four depth7 correctness cases and free bytes before timing release; no automatic launch or cap/scale change."
+    },
+    "primary_forecast": "Actual four correctness case retained/rawpeak and current free bytes before main timing release."
+  },
+  "metadata_supersedes": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-large-performance-20261115/plan-v1/plan.json",
+    "sha256": "694b05c88026ccea3ec6eb4518614b76d7ceda811a859c531a8549e11874dcf5"
+  }
+}
