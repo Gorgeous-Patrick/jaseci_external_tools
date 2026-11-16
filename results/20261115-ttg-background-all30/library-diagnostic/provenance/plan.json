@@ -1,0 +1,174 @@
+{
+  "kind": "library-prefetch-timeliness-diagnostic-v1",
+  "observer_pending": false,
+  "proposal": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-library-prefetch-performance-20261116/proposal-v1.json",
+    "sha256": "c4d3ad35a7092c66219fb39b4a666fcf92a2acc630772482bc54a2d87419f86d"
+  },
+  "parent_plan": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-portfolio-performance-20261115/A2/plan-v1/plan.json",
+    "sha256": "3c292f07e7b573859fce87ca6945cca6f6e55f6a80e30cf9ac202bf3a6875eab"
+  },
+  "sources": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-library-prefetch-performance-20261116/source-v3/sources.json",
+    "sha256": "706a6b043d670fe9e54be5f5c132513fec5e7849b89bf087bd872c6127615d19"
+  },
+  "source_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-library-prefetch-performance-20261116/source-v3/manifest.json",
+    "sha256": "3ceddbaec017f4c03dff4df98095fcdf3395c7c36b152ef45d17e04398de37f5"
+  },
+  "observer": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-library-prefetch-diagnostics-20261116/checkpoint-v3/source/library_timeliness.py",
+    "sha256": "652eb9ba062a62ca5a343abd2acf7088ce7315f72d13056e5937e5b68a5cc25d"
+  },
+  "observer_manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-library-prefetch-diagnostics-20261116/checkpoint-v3/manifest.json",
+    "sha256": "c098be47c53319f6b01105356aacdf677a61492a12f89534fb486f60d8153803"
+  },
+  "observer_checks": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-library-prefetch-diagnostics-20261116/observer-checks-v3.json",
+    "sha256": "fcb011da751adb44c5d3f7b7e63c21b617d111aa13c7edd88ad12d0ce11e4200"
+  },
+  "runtime": {
+    "clean": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-restoration-performance-20261115/runtime-v1/clean-manifest.json",
+      "sha256": "6a21cb2fa698350db184f09428142b36818645b7bc5818fbe4e2e2294e8e504b"
+    },
+    "overlay": {
+      "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-background-pushdown-restoration-performance-20261115/runtime-v1/overlay-manifest.json",
+      "sha256": "05ea3beac131a08b03a80d766cc65f16a57d33135101457df72e369281fd2e2f"
+    }
+  },
+  "seed": 42,
+  "app_snapshot": {
+    "path": "/home/baichuan/jaseci/reproduction/ttg-app-performance/suite-final-20261030-v1/snapshot.json",
+    "sha256": "ef180e4e3548780779ca6e894a9a3c564d81dbace299ede6c25710ae6456aea7"
+  },
+  "configs": {
+    "off": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "thread",
+      "ttg_prefetch_model": "always",
+      "prefetching": "none",
+      "ttg_fused_sql": false,
+      "ttg_background_sql": false
+    },
+    "restored": {
+      "topology_index": true,
+      "prefetch_limit": 2048,
+      "prefetch_workers": 1,
+      "cross_root_resolve": true,
+      "async_prefetch": "thread",
+      "ttg_prefetch_model": "always",
+      "prefetching": "ttg_dependency",
+      "ttg_fused_sql": true,
+      "ttg_background_sql": true
+    }
+  },
+  "schedule": [
+    {
+      "case_id": "library_loans-smoke",
+      "app": "library_loans",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "phase": "diagnostic",
+      "config_id": "off",
+      "repeat": 0,
+      "timeliness_observer": true,
+      "trial_id": "library_loans-smoke-off-traced-diagnostic-0"
+    },
+    {
+      "case_id": "library_loans-smoke",
+      "app": "library_loans",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "phase": "diagnostic",
+      "config_id": "restored",
+      "repeat": 0,
+      "timeliness_observer": true,
+      "trial_id": "library_loans-smoke-restored-traced-diagnostic-0"
+    },
+    {
+      "case_id": "library_loans-smoke",
+      "app": "library_loans",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "phase": "diagnostic",
+      "config_id": "restored",
+      "repeat": 1,
+      "timeliness_observer": true,
+      "trial_id": "library_loans-smoke-restored-traced-diagnostic-1"
+    },
+    {
+      "case_id": "library_loans-smoke",
+      "app": "library_loans",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "phase": "diagnostic",
+      "config_id": "restored",
+      "repeat": 2,
+      "timeliness_observer": true,
+      "trial_id": "library_loans-smoke-restored-traced-diagnostic-2"
+    },
+    {
+      "case_id": "library_loans-smoke",
+      "app": "library_loans",
+      "scale": "smoke",
+      "length": null,
+      "guard": true,
+      "phase": "diagnostic",
+      "config_id": "restored",
+      "repeat": 0,
+      "timeliness_observer": false,
+      "trial_id": "library_loans-smoke-restored-timeliness-disabled-diagnostic-0"
+    }
+  ],
+  "regime": {
+    "workers": 1,
+    "limit": 2048,
+    "steps": 32768,
+    "GIL": "Actual disabled GIL asserted at SQL thread boundaries; strict backend isolation unchanged",
+    "snapshot": "Lazy once/native transaction export on foreground; private job import. Export/import/setup SQL retained in measured all-role totals.",
+    "pool": "Persistent process-global threads only; fresh server/workflow, separate per-job DB contexts. Actual noncreating prebusiness state labels cold/warm; no forced reset/prewarm.",
+    "warmup": "No extra warmup workflows. Existing unchanged setup/views,3steady_warmup,3steady_read and final restart remain outside primary23HTTP and are retained.",
+    "SQL": "Unchanged lexical data/control/TOTAL; independent source-bound setup/path/payload/business-purpose decomposition. Foreground/background and late calls retained.",
+    "HTTP": "Instrumented response-body wall; explicit after-response Future drain separate; no pool-thread joins or native-close intervention.",
+    "statistics": "ANALYZE anchors+graph_types after setup/views before first primary/reset; WAL32/64MB and no SQL statement logging.",
+    "summaries": "3 Restored traced diagnostic repeats;1 Off traced and1 Restored timeliness-observer-disabled fresh control. Separate diagnostic vectors; no n5/p95, clean CPU or performance claim.",
+    "HTTP_timeout_seconds": 300,
+    "instrumentation": "Common SQL/GIL/DIRECT+compact+job capture in all five workflows. Only timeliness observer disabled for the control; instrumented response wall and separate post-HTTP drain.",
+    "tracing": "Actual keys and native decisions only. No key precompute, SQL condition probe, planner tuning, native wait, forced publication or original runtime/source edit."
+  },
+  "storage": {
+    "startup": 3221225472,
+    "between": 2684354560,
+    "stop": 2147483648,
+    "actual_free_at_build_bytes": 3596730368
+  },
+  "capacity": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-library-prefetch-performance-20261116/plan-v3/capacity.json",
+    "sha256": "6db45940d9633a4fc742f592746ff7cba09b59497374f37ce18f61874e31ac44"
+  },
+  "counts": {
+    "workflows": 5,
+    "Off_traced": 1,
+    "Restored_traced": 3,
+    "Restored_timeliness_disabled_control": 1,
+    "business_HTTP_per_workflow": 23
+  },
+  "gates": "Same native outputs/final state/restart/independent scenario/physical census/GIL/backend/cleanup. Fresh Off proof pairs all Restored runs. SQL/job/native counts reported; no exact asynchronous historical count gate.",
+  "preserved_failed_attempt": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-library-prefetch-performance-20261116/diagnostic-v1-failed-stopped.json",
+    "sha256": "cec1e2063dabd816297b2cc37f8f84c9e377c4d764f558aaa2db49c05dcd99a8"
+  },
+  "prior_results": "All30 n5 and28pagePDF immutable. These5diagnostic workflows are separate; appendix is additive.",
+  "SQL": "OriginalSQL/text/fingerprints+protocol metadata retained; original Bind values/raw packets not retained.",
+  "authorization": "User authorized this exact bounded LibraryLoans diagnostic; proceed after observational integration checks and no concrete blocker. Reviewer concurrent, not an added approval layer."
+}

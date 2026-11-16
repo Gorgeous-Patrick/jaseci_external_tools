@@ -1,0 +1,45 @@
+{
+  "passed": true,
+  "scope": "Narrow observer v2-to-v3 class-bearing exact-key codec source/check binding only. Prior seam/definition review carries; no native acceptance or new test/release gate.",
+  "manifest": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-library-prefetch-diagnostics-20261116/checkpoint-v3/manifest.json",
+    "sha256": "c098be47c53319f6b01105356aacdf677a61492a12f89534fb486f60d8153803"
+  },
+  "source": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-library-prefetch-diagnostics-20261116/checkpoint-v3/source/library_timeliness.py",
+    "sha256": "652eb9ba062a62ca5a343abd2acf7088ce7315f72d13056e5937e5b68a5cc25d",
+    "bytes": 18400
+  },
+  "contract": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-library-prefetch-diagnostics-20261116/checkpoint-v3/source/CONTRACT.md",
+    "sha256": "f4fddf970776279de067c68935cc0f00543e036bbf63a850e5da569b96cc756f",
+    "bytes": 4447
+  },
+  "owner_pure_checks": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-library-prefetch-diagnostics-20261116/observer-checks-v3.json",
+    "sha256": "fcb011da751adb44c5d3f7b7e63c21b617d111aa13c7edd88ad12d0ce11e4200"
+  },
+  "prior_definition_review": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/background-pushdown-library-timeliness-review-20261116/observer-v2-source-definition-review.json",
+    "sha256": "b0b4b103d0e72983b9e86347a8c4019e756cbcf2a6a254898f70b4e42d453340"
+  },
+  "failed_attempt": {
+    "path": "/home/baichuan/jaseci/project-notes/measurements/ttg-library-prefetch-performance-20261116/diagnostic-v1-failed-stopped.json",
+    "sha256": "cec1e2063dabd816297b2cc37f8f84c9e377c4d764f558aaa2db49c05dcd99a8"
+  },
+  "findings": [],
+  "verified": [
+    "Only typed class-bearing codec, guarded process-local registry in key/region encoding, three focused checks and contract clarification changed. Runtime, lookup, submission, scheduling, publication and drain wrappers unchanged.",
+    "Actual class objects are held by strong references, assigned stable per-process cN tokens under observer lock. Distinct actual classes with identical module/qualname stay distinct.",
+    "Display module/qualname reads use exact builtin type storage descriptors rather than custom metaclass getters. Encoding does not invoke repr/str or construct query/cache keys.",
+    "Native emitted shape ttg_templates210-249 contains actual edge/node classes, UUID origins, direction, supported Boolean predicates and actor; added fake-shape test matches it and distinguishes predicate changes.",
+    "Worker region and native key use the same codec registry. Digest indexes full typed definitions; identity is not inferred from SQL fingerprint or display name.",
+    "Prior16purechecks retained plus3classchecks; owner reports19PASS, reviewer inspected source/log references without rerun. Four frozen binding references unchanged."
+  ],
+  "qualifications": [
+    "Class token namespace is per process. Offline joins must include PID plus session/epoch/key, never equate cN across processes.",
+    "Preserved zero-accepted diagnostic-v1 failure is observer unsupported-class encoding, not established runtime failure. No old failed sample accepted.",
+    "Actual revised native run may reveal other unsupported shapes; no correctness/timeliness acceptance before new evidence."
+  ],
+  "next": "No concrete blocker in narrow codec delta; owner may retry exact authorized five in NEW plan/output. Quiet during window; actual evidence mapping after stopped proof."
+}
